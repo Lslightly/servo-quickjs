@@ -996,23 +996,7 @@ unsafe extern "C" {
     pub fn __JS_FreeValue(ctx: *mut JSContext, v: JSValue);
 }
 unsafe extern "C" {
-    #[link_name = "JS_FreeValue__sys"]
-    pub fn JS_FreeValue(ctx: *mut JSContext, v: JSValue);
-}
-unsafe extern "C" {
     pub fn __JS_FreeValueRT(rt: *mut JSRuntime, v: JSValue);
-}
-unsafe extern "C" {
-    #[link_name = "JS_FreeValueRT__sys"]
-    pub fn JS_FreeValueRT(rt: *mut JSRuntime, v: JSValue);
-}
-unsafe extern "C" {
-    #[link_name = "JS_DupValue__sys"]
-    pub fn JS_DupValue(ctx: *mut JSContext, v: JSValue) -> JSValue;
-}
-unsafe extern "C" {
-    #[link_name = "JS_DupValueRT__sys"]
-    pub fn JS_DupValueRT(rt: *mut JSRuntime, v: JSValue) -> JSValue;
 }
 unsafe extern "C" {
     pub fn JS_StrictEq(ctx: *mut JSContext, op1: JSValue, op2: JSValue) -> ::std::os::raw::c_int;

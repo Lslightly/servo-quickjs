@@ -22,10 +22,6 @@ int JS_IsUninitialized__sys(JSValue v) { return JS_IsUninitialized(v); }
 int JS_IsString__sys(JSValue v) { return JS_IsString(v); }
 int JS_IsSymbol__sys(JSValue v) { return JS_IsSymbol(v); }
 int JS_IsObject__sys(JSValue v) { return JS_IsObject(v); }
-void JS_FreeValue__sys(JSContext *ctx, JSValue v) { JS_FreeValue(ctx, v); }
-void JS_FreeValueRT__sys(JSRuntime *rt, JSValue v) { JS_FreeValueRT(rt, v); }
-JSValue JS_DupValue__sys(JSContext *ctx, JSValue v) { return JS_DupValue(ctx, v); }
-JSValue JS_DupValueRT__sys(JSRuntime *rt, JSValue v) { return JS_DupValueRT(rt, v); }
 int JS_ToUint32__sys(JSContext *ctx, uint32_t *pres, JSValue val) { return JS_ToUint32(ctx, pres, val); }
 JSValue JS_NewString__sys(JSContext *ctx, const char *str) { return JS_NewString(ctx, str); }
 const char * JS_ToCStringLen__sys(JSContext *ctx, size_t *plen, JSValue val1) { return JS_ToCStringLen(ctx, plen, val1); }

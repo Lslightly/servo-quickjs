@@ -44,6 +44,52 @@ impl JSValue {
     }
 }
 
+/// `__js_rc`: the reference count is stored just before the object.
+#[inline(always)]
+unsafe fn ref_count(v: JSValue) -> *mut i32 {
+    unsafe { (v.ptr() as *mut i32).sub(1) }
+}
+
+/// The `static inline` reference counting functions of quickjs.h, inlined into Rust callers.
+#[inline(always)]
+pub unsafe fn JS_DupValueRT(_rt: *mut JSRuntime, v: JSValue) -> JSValue {
+    if v.has_ref_count() {
+        unsafe { *ref_count(v) += 1 };
+    }
+    v
+}
+
+#[inline(always)]
+pub unsafe fn JS_DupValue(_ctx: *mut JSContext, v: JSValue) -> JSValue {
+    unsafe { JS_DupValueRT(std::ptr::null_mut(), v) }
+}
+
+#[inline(always)]
+pub unsafe fn JS_FreeValueRT(rt: *mut JSRuntime, v: JSValue) {
+    if v.has_ref_count() {
+        unsafe {
+            let count = ref_count(v);
+            *count -= 1;
+            if *count <= 0 {
+                __JS_FreeValueRT(rt, v);
+            }
+        }
+    }
+}
+
+#[inline(always)]
+pub unsafe fn JS_FreeValue(ctx: *mut JSContext, v: JSValue) {
+    if v.has_ref_count() {
+        unsafe {
+            let count = ref_count(v);
+            *count -= 1;
+            if *count <= 0 {
+                __JS_FreeValue(ctx, v);
+            }
+        }
+    }
+}
+
 pub const JS_NULL: JSValue = JSValue::mkval(JS_TAG_NULL, 0);
 pub const JS_UNDEFINED: JSValue = JSValue::mkval(JS_TAG_UNDEFINED, 0);
 pub const JS_FALSE: JSValue = JSValue::mkval(JS_TAG_BOOL, 0);
