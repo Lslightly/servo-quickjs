@@ -1284,6 +1284,7 @@ static void js_promise_finalizer(JSRuntime *rt, JSValue val);
 static void js_promise_mark(JSRuntime *rt, JSValueConst val,
                                 JS_MarkFunc *mark_func);
 static void js_promise_resolve_function_finalizer(JSRuntime *rt, JSValue val);
+static JSContext *js_promise_function_realm(JSObject *p);
 static void js_promise_resolve_function_mark(JSRuntime *rt, JSValueConst val,
                                 JS_MarkFunc *mark_func);
 
@@ -21078,6 +21079,12 @@ JSContext *JS_GetFunctionRealm(JSContext *ctx, JSValueConst func_obj)
             JSBoundFunction *bf = p->u.bound_function;
             realm = JS_GetFunctionRealm(ctx, bf->func_obj);
         }
+        break;
+    case JS_CLASS_PROMISE_RESOLVE_FUNCTION: /* Servo */
+    case JS_CLASS_PROMISE_REJECT_FUNCTION:
+        realm = js_promise_function_realm(p);
+        if (!realm)
+            realm = ctx;
         break;
     default:
         realm = ctx;
@@ -53836,6 +53843,7 @@ typedef struct JSPromiseFunctionDataResolved {
 typedef struct JSPromiseFunctionData {
     JSValue promise;
     JSPromiseFunctionDataResolved *presolved;
+    JSContext *realm; /* Servo: [[Realm]] of the function */
 } JSPromiseFunctionData;
 
 typedef struct JSPromiseReactionData {
@@ -54056,6 +54064,7 @@ static int js_create_resolving_functions(JSContext *ctx,
         sr->ref_count++;
         s->presolved = sr;
         s->promise = JS_DupValue(ctx, promise);
+        s->realm = JS_DupContext(ctx);
         JS_SetOpaque(obj, s);
         js_function_set_properties(ctx, obj, JS_ATOM_empty_string, 1);
         resolving_funcs[i] = obj;
@@ -54064,12 +54073,19 @@ static int js_create_resolving_functions(JSContext *ctx,
     return ret;
 }
 
+/* Servo: the realm of a promise resolving function, or NULL */
+static JSContext *js_promise_function_realm(JSObject *p)
+{
+    return p->u.promise_function_data ? p->u.promise_function_data->realm : NULL;
+}
+
 static void js_promise_resolve_function_finalizer(JSRuntime *rt, JSValue val)
 {
     JSPromiseFunctionData *s = JS_VALUE_GET_OBJ(val)->u.promise_function_data;
     if (s) {
         js_promise_resolve_function_free_resolved(rt, s->presolved);
         JS_FreeValueRT(rt, s->promise);
+        JS_FreeContext(s->realm);
         js_free_rt(rt, s);
     }
 }
@@ -54080,6 +54096,7 @@ static void js_promise_resolve_function_mark(JSRuntime *rt, JSValueConst val,
     JSPromiseFunctionData *s = JS_VALUE_GET_OBJ(val)->u.promise_function_data;
     if (s) {
         JS_MarkValue(rt, s->promise, mark_func);
+        mark_func(rt, &s->realm->header); /* Servo */
     }
 }
 
@@ -54098,6 +54115,8 @@ static JSValue js_promise_resolve_function_call(JSContext *ctx,
     s = p->u.promise_function_data;
     if (!s || s->presolved->already_resolved)
         return JS_UNDEFINED;
+    /* Servo: like other built-in functions, they run in their own realm */
+    ctx = s->realm;
     s->presolved->already_resolved = TRUE;
     is_reject = p->class_id - JS_CLASS_PROMISE_RESOLVE_FUNCTION;
     if (argc > 0)
@@ -62782,6 +62801,9 @@ JSContext *JS_GetObjectRealm(JSValueConst obj)
             JSProxyData *s = p->u.opaque;
             return s ? s->realm : NULL;
         }
+    case JS_CLASS_PROMISE_RESOLVE_FUNCTION:
+    case JS_CLASS_PROMISE_REJECT_FUNCTION:
+        return js_promise_function_realm(p);
     default:
         return NULL;
     }
