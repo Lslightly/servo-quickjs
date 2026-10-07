@@ -1036,6 +1036,8 @@ typedef int JSCanCompileStringsHook(JSContext *ctx, JSCompileKindEnum kind,
                                     void *opaque);
 void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
                                  void *opaque);
+/* Servo: the realm 'obj' was created in, where known (functions and proxies); NULL otherwise */
+JSContext *JS_GetObjectRealm(JSValueConst obj);
 /* Servo: debug hook called when an object is freed, before its finalizer */
 typedef void JSFreeObjectHook(JSRuntime *rt, JSValueConst obj);
 void JS_SetFreeObjectHook(JSRuntime *rt, JSFreeObjectHook *hook);

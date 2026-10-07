@@ -781,6 +781,7 @@ typedef struct JSProxyData {
     JSValue handler;
     uint8_t is_func;
     uint8_t is_revoked;
+    JSContext *realm; /* Servo: the realm the proxy was created in */
 } JSProxyData;
 
 typedef struct JSArrayBuffer {
@@ -8437,7 +8438,6 @@ JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
                 if (em) {
                     if (em->get_property) {
                         JSValue obj1, retval;
-                        /* XXX: should pass throw_ref_error */
                         /* Note: if 'p' is a prototype, it can be
                            freed in the called function */
                         obj1 = JS_DupValue(ctx, JS_MKPTR(JS_TAG_OBJECT, p));
@@ -51000,6 +51000,7 @@ static void js_proxy_finalizer(JSRuntime *rt, JSValue val)
     if (s) {
         JS_FreeValueRT(rt, s->target);
         JS_FreeValueRT(rt, s->handler);
+        JS_FreeContext(s->realm); /* Servo */
         js_free_rt(rt, s);
     }
 }
@@ -51011,6 +51012,7 @@ static void js_proxy_mark(JSRuntime *rt, JSValueConst val,
     if (s) {
         JS_MarkValue(rt, s->target, mark_func);
         JS_MarkValue(rt, s->handler, mark_func);
+        mark_func(rt, &s->realm->header); /* Servo */
     }
 }
 
@@ -51911,6 +51913,7 @@ static JSValue js_proxy_constructor(JSContext *ctx, JSValueConst this_val,
     s->handler = JS_DupValue(ctx, handler);
     s->is_func = JS_IsFunction(ctx, target);
     s->is_revoked = FALSE;
+    s->realm = JS_DupContext(ctx); /* Servo */
     JS_SetOpaque(obj, s);
     JS_SetConstructorBit(ctx, obj, JS_IsConstructor(ctx, target));
     return obj;
@@ -62599,4 +62602,34 @@ JSValue JS_NewResizableArrayBufferCopy(JSContext *ctx, const uint8_t *buf, size_
 void JS_SetFreeObjectHook(JSRuntime *rt, JSFreeObjectHook *hook)
 {
     rt->free_object_hook = hook;
+}
+
+/* Servo: the realm an object was created in, where QuickJS records it:
+   functions, bound functions and proxies (Q13). Never throws. */
+
+JSContext *JS_GetObjectRealm(JSValueConst obj)
+{
+    JSObject *p;
+
+    if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT)
+        return NULL;
+    p = JS_VALUE_GET_OBJ(obj);
+    switch(p->class_id) {
+    case JS_CLASS_C_FUNCTION:
+        return p->u.cfunc.realm;
+    case JS_CLASS_BYTECODE_FUNCTION:
+    case JS_CLASS_GENERATOR_FUNCTION:
+    case JS_CLASS_ASYNC_FUNCTION:
+    case JS_CLASS_ASYNC_GENERATOR_FUNCTION:
+        return p->u.func.function_bytecode->realm;
+    case JS_CLASS_BOUND_FUNCTION:
+        return JS_GetObjectRealm(p->u.bound_function->func_obj);
+    case JS_CLASS_PROXY:
+        {
+            JSProxyData *s = p->u.opaque;
+            return s ? s->realm : NULL;
+        }
+    default:
+        return NULL;
+    }
 }

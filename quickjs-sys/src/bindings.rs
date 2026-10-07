@@ -1707,6 +1707,9 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+unsafe extern "C" {
+    pub fn JS_GetObjectRealm(obj: JSValue) -> *mut JSContext;
+}
 pub type JSFreeObjectHook =
     ::std::option::Option<unsafe extern "C" fn(rt: *mut JSRuntime, obj: JSValue)>;
 unsafe extern "C" {
