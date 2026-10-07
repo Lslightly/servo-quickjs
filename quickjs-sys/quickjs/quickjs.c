@@ -8441,6 +8441,18 @@ JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
                         /* Note: if 'p' is a prototype, it can be
                            freed in the called function */
                         obj1 = JS_DupValue(ctx, JS_MKPTR(JS_TAG_OBJECT, p));
+                        /* Servo: an unresolvable reference throws even when
+                           the global's prototype chain has an exotic object
+                           (HasBinding before GetBindingValue) */
+                        if (throw_ref_error && em->has_property) {
+                            int ret = em->has_property(ctx, obj1, prop);
+                            if (ret <= 0) {
+                                JS_FreeValue(ctx, obj1);
+                                if (ret < 0)
+                                    return JS_EXCEPTION;
+                                return JS_ThrowReferenceErrorNotDefined(ctx, prop);
+                            }
+                        }
                         retval = em->get_property(ctx, obj1, prop, this_obj);
                         JS_FreeValue(ctx, obj1);
                         return retval;
