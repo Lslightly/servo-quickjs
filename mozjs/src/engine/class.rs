@@ -13,6 +13,7 @@ use std::collections::HashMap;
 use std::ffi::{c_int, c_void};
 use std::ptr;
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use quickjs_sys as q;
 
@@ -64,6 +65,9 @@ struct Registry {
 
 static REGISTRY: Mutex<Option<Registry>> = Mutex::new(None);
 
+/// `Registry::by_id` for small ids, readable without the lock: `object_data` is on every DOM call.
+static CLASPS_BY_ID: [AtomicUsize; 8192] = [const { AtomicUsize::new(0) }; 8192];
+
 fn with_registry<R>(f: impl FnOnce(&mut Registry) -> R) -> R {
     let mut guard = REGISTRY.lock().unwrap();
     f(guard.get_or_insert_with(Default::default))
@@ -85,6 +89,9 @@ pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass
             let mut id = 0;
             q::JS_NewClassID(&mut id);
             r.by_id.insert(id, clasp as usize);
+            if let Some(slot) = CLASPS_BY_ID.get(id as usize) {
+                slot.store(clasp as usize, Ordering::Release);
+            }
             id
         })
     });
@@ -104,11 +111,16 @@ pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass
     id
 }
 
+#[inline]
 fn clasp_of_id(id: q::JSClassID) -> *const root::JSClass {
-    with_registry(|r| r.by_id.get(&id).copied().unwrap_or(0) as *const root::JSClass)
+    match CLASPS_BY_ID.get(id as usize) {
+        Some(slot) => slot.load(Ordering::Acquire) as *const root::JSClass,
+        None => with_registry(|r| r.by_id.get(&id).copied().unwrap_or(0) as *const root::JSClass),
+    }
 }
 
 /// The object data of `obj`, if it is an object of a SpiderMonkey class (globals included).
+#[inline]
 pub(crate) unsafe fn object_data<'a>(obj: *mut root::JSObject) -> Option<&'a mut ObjectData> {
     let v = obj_val(obj);
     let id = q::JS_GetClassID(v);
