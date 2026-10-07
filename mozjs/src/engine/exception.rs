@@ -11,12 +11,23 @@ use super::Cx;
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
+/// Clears an uncatchable exception (script termination, e.g. by an interrupt callback): for
+/// SpiderMonkey, termination is a failure without a pending exception.
+unsafe fn clear_uncatchable(cx: &Cx) {
+    if q::JS_HasUncatchableException(cx.qctx()) != 0 {
+        q::JS_FreeValueRT(cx.rt, q::JS_GetException(cx.qctx()));
+    }
+}
+
 pub(crate) unsafe fn JS_IsExceptionPending(cx: *mut root::JSContext) -> bool {
-    q::JS_HasException(Cx::from_raw(cx).qctx()) != 0
+    let cx = Cx::from_raw(cx);
+    clear_uncatchable(cx);
+    q::JS_HasException(cx.qctx()) != 0
 }
 
 pub(crate) unsafe fn JS_GetPendingException(cx: *mut root::JSContext, vp: root::JS::MutableHandleValue) -> bool {
     let cx = Cx::from_raw(cx);
+    clear_uncatchable(cx);
     let qctx = cx.qctx();
     if q::JS_HasException(qctx) == 0 {
         return false;
