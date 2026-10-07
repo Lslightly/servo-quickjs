@@ -1582,6 +1582,36 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+unsafe extern "C" {
+    pub fn JS_PromiseResolve(
+        ctx: *mut JSContext,
+        value: JSValue,
+        is_reject: ::std::os::raw::c_int,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_SettlePromise(
+        ctx: *mut JSContext,
+        promise: JSValue,
+        value: JSValue,
+        is_reject: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_PerformPromiseThen(
+        ctx: *mut JSContext,
+        promise: JSValue,
+        on_fulfilled: JSValue,
+        on_rejected: JSValue,
+        create_result: ::std::os::raw::c_int,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetPromiseIsHandled(promise: JSValue) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_SetPromiseIsHandled(promise: JSValue, is_handled: ::std::os::raw::c_int);
+}
 pub type JSInterruptHandler = ::std::option::Option<
     unsafe extern "C" fn(
         rt: *mut JSRuntime,
@@ -1682,6 +1712,22 @@ unsafe extern "C" {
         argc: ::std::os::raw::c_int,
         argv: *mut JSValue,
     ) -> ::std::os::raw::c_int;
+}
+pub type JSEnqueueJobHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        job_func: JSJobFunc,
+        argc: ::std::os::raw::c_int,
+        argv: *mut JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_SetEnqueueJobHook(
+        rt: *mut JSRuntime,
+        hook: JSEnqueueJobHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
 }
 unsafe extern "C" {
     pub fn JS_IsJobPending(rt: *mut JSRuntime) -> ::std::os::raw::c_int;

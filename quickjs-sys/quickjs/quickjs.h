@@ -968,6 +968,18 @@ typedef void JSHostPromiseRejectionTracker(JSContext *ctx, JSValueConst promise,
                                            JSValueConst reason,
                                            JS_BOOL is_handled, void *opaque);
 void JS_SetHostPromiseRejectionTracker(JSRuntime *rt, JSHostPromiseRejectionTracker *cb, void *opaque);
+/* Servo: promise operations of the SpiderMonkey API. JS_PromiseResolve() is
+   %Promise%.resolve() / %Promise%.reject(). JS_SettlePromise() resolves or rejects a
+   pending promise (no-op otherwise). JS_PerformPromiseThen() adds reactions; without
+   'create_result' it returns JS_UNDEFINED and the handlers' results are ignored. */
+JSValue JS_PromiseResolve(JSContext *ctx, JSValueConst value, JS_BOOL is_reject);
+int JS_SettlePromise(JSContext *ctx, JSValueConst promise, JSValueConst value,
+                     JS_BOOL is_reject);
+JSValue JS_PerformPromiseThen(JSContext *ctx, JSValueConst promise,
+                              JSValueConst on_fulfilled, JSValueConst on_rejected,
+                              JS_BOOL create_result);
+JS_BOOL JS_GetPromiseIsHandled(JSValueConst promise);
+void JS_SetPromiseIsHandled(JSValueConst promise, JS_BOOL is_handled);
 
 /* return != 0 if the JS code needs to be interrupted */
 typedef int JSInterruptHandler(JSRuntime *rt, void *opaque);
@@ -1020,6 +1032,11 @@ JSValue JS_GetModuleNamespace(JSContext *ctx, JSModuleDef *m);
 
 typedef JSValue JSJobFunc(JSContext *ctx, int argc, JSValueConst *argv);
 int JS_EnqueueJob(JSContext *ctx, JSJobFunc *job_func, int argc, JSValueConst *argv);
+/* Servo: if set, the jobs of JS_EnqueueJob() (promise jobs) are passed to the hook
+   instead of the internal job list. 'argv' is borrowed. Return < 0 on exception. */
+typedef int JSEnqueueJobHook(JSContext *ctx, JSJobFunc *job_func, int argc,
+                             JSValueConst *argv, void *opaque);
+void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque);
 
 JS_BOOL JS_IsJobPending(JSRuntime *rt);
 int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx);

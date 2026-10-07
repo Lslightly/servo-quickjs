@@ -364,6 +364,9 @@ struct JSRuntime {
     void *host_promise_rejection_tracker_opaque;
 
     struct list_head job_list; /* list of JSJobEntry.link */
+    /* Servo: host job queue */
+    JSEnqueueJobHook *enqueue_job_hook;
+    void *enqueue_job_opaque;
 
     JSModuleNormalizeFunc *module_normalize_func;
     BOOL module_loader_has_attr;
@@ -2267,6 +2270,9 @@ static int JS_EnqueueJob2(JSContext *ctx, JSJobFunc *job_func,
     JSJobEntry *e;
     int i;
 
+    /* Servo: promise jobs go to the host's job queue */
+    if (!no_exception && rt->enqueue_job_hook)
+        return rt->enqueue_job_hook(ctx, job_func, argc, argv, rt->enqueue_job_opaque);
     if (no_exception)
         e = js_malloc_rt(ctx->rt, sizeof(*e) + argc * sizeof(JSValue));
     else
@@ -61859,4 +61865,80 @@ size_t JS_GetStringData(JSValueConst str, const void **pdata, int *pwide)
     else
         *pdata = p->u.str8;
     return p->len;
+}
+
+/* Servo: host job queue and the promise operations of the SpiderMonkey API (Q4). */
+
+void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque)
+{
+    rt->enqueue_job_hook = hook;
+    rt->enqueue_job_opaque = opaque;
+}
+
+JSValue JS_PromiseResolve(JSContext *ctx, JSValueConst value, BOOL is_reject)
+{
+    return js_promise_resolve(ctx, ctx->promise_ctor, 1, &value, is_reject);
+}
+
+int JS_SettlePromise(JSContext *ctx, JSValueConst promise, JSValueConst value,
+                     BOOL is_reject)
+{
+    JSPromiseData *s = JS_GetOpaque2(ctx, promise, JS_CLASS_PROMISE);
+    JSValue resolving_funcs[2], ret;
+
+    if (!s)
+        return -1;
+    if (s->promise_state != JS_PROMISE_PENDING)
+        return 0;
+    if (js_create_resolving_functions(ctx, resolving_funcs, promise) < 0)
+        return -1;
+    ret = JS_Call(ctx, resolving_funcs[is_reject], JS_UNDEFINED, 1, &value);
+    JS_FreeValue(ctx, resolving_funcs[0]);
+    JS_FreeValue(ctx, resolving_funcs[1]);
+    if (JS_IsException(ret))
+        return -1;
+    JS_FreeValue(ctx, ret);
+    return 0;
+}
+
+JSValue JS_PerformPromiseThen(JSContext *ctx, JSValueConst promise,
+                              JSValueConst on_fulfilled, JSValueConst on_rejected,
+                              BOOL create_result)
+{
+    JSValue result = JS_UNDEFINED;
+    JSValue resolving_funcs[2] = { JS_UNDEFINED, JS_UNDEFINED };
+    JSValueConst handlers[2];
+    int ret;
+
+    if (!JS_GetOpaque2(ctx, promise, JS_CLASS_PROMISE))
+        return JS_EXCEPTION;
+    if (create_result) {
+        result = js_new_promise_capability(ctx, resolving_funcs, JS_UNDEFINED);
+        if (JS_IsException(result))
+            return result;
+    }
+    handlers[0] = on_fulfilled;
+    handlers[1] = on_rejected;
+    ret = perform_promise_then(ctx, promise, handlers,
+                               (JSValueConst *)resolving_funcs);
+    JS_FreeValue(ctx, resolving_funcs[0]);
+    JS_FreeValue(ctx, resolving_funcs[1]);
+    if (ret) {
+        JS_FreeValue(ctx, result);
+        return JS_EXCEPTION;
+    }
+    return result;
+}
+
+BOOL JS_GetPromiseIsHandled(JSValueConst promise)
+{
+    JSPromiseData *s = JS_GetOpaque(promise, JS_CLASS_PROMISE);
+    return s && s->is_handled;
+}
+
+void JS_SetPromiseIsHandled(JSValueConst promise, BOOL is_handled)
+{
+    JSPromiseData *s = JS_GetOpaque(promise, JS_CLASS_PROMISE);
+    if (s)
+        s->is_handled = is_handled;
 }
