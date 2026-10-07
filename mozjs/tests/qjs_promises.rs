@@ -339,15 +339,17 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
 }
 
 thread_local!(static MUTED: RefCell<Vec<bool>> = const { RefCell::new(Vec::new()) });
+thread_local!(static TRACKER_GLOBALS: RefCell<Vec<*mut JSObject>> = const { RefCell::new(Vec::new()) });
 
 unsafe extern "C" fn track_rejection(
-    _: *mut RawJSContext,
+    cx: *mut RawJSContext,
     muted_errors: bool,
     promise: HandleObject,
     state: PromiseRejectionHandlingState,
     data: *mut c_void,
 ) {
     MUTED.with(|m| m.borrow_mut().push(muted_errors));
+    TRACKER_GLOBALS.with(|g| g.borrow_mut().push(jsapi::CurrentGlobalOrNull(cx)));
     assert!(jsapi::IsPromiseObject(promise));
     let log = &*(data as *const RefCell<Vec<PromiseRejectionHandlingState>>);
     log.borrow_mut().push(state);
@@ -413,6 +415,21 @@ fn rejection_tracker(cx: &mut JSContext, global: SafeHandleObject) {
         evaluate_script(cx, global, "Promise.reject(4); eval('Promise.reject(5)')", rval.handle_mut(), options).unwrap();
         eval(cx, global, "Promise.reject(6)").unwrap();
         assert_eq!(MUTED.with(|m| m.borrow().clone()), [true, true, false]);
+
+        // The resolving functions of a promise run in the realm that created them.
+        rooted!(&in(cx) let other = JS_NewGlobalObject(
+            cx,
+            &SIMPLE_GLOBAL_CLASS,
+            ptr::null_mut(),
+            OnNewGlobalHookOption::FireOnNewGlobalHook,
+            &*RealmOptions::default(),
+        ));
+        let other_val = ObjectValue(other.get());
+        assert!(jsapi::JS_DefineProperty(cx.raw_cx(), handle(&global.get()), c"other".as_ptr(), handle(&other_val), 0));
+        TRACKER_GLOBALS.with(|g| g.borrow_mut().clear());
+        eval(cx, global, "new other.Promise((_, reject) => reject(7))").unwrap();
+        eval(cx, global, "Promise.reject(8)").unwrap();
+        assert_eq!(TRACKER_GLOBALS.with(|g| g.borrow().clone()), [other.get(), global.get()]);
         jsapi::SetPromiseRejectionTrackerCallback(cx.raw_cx(), None, ptr::null_mut());
     }
 }
