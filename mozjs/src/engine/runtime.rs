@@ -31,6 +31,7 @@ pub(crate) unsafe fn JS_NewContext(maxbytes: u32, parentRuntime: *mut root::JSRu
         pool: Vec::new(),
         atom_pool: Vec::new(),
         warning_reporter: None,
+        hooks: Default::default(),
     }));
     q::JS_SetRuntimeOpaque(rt, cx as *mut _);
     set_current(cx);
