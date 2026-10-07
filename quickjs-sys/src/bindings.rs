@@ -1234,6 +1234,15 @@ unsafe extern "C" {
     pub fn JS_GetPrototype(ctx: *mut JSContext, val: JSValue) -> JSValue;
 }
 unsafe extern "C" {
+    pub fn JS_GetStaticPrototype(ctx: *mut JSContext, obj: JSValue) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_SetImmutablePrototype(ctx: *mut JSContext, obj: JSValue);
+}
+unsafe extern "C" {
+    pub fn JS_GetFunctionRealm(ctx: *mut JSContext, func_obj: JSValue) -> *mut JSContext;
+}
+unsafe extern "C" {
     pub fn JS_GetOwnPropertyNames(
         ctx: *mut JSContext,
         ptab: *mut *mut JSPropertyEnum,
