@@ -375,6 +375,8 @@ struct JSRuntime {
     /* Servo: host check for eval() and Function() */
     JSCanCompileStringsHook *can_compile_strings_hook;
     void *can_compile_strings_opaque;
+    /* Servo: debug hook called when an object is freed */
+    JSFreeObjectHook *free_object_hook;
 
     JSModuleNormalizeFunc *module_normalize_func;
     BOOL module_loader_has_attr;
@@ -6419,6 +6421,8 @@ static void free_object(JSRuntime *rt, JSObject *p)
 
     p->free_mark = 1; /* used to tell the object is invalid when
                          freeing cycles */
+    if (unlikely(rt->free_object_hook)) /* Servo */
+        rt->free_object_hook(rt, JS_MKPTR(JS_TAG_OBJECT, p));
     /* free all the fields */
     sh = p->shape;
     pr = get_shape_prop(sh);
@@ -62588,4 +62592,11 @@ JSValue JS_NewResizableArrayBufferCopy(JSContext *ctx, const uint8_t *buf, size_
     return js_array_buffer_constructor3(ctx, JS_UNDEFINED, len, &max,
                                         JS_CLASS_ARRAY_BUFFER, (uint8_t *)buf,
                                         js_array_buffer_free, NULL, TRUE);
+}
+
+/* Servo: debug hook called when an object is freed, before its finalizer (Q12). */
+
+void JS_SetFreeObjectHook(JSRuntime *rt, JSFreeObjectHook *hook)
+{
+    rt->free_object_hook = hook;
 }

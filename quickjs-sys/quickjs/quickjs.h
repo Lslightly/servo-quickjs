@@ -1036,6 +1036,9 @@ typedef int JSCanCompileStringsHook(JSContext *ctx, JSCompileKindEnum kind,
                                     void *opaque);
 void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
                                  void *opaque);
+/* Servo: debug hook called when an object is freed, before its finalizer */
+typedef void JSFreeObjectHook(JSRuntime *rt, JSValueConst obj);
+void JS_SetFreeObjectHook(JSRuntime *rt, JSFreeObjectHook *hook);
 /* if can_block is TRUE, Atomics.wait() can be used */
 void JS_SetCanBlock(JSRuntime *rt, JS_BOOL can_block);
 /* select which debug info is stripped from the compiled code */

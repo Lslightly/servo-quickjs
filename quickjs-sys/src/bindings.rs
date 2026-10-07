@@ -1707,6 +1707,11 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+pub type JSFreeObjectHook =
+    ::std::option::Option<unsafe extern "C" fn(rt: *mut JSRuntime, obj: JSValue)>;
+unsafe extern "C" {
+    pub fn JS_SetFreeObjectHook(rt: *mut JSRuntime, hook: JSFreeObjectHook);
+}
 unsafe extern "C" {
     pub fn JS_SetCanBlock(rt: *mut JSRuntime, can_block: ::std::os::raw::c_int);
 }
