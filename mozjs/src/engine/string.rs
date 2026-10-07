@@ -18,7 +18,7 @@ use super::{obj_val, Cx};
 use crate::sys::glue;
 use crate::sys::jsapi as root;
 use crate::sys::jsid::{from_atom, IntId};
-use crate::sys::jsval::{Int32Value, StringValue, UndefinedValue};
+use crate::sys::jsval::{Int32Value, JSVal, StringValue, UndefinedValue};
 
 extern "C" {
     // ID_Start / ID_Continue from QuickJS's libunicode.
@@ -957,4 +957,125 @@ pub(crate) unsafe fn JS_IsIdentifier(cx: *mut root::JSContext, str_: root::JS::H
 
 pub(crate) unsafe fn JS_IsIdentifier1(chars: *const u16, length: usize) -> bool {
     is_identifier(raw_slice(chars, length).iter().copied())
+}
+
+// JSON.
+
+/// `JSON.parse(text, reviver)`; consumes `text`.
+unsafe fn parse_json(cx: &mut Cx, text: q::JSValue, reviver: q::JSValue, vp: root::JS::MutableHandleValue) -> bool {
+    if text.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    let qctx = cx.qctx();
+    let v = if q::JS_IsFunction(qctx, reviver) != 0 {
+        let global = q::JS_GetGlobalObject(qctx);
+        let json = q::JS_GetPropertyStr(qctx, global, c"JSON".as_ptr());
+        let parse = q::JS_GetPropertyStr(qctx, json, c"parse".as_ptr());
+        let mut args = [text, reviver];
+        let v = q::JS_Call(qctx, parse, json, 2, args.as_mut_ptr());
+        for v in [parse, json, global] {
+            q::JS_FreeValueRT(cx.rt, v);
+        }
+        v
+    } else {
+        let mut len = 0;
+        let buf = q::JS_ToCStringLen2(qctx, &mut len, text, 0);
+        if buf.is_null() {
+            q::JS_EXCEPTION
+        } else {
+            let v = q::JS_ParseJSON(qctx, buf, len, c"<input>".as_ptr());
+            q::JS_FreeCString(qctx, buf);
+            v
+        }
+    };
+    q::JS_FreeValueRT(cx.rt, text);
+    if v.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    *vp.ptr = cx.adopt(v);
+    true
+}
+
+pub(crate) unsafe fn JS_ParseJSON(cx: *mut root::JSContext, chars: *const u16, len: u32, vp: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let chars = raw_slice(chars, len as usize);
+    let text = q::JS_NewStringUTF16(cx.qctx(), chars.as_ptr(), chars.len());
+    parse_json(cx, text, q::JS_UNDEFINED, vp)
+}
+
+pub(crate) unsafe fn JS_ParseJSON1(cx: *mut root::JSContext, str_: root::JS::Handle<*mut root::JSString>, vp: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let text = q::JS_DupValueRT(cx.rt, str_val(*str_.ptr));
+    parse_json(cx, text, q::JS_UNDEFINED, vp)
+}
+
+pub(crate) unsafe fn JS_ParseJSON2(cx: *mut root::JSContext, chars: *const root::JS::Latin1Char, len: u32, vp: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let chars = raw_slice(chars, len as usize);
+    let text = q::JS_NewStringLatin1(cx.qctx(), chars.as_ptr(), chars.len());
+    parse_json(cx, text, q::JS_UNDEFINED, vp)
+}
+
+pub(crate) unsafe fn JS_ParseJSONWithReviver(cx: *mut root::JSContext, chars: *const u16, len: u32, reviver: root::JS::Handle<root::JS::Value>, vp: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let chars = raw_slice(chars, len as usize);
+    let text = q::JS_NewStringUTF16(cx.qctx(), chars.as_ptr(), chars.len());
+    parse_json(cx, text, (*reviver.ptr).to_qjs(), vp)
+}
+
+pub(crate) unsafe fn JS_ParseJSONWithReviver1(cx: *mut root::JSContext, str_: root::JS::Handle<*mut root::JSString>, reviver: root::JS::Handle<root::JS::Value>, vp: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let text = q::JS_DupValueRT(cx.rt, str_val(*str_.ptr));
+    parse_json(cx, text, (*reviver.ptr).to_qjs(), vp)
+}
+
+/// `JSON.stringify(value, replacer, space)`, handed to `callback` in one piece. An undefined
+/// result is written as "null" if `undefined_as_null`, and not written otherwise.
+unsafe fn stringify(cx: &mut Cx, value: JSVal, replacer: *mut root::JSObject, space: JSVal, callback: root::JSONWriteCallback, data: *mut c_void, undefined_as_null: bool) -> bool {
+    let replacer = if replacer.is_null() { q::JS_UNDEFINED } else { obj_val(replacer) };
+    let s = q::JS_JSONStringify(cx.qctx(), value.to_qjs(), replacer, space.to_qjs());
+    let units = match s.tag() {
+        q::JS_TAG_EXCEPTION => return false,
+        q::JS_TAG_UNDEFINED if !undefined_as_null => return true,
+        q::JS_TAG_UNDEFINED => "null".encode_utf16().collect(),
+        _ => Chars::of(cx.adopt(s).to_string()).to_utf16(),
+    };
+    match callback {
+        Some(callback) => callback(units.as_ptr(), units.len() as u32, data),
+        None => true,
+    }
+}
+
+unsafe fn handle_obj(h: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+    if h.ptr.is_null() {
+        ptr::null_mut()
+    } else {
+        *h.ptr
+    }
+}
+
+unsafe fn handle_val(h: root::JS::Handle<root::JS::Value>) -> JSVal {
+    if h.ptr.is_null() {
+        UndefinedValue()
+    } else {
+        *h.ptr
+    }
+}
+
+pub(crate) unsafe fn JS_Stringify(cx: *mut root::JSContext, value: root::JS::MutableHandle<root::JS::Value>, replacer: root::JS::Handle<*mut root::JSObject>, space: root::JS::Handle<root::JS::Value>, callback: root::JSONWriteCallback, data: *mut ::std::os::raw::c_void) -> bool {
+    stringify(Cx::from_raw(cx), *value.ptr, handle_obj(replacer), handle_val(space), callback, data, true)
+}
+
+pub(crate) unsafe fn JS_StringifyWithLengthHint(cx: *mut root::JSContext, value: root::JS::MutableHandle<root::JS::Value>, replacer: root::JS::Handle<*mut root::JSObject>, space: root::JS::Handle<root::JS::Value>, callback: root::JSONWriteCallback, data: *mut ::std::os::raw::c_void, lengthHint: usize) -> bool {
+    let _ = lengthHint;
+    stringify(Cx::from_raw(cx), *value.ptr, handle_obj(replacer), handle_val(space), callback, data, true)
+}
+
+pub(crate) unsafe fn ToJSON(cx: *mut root::JSContext, value: root::JS::Handle<root::JS::Value>, replacer: root::JS::Handle<*mut root::JSObject>, space: root::JS::Handle<root::JS::Value>, callback: root::JSONWriteCallback, data: *mut ::std::os::raw::c_void) -> bool {
+    stringify(Cx::from_raw(cx), handle_val(value), handle_obj(replacer), handle_val(space), callback, data, false)
+}
+
+pub(crate) unsafe fn ToJSONMaybeSafely(cx: *mut root::JSContext, input: root::JS::Handle<*mut root::JSObject>, callback: root::JSONWriteCallback, data: *mut ::std::os::raw::c_void) -> bool {
+    let value = JSVal::from_qjs(obj_val(*input.ptr));
+    stringify(Cx::from_raw(cx), value, ptr::null_mut(), UndefinedValue(), callback, data, false)
 }
