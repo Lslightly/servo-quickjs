@@ -752,7 +752,8 @@ fn transfer_array_buffer() {
             global,
             "var b = new ArrayBuffer(8); new Uint8Array(b).set([9, 8, 7]);
              var r = new ArrayBuffer(2, { maxByteLength: 8 });
-             ({ b, view: new Uint8Array(b, 1, 2), r })",
+             ({ b, view: new Uint8Array(b, 1, 2), r, tracking: new Uint16Array(r), dv: new DataView(r, 1),
+                fixed: new Uint8Array(r, 0, 2) })",
         );
         let transfer = eval(cx, global, "[b, r]");
         let bytes = write(cx, input, transfer).unwrap();
@@ -770,6 +771,12 @@ fn transfer_array_buffer() {
             "out.view.buffer === out.b && out.view[0] === 8 && out.view.byteOffset === 1",
         );
         check(cx, global, "out.r.resizable && out.r.maxByteLength === 8");
+        // Length-tracking views stay length-tracking.
+        check(
+            cx,
+            global,
+            "out.r.resize(6); out.tracking.length === 3 && out.dv.byteLength === 5 && out.fixed.length === 2",
+        );
         // Each copy of the bytes can be read once.
         assert!(read(cx, &bytes).is_some());
 

@@ -65,6 +65,8 @@ const T_SET: u8 = 20;
 const T_ERROR: u8 = 21;
 const T_ARRAY_BUFFER: u8 = 22;
 const T_TYPED_ARRAY: u8 = 23;
+/// The length of a length-tracking view.
+const TRACKING_LENGTH: u64 = u64::MAX;
 const T_DATA_VIEW: u8 = 24;
 const T_HOST: u8 = 25;
 
@@ -715,18 +717,20 @@ impl Writer {
     }
 
     /// A typed array (type, length) or DataView (byte length), its buffer, and the byte offset.
+    /// Length-tracking views have the length `TRACKING_LENGTH`.
     unsafe fn write_view(&mut self, kind: q::JSBufferKind, info: &q::JSBufferInfo) -> bool {
         if info.detached != 0 || info.data.is_null() {
             return self.report(root::JS_SCERR_TYPED_ARRAY_DETACHED);
         }
+        let tracking = info.length_tracking != 0;
         if kind == q::JS_BUFFER_TYPED_ARRAY {
             let ty = info.type_ as usize;
             self.put_u8(T_TYPED_ARRAY);
             self.put_u8(ty as u8);
-            self.put_u64((info.byte_length / ELEMENT_SIZES[ty]) as u64);
+            self.put_u64(if tracking { TRACKING_LENGTH } else { (info.byte_length / ELEMENT_SIZES[ty]) as u64 });
         } else {
             self.put_u8(T_DATA_VIEW);
-            self.put_u64(info.byte_length as u64);
+            self.put_u64(if tracking { TRACKING_LENGTH } else { info.byte_length as u64 });
         }
         if !self.write_value(info.buffer) {
             return false;
@@ -1253,11 +1257,17 @@ impl<'a> Reader<'a> {
             self.bad(c"view without an ArrayBuffer");
             return None;
         }
+        let tracking = length == TRACKING_LENGTH;
+        if tracking && info.resizable == 0 {
+            self.bad(c"length-tracking view of a fixed-length buffer");
+            return None;
+        }
         let view = if tag == T_TYPED_ARRAY {
-            let mut args = [buffer.v, q::JS_NewInt64(ctx, offset as i64), q::JS_NewInt64(ctx, length as i64)];
+            let length = if tracking { q::JS_UNDEFINED } else { q::JS_NewInt64(ctx, length as i64) };
+            let mut args = [buffer.v, q::JS_NewInt64(ctx, offset as i64), length];
             q::JS_NewTypedArray(ctx, 3, args.as_mut_ptr(), ty as q::JSTypedArrayEnum)
         } else {
-            q::JS_NewDataView(ctx, buffer.v, offset as usize, length as usize)
+            q::JS_NewDataView(ctx, buffer.v, offset as usize, if tracking { usize::MAX } else { length as usize })
         };
         let view = self.owned(view)?;
         self.fill(index, &view);
