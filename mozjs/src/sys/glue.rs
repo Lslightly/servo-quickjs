@@ -6,7 +6,7 @@ mod generated {
     #![allow(non_camel_case_types)]
     #![allow(non_snake_case)]
     #![allow(unnecessary_transmutes)]
-    include!("generated/gluebindings.rs");
+    include!(concat!(env!("OUT_DIR"), "/gluebindings.rs"));
 }
 
 use core::mem;

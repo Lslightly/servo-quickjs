@@ -20,20 +20,34 @@ use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
 mod atom;
+mod buffer;
 mod class;
+mod error;
 mod eval;
 mod exception;
+mod misc;
+mod object;
+mod promise;
 mod property;
+mod proxy;
 mod realm;
 mod runtime;
+mod string;
 
 pub(crate) use atom::*;
+pub(crate) use buffer::*;
 pub(crate) use class::*;
+pub(crate) use error::*;
 pub(crate) use eval::*;
 pub(crate) use exception::*;
+pub(crate) use misc::*;
+pub(crate) use object::*;
+pub(crate) use promise::*;
 pub(crate) use property::*;
+pub(crate) use proxy::*;
 pub(crate) use realm::*;
 pub(crate) use runtime::*;
+pub(crate) use string::*;
 
 /// What a SpiderMonkey `JSContext*` points to: one per QuickJS runtime (one per thread).
 pub(crate) struct Cx {

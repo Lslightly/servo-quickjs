@@ -19,7 +19,7 @@ pub use self::generated::root as jsapi;
 #[allow(dead_code, unused_variables, clippy::all)]
 mod generated {
     #![allow(unnecessary_transmutes)]
-    include!("generated/jsapi.rs");
+    include!(concat!(env!("OUT_DIR"), "/jsapi.rs"));
 }
 
 // The bindgen statics used to be `extern` and so needed no `Sync`; as Rust statics they do. They are
