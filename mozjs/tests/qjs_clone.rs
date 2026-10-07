@@ -51,13 +51,16 @@ static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {
 fn with_global(f: impl FnOnce(&mut JSContext, HandleObject)) {
     let mut runtime = Runtime::new(ENGINE.clone());
     let context = runtime.cx();
+    let mut options = RealmOptions::default();
+    options.creationOptions_.sharedMemoryAndAtomics_ = true;
+    options.creationOptions_.defineSharedArrayBufferConstructor_ = true;
     unsafe {
         rooted!(&in(context) let global = JS_NewGlobalObject(
             context,
             &SIMPLE_GLOBAL_CLASS,
             ptr::null_mut(),
             OnNewGlobalHookOption::FireOnNewGlobalHook,
-            &*RealmOptions::default(),
+            &*options,
         ));
         let mut realm = AutoRealm::new_from_handle(context, global.handle());
         f(&mut realm, global.handle());

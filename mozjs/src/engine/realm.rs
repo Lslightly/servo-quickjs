@@ -18,6 +18,7 @@
 //! frees a realm together with its global once nothing else refers to either.
 
 use std::collections::HashMap;
+use std::ffi::CStr;
 use std::ptr;
 
 use quickjs_sys as q;
@@ -195,6 +196,12 @@ pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const 
     } else {
         (ptr::read(&(*options).creationOptions_), ptr::read(&(*options).behaviors_))
     };
+    if !creation_options.sharedMemoryAndAtomics_ {
+        delete_global(qctx, global, c"Atomics");
+        delete_global(qctx, global, c"SharedArrayBuffer");
+    } else if !creation_options.defineSharedArrayBufferConstructor_ {
+        delete_global(qctx, global, c"SharedArrayBuffer");
+    }
     if !principals.is_null() {
         super::JS_HoldPrincipals(principals);
     }
@@ -216,6 +223,13 @@ pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const 
     q::JS_FreeContext(qctx);
     cx.retain(JSVal::from_qjs(obj_val(global)));
     global
+}
+
+/// Removes a standard global that the realm's creation options disable.
+unsafe fn delete_global(qctx: *mut q::JSContext, global: *mut root::JSObject, name: &CStr) {
+    let atom = q::JS_NewAtom(qctx, name.as_ptr());
+    q::JS_DeleteProperty(qctx, obj_val(global), atom, 0);
+    q::JS_FreeAtom(qctx, atom);
 }
 
 pub(crate) unsafe fn JS_FireOnNewGlobalObject(cx: *mut root::JSContext, global: root::JS::HandleObject) {
