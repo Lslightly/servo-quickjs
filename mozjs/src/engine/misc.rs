@@ -340,10 +340,6 @@ pub(crate) unsafe fn SetContextProfilingStack(cx: *mut root::JSContext, profilin
     let _ = (cx, profilingStack);
 }
 
-pub(crate) unsafe fn RegisterScriptEnvironmentPreparer(cx: *mut root::JSContext, hook: crate::sys::glue::InvokeScriptPreparerHook) {
-    let _ = (cx, hook);
-}
-
 pub(crate) unsafe fn SetScriptEnvironmentPreparer(cx: *mut root::JSContext, preparer: *mut root::js::ScriptEnvironmentPreparer) {
     let _ = (cx, preparer);
 }

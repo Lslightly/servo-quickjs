@@ -445,6 +445,41 @@ fn top_level_await() {
         assert_eq!(promise_state(promise_obj), qjs::JS_PROMISE_FULFILLED);
         let ns = namespace(cx, &url("main.js"));
         assert_eq!(get(cx, ns, c"seen").to_int32(), 2);
+        assert!(REPORTED.with(|r| r.borrow().is_empty()));
+    });
+}
+
+thread_local!(static REPORTED: RefCell<Vec<i32>> = const { RefCell::new(Vec::new()) });
+
+/// Servo's script environment preparer: runs the closure and reports its exception.
+unsafe extern "C" fn prepare_and_report(_global: jsapi::HandleObject, closure: *mut jsapi::ScriptEnvironmentPreparer_Closure) {
+    let mut context = mozjs::rust::Runtime::get().map(|cx| JSContext::from_ptr(cx)).unwrap();
+    let cx = &mut context;
+    if !mozjs::glue::RunScriptEnvironmentPreparerClosure(cx.raw_cx(), closure) {
+        let error = pending_exception(cx);
+        REPORTED.with(|r| r.borrow_mut().push(error.to_int32()));
+    }
+}
+
+#[test]
+fn top_level_await_rejection_is_reported() {
+    add_sources(&[
+        ("main.js", "import './tla.js';"),
+        ("tla.js", "await null;\nthrow 5;"),
+    ]);
+    with_realm(|cx| unsafe {
+        mozjs::glue::RegisterScriptEnvironmentPreparer(cx.raw_cx(), Some(prepare_and_report));
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert!(ModuleLink(cx, root.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        rooted!(&in(cx) let promise = promise.get().to_object());
+        assert!(ThrowOnModuleEvaluationFailure(cx, promise.handle(), ModuleErrorBehaviour::ThrowModuleErrorsSync));
+        run_jobs(cx);
+        assert_eq!(promise_state(promise.get()), qjs::JS_PROMISE_REJECTED);
+        assert_eq!(REPORTED.with(|r| r.borrow().clone()), [5]);
+        // Reported, not an unhandled rejection.
+        assert!(LOADER.with(|l| l.borrow().rejections.iter().all(|&(p, handled)| p != promise.get() as *mut c_void || handled)));
     });
 }
 

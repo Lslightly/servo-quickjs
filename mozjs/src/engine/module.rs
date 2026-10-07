@@ -475,14 +475,20 @@ pub(crate) unsafe fn ThrowOnModuleEvaluationFailure(cx: *mut root::JSContext, ev
     if promise.is_null() {
         return false;
     }
-    if errorBehaviour == root::JS::ModuleErrorBehaviour::ReportModuleErrorsAsync {
-        // A rejection is reported by the rejection tracker.
-        return true;
-    }
     let promise = obj_val(promise);
-    // SpiderMonkey reports a pending (top-level await) promise as a failure with an undefined
-    // exception; a pending evaluation has not failed (yet), so it is a success here.
-    if q::JS_PromiseState(qctx, promise) != q::JS_PROMISE_REJECTED {
+    let state = q::JS_PromiseState(qctx, promise);
+    // SpiderMonkey's asynchronous path, also taken for a pending (top-level await) evaluation,
+    // which SpiderMonkey reports as failed with an undefined exception: a later rejection is
+    // reported as an exception (HTML "run a module script").
+    if errorBehaviour == root::JS::ModuleErrorBehaviour::ReportModuleErrorsAsync || state == q::JS_PROMISE_PENDING {
+        let on_rejected = super::class::new_function(cx, Some(report_rejected_module), ptr::null(), 1, false, 0);
+        if on_rejected.tag() == q::JS_TAG_EXCEPTION {
+            return false;
+        }
+        let on_rejected = cx.adopt(on_rejected);
+        return q::JS_PerformPromiseThen(qctx, promise, q::JS_UNDEFINED, on_rejected.to_qjs(), 0).tag() != q::JS_TAG_EXCEPTION;
+    }
+    if state != q::JS_PROMISE_REJECTED {
         return true;
     }
     q::JS_MarkPromiseHandled(qctx, promise);
@@ -506,6 +512,7 @@ pub(crate) unsafe fn GetModuleNamespace(cx: *mut root::JSContext, moduleRecord: 
 
 #[derive(Clone, Copy, Default)]
 struct Hooks {
+    preparer: crate::sys::glue::InvokeScriptPreparerHook,
     resolve: root::JS::ModuleResolveHook,
     metadata: root::JS::ModuleMetadataHook,
     dynamic_import: root::JS::ModuleDynamicImportHook,
@@ -523,6 +530,37 @@ fn hooks(rt: *mut q::JSRuntime) -> Hooks {
 
 fn update_hooks(rt: *mut root::JSRuntime, f: impl FnOnce(&mut Hooks)) {
     HOOKS.with(|h| f(h.borrow_mut().entry(rt as usize).or_default()));
+}
+
+pub(crate) unsafe fn RegisterScriptEnvironmentPreparer(cx: *mut root::JSContext, hook: crate::sys::glue::InvokeScriptPreparerHook) {
+    update_hooks(Cx::from_raw(cx).rt as *mut root::JSRuntime, |h| h.preparer = hook);
+}
+
+/// What the shim passes as a `ScriptEnvironmentPreparer::Closure`: running it throws `error`.
+#[repr(C)]
+struct ReportClosure {
+    error: JSVal,
+}
+
+pub(crate) unsafe fn RunScriptEnvironmentPreparerClosure(cx: *mut root::JSContext, closure: *mut root::js::ScriptEnvironmentPreparer_Closure) -> bool {
+    let cx = Cx::from_raw(cx);
+    let closure = &*(closure as *const ReportClosure);
+    q::JS_Throw(cx.qctx(), q::JS_DupValueRT(cx.rt, closure.error.to_qjs()));
+    false
+}
+
+/// Rejection handler of a module evaluation promise: reports the reason through the embedder's
+/// script environment preparer, as SpiderMonkey's `OnRootModuleRejected`.
+unsafe extern "C" fn report_rejected_module(cx: *mut root::JSContext, argc: u32, vp: *mut JSVal) -> bool {
+    let cx = Cx::from_raw(cx);
+    let mut closure = ReportClosure { error: if argc > 0 { *vp.add(2) } else { JSVal::from_qjs(q::JS_UNDEFINED) } };
+    *vp = JSVal::from_qjs(q::JS_UNDEFINED);
+    let realm = cx.current_realm();
+    if let (Some(preparer), false) = (hooks(cx.rt).preparer, realm.is_null()) {
+        let global = (*realm).global;
+        preparer(handle(&global), &mut closure as *mut ReportClosure as *mut root::js::ScriptEnvironmentPreparer_Closure);
+    }
+    true
 }
 
 pub(crate) unsafe fn SetModuleResolveHook(rt: *mut root::JSRuntime, func: root::JS::ModuleResolveHook) {
