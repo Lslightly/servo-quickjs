@@ -456,6 +456,17 @@ pub(crate) unsafe fn CallPropertyDescriptorTracer(trc: *mut root::JSTracer, desc
     let _ = (trc, desc);
 }
 
+// Symbols and BigInts are reference-counted but not cycle-collected (`JS_MarkValue` ignores
+// them); the count held by the `Heap` is enough.
+
+pub(crate) unsafe fn CallSymbolTracer(trc: *mut root::JSTracer, bip: *mut root::JS::Heap<*mut root::JS::Symbol>, name: *const ::std::os::raw::c_char) {
+    let _ = (trc, bip, name);
+}
+
+pub(crate) unsafe fn CallBigIntTracer(trc: *mut root::JSTracer, bip: *mut root::JS::Heap<*mut root::JS::BigInt>, name: *const ::std::os::raw::c_char) {
+    let _ = (trc, bip, name);
+}
+
 // Objects and prototypes.
 
 pub(crate) unsafe fn JS_NewObjectWithoutMetadata(cx: *mut root::JSContext, clasp: *const root::JSClass, proto: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
