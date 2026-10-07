@@ -9,7 +9,7 @@
 //! an atom's string is the atom itself. External strings are copied and their buffer is released
 //! at once. Pinned atoms are kept alive by the pool, like every other value handed to Rust.
 
-use std::ffi::{c_char, c_void, CStr};
+use std::ffi::{c_char, c_int, c_void, CStr};
 use std::{ptr, slice};
 
 use quickjs_sys as q;
@@ -17,7 +17,14 @@ use quickjs_sys as q;
 use super::{obj_val, Cx};
 use crate::sys::glue;
 use crate::sys::jsapi as root;
-use crate::sys::jsval::StringValue;
+use crate::sys::jsid::{from_atom, IntId};
+use crate::sys::jsval::{Int32Value, StringValue, UndefinedValue};
+
+extern "C" {
+    // ID_Start / ID_Continue from QuickJS's libunicode.
+    fn lre_is_id_start(c: u32) -> c_int;
+    fn lre_is_id_continue(c: u32) -> c_int;
+}
 
 const ATOM_TAG_INT: q::JSAtom = 1 << 31;
 
@@ -767,4 +774,187 @@ pub(crate) unsafe fn SameValue(cx: *mut root::JSContext, v1: root::JS::Handle<ro
 pub(crate) unsafe fn StrictlyEqual(cx: *mut root::JSContext, v1: root::JS::Handle<root::JS::Value>, v2: root::JS::Handle<root::JS::Value>, equal: *mut bool) -> bool {
     *equal = q::JS_StrictEq(Cx::from_raw(cx).qctx(), (*v1.ptr).to_qjs(), (*v2.ptr).to_qjs()) != 0;
     true
+}
+
+// Property keys.
+
+/// The id of a new atom reference, which the pool takes over.
+unsafe fn atom_id(cx: &mut Cx, atom: q::JSAtom) -> root::jsid {
+    from_atom(cx.adopt_atom(atom))
+}
+
+unsafe fn value_to_id(cx: &mut Cx, v: q::JSValue, idp: *mut root::jsid) -> bool {
+    let atom = q::JS_ValueToAtom(cx.qctx(), v);
+    if atom == q::JS_ATOM_NULL {
+        return false;
+    }
+    *idp = atom_id(cx, atom);
+    true
+}
+
+pub(crate) unsafe fn JS_StringToId(cx: *mut root::JSContext, s: root::JS::HandleString, idp: root::JS::MutableHandleId) -> bool {
+    value_to_id(Cx::from_raw(cx), str_val(*s.ptr), idp.ptr)
+}
+
+pub(crate) unsafe fn JS_ValueToId(cx: *mut root::JSContext, v: root::JS::HandleValue, idp: root::JS::MutableHandleId) -> bool {
+    value_to_id(Cx::from_raw(cx), (*v.ptr).to_qjs(), idp.ptr)
+}
+
+pub(crate) unsafe fn JS_CharsToId(cx: *mut root::JSContext, chars: root::JS::TwoByteChars, arg1: root::JS::MutableHandleId) -> bool {
+    let cx = Cx::from_raw(cx);
+    let chars = range_slice(&chars._base);
+    let s = q::JS_NewStringUTF16(cx.qctx(), chars.as_ptr(), chars.len());
+    if s.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    let ok = value_to_id(cx, s, arg1.ptr);
+    q::JS_FreeValueRT(cx.rt, s);
+    ok
+}
+
+pub(crate) unsafe fn JS_IndexToId(cx: *mut root::JSContext, index: u32, arg1: root::JS::MutableHandleId) -> bool {
+    let cx = Cx::from_raw(cx);
+    if index <= i32::MAX as u32 {
+        *arg1.ptr = IntId(index as i32);
+        return true;
+    }
+    let atom = q::JS_NewAtomUInt32(cx.qctx(), index);
+    if atom == q::JS_ATOM_NULL {
+        return false;
+    }
+    *arg1.ptr = atom_id(cx, atom);
+    true
+}
+
+pub(crate) unsafe fn JS_IdToValue(cx: *mut root::JSContext, id: root::jsid, vp: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    *vp.ptr = if id.is_int() {
+        Int32Value(id.to_int())
+    } else if id.is_void() {
+        UndefinedValue()
+    } else {
+        cx.adopt(q::JS_AtomToValue(cx.qctx(), id.to_atom()))
+    };
+    true
+}
+
+/// The well-known symbol code of a `JSPropertySpec` name, if it names a symbol.
+fn spec_symbol_code(name: root::JSPropertySpec_Name) -> Option<usize> {
+    let raw = unsafe { name.symbol_ };
+    (raw != 0 && raw <= root::JS::SymbolCode::Limit as usize).then(|| raw - 1)
+}
+
+pub(crate) unsafe fn PropertySpecNameEqualsId(name: root::JSPropertySpec_Name, id: root::JS::HandleId) -> bool {
+    let id = *id.ptr;
+    match spec_symbol_code(name) {
+        Some(code) => id.is_symbol() && id.to_atom() == super::well_known_symbol_atom(super::current(), code),
+        None => id.is_string() && equals_ascii(Chars::of(id.to_string()), CStr::from_ptr(name.string_).to_bytes()),
+    }
+}
+
+pub(crate) unsafe fn PropertySpecNameToPermanentId(cx: *mut root::JSContext, name: root::JSPropertySpec_Name, idp: *mut root::jsid) -> bool {
+    let cx = Cx::from_raw(cx);
+    let atom = match spec_symbol_code(name) {
+        Some(code) => super::well_known_symbol_atom(cx, code),
+        // Permanent: this reference is never released.
+        None => q::JS_NewAtom(cx.qctx(), name.string_),
+    };
+    if atom == q::JS_ATOM_NULL {
+        return false;
+    }
+    *idp = from_atom(atom);
+    true
+}
+
+pub(crate) unsafe fn RUST_JSID_IS_INT(id: root::JS::HandleId) -> bool {
+    (*id.ptr).is_int()
+}
+
+pub(crate) unsafe fn RUST_JSID_TO_INT(id: root::JS::HandleId) -> i32 {
+    (*id.ptr).to_int()
+}
+
+pub(crate) unsafe fn RUST_JSID_IS_STRING(id: root::JS::HandleId) -> bool {
+    (*id.ptr).is_string()
+}
+
+pub(crate) unsafe fn RUST_JSID_TO_STRING(id: root::JS::HandleId) -> *mut root::JSString {
+    (*id.ptr).to_string()
+}
+
+pub(crate) unsafe fn RUST_JSID_IS_VOID(id: root::JS::HandleId) -> bool {
+    (*id.ptr).is_void()
+}
+
+pub(crate) unsafe fn RUST_INTERNED_STRING_TO_JSID(cx: *mut root::JSContext, str_: *mut root::JSString, id: root::JS::MutableHandleId) {
+    let _ = cx;
+    *id.ptr = crate::sys::jsid::StringId(str_);
+}
+
+pub(crate) unsafe fn RUST_SYMBOL_TO_JSID(sym: *mut root::JS::Symbol, id: root::JS::MutableHandleId) {
+    *id.ptr = crate::sys::jsid::SymbolId(sym);
+}
+
+pub(crate) unsafe fn int_to_jsid(i: i32, id: root::JS::MutableHandleId) {
+    *id.ptr = IntId(i);
+}
+
+/// The array index (a canonical decimal below 2^32 - 1) spelled by `units`, if any.
+fn array_index(len: usize, units: impl Iterator<Item = u16>) -> Option<u32> {
+    if len == 0 || len > 10 {
+        return None;
+    }
+    let mut n: u64 = 0;
+    for (i, c) in units.enumerate() {
+        let d = c.wrapping_sub(b'0' as u16);
+        if d > 9 || (i == 0 && d == 0 && len > 1) {
+            return None;
+        }
+        n = n * 10 + d as u64;
+    }
+    (n < u32::MAX as u64).then_some(n as u32)
+}
+
+pub(crate) unsafe fn StringIsArrayIndex(str_: *const root::JSLinearString, indexp: *mut u32) -> bool {
+    let chars = Chars::of(str_ as *mut root::JSString);
+    array_index(chars.len(), chars.units()).map(|i| *indexp = i).is_some()
+}
+
+pub(crate) unsafe fn StringIsArrayIndex1(str_: *const u16, length: u32, indexp: *mut u32) -> bool {
+    let chars = raw_slice(str_, length as usize);
+    array_index(chars.len(), chars.iter().copied()).map(|i| *indexp = i).is_some()
+}
+
+/// Whether `units` form an ECMAScript IdentifierName (reserved words included).
+fn is_identifier(units: impl Iterator<Item = u16>) -> bool {
+    let mut empty = true;
+    for c in char::decode_utf16(units) {
+        let Ok(c) = c else {
+            return false;
+        };
+        let c = c as u32;
+        let ok = if c < 0x80 {
+            let b = c as u8;
+            b.is_ascii_alphabetic() || b == b'$' || b == b'_' || (!empty && b.is_ascii_digit())
+        } else if empty {
+            unsafe { lre_is_id_start(c) != 0 }
+        } else {
+            c == 0x200c || c == 0x200d || unsafe { lre_is_id_continue(c) != 0 }
+        };
+        if !ok {
+            return false;
+        }
+        empty = false;
+    }
+    !empty
+}
+
+pub(crate) unsafe fn JS_IsIdentifier(cx: *mut root::JSContext, str_: root::JS::HandleString, isIdentifier: *mut bool) -> bool {
+    let _ = cx;
+    *isIdentifier = is_identifier(Chars::of(*str_.ptr).units());
+    true
+}
+
+pub(crate) unsafe fn JS_IsIdentifier1(chars: *const u16, length: usize) -> bool {
+    is_identifier(raw_slice(chars, length).iter().copied())
 }
