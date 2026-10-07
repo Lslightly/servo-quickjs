@@ -27,11 +27,58 @@ pub(crate) fn realm_of_global(global: *mut root::JSObject) -> *mut RealmData {
     GLOBALS.with(|g| g.borrow().get(&(global as usize)).copied().unwrap_or(ptr::null_mut()))
 }
 
-/// The realm of `obj`: exact for globals, otherwise the current realm (QuickJS objects do not
-/// record their realm; shim classes will store it in their object data).
+/// The realm of `obj`: exact for globals, otherwise derived from the function or prototype chain
+/// (QuickJS objects do not record their realm), falling back to the current realm.
 pub(crate) fn realm_of_object(cx: &Cx, obj: *mut root::JSObject) -> *mut RealmData {
     let realm = realm_of_global(obj);
+    if !realm.is_null() {
+        return realm;
+    }
+    let realm = unsafe { realm_of_plain_object(cx, obj) };
     if realm.is_null() { cx.current_realm() } else { realm }
+}
+
+pub(crate) fn realm_of_qctx(qctx: *mut q::JSContext) -> *mut RealmData {
+    all_realms()
+        .into_iter()
+        .find(|realm| unsafe { (**realm).qctx } == qctx)
+        .unwrap_or(ptr::null_mut())
+}
+
+/// QuickJS: functions know their realm; other objects get the realm of the first prototype whose
+/// realm is known, or whose chain ends at a realm's `Object.prototype`.
+unsafe fn realm_of_plain_object(cx: &Cx, obj: *mut root::JSObject) -> *mut RealmData {
+    if q::JS_IsFunction(cx.base_ctx, obj_val(obj)) != 0 {
+        let realm = realm_of_qctx(q::JS_GetFunctionRealm(cx.base_ctx, obj_val(obj)));
+        if !realm.is_null() {
+            return realm;
+        }
+    }
+    let mut current = obj;
+    loop {
+        let proto = q::JS_GetStaticPrototype(cx.base_ctx, obj_val(current));
+        if proto.tag() != q::JS_TAG_OBJECT {
+            break;
+        }
+        let proto = val_obj(proto);
+        q::JS_FreeValueRT(cx.rt, obj_val(proto));
+        let realm = super::class::known_object_realm(proto);
+        if !realm.is_null() {
+            return realm;
+        }
+        current = proto;
+    }
+    if current == obj {
+        return ptr::null_mut();
+    }
+    all_realms()
+        .into_iter()
+        .find(|realm| {
+            let object_proto = q::JS_GetClassProto((**realm).qctx, 1);
+            q::JS_FreeValueRT(cx.rt, object_proto);
+            object_proto.tag() == q::JS_TAG_OBJECT && val_obj(object_proto) == current
+        })
+        .unwrap_or(ptr::null_mut())
 }
 
 pub(crate) fn all_realms() -> Vec<*mut RealmData> {

@@ -155,6 +155,15 @@ pub(crate) unsafe fn object_class(obj: *mut root::JSObject) -> *const root::JSCl
 
 /// The realm an object was created in, where known.
 pub(crate) unsafe fn object_realm(cx: &Cx, obj: *mut root::JSObject) -> *mut RealmData {
+    let realm = known_object_realm(obj);
+    if !realm.is_null() {
+        return realm;
+    }
+    super::realm::realm_of_object(cx, obj)
+}
+
+/// The realm recorded by shim objects, functions, proxies and globals, or null.
+pub(crate) unsafe fn known_object_realm(obj: *mut root::JSObject) -> *mut RealmData {
     if let Some(data) = object_data(obj) {
         if !data.realm.is_null() {
             return data.realm;
@@ -167,7 +176,7 @@ pub(crate) unsafe fn object_realm(cx: &Cx, obj: *mut root::JSObject) -> *mut Rea
     if let Some(realm) = super::proxy::proxy_realm(obj) {
         return realm;
     }
-    super::realm::realm_of_object(cx, obj)
+    super::realm::realm_of_global(obj)
 }
 
 unsafe extern "C" fn finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
