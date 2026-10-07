@@ -133,7 +133,13 @@ unsafe impl Traceable for PropertyDescriptor {
 unsafe impl<T: Traceable> Traceable for Rc<T> {
     #[inline]
     unsafe fn trace(&self, trc: *mut JSTracer) {
-        (**self).trace(trc);
+        // QuickJS: a shared `Rc` would be traced once per owner while its contents hold one
+        // reference count, which makes the cycle collector free live objects. Only the sole
+        // owner traces; shared contents act as external references (they may leak, but are never
+        // freed early).
+        if Rc::strong_count(self) == 1 {
+            (**self).trace(trc);
+        }
     }
 }
 

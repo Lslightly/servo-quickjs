@@ -202,3 +202,20 @@ pub(crate) unsafe fn retain_rooted(cx: *mut root::JSContext, kind: root::JS::Roo
         cx.retain(JSVal::from_qjs(q::JSValue::mkptr(ptr_tag, p)));
     }
 }
+
+/// See `crate::quickjs::retain_object`.
+pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
+    q::JS_DupValueRT(current().rt, obj_val(obj));
+}
+
+/// See `crate::quickjs::release_object`.
+pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
+    q::JS_FreeValueRT(current().rt, obj_val(obj));
+}
+
+pub(crate) fn drain_current_pool() {
+    let cx = CURRENT.with(|c| c.get());
+    if !cx.is_null() {
+        unsafe { (*cx).drain_pool((0, 0)) };
+    }
+}

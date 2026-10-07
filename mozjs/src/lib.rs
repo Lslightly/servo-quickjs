@@ -42,6 +42,8 @@ mod engine;
 
 pub use quickjs_sys as qjs;
 
+pub mod quickjs;
+
 pub mod jsapi {
     // Resolve ambiguous imports
     pub use crate::sys::jsapi::js::detail;
