@@ -1468,6 +1468,50 @@ unsafe extern "C" {
         pbytes_per_element: *mut usize,
     ) -> JSValue;
 }
+pub const JS_BUFFER_NONE: JSBufferKind = 0;
+pub const JS_BUFFER_ARRAY_BUFFER: JSBufferKind = 1;
+pub const JS_BUFFER_SHARED_ARRAY_BUFFER: JSBufferKind = 2;
+pub const JS_BUFFER_TYPED_ARRAY: JSBufferKind = 3;
+pub const JS_BUFFER_DATA_VIEW: JSBufferKind = 4;
+pub type JSBufferKind = ::std::os::raw::c_uint;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct JSBufferInfo {
+    pub buffer: JSValue,
+    pub data: *mut u8,
+    pub byte_offset: usize,
+    pub byte_length: usize,
+    pub type_: ::std::os::raw::c_int,
+    pub detached: ::std::os::raw::c_int,
+    pub shared: ::std::os::raw::c_int,
+    pub resizable: ::std::os::raw::c_int,
+}
+impl Default for JSBufferInfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+unsafe extern "C" {
+    pub fn JS_GetBufferInfo(obj: JSValue, info: *mut JSBufferInfo) -> JSBufferKind;
+}
+unsafe extern "C" {
+    pub fn JS_StealArrayBuffer(ctx: *mut JSContext, plen: *mut usize, obj: JSValue) -> *mut u8;
+}
+unsafe extern "C" {
+    pub fn JS_NewArrayBufferOwned(ctx: *mut JSContext, buf: *mut u8, len: usize) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_NewDataView(
+        ctx: *mut JSContext,
+        buffer: JSValue,
+        byte_offset: usize,
+        byte_length: usize,
+    ) -> JSValue;
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct JSSharedArrayBufferFunctions {
