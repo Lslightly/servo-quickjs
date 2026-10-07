@@ -922,6 +922,8 @@ pub struct JSStackFrameInfo {
     pub frame: *const ::std::os::raw::c_void,
     pub is_native: ::std::os::raw::c_int,
     pub realm: *mut JSContext,
+    pub module: *mut JSModuleDef,
+    pub script_private: JSValue,
     pub name: JSValue,
     pub filename: JSAtom,
     pub line_num: ::std::os::raw::c_int,
@@ -1712,11 +1714,6 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn JS_SetIsHTMLDDA(ctx: *mut JSContext, obj: JSValue);
 }
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct JSModuleDef {
-    _unused: [u8; 0],
-}
 pub type JSModuleNormalizeFunc = ::std::option::Option<
     unsafe extern "C" fn(
         ctx: *mut JSContext,
@@ -1818,6 +1815,21 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn JS_GetScriptFileName(ctx: *mut JSContext, script: JSValue) -> JSAtom;
 }
+pub type JSScriptPrivateFinalizer =
+    ::std::option::Option<unsafe extern "C" fn(rt: *mut JSRuntime, val: JSValue)>;
+unsafe extern "C" {
+    pub fn JS_SetScriptPrivateFinalizer(rt: *mut JSRuntime, finalizer: JSScriptPrivateFinalizer);
+}
+unsafe extern "C" {
+    pub fn JS_SetScriptPrivateValue(
+        ctx: *mut JSContext,
+        script: JSValue,
+        val: JSValue,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_GetScriptPrivateValue(ctx: *mut JSContext, script: JSValue) -> JSValue;
+}
 pub type JSImportMetaHook = ::std::option::Option<
     unsafe extern "C" fn(
         ctx: *mut JSContext,
@@ -1829,8 +1841,8 @@ pub type JSImportMetaHook = ::std::option::Option<
 pub type JSDynamicImportHook = ::std::option::Option<
     unsafe extern "C" fn(
         ctx: *mut JSContext,
-        basename: JSValue,
         m: *mut JSModuleDef,
+        script_private: JSValue,
         specifier: JSValue,
         attributes: JSValue,
         promise: JSValue,
@@ -2396,4 +2408,9 @@ unsafe extern "C" {
         val: JSValue,
         options: *const JSPrintValueOptions,
     );
+}
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone)]
+pub struct JSModuleDef {
+    pub _address: u8,
 }

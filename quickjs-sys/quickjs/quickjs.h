@@ -685,11 +685,15 @@ JS_BOOL JS_GetExceptionLocation(JSContext *ctx, JSAtom *pfilename, int *pline_nu
                                 int *pcol_num);
 /* Servo: the frames of the current call stack, innermost first, until 'cb' returns
    non-zero. 'name' is the function's own "name" data property or JS_UNDEFINED (for
-   top-level code), borrowed. Native frames have 'is_native' set and no location. */
+   top-level code), borrowed. Native frames have 'is_native' set and no location.
+   'module' and 'script_private' are the frame's script or module as for
+   JSDynamicImportHook. */
 typedef struct JSStackFrameInfo {
     const void *frame; /* identifies the frame while it is live */
     JS_BOOL is_native;
     JSContext *realm; /* realm of a bytecode function */
+    struct JSModuleDef *module;
+    JSValueConst script_private; /* borrowed */
     JSValueConst name;
     JSAtom filename; /* JS_ATOM_NULL if unknown */
     int line_num; /* 1-based, 0 if unknown */
@@ -1112,14 +1116,22 @@ JSModuleDef *JS_FindLoadedModule(JSContext *ctx, JSAtom name);
 /* Servo: the file name of a compiled script (JS_TAG_FUNCTION_BYTECODE), or
    JS_ATOM_NULL */
 JSAtom JS_GetScriptFileName(JSContext *ctx, JSValueConst script);
+/* Servo: the host-defined value of a compiled script (JS_TAG_FUNCTION_BYTECODE),
+   shared with the eval and Function code it creates. The setter takes ownership
+   of 'val' and returns < 0 for modules and non-scripts. The finalizer is called
+   for a replaced value and when the last code of the script is freed. */
+typedef void JSScriptPrivateFinalizer(JSRuntime *rt, JSValueConst val);
+void JS_SetScriptPrivateFinalizer(JSRuntime *rt, JSScriptPrivateFinalizer *finalizer);
+int JS_SetScriptPrivateValue(JSContext *ctx, JSValueConst script, JSValue val);
+JSValue JS_GetScriptPrivateValue(JSContext *ctx, JSValueConst script);
 /* Servo: host hooks. The import.meta hook populates the new import.meta object of
-   'm'. The dynamic import hook replaces the module loader for import():
-   'basename' is the file name of the calling script or module (JS_NULL if
-   unknown), 'm' the loaded module of that name in 'ctx' if any, and the host
-   settles 'promise', the result of import(). Both return < 0 on exception. */
+   'm'. The dynamic import hook replaces the module loader for import(): 'm' is
+   the module of the calling code, or NULL for script code, whose host-defined
+   value is 'script_private' (JS_UNDEFINED if none); the host settles 'promise',
+   the result of import(). Both return < 0 on exception. */
 typedef int JSImportMetaHook(JSContext *ctx, JSModuleDef *m, JSValueConst meta,
                              void *opaque);
-typedef int JSDynamicImportHook(JSContext *ctx, JSValueConst basename, JSModuleDef *m,
+typedef int JSDynamicImportHook(JSContext *ctx, JSModuleDef *m, JSValueConst script_private,
                                 JSValueConst specifier, JSValueConst attributes,
                                 JSValueConst promise, void *opaque);
 void JS_SetImportMetaHook(JSRuntime *rt, JSImportMetaHook *hook, void *opaque);

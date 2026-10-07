@@ -393,6 +393,7 @@ struct JSRuntime {
     void *import_meta_opaque;
     JSDynamicImportHook *dynamic_import_hook;
     void *dynamic_import_opaque;
+    JSScriptPrivateFinalizer *script_private_finalizer;
     /* timestamp for internal use in module evaluation */
     int64_t module_async_evaluation_next_timestamp;
 
@@ -710,6 +711,14 @@ typedef enum JSFunctionKindEnum {
     JS_FUNC_ASYNC_GENERATOR = (JS_FUNC_GENERATOR | JS_FUNC_ASYNC),
 } JSFunctionKindEnum;
 
+/* Servo: ECMA-262 [[ScriptOrModule]], shared by the functions of a script or module
+   and by the eval and Function code they create */
+typedef struct JSScriptOrModule {
+    int ref_count;
+    JSModuleDef *module; /* NULL for scripts; cleared when the module is freed */
+    JSValue private_value; /* host-defined value of a script */
+} JSScriptOrModule;
+
 typedef struct JSFunctionBytecode {
     JSGCObjectHeader header; /* must come first */
     uint8_t js_mode;
@@ -738,6 +747,7 @@ typedef struct JSFunctionBytecode {
     uint16_t stack_size; /* maximum stack size */
     uint16_t var_ref_count; /* number of local variable references */
     JSContext *realm; /* function realm */
+    JSScriptOrModule *script_or_module; /* Servo: counted, or NULL */
     JSValue *cpool; /* constant pool (self pointer) */
     int cpool_count;
     int closure_var_count;
@@ -965,6 +975,7 @@ struct JSModuleDef {
     JSValue eval_exception;
     JSValue meta_obj; /* for import.meta */
     JSValue private_value; /* private value for C modules */
+    JSScriptOrModule *script_or_module; /* Servo: counted, or NULL */
 };
 
 typedef struct JSJobEntry {
@@ -1363,9 +1374,12 @@ static void js_mark_module_def(JSRuntime *rt, JSModuleDef *m,
 static JSValue js_import_meta(JSContext *ctx);
 static JSValue js_dynamic_import(JSContext *ctx, JSValueConst specifier, JSValueConst options);
 /* Servo: defined with the module loading patch at the end of the file */
-static int js_servo_dynamic_import(JSContext *ctx, JSValueConst basename,
-                                   JSValueConst specifier, JSValueConst attributes,
-                                   JSValueConst promise);
+static int js_servo_dynamic_import(JSContext *ctx, JSValueConst specifier,
+                                   JSValueConst attributes, JSValueConst promise);
+static JSScriptOrModule *js_new_script_or_module(JSContext *ctx, JSModuleDef *m);
+static JSScriptOrModule *js_dup_script_or_module(JSScriptOrModule *sm);
+static void js_free_script_or_module(JSRuntime *rt, JSScriptOrModule *sm);
+static JSScriptOrModule *js_get_active_script_or_module(JSContext *ctx);
 static void free_var_ref(JSRuntime *rt, JSVarRef *var_ref);
 static JSValue js_new_promise_capability(JSContext *ctx,
                                          JSValue *resolving_funcs,
@@ -22396,6 +22410,7 @@ typedef struct JSFunctionDef {
     int source_len;
 
     JSModuleDef *module; /* != NULL when parsing a module */
+    JSScriptOrModule *script_or_module; /* Servo: counted, or NULL */
     BOOL has_await; /* TRUE if await is used (used in module eval) */
 } JSFunctionDef;
 
@@ -30084,6 +30099,10 @@ static void js_free_module_def(JSRuntime *rt, JSModuleDef *m)
     JS_FreeValueRT(rt, m->resolving_funcs[0]);
     JS_FreeValueRT(rt, m->resolving_funcs[1]);
     JS_FreeValueRT(rt, m->private_value);
+    if (m->script_or_module) {
+        m->script_or_module->module = NULL;
+        js_free_script_or_module(rt, m->script_or_module);
+    }
     /* during the GC the finalizers are called in an arbitrary
        order so the module may no longer be referenced by the JSContext list */
     if (m->link.next) {
@@ -31254,23 +31273,15 @@ JSValue JS_GetImportMeta(JSContext *ctx, JSModuleDef *m)
 
 static JSValue js_import_meta(JSContext *ctx)
 {
-    JSAtom filename;
-    JSModuleDef *m;
+    JSScriptOrModule *sm;
 
-    filename = JS_GetScriptOrModuleName(ctx, 0);
-    if (filename == JS_ATOM_NULL)
-        goto fail;
-
-    /* XXX: inefficient, need to add a module or script pointer in
-       JSFunctionBytecode */
-    m = js_find_loaded_module(ctx, filename);
-    JS_FreeAtom(ctx, filename);
-    if (!m) {
-    fail:
+    /* Servo: the module of the running code, not the first module of its name */
+    sm = js_get_active_script_or_module(ctx);
+    if (!sm || !sm->module) {
         JS_ThrowTypeError(ctx, "import.meta not supported in this context");
         return JS_EXCEPTION;
     }
-    return JS_GetImportMeta(ctx, m);
+    return JS_GetImportMeta(ctx, sm->module);
 }
 
 static JSValue JS_NewModuleValue(JSContext *ctx, JSModuleDef *m)
@@ -31493,7 +31504,7 @@ static JSValue js_dynamic_import(JSContext *ctx, JSValueConst specifier, JSValue
 
     /* Servo: the host loads the module and settles the promise */
     if (ctx->rt->dynamic_import_hook) {
-        if (js_servo_dynamic_import(ctx, basename_val, specifier_str, attributes, promise) < 0) {
+        if (js_servo_dynamic_import(ctx, specifier_str, attributes, promise) < 0) {
             err = JS_GetException(ctx);
             ret = JS_Call(ctx, resolving_funcs[1], JS_UNDEFINED,
                           1, (JSValueConst *)&err);
@@ -32445,6 +32456,7 @@ static JSFunctionDef *js_new_function_def(JSContext *ctx,
         list_add_tail(&fd->link, &parent->child_list);
         fd->js_mode = parent->js_mode;
         fd->parent_scope_level = parent->scope_level;
+        fd->script_or_module = js_dup_script_or_module(parent->script_or_module);
     }
     fd->strip_debug = ((ctx->rt->strip_flags & JS_STRIP_DEBUG) != 0);
     fd->strip_source = ((ctx->rt->strip_flags & (JS_STRIP_DEBUG | JS_STRIP_SOURCE)) != 0);
@@ -32570,6 +32582,7 @@ static void js_free_function_def(JSContext *ctx, JSFunctionDef *fd)
     if (fd->scopes != fd->def_scope_array)
         js_free(ctx, fd->scopes);
 
+    js_free_script_or_module(ctx->rt, fd->script_or_module);
     JS_FreeAtom(ctx, fd->filename);
     dbuf_free(&fd->pc2line);
 
@@ -36656,6 +36669,8 @@ static JSValue js_create_function(JSContext *ctx, JSFunctionDef *fd)
     b->is_direct_or_indirect_eval = (fd->eval_type == JS_EVAL_TYPE_DIRECT ||
                                      fd->eval_type == JS_EVAL_TYPE_INDIRECT);
     b->realm = JS_DupContext(ctx);
+    b->script_or_module = fd->script_or_module;
+    fd->script_or_module = NULL;
 
     add_gc_object(ctx->rt, &b->header, JS_GC_OBJ_TYPE_FUNCTION_BYTECODE);
 
@@ -36705,6 +36720,7 @@ static void free_function_bytecode(JSRuntime *rt, JSFunctionBytecode *b)
     }
     if (b->realm)
         JS_FreeContext(b->realm);
+    js_free_script_or_module(rt, b->script_or_module);
 
     JS_FreeAtomRT(rt, b->func_name);
     if (b->has_debug) {
@@ -37647,6 +37663,18 @@ static JSValue __JS_EvalInternal(JSContext *ctx, JSValueConst this_obj,
             goto fail;
     }
     fd->module = m;
+    /* Servo: eval and Function code belong to the script or module of their caller */
+    if (eval_type == JS_EVAL_TYPE_DIRECT) {
+        fd->script_or_module = js_dup_script_or_module(b->script_or_module);
+    } else if (eval_type == JS_EVAL_TYPE_INDIRECT) {
+        fd->script_or_module = js_dup_script_or_module(js_get_active_script_or_module(ctx));
+    } else {
+        fd->script_or_module = js_new_script_or_module(ctx, m);
+        if (!fd->script_or_module)
+            goto fail;
+        if (m)
+            m->script_or_module = js_dup_script_or_module(fd->script_or_module);
+    }
     if (m != NULL || (flags & JS_EVAL_FLAG_ASYNC)) {
         fd->in_function_body = TRUE;
         fd->func_kind = JS_FUNC_ASYNC;
@@ -62180,6 +62208,7 @@ void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaqu
         memset(&info, 0, sizeof(info));
         info.frame = sf;
         info.name = JS_UNDEFINED;
+        info.script_private = JS_UNDEFINED;
         if (JS_VALUE_GET_TAG(sf->cur_func) != JS_TAG_OBJECT)
             continue;
         p = JS_VALUE_GET_OBJ(sf->cur_func);
@@ -62188,6 +62217,11 @@ void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaqu
         } else {
             b = p->u.func.function_bytecode;
             info.realm = b->realm;
+            if (b->script_or_module) {
+                info.module = b->script_or_module->module;
+                if (!info.module)
+                    info.script_private = b->script_or_module->private_value;
+            }
             if (b->func_name != JS_ATOM__eval_) {
                 prs = find_own_property(&pr, p, JS_ATOM_name);
                 if (prs && (prs->flags & JS_PROP_TMASK) == JS_PROP_NORMAL &&
@@ -62359,22 +62393,99 @@ void JS_SetDynamicImportHook(JSRuntime *rt, JSDynamicImportHook *hook, void *opa
     rt->dynamic_import_opaque = opaque;
 }
 
-static int js_servo_dynamic_import(JSContext *ctx, JSValueConst basename,
-                                   JSValueConst specifier, JSValueConst attributes,
-                                   JSValueConst promise)
+static int js_servo_dynamic_import(JSContext *ctx, JSValueConst specifier,
+                                   JSValueConst attributes, JSValueConst promise)
 {
-    JSModuleDef *m = NULL;
-    JSAtom name;
+    JSScriptOrModule *sm = js_get_active_script_or_module(ctx);
+    JSModuleDef *m = sm ? sm->module : NULL;
+    JSValueConst script_private = sm && !m ? sm->private_value : JS_UNDEFINED;
 
-    if (JS_IsString(basename)) {
-        name = JS_ValueToAtom(ctx, basename);
-        if (name == JS_ATOM_NULL)
-            return -1;
-        m = js_find_loaded_module(ctx, name);
-        JS_FreeAtom(ctx, name);
-    }
-    return ctx->rt->dynamic_import_hook(ctx, basename, m, specifier, attributes,
+    return ctx->rt->dynamic_import_hook(ctx, m, script_private, specifier, attributes,
                                         promise, ctx->rt->dynamic_import_opaque);
+}
+
+/* Servo: [[ScriptOrModule]] records */
+
+static JSScriptOrModule *js_new_script_or_module(JSContext *ctx, JSModuleDef *m)
+{
+    JSScriptOrModule *sm = js_malloc(ctx, sizeof(*sm));
+    if (!sm)
+        return NULL;
+    sm->ref_count = 1;
+    sm->module = m;
+    sm->private_value = JS_UNDEFINED;
+    return sm;
+}
+
+static JSScriptOrModule *js_dup_script_or_module(JSScriptOrModule *sm)
+{
+    if (sm)
+        sm->ref_count++;
+    return sm;
+}
+
+static void js_free_script_or_module(JSRuntime *rt, JSScriptOrModule *sm)
+{
+    if (!sm || --sm->ref_count > 0)
+        return;
+    if (!JS_IsUndefined(sm->private_value) && rt->script_private_finalizer)
+        rt->script_private_finalizer(rt, sm->private_value);
+    JS_FreeValueRT(rt, sm->private_value);
+    js_free_rt(rt, sm);
+}
+
+/* The [[ScriptOrModule]] of the innermost bytecode frame, or NULL */
+static JSScriptOrModule *js_get_active_script_or_module(JSContext *ctx)
+{
+    JSStackFrame *sf;
+    JSObject *p;
+
+    for(sf = ctx->rt->current_stack_frame; sf != NULL; sf = sf->prev_frame) {
+        if (JS_VALUE_GET_TAG(sf->cur_func) != JS_TAG_OBJECT)
+            continue;
+        p = JS_VALUE_GET_OBJ(sf->cur_func);
+        if (js_class_has_bytecode(p->class_id))
+            return p->u.func.function_bytecode->script_or_module;
+    }
+    return NULL;
+}
+
+static JSScriptOrModule *js_script_record(JSValueConst script)
+{
+    if (JS_VALUE_GET_TAG(script) != JS_TAG_FUNCTION_BYTECODE)
+        return NULL;
+    return ((JSFunctionBytecode *)JS_VALUE_GET_PTR(script))->script_or_module;
+}
+
+void JS_SetScriptPrivateFinalizer(JSRuntime *rt, JSScriptPrivateFinalizer *finalizer)
+{
+    rt->script_private_finalizer = finalizer;
+}
+
+int JS_SetScriptPrivateValue(JSContext *ctx, JSValueConst script, JSValue val)
+{
+    JSScriptOrModule *sm = js_script_record(script);
+    JSValue old;
+
+    if (!sm || sm->module) {
+        JS_FreeValue(ctx, val);
+        return -1;
+    }
+    old = sm->private_value;
+    sm->private_value = val;
+    if (!JS_IsUndefined(old) && ctx->rt->script_private_finalizer)
+        ctx->rt->script_private_finalizer(ctx->rt, old);
+    JS_FreeValue(ctx, old);
+    return 0;
+}
+
+JSValue JS_GetScriptPrivateValue(JSContext *ctx, JSValueConst script)
+{
+    JSScriptOrModule *sm = js_script_record(script);
+
+    if (!sm || sm->module)
+        return JS_UNDEFINED;
+    return JS_DupValue(ctx, sm->private_value);
 }
 
 /* Marks a settled promise as handled, telling the rejection tracker like
