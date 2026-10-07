@@ -347,3 +347,16 @@ pub(crate) unsafe fn RegisterScriptEnvironmentPreparer(cx: *mut root::JSContext,
 pub(crate) unsafe fn SetScriptEnvironmentPreparer(cx: *mut root::JSContext, preparer: *mut root::js::ScriptEnvironmentPreparer) {
     let _ = (cx, preparer);
 }
+
+pub(crate) unsafe fn GCTraceKindToAscii(kind: root::JS::TraceKind) -> *const c_char {
+    use root::JS::TraceKind;
+    let name: &'static std::ffi::CStr = match kind {
+        TraceKind::Object => c"Object",
+        TraceKind::BigInt => c"BigInt",
+        TraceKind::String => c"String",
+        TraceKind::Symbol => c"Symbol",
+        TraceKind::Script => c"Script",
+        _ => c"Internal",
+    };
+    name.as_ptr()
+}
