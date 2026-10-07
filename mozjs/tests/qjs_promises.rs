@@ -338,6 +338,8 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
     }
 }
 
+thread_local!(static MUTED: RefCell<Vec<bool>> = const { RefCell::new(Vec::new()) });
+
 unsafe extern "C" fn track_rejection(
     _: *mut RawJSContext,
     muted_errors: bool,
@@ -345,7 +347,7 @@ unsafe extern "C" fn track_rejection(
     state: PromiseRejectionHandlingState,
     data: *mut c_void,
 ) {
-    assert!(!muted_errors);
+    MUTED.with(|m| m.borrow_mut().push(muted_errors));
     assert!(jsapi::IsPromiseObject(promise));
     let log = &*(data as *const RefCell<Vec<PromiseRejectionHandlingState>>);
     log.borrow_mut().push(state);
@@ -402,6 +404,15 @@ fn rejection_tracker(cx: &mut JSContext, global: SafeHandleObject) {
             handle(&Int32Value(3))
         ));
         assert!(log.borrow().is_empty());
+
+        // Rejections in a script with muted errors, and in eval code it runs, are muted.
+        MUTED.with(|m| m.borrow_mut().clear());
+        rooted!(&in(cx) let mut rval = UndefinedValue());
+        let options = CompileOptionsWrapper::new(cx, c"cross-origin.js".to_owned(), 1);
+        (*options.ptr)._base.mutedErrors_ = true;
+        evaluate_script(cx, global, "Promise.reject(4); eval('Promise.reject(5)')", rval.handle_mut(), options).unwrap();
+        eval(cx, global, "Promise.reject(6)").unwrap();
+        assert_eq!(MUTED.with(|m| m.borrow().clone()), [true, true, false]);
         jsapi::SetPromiseRejectionTrackerCallback(cx.raw_cx(), None, ptr::null_mut());
     }
 }

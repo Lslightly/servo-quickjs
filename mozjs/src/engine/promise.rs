@@ -227,8 +227,9 @@ unsafe fn notify_rejection_tracker(cx: &mut Cx, ctx: *mut q::JSContext, promise:
         return;
     };
     let data = cx.hooks.rejection_tracker_data;
+    let muted = super::error::current_script_muted(cx);
     let entered = enter_qctx(cx, ctx);
-    callback(cx.as_raw(), false, handle(&promise), state, data);
+    callback(cx.as_raw(), muted, handle(&promise), state, data);
     leave_qctx(cx, entered);
 }
 

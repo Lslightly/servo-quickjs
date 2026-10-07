@@ -53,7 +53,10 @@ pub(crate) unsafe fn source_buffer(lineno: u32, units: *const u8, len: usize) ->
     buf
 }
 
-unsafe fn eval(cx: &mut Cx, options: &CompileOptions, src: &[u8], flags: i32) -> q::JSValue {
+unsafe fn eval(cx: &mut Cx, options: &CompileOptions, src: &[u8], mut flags: i32) -> q::JSValue {
+    if options.base._base.mutedErrors_ {
+        flags |= q::JS_EVAL_FLAG_MUTED_ERRORS as i32;
+    }
     q::JS_Eval(
         cx.qctx(),
         src.as_ptr() as *const c_char,

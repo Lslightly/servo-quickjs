@@ -69,6 +69,20 @@ unsafe fn scripted_frames(cx: &Cx, max: usize) -> Vec<Frame> {
     frames
 }
 
+/// Whether the innermost scripted frame's script has muted errors (SpiderMonkey's
+/// `cx->currentScript()->mutedErrors()`).
+pub(crate) unsafe fn current_script_muted(cx: &Cx) -> bool {
+    let mut muted = false;
+    visit_frames(cx, |info| {
+        if info.is_native != 0 {
+            return false;
+        }
+        muted = info.muted_errors != 0;
+        true
+    });
+    muted
+}
+
 /// The realm of the innermost scripted frame, or null.
 pub(crate) unsafe fn innermost_script_realm(cx: &Cx) -> *mut q::JSContext {
     scripted_frames(cx, 1).first().map_or(ptr::null_mut(), |f| f.realm)
