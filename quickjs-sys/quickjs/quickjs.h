@@ -1093,6 +1093,11 @@ typedef JSModuleDef *JSModuleResolveFunc(JSContext *ctx, JSModuleDef *m, int idx
 int JS_LinkModule(JSContext *ctx, JSModuleDef *m, JSModuleResolveFunc *resolve,
                   void *opaque);
 JS_BOOL JS_IsModuleLinked(JSModuleDef *m);
+/* Servo: whether 'm' was created with JS_NewCModule() */
+JS_BOOL JS_IsCModule(JSModuleDef *m);
+/* Servo: the first module of 'ctx' named 'name' (the file name of its code), like
+   import.meta and import() find the calling module, or NULL */
+JSModuleDef *JS_FindLoadedModule(JSContext *ctx, JSAtom name);
 /* Servo: the file name of a compiled script (JS_TAG_FUNCTION_BYTECODE), or
    JS_ATOM_NULL */
 JSAtom JS_GetScriptFileName(JSContext *ctx, JSValueConst script);

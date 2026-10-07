@@ -1817,6 +1817,12 @@ unsafe extern "C" {
     pub fn JS_IsModuleLinked(m: *mut JSModuleDef) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
+    pub fn JS_IsCModule(m: *mut JSModuleDef) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_FindLoadedModule(ctx: *mut JSContext, name: JSAtom) -> *mut JSModuleDef;
+}
+unsafe extern "C" {
     pub fn JS_GetScriptFileName(ctx: *mut JSContext, script: JSValue) -> JSAtom;
 }
 pub type JSImportMetaHook = ::std::option::Option<

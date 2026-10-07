@@ -62217,6 +62217,16 @@ JS_BOOL JS_IsModuleLinked(JSModuleDef *m)
         m->status != JS_MODULE_STATUS_LINKING;
 }
 
+JS_BOOL JS_IsCModule(JSModuleDef *m)
+{
+    return m->init_func != NULL;
+}
+
+JSModuleDef *JS_FindLoadedModule(JSContext *ctx, JSAtom name)
+{
+    return js_find_loaded_module(ctx, name);
+}
+
 /* Sets the module of every unresolved request reachable from 'm'. A module is
    marked resolved only once its whole graph is, so that a failed call can be
    retried. */
