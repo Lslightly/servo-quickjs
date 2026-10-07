@@ -15,7 +15,7 @@ use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
 /// SpiderMonkey `JSPROP_*` attributes as QuickJS data-property flags.
-fn data_flags(attrs: c_uint) -> c_int {
+pub(crate) fn data_flags(attrs: c_uint) -> c_int {
     let mut flags = 0;
     if attrs & root::JSPROP_PERMANENT as c_uint == 0 {
         flags |= q::JS_PROP_CONFIGURABLE;
