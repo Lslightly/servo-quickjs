@@ -1130,6 +1130,36 @@ void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque);
 JS_BOOL JS_IsJobPending(JSRuntime *rt);
 int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx);
 
+/* Servo: internal slots for HTML structured serialization, without running JS code. */
+/* [[NumberData]], [[StringData]], [[BooleanData]], [[BigIntData]] or [[DateValue]] of
+   'obj'; JS_UNDEFINED for other objects */
+JSValue JS_GetPrimitiveObjectData(JSContext *ctx, JSValueConst obj);
+/* a Number, String, Boolean or BigInt wrapper object of the current realm */
+JSValue JS_NewPrimitiveObject(JSContext *ctx, JSValueConst val);
+/* [[OriginalSource]] of a RegExp; '*pflags' receives its flags as a string */
+JSValue JS_GetRegExpOriginal(JSContext *ctx, JSValueConst obj, JSValue *pflags);
+JSValue JS_NewRegExpOriginal(JSContext *ctx, JSValueConst source, JSValueConst flags);
+JSValue JS_NewMapOrSet(JSContext *ctx, JS_BOOL is_set);
+/* a new array with a snapshot of the entries of a Map ([key0, value0, key1, ...]) or a
+   Set ([key0, key1, ...]) */
+JSValue JS_GetMapRecords(JSContext *ctx, JSValueConst obj);
+/* what Map.prototype.set / Set.prototype.add do, without looking them up ('value' is
+   ignored for Sets) */
+int JS_AddMapRecord(JSContext *ctx, JSValueConst obj, JSValueConst key,
+                    JSValueConst value);
+/* an Error object without stack, with the prototype of %Error% (error_num < 0) or of the
+   native error 'error_num' (EvalError, RangeError, ReferenceError, SyntaxError, TypeError,
+   URIError, InternalError, AggregateError) */
+JSValue JS_NewNativeErrorObject(JSContext *ctx, int error_num);
+/* the two's complement 32-bit words of a BigInt, least significant first: returns their
+   count and stores at most 'max_words' of them */
+size_t JS_GetBigIntWords(JSValueConst val, uint32_t *words, size_t max_words);
+JSValue JS_NewBigIntWords(JSContext *ctx, const uint32_t *words, size_t count);
+/* [[ArrayBufferMaxByteLength]], or -1 if 'obj' is not a resizable ArrayBuffer */
+int64_t JS_GetArrayBufferMaxByteLength(JSValueConst obj);
+JSValue JS_NewResizableArrayBufferCopy(JSContext *ctx, const uint8_t *buf, size_t len,
+                                       size_t max_len);
+
 /* Object Writer/Reader (currently only used to handle precompiled code) */
 #define JS_WRITE_OBJ_BYTECODE  (1 << 0) /* allow function/module */
 #define JS_WRITE_OBJ_BSWAP     (1 << 1) /* byte swapped output */

@@ -62340,3 +62340,224 @@ void JS_MarkPromiseHandled(JSContext *ctx, JSValueConst promise)
     }
     s->is_handled = TRUE;
 }
+
+/* Servo: internal slots for HTML structured serialization, without running JS code. */
+
+JSValue JS_GetPrimitiveObjectData(JSContext *ctx, JSValueConst obj)
+{
+    JSObject *p;
+
+    if (JS_VALUE_GET_TAG(obj) == JS_TAG_OBJECT) {
+        p = JS_VALUE_GET_OBJ(obj);
+        switch(p->class_id) {
+        case JS_CLASS_NUMBER:
+        case JS_CLASS_STRING:
+        case JS_CLASS_BOOLEAN:
+        case JS_CLASS_DATE:
+        case JS_CLASS_BIG_INT:
+            return JS_DupValue(ctx, p->u.object_data);
+        }
+    }
+    return JS_UNDEFINED;
+}
+
+JSValue JS_NewPrimitiveObject(JSContext *ctx, JSValueConst val)
+{
+    switch(JS_VALUE_GET_NORM_TAG(val)) {
+    case JS_TAG_INT:
+    case JS_TAG_FLOAT64:
+    case JS_TAG_STRING:
+    case JS_TAG_STRING_ROPE:
+    case JS_TAG_BOOL:
+    case JS_TAG_SHORT_BIG_INT:
+    case JS_TAG_BIG_INT:
+        return JS_ToObject(ctx, val);
+    default:
+        return JS_ThrowTypeError(ctx, "not a number, string, boolean or bigint");
+    }
+}
+
+JSValue JS_GetRegExpOriginal(JSContext *ctx, JSValueConst obj, JSValue *pflags)
+{
+    static const int flag_mask[8] = {
+        LRE_FLAG_INDICES, LRE_FLAG_GLOBAL, LRE_FLAG_IGNORECASE, LRE_FLAG_MULTILINE,
+        LRE_FLAG_DOTALL, LRE_FLAG_UNICODE, LRE_FLAG_UNICODE_SETS, LRE_FLAG_STICKY,
+    };
+    static const char flag_char[8] = { 'd', 'g', 'i', 'm', 's', 'u', 'v', 'y' };
+    JSRegExp *re;
+    char str[8];
+    int flags, i, len;
+
+    *pflags = JS_UNDEFINED;
+    re = js_get_regexp(ctx, obj, TRUE);
+    if (!re)
+        return JS_EXCEPTION;
+    flags = lre_get_flags(re->bytecode->u.str8);
+    len = 0;
+    for(i = 0; i < 8; i++) {
+        if (flags & flag_mask[i])
+            str[len++] = flag_char[i];
+    }
+    *pflags = JS_NewStringLen(ctx, str, len);
+    if (JS_IsException(*pflags))
+        return JS_EXCEPTION;
+    return JS_DupValue(ctx, JS_MKPTR(JS_TAG_STRING, re->pattern));
+}
+
+JSValue JS_NewRegExpOriginal(JSContext *ctx, JSValueConst source, JSValueConst flags)
+{
+    JSValue bc;
+
+    if (JS_VALUE_GET_TAG(source) != JS_TAG_STRING)
+        return JS_ThrowTypeError(ctx, "string expected");
+    bc = js_compile_regexp(ctx, source, flags);
+    if (JS_IsException(bc))
+        return bc;
+    return JS_NewRegexp(ctx, JS_DupValue(ctx, source), bc);
+}
+
+JSValue JS_NewMapOrSet(JSContext *ctx, JS_BOOL is_set)
+{
+    return js_map_constructor(ctx, JS_UNDEFINED, 0, NULL, is_set ? MAGIC_SET : 0);
+}
+
+static JSMapState *js_get_map_or_set(JSContext *ctx, JSValueConst obj, BOOL *pis_set)
+{
+    JSObject *p;
+
+    if (JS_VALUE_GET_TAG(obj) == JS_TAG_OBJECT) {
+        p = JS_VALUE_GET_OBJ(obj);
+        if (p->class_id == JS_CLASS_MAP || p->class_id == JS_CLASS_SET) {
+            *pis_set = p->class_id == JS_CLASS_SET;
+            return p->u.map_state;
+        }
+    }
+    JS_ThrowTypeError(ctx, "not a Map or Set");
+    return NULL;
+}
+
+JSValue JS_GetMapRecords(JSContext *ctx, JSValueConst obj)
+{
+    JSMapState *s;
+    struct list_head *el;
+    JSMapRecord *mr;
+    JSValue arr;
+    uint32_t i;
+    BOOL is_set;
+
+    s = js_get_map_or_set(ctx, obj, &is_set);
+    if (!s)
+        return JS_EXCEPTION;
+    arr = JS_NewArray(ctx);
+    if (JS_IsException(arr))
+        return arr;
+    i = 0;
+    list_for_each(el, &s->records) {
+        mr = list_entry(el, JSMapRecord, link);
+        if (mr->empty)
+            continue;
+        if (JS_DefinePropertyValueUint32(ctx, arr, i++, JS_DupValue(ctx, mr->key),
+                                        JS_PROP_C_W_E) < 0)
+            goto fail;
+        if (!is_set &&
+            JS_DefinePropertyValueUint32(ctx, arr, i++, JS_DupValue(ctx, mr->value),
+                                        JS_PROP_C_W_E) < 0)
+            goto fail;
+    }
+    return arr;
+ fail:
+    JS_FreeValue(ctx, arr);
+    return JS_EXCEPTION;
+}
+
+int JS_AddMapRecord(JSContext *ctx, JSValueConst obj, JSValueConst key,
+                    JSValueConst value)
+{
+    JSValueConst args[2];
+    JSValue ret;
+    BOOL is_set;
+
+    if (!js_get_map_or_set(ctx, obj, &is_set))
+        return -1;
+    args[0] = key;
+    args[1] = value;
+    ret = js_map_set(ctx, obj, 2, args, is_set ? MAGIC_SET : 0);
+    if (JS_IsException(ret))
+        return -1;
+    JS_FreeValue(ctx, ret);
+    return 0;
+}
+
+JSValue JS_NewNativeErrorObject(JSContext *ctx, int error_num)
+{
+    JSValueConst proto;
+
+    if (error_num < 0 || error_num >= JS_NATIVE_ERROR_COUNT)
+        proto = ctx->class_proto[JS_CLASS_ERROR];
+    else
+        proto = ctx->native_error_proto[error_num];
+    return JS_NewObjectProtoClass(ctx, proto, JS_CLASS_ERROR);
+}
+
+#define JS_LIMB_WORDS (JS_LIMB_BITS / 32)
+
+size_t JS_GetBigIntWords(JSValueConst val, uint32_t *words, size_t max_words)
+{
+    JSBigIntBuf buf;
+    const JSBigInt *p;
+    size_t n, i;
+
+    if (JS_VALUE_GET_TAG(val) == JS_TAG_SHORT_BIG_INT)
+        p = js_bigint_set_short(&buf, val);
+    else
+        p = JS_VALUE_GET_PTR(val);
+    n = (size_t)p->len * JS_LIMB_WORDS;
+    for(i = 0; i < n && i < max_words; i++)
+        words[i] = (uint32_t)(p->tab[i / JS_LIMB_WORDS] >> (32 * (i % JS_LIMB_WORDS)));
+    return n;
+}
+
+JSValue JS_NewBigIntWords(JSContext *ctx, const uint32_t *words, size_t count)
+{
+    JSBigInt *r;
+    size_t len, i;
+
+    if (count == 0)
+        return JS_NewBigInt64(ctx, 0);
+    len = (count + JS_LIMB_WORDS - 1) / JS_LIMB_WORDS;
+    if (len > JS_BIGINT_MAX_SIZE)
+        return JS_ThrowRangeError(ctx, "BigInt is too large to allocate");
+    r = js_bigint_new(ctx, len);
+    if (!r)
+        return JS_EXCEPTION;
+    for(i = 0; i < len; i++)
+        r->tab[i] = 0;
+    for(i = 0; i < count; i++)
+        r->tab[i / JS_LIMB_WORDS] |= (js_limb_t)words[i] << (32 * (i % JS_LIMB_WORDS));
+    /* sign extension of a partial most significant limb */
+    if ((count % JS_LIMB_WORDS) != 0 && (words[count - 1] >> 31) != 0)
+        r->tab[len - 1] |= (js_limb_t)-1 << (32 * (count % JS_LIMB_WORDS));
+    r = js_bigint_normalize(ctx, r);
+    return JS_CompactBigInt(ctx, r);
+}
+
+int64_t JS_GetArrayBufferMaxByteLength(JSValueConst obj)
+{
+    JSArrayBuffer *abuf = JS_GetOpaque(obj, JS_CLASS_ARRAY_BUFFER);
+
+    if (!abuf || !array_buffer_is_resizable(abuf))
+        return -1;
+    return abuf->max_byte_length;
+}
+
+JSValue JS_NewResizableArrayBufferCopy(JSContext *ctx, const uint8_t *buf, size_t len,
+                                       size_t max_len)
+{
+    uint64_t max = max_len;
+
+    if (len > max_len)
+        return JS_ThrowRangeError(ctx, "invalid array buffer length");
+    return js_array_buffer_constructor3(ctx, JS_UNDEFINED, len, &max,
+                                        JS_CLASS_ARRAY_BUFFER, (uint8_t *)buf,
+                                        js_array_buffer_free, NULL, TRUE);
+}
