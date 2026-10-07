@@ -45,11 +45,12 @@ pub(crate) fn realm_of_qctx(qctx: *mut q::JSContext) -> *mut RealmData {
         .unwrap_or(ptr::null_mut())
 }
 
-/// QuickJS: functions know their realm; other objects get the realm of the first prototype whose
-/// realm is known, or whose chain ends at a realm's `Object.prototype`.
+/// QuickJS: functions and proxies know their realm (patch Q13); other objects get the realm of the
+/// first prototype whose realm is known, or whose chain ends at a realm's `Object.prototype`.
 unsafe fn realm_of_plain_object(cx: &Cx, obj: *mut root::JSObject) -> *mut RealmData {
-    if q::JS_IsFunction(cx.base_ctx, obj_val(obj)) != 0 {
-        let realm = realm_of_qctx(q::JS_GetFunctionRealm(cx.base_ctx, obj_val(obj)));
+    let qctx = q::JS_GetObjectRealm(obj_val(obj));
+    if !qctx.is_null() {
+        let realm = realm_of_qctx(qctx);
         if !realm.is_null() {
             return realm;
         }
