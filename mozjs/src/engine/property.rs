@@ -161,6 +161,35 @@ unsafe fn define_accessor(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom
     ok(q::JS_DefinePropertyGetSet(cx.qctx(), obj_val(obj), atom, getter, setter, accessor_flags(attrs)))
 }
 
+/// SetFunctionName with a prefix: `"get name"`, or `"get [description]"` for a symbol key. The
+/// caller owns the returned atom.
+unsafe fn accessor_name(cx: &mut Cx, prefix: &str, name: q::JSAtom) -> q::JSAtom {
+    let qctx = cx.qctx();
+    let is_symbol = crate::sys::jsid::from_atom(name).is_symbol();
+    let key = if is_symbol { q::JS_AtomToValue(qctx, name) } else { q::JS_AtomToString(qctx, name) };
+    let text = if is_symbol {
+        let desc = q::JS_GetPropertyStr(qctx, key, c"description".as_ptr());
+        let text = string_lossy(qctx, desc);
+        q::JS_FreeValueRT(cx.rt, desc);
+        format!("{prefix} [{text}]")
+    } else {
+        format!("{prefix} {}", string_lossy(qctx, key))
+    };
+    q::JS_FreeValueRT(cx.rt, key);
+    q::JS_NewAtomLen(qctx, text.as_ptr() as *const c_char, text.len())
+}
+
+unsafe fn string_lossy(qctx: *mut q::JSContext, v: q::JSValue) -> String {
+    let s = q::JS_ToCString(qctx, v);
+    if s.is_null() {
+        q::JS_FreeValue(qctx, q::JS_GetException(qctx));
+        return String::new();
+    }
+    let text = std::ffi::CStr::from_ptr(s).to_string_lossy().into_owned();
+    q::JS_FreeCString(qctx, s);
+    text
+}
+
 unsafe fn native_fn(cx: &mut Cx, native: root::JSNative, info: *const root::JSJitInfo, nargs: u32, name: q::JSAtom) -> q::JSValue {
     if native.is_none() {
         return q::JS_UNDEFINED;
@@ -658,8 +687,12 @@ pub(crate) unsafe fn JS_DefineProperties(cx: *mut root::JSContext, obj: root::JS
             root::JSPropertySpec_Kind::NativeAccessor => {
                 let getter = s.u.accessors.getter.native;
                 let setter = s.u.accessors.setter.native;
-                let g = native_fn(cx, getter.op, getter.info, 0, atom.atom);
-                let st = native_fn(cx, setter.op, setter.info, 1, atom.atom);
+                let get_name = accessor_name(cx, "get", atom.atom);
+                let set_name = accessor_name(cx, "set", atom.atom);
+                let g = native_fn(cx, getter.op, getter.info, 0, get_name);
+                let st = native_fn(cx, setter.op, setter.info, 1, set_name);
+                q::JS_FreeAtomRT(cx.rt, get_name);
+                q::JS_FreeAtomRT(cx.rt, set_name);
                 define_accessor(cx, *obj.ptr, atom.atom, g, st, attrs)
             },
             root::JSPropertySpec_Kind::Value => {

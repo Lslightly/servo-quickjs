@@ -492,3 +492,47 @@ fn class_construct_hook() {
         assert_eq!(v.to_int32(), 42);
     });
 }
+
+unsafe extern "C" fn seven(_cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
+    let args = CallArgs::from_vp(vp, argc);
+    args.rval().set(Int32Value(7));
+    true
+}
+
+/// WebIDL attribute getters are named "get <name>".
+#[test]
+fn accessor_function_names() {
+    use mozjs::jsapi::{
+        JSPropertySpec, JSPropertySpec_Accessor, JSPropertySpec_AccessorsOrValue,
+        JSPropertySpec_AccessorsOrValue_Accessors, JSPropertySpec_Kind,
+    };
+    with_global(|cx, global| unsafe {
+        let accessor = |op| JSPropertySpec_Accessor { native: JSNativeWrapper { op, info: ptr::null() } };
+        let specs = [
+            JSPropertySpec {
+                name: JSPropertySpec_Name { string_: c"x".as_ptr() },
+                attributes_: JSPROP_ENUMERATE as u8,
+                kind_: JSPropertySpec_Kind::NativeAccessor,
+                u: JSPropertySpec_AccessorsOrValue {
+                    accessors: JSPropertySpec_AccessorsOrValue_Accessors {
+                        getter: accessor(Some(seven)),
+                        setter: accessor(Some(seven)),
+                    },
+                },
+            },
+            JSPropertySpec::ZERO,
+        ];
+        let obj = JS_NewPlainObject(cx);
+        rooted!(&in(cx) let obj = obj);
+        assert!(mozjs::rust::wrappers2::JS_DefineProperties(cx, obj.handle(), specs.as_ptr()));
+        set_global(cx, global, c"o", ObjectValue(obj.get()));
+        let v = eval(
+            cx,
+            global,
+            "var d = Object.getOwnPropertyDescriptor(o, 'x'); [o.x, d.get.name, d.set.name].join()",
+        );
+        rooted!(&in(cx) let v = v);
+        let s = mozjs::conversions::jsstr_to_string(cx, std::ptr::NonNull::new(v.to_string()).unwrap());
+        assert_eq!(s, "7,get x,set x");
+    });
+}
