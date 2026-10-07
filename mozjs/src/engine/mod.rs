@@ -74,8 +74,11 @@ pub(crate) struct RealmData {
     pub global: *mut root::JSObject,
     pub private: *mut std::os::raw::c_void,
     pub principals: *mut root::JSPrincipals,
-    /// Reserved slots of the global (QuickJS's global object has no opaque of ours yet).
-    pub global_data: Option<Box<class::ObjectData>>,
+    /// Copied from the `RealmOptions`; `traceGlobal_` is run by `JS_GlobalObjectTraceHook`.
+    pub creation_options: root::JS::RealmCreationOptions,
+    pub behaviors: root::JS::RealmBehaviors,
+    /// The WindowProxy of a Window global (`SetWindowProxy`), kept alive as its global `this`.
+    pub window_proxy: *mut root::JSObject,
 }
 
 thread_local!(static CURRENT: Cell<*mut Cx> = const { Cell::new(ptr::null_mut()) });

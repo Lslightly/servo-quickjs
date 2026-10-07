@@ -111,7 +111,8 @@ def convert_item(item, indent, implemented, stats):
         ret = m.group("ret") or ""
         name = m.group("name")
         stats["fn"] += 1
-        if name in implemented:
+        # A name in both jsapi and glue (NewProxyObject) forwards only where the arity matches.
+        if name in implemented and len(param_names(params)) in implemented[name]:
             args = ", ".join(param_names(params))
             return f"{indent}{attrs.strip()}\n{indent}pub unsafe extern \"C\" fn {name}({params}){ret} {{ crate::engine::{name}({args}) }}\n"
         return f"{indent}{attrs.strip()}\n{indent}pub unsafe extern \"C\" fn {name}({params}){ret} {{ qjs_todo!(\"{name}\") }}\n"
@@ -156,13 +157,21 @@ def convert(text, implemented):
 
 def main():
     src, dst = sys.argv[1], sys.argv[2]
-    implemented = set()
+    implemented = {}
     if len(sys.argv) > 3:
-        # Functions implemented in the shim's engine module: `pub(crate) unsafe fn NAME(`.
+        # Functions implemented in the shim's engine module: `pub(crate) unsafe fn NAME(`, with
+        # their arities.
         import glob
         for path in glob.glob(sys.argv[3] + "/**/*.rs", recursive=True):
             with open(path) as f:
-                implemented |= set(re.findall(r"pub\(crate\) unsafe fn (\w+)\(", f.read()))
+                text = f.read()
+            for m in re.finditer(r"pub\(crate\) unsafe fn (\w+)\(", text):
+                depth, i = 1, m.end()
+                while depth:
+                    depth += {"(": 1, ")": -1}.get(text[i], 0)
+                    i += 1
+                arity = len(param_names(text[m.end() : i - 1]))
+                implemented.setdefault(m.group(1), set()).add(arity)
     with open(src) as f:
         text = f.read()
     # Layout assertions encode SpiderMonkey's sizes, which the shim changes (e.g. JS::Value).
