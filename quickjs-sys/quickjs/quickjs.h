@@ -668,6 +668,26 @@ JSValue JS_Throw(JSContext *ctx, JSValue obj);
 void JS_SetUncatchableException(JSContext *ctx, JS_BOOL flag);
 JSValue JS_GetException(JSContext *ctx);
 JS_BOOL JS_HasException(JSContext *ctx);
+/* Servo: whether the pending exception is uncatchable (e.g. interrupted script) */
+JS_BOOL JS_HasUncatchableException(JSContext *ctx);
+/* Servo: where the last exception was thrown, if in a bytecode function (the
+   innermost such frame it unwound). 'filename' is valid until the next throw. */
+JS_BOOL JS_GetExceptionLocation(JSContext *ctx, JSAtom *pfilename, int *pline_num,
+                                int *pcol_num);
+/* Servo: the frames of the current call stack, innermost first, until 'cb' returns
+   non-zero. 'name' is the function's own "name" data property or JS_UNDEFINED (for
+   top-level code), borrowed. Native frames have 'is_native' set and no location. */
+typedef struct JSStackFrameInfo {
+    const void *frame; /* identifies the frame while it is live */
+    JS_BOOL is_native;
+    JSContext *realm; /* realm of a bytecode function */
+    JSValueConst name;
+    JSAtom filename; /* JS_ATOM_NULL if unknown */
+    int line_num; /* 1-based, 0 if unknown */
+    int col_num; /* 1-based, 0 if unknown */
+} JSStackFrameInfo;
+typedef int JSStackFrameCallback(void *opaque, const JSStackFrameInfo *info);
+void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaque);
 JS_BOOL JS_IsError(JSContext *ctx, JSValueConst val);
 JSValue JS_NewError(JSContext *ctx);
 JSValue __js_printf_like(2, 3) JS_ThrowSyntaxError(JSContext *ctx, const char *fmt, ...);
@@ -968,10 +988,38 @@ typedef void JSHostPromiseRejectionTracker(JSContext *ctx, JSValueConst promise,
                                            JSValueConst reason,
                                            JS_BOOL is_handled, void *opaque);
 void JS_SetHostPromiseRejectionTracker(JSRuntime *rt, JSHostPromiseRejectionTracker *cb, void *opaque);
+/* Servo: promise operations of the SpiderMonkey API. JS_PromiseResolve() is
+   %Promise%.resolve() / %Promise%.reject(). JS_SettlePromise() resolves or rejects a
+   pending promise (no-op otherwise). JS_PerformPromiseThen() adds reactions; without
+   'create_result' it returns JS_UNDEFINED and the handlers' results are ignored. */
+JSValue JS_PromiseResolve(JSContext *ctx, JSValueConst value, JS_BOOL is_reject);
+int JS_SettlePromise(JSContext *ctx, JSValueConst promise, JSValueConst value,
+                     JS_BOOL is_reject);
+JSValue JS_PerformPromiseThen(JSContext *ctx, JSValueConst promise,
+                              JSValueConst on_fulfilled, JSValueConst on_rejected,
+                              JS_BOOL create_result);
+JS_BOOL JS_GetPromiseIsHandled(JSValueConst promise);
+void JS_SetPromiseIsHandled(JSValueConst promise, JS_BOOL is_handled);
 
 /* return != 0 if the JS code needs to be interrupted */
 typedef int JSInterruptHandler(JSRuntime *rt, void *opaque);
 void JS_SetInterruptHandler(JSRuntime *rt, JSInterruptHandler *cb, void *opaque);
+/* Servo: host check before eval() and the Function constructors compile code
+   (HostEnsureCanCompileStrings). 'code' is the source text. For the Function
+   constructors, 'arg_strings' (converted to strings) and 'args' (as passed) are the
+   parameters followed by the body. Return 1 to allow, 0 to block (an EvalError is
+   thrown) or < 0 on exception. */
+typedef enum JSCompileKindEnum {
+    JS_COMPILE_DIRECT_EVAL,
+    JS_COMPILE_INDIRECT_EVAL,
+    JS_COMPILE_FUNCTION,
+} JSCompileKindEnum;
+typedef int JSCanCompileStringsHook(JSContext *ctx, JSCompileKindEnum kind,
+                                    JSValueConst code, int argc,
+                                    JSValueConst *arg_strings, JSValueConst *args,
+                                    void *opaque);
+void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
+                                 void *opaque);
 /* if can_block is TRUE, Atomics.wait() can be used */
 void JS_SetCanBlock(JSRuntime *rt, JS_BOOL can_block);
 /* select which debug info is stripped from the compiled code */
@@ -1020,6 +1068,11 @@ JSValue JS_GetModuleNamespace(JSContext *ctx, JSModuleDef *m);
 
 typedef JSValue JSJobFunc(JSContext *ctx, int argc, JSValueConst *argv);
 int JS_EnqueueJob(JSContext *ctx, JSJobFunc *job_func, int argc, JSValueConst *argv);
+/* Servo: if set, the jobs of JS_EnqueueJob() (promise jobs) are passed to the hook
+   instead of the internal job list. 'argv' is borrowed. Return < 0 on exception. */
+typedef int JSEnqueueJobHook(JSContext *ctx, JSJobFunc *job_func, int argc,
+                             JSValueConst *argv, void *opaque);
+void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque);
 
 JS_BOOL JS_IsJobPending(JSRuntime *rt);
 int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx);

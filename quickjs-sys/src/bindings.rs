@@ -904,6 +904,50 @@ unsafe extern "C" {
     pub fn JS_HasException(ctx: *mut JSContext) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
+    pub fn JS_HasUncatchableException(ctx: *mut JSContext) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_GetExceptionLocation(
+        ctx: *mut JSContext,
+        pfilename: *mut JSAtom,
+        pline_num: *mut ::std::os::raw::c_int,
+        pcol_num: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct JSStackFrameInfo {
+    pub frame: *const ::std::os::raw::c_void,
+    pub is_native: ::std::os::raw::c_int,
+    pub realm: *mut JSContext,
+    pub name: JSValue,
+    pub filename: JSAtom,
+    pub line_num: ::std::os::raw::c_int,
+    pub col_num: ::std::os::raw::c_int,
+}
+impl Default for JSStackFrameInfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type JSStackFrameCallback = ::std::option::Option<
+    unsafe extern "C" fn(
+        opaque: *mut ::std::os::raw::c_void,
+        info: *const JSStackFrameInfo,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_IterateStackFrames(
+        ctx: *mut JSContext,
+        cb: JSStackFrameCallback,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+unsafe extern "C" {
     pub fn JS_IsError(ctx: *mut JSContext, val: JSValue) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
@@ -1582,6 +1626,36 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+unsafe extern "C" {
+    pub fn JS_PromiseResolve(
+        ctx: *mut JSContext,
+        value: JSValue,
+        is_reject: ::std::os::raw::c_int,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_SettlePromise(
+        ctx: *mut JSContext,
+        promise: JSValue,
+        value: JSValue,
+        is_reject: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_PerformPromiseThen(
+        ctx: *mut JSContext,
+        promise: JSValue,
+        on_fulfilled: JSValue,
+        on_rejected: JSValue,
+        create_result: ::std::os::raw::c_int,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetPromiseIsHandled(promise: JSValue) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_SetPromiseIsHandled(promise: JSValue, is_handled: ::std::os::raw::c_int);
+}
 pub type JSInterruptHandler = ::std::option::Option<
     unsafe extern "C" fn(
         rt: *mut JSRuntime,
@@ -1592,6 +1666,28 @@ unsafe extern "C" {
     pub fn JS_SetInterruptHandler(
         rt: *mut JSRuntime,
         cb: JSInterruptHandler,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+pub const JS_COMPILE_DIRECT_EVAL: JSCompileKindEnum = 0;
+pub const JS_COMPILE_INDIRECT_EVAL: JSCompileKindEnum = 1;
+pub const JS_COMPILE_FUNCTION: JSCompileKindEnum = 2;
+pub type JSCompileKindEnum = ::std::os::raw::c_uint;
+pub type JSCanCompileStringsHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        kind: JSCompileKindEnum,
+        code: JSValue,
+        argc: ::std::os::raw::c_int,
+        arg_strings: *mut JSValue,
+        args: *mut JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_SetCanCompileStringsHook(
+        rt: *mut JSRuntime,
+        hook: JSCanCompileStringsHook,
         opaque: *mut ::std::os::raw::c_void,
     );
 }
@@ -1682,6 +1778,22 @@ unsafe extern "C" {
         argc: ::std::os::raw::c_int,
         argv: *mut JSValue,
     ) -> ::std::os::raw::c_int;
+}
+pub type JSEnqueueJobHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        job_func: JSJobFunc,
+        argc: ::std::os::raw::c_int,
+        argv: *mut JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_SetEnqueueJobHook(
+        rt: *mut JSRuntime,
+        hook: JSEnqueueJobHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
 }
 unsafe extern "C" {
     pub fn JS_IsJobPending(rt: *mut JSRuntime) -> ::std::os::raw::c_int;

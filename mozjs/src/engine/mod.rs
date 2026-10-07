@@ -64,6 +64,8 @@ pub(crate) struct Cx {
     pub pool: Vec<q::JSValue>,
     pub atom_pool: Vec<q::JSAtom>,
     pub warning_reporter: root::JS::WarningReporter,
+    /// Job queue, promise rejection tracking, interrupts and security callbacks.
+    pub hooks: promise::RuntimeHooks,
 }
 
 /// What a SpiderMonkey `JS::Realm*` (and `JS::Compartment*`) points to.

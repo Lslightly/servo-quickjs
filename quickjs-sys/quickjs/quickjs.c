@@ -352,6 +352,11 @@ struct JSRuntime {
     JSValue current_exception;
     /* true if the current exception cannot be catched */
     BOOL current_exception_is_uncatchable : 8;
+    /* Servo: where the current exception was thrown in bytecode */
+    BOOL current_exception_has_location : 8;
+    JSAtom current_exception_filename;
+    int current_exception_line_num;
+    int current_exception_col_num;
     /* true if inside an out of memory error, to avoid recursing */
     BOOL in_out_of_memory : 8;
 
@@ -364,6 +369,12 @@ struct JSRuntime {
     void *host_promise_rejection_tracker_opaque;
 
     struct list_head job_list; /* list of JSJobEntry.link */
+    /* Servo: host job queue */
+    JSEnqueueJobHook *enqueue_job_hook;
+    void *enqueue_job_opaque;
+    /* Servo: host check for eval() and Function() */
+    JSCanCompileStringsHook *can_compile_strings_hook;
+    void *can_compile_strings_opaque;
 
     JSModuleNormalizeFunc *module_normalize_func;
     BOOL module_loader_has_attr;
@@ -1167,8 +1178,10 @@ static JSValue JS_InvokeFree(JSContext *ctx, JSValue this_val, JSAtom atom,
                              int argc, JSValueConst *argv);
 static __exception int JS_ToArrayLengthFree(JSContext *ctx, uint32_t *plen,
                                             JSValue val, BOOL is_array_ctor);
+/* Servo: 'compile_kind' is the JSCompileKindEnum of the host check, -1 for none */
 static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
-                             JSValueConst val, int flags, int scope_idx);
+                             JSValueConst val, int flags, int scope_idx,
+                             int compile_kind);
 JSValue __attribute__((format(printf, 2, 3))) JS_ThrowInternalError(JSContext *ctx, const char *fmt, ...);
 static __maybe_unused void JS_DumpAtoms(JSRuntime *rt);
 static __maybe_unused void JS_DumpString(JSRuntime *rt, const JSString *p);
@@ -2267,6 +2280,9 @@ static int JS_EnqueueJob2(JSContext *ctx, JSJobFunc *job_func,
     JSJobEntry *e;
     int i;
 
+    /* Servo: promise jobs go to the host's job queue */
+    if (!no_exception && rt->enqueue_job_hook)
+        return rt->enqueue_job_hook(ctx, job_func, argc, argv, rt->enqueue_job_opaque);
     if (no_exception)
         e = js_malloc_rt(ctx->rt, sizeof(*e) + argc * sizeof(JSValue));
     else
@@ -2408,6 +2424,7 @@ void JS_FreeRuntime(JSRuntime *rt)
     int i;
 
     JS_FreeValueRT(rt, rt->current_exception);
+    JS_FreeAtomRT(rt, rt->current_exception_filename);
 
     list_for_each_safe(el, el1, &rt->job_list) {
         JSJobEntry *e = list_entry(el, JSJobEntry, link);
@@ -7380,6 +7397,7 @@ JSValue JS_Throw(JSContext *ctx, JSValue obj)
     JS_FreeValue(ctx, rt->current_exception);
     rt->current_exception = obj;
     rt->current_exception_is_uncatchable = FALSE;
+    rt->current_exception_has_location = FALSE;
     return JS_EXCEPTION;
 }
 
@@ -18552,7 +18570,8 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValueConst func_obj,
                     else
                         obj = JS_UNDEFINED;
                     ret_val = JS_EvalObject(ctx, JS_UNDEFINED, obj,
-                                            JS_EVAL_TYPE_DIRECT, scope_idx);
+                                            JS_EVAL_TYPE_DIRECT, scope_idx,
+                                            JS_COMPILE_DIRECT_EVAL);
                 } else {
                     ret_val = JS_CallInternal(ctx, call_argv[-1], JS_UNDEFINED,
                                               JS_UNDEFINED, call_argc, call_argv, 0);
@@ -18585,7 +18604,8 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValueConst func_obj,
                     else
                         obj = JS_UNDEFINED;
                     ret_val = JS_EvalObject(ctx, JS_UNDEFINED, obj,
-                                            JS_EVAL_TYPE_DIRECT, scope_idx);
+                                            JS_EVAL_TYPE_DIRECT, scope_idx,
+                                            JS_COMPILE_DIRECT_EVAL);
                 } else {
                     ret_val = JS_Call(ctx, sp[-2], JS_UNDEFINED, len,
                                       (JSValueConst *)tab);
@@ -20843,6 +20863,15 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValueConst func_obj,
            operation */
         sf->cur_pc = pc;
         build_backtrace(ctx, rt->current_exception, NULL, 0, 0, 0);
+    }
+    /* Servo: remember where the exception was thrown */
+    if (!rt->current_exception_has_location && b->has_debug) {
+        JS_FreeAtomRT(rt, rt->current_exception_filename);
+        rt->current_exception_filename = JS_DupAtom(ctx, b->debug.filename);
+        rt->current_exception_line_num =
+            find_line_num(ctx, b, pc - b->byte_code_buf - 1,
+                          &rt->current_exception_col_num);
+        rt->current_exception_has_location = TRUE;
     }
     if (!rt->current_exception_is_uncatchable) {
         while (sp > stack_buf) {
@@ -37581,8 +37610,44 @@ static JSValue JS_EvalInternal(JSContext *ctx, JSValueConst this_obj,
     return ret;
 }
 
+/* Servo: EvalError for code the host does not allow */
+static JSValue __attribute__((format(printf, 2, 3))) js_throw_eval_error(JSContext *ctx, const char *fmt, ...)
+{
+    JSValue val;
+    va_list ap;
+
+    va_start(ap, fmt);
+    val = JS_ThrowError(ctx, JS_EVAL_ERROR, fmt, ap);
+    va_end(ap);
+    return val;
+}
+
+/* Servo: HostEnsureCanCompileStrings; returns < 0 with a pending exception if the
+   code must not be compiled. */
+static int js_host_can_compile_strings(JSContext *ctx, JSCompileKindEnum kind,
+                                       JSValueConst code, int argc,
+                                       JSValueConst *arg_strings, JSValueConst *args)
+{
+    JSRuntime *rt = ctx->rt;
+    int ret;
+
+    if (!rt->can_compile_strings_hook)
+        return 0;
+    ret = rt->can_compile_strings_hook(ctx, kind, code, argc, arg_strings, args,
+                                       rt->can_compile_strings_opaque);
+    if (ret < 0)
+        return -1;
+    if (ret == 0) {
+        js_throw_eval_error(ctx, "call to %s blocked by CSP",
+                            kind == JS_COMPILE_FUNCTION ? "Function()" : "eval()");
+        return -1;
+    }
+    return 0;
+}
+
 static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
-                             JSValueConst val, int flags, int scope_idx)
+                             JSValueConst val, int flags, int scope_idx,
+                             int compile_kind)
 {
     JSValue ret;
     const char *str;
@@ -37590,6 +37655,9 @@ static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
 
     if (!JS_IsString(val))
         return JS_DupValue(ctx, val);
+    if (compile_kind >= 0 &&
+        js_host_can_compile_strings(ctx, compile_kind, val, 0, NULL, NULL) < 0)
+        return JS_EXCEPTION;
     str = JS_ToCStringLen(ctx, &len, val);
     if (!str)
         return JS_EXCEPTION;
@@ -40138,7 +40206,8 @@ static JSValue JS_NewCConstructor(JSContext *ctx, int class_id, const char *name
 static JSValue js_global_eval(JSContext *ctx, JSValueConst this_val,
                               int argc, JSValueConst *argv)
 {
-    return JS_EvalObject(ctx, ctx->global_obj, argv[0], JS_EVAL_TYPE_INDIRECT, -1);
+    return JS_EvalObject(ctx, ctx->global_obj, argv[0], JS_EVAL_TYPE_INDIRECT, -1,
+                         JS_COMPILE_INDIRECT_EVAL);
 }
 
 static JSValue js_global_isNaN(JSContext *ctx, JSValueConst this_val,
@@ -41343,6 +41412,19 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
     int i, n, ret;
     JSValue s, proto, obj = JS_UNDEFINED;
     StringBuffer b_s, *b = &b_s;
+    JSValue *strs = NULL;
+
+    /* Servo: convert the arguments once, for the host check and the source text */
+    if (argc > 0) {
+        strs = js_mallocz(ctx, sizeof(strs[0]) * argc);
+        if (!strs)
+            return JS_EXCEPTION;
+        for(i = 0; i < argc; i++) {
+            strs[i] = JS_ToString(ctx, argv[i]);
+            if (JS_IsException(strs[i]))
+                goto fail2;
+        }
+    }
 
     string_buffer_init(ctx, b, 0);
     string_buffer_putc8(b, '(');
@@ -41362,12 +41444,12 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
         if (i != 0) {
             string_buffer_putc8(b, ',');
         }
-        if (string_buffer_concat_value(b, argv[i]))
+        if (string_buffer_concat_value(b, strs[i]))
             goto fail;
     }
     string_buffer_puts8(b, "\n) {\n");
     if (n >= 0) {
-        if (string_buffer_concat_value(b, argv[n]))
+        if (string_buffer_concat_value(b, strs[n]))
             goto fail;
     }
     string_buffer_puts8(b, "\n})");
@@ -41375,7 +41457,12 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
     if (JS_IsException(s))
         goto fail1;
 
-    obj = JS_EvalObject(ctx, ctx->global_obj, s, JS_EVAL_TYPE_INDIRECT, -1);
+    if (js_host_can_compile_strings(ctx, JS_COMPILE_FUNCTION, s, argc,
+                                    (JSValueConst *)strs, argv) < 0) {
+        JS_FreeValue(ctx, s);
+        goto fail1;
+    }
+    obj = JS_EvalObject(ctx, ctx->global_obj, s, JS_EVAL_TYPE_INDIRECT, -1, -1);
     JS_FreeValue(ctx, s);
     if (JS_IsException(obj))
         goto fail1;
@@ -41397,12 +41484,15 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
         if (ret < 0)
             goto fail1;
     }
+    free_arg_list(ctx, strs, argc);
     return obj;
 
  fail:
     string_buffer_free(b);
  fail1:
     JS_FreeValue(ctx, obj);
+ fail2:
+    free_arg_list(ctx, strs, argc);
     return JS_EXCEPTION;
 }
 
@@ -61859,4 +61949,149 @@ size_t JS_GetStringData(JSValueConst str, const void **pdata, int *pwide)
     else
         *pdata = p->u.str8;
     return p->len;
+}
+
+/* Servo: host job queue and the promise operations of the SpiderMonkey API (Q4). */
+
+void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque)
+{
+    rt->enqueue_job_hook = hook;
+    rt->enqueue_job_opaque = opaque;
+}
+
+JSValue JS_PromiseResolve(JSContext *ctx, JSValueConst value, BOOL is_reject)
+{
+    return js_promise_resolve(ctx, ctx->promise_ctor, 1, &value, is_reject);
+}
+
+int JS_SettlePromise(JSContext *ctx, JSValueConst promise, JSValueConst value,
+                     BOOL is_reject)
+{
+    JSPromiseData *s = JS_GetOpaque2(ctx, promise, JS_CLASS_PROMISE);
+    JSValue resolving_funcs[2], ret;
+
+    if (!s)
+        return -1;
+    if (s->promise_state != JS_PROMISE_PENDING)
+        return 0;
+    if (js_create_resolving_functions(ctx, resolving_funcs, promise) < 0)
+        return -1;
+    ret = JS_Call(ctx, resolving_funcs[is_reject], JS_UNDEFINED, 1, &value);
+    JS_FreeValue(ctx, resolving_funcs[0]);
+    JS_FreeValue(ctx, resolving_funcs[1]);
+    if (JS_IsException(ret))
+        return -1;
+    JS_FreeValue(ctx, ret);
+    return 0;
+}
+
+JSValue JS_PerformPromiseThen(JSContext *ctx, JSValueConst promise,
+                              JSValueConst on_fulfilled, JSValueConst on_rejected,
+                              BOOL create_result)
+{
+    JSValue result = JS_UNDEFINED;
+    JSValue resolving_funcs[2] = { JS_UNDEFINED, JS_UNDEFINED };
+    JSValueConst handlers[2];
+    int ret;
+
+    if (!JS_GetOpaque2(ctx, promise, JS_CLASS_PROMISE))
+        return JS_EXCEPTION;
+    if (create_result) {
+        result = js_new_promise_capability(ctx, resolving_funcs, JS_UNDEFINED);
+        if (JS_IsException(result))
+            return result;
+    }
+    handlers[0] = on_fulfilled;
+    handlers[1] = on_rejected;
+    ret = perform_promise_then(ctx, promise, handlers,
+                               (JSValueConst *)resolving_funcs);
+    JS_FreeValue(ctx, resolving_funcs[0]);
+    JS_FreeValue(ctx, resolving_funcs[1]);
+    if (ret) {
+        JS_FreeValue(ctx, result);
+        return JS_EXCEPTION;
+    }
+    return result;
+}
+
+BOOL JS_GetPromiseIsHandled(JSValueConst promise)
+{
+    JSPromiseData *s = JS_GetOpaque(promise, JS_CLASS_PROMISE);
+    return s && s->is_handled;
+}
+
+void JS_SetPromiseIsHandled(JSValueConst promise, BOOL is_handled)
+{
+    JSPromiseData *s = JS_GetOpaque(promise, JS_CLASS_PROMISE);
+    if (s)
+        s->is_handled = is_handled;
+}
+
+/* Servo: host check for eval() and the Function constructors (Q5). */
+
+void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
+                                 void *opaque)
+{
+    rt->can_compile_strings_hook = hook;
+    rt->can_compile_strings_opaque = opaque;
+}
+
+/* Servo: the uncatchable-exception flag, exception locations and structured stack frames
+   (Q9). */
+
+BOOL JS_HasUncatchableException(JSContext *ctx)
+{
+    JSRuntime *rt = ctx->rt;
+    return !JS_IsUninitialized(rt->current_exception) &&
+        rt->current_exception_is_uncatchable;
+}
+
+BOOL JS_GetExceptionLocation(JSContext *ctx, JSAtom *pfilename, int *pline_num,
+                             int *pcol_num)
+{
+    JSRuntime *rt = ctx->rt;
+    if (!rt->current_exception_has_location)
+        return FALSE;
+    *pfilename = rt->current_exception_filename;
+    *pline_num = rt->current_exception_line_num;
+    *pcol_num = rt->current_exception_col_num;
+    return TRUE;
+}
+
+void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaque)
+{
+    JSStackFrame *sf;
+    JSStackFrameInfo info;
+    JSObject *p;
+    JSFunctionBytecode *b;
+    JSShapeProperty *prs;
+    JSProperty *pr;
+
+    for(sf = ctx->rt->current_stack_frame; sf != NULL; sf = sf->prev_frame) {
+        memset(&info, 0, sizeof(info));
+        info.frame = sf;
+        info.name = JS_UNDEFINED;
+        if (JS_VALUE_GET_TAG(sf->cur_func) != JS_TAG_OBJECT)
+            continue;
+        p = JS_VALUE_GET_OBJ(sf->cur_func);
+        if (!js_class_has_bytecode(p->class_id)) {
+            info.is_native = TRUE;
+        } else {
+            b = p->u.func.function_bytecode;
+            info.realm = b->realm;
+            if (b->func_name != JS_ATOM__eval_) {
+                prs = find_own_property(&pr, p, JS_ATOM_name);
+                if (prs && (prs->flags & JS_PROP_TMASK) == JS_PROP_NORMAL &&
+                    JS_VALUE_GET_TAG(pr->u.value) == JS_TAG_STRING)
+                    info.name = pr->u.value;
+            }
+            if (b->has_debug) {
+                info.filename = b->debug.filename;
+                info.line_num = find_line_num(ctx, b, sf->cur_pc - b->byte_code_buf - 1,
+                                              &info.col_num);
+            }
+        }
+        if (cb(opaque, &info))
+            break;
+    }
 }
