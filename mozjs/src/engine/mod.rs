@@ -26,6 +26,7 @@ mod clone;
 mod error;
 mod eval;
 mod exception;
+mod intl;
 mod misc;
 mod module;
 mod object;
