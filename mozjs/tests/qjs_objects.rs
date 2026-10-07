@@ -434,3 +434,61 @@ fn jit_info() {
         assert!(mozjs::glue::RUST_FUNCTION_VALUE_TO_JITINFO(plain).is_null());
     });
 }
+
+unsafe extern "C" fn construct_hook(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
+    let args = CallArgs::from_vp(vp, argc);
+    let obj = mozjs::jsapi::JS_NewPlainObject(cx);
+    let arg = if argc > 0 { *args.get(0).ptr } else { UndefinedValue() };
+    rooted!(in(cx) let obj = obj);
+    rooted!(in(cx) let arg = arg);
+    assert!(mozjs::jsapi::JS_DefineProperty(
+        cx,
+        obj.handle().into(),
+        c"arg".as_ptr(),
+        arg.handle().into(),
+        JSPROP_ENUMERATE as u32
+    ));
+    args.rval().set(ObjectValue(obj.get()));
+    true
+}
+
+static CONSTRUCTIBLE_OPS: mozjs::jsapi::JSClassOps = mozjs::jsapi::JSClassOps {
+    addProperty: None,
+    delProperty: None,
+    enumerate: None,
+    newEnumerate: None,
+    resolve: None,
+    mayResolve: None,
+    finalize: None,
+    call: None,
+    construct: Some(construct_hook),
+    trace: None,
+};
+
+static CONSTRUCTIBLE_CLASS: mozjs::jsapi::JSClass = mozjs::jsapi::JSClass {
+    name: c"Constructible".as_ptr(),
+    flags: 0,
+    cOps: &CONSTRUCTIBLE_OPS,
+    spec: ptr::null(),
+    ext: ptr::null(),
+    oOps: ptr::null(),
+};
+
+/// Like Servo's interface objects: an object whose class has a `construct` hook works with `new`.
+#[test]
+fn class_construct_hook() {
+    with_global(|cx, global| unsafe {
+        rooted!(&in(cx) let proto = ptr::null_mut::<JSObject>());
+        let ctor = mozjs::rust::wrappers2::JS_NewObjectWithGivenProto(
+            cx,
+            &CONSTRUCTIBLE_CLASS,
+            proto.handle(),
+        );
+        assert!(!ctor.is_null());
+        rooted!(&in(cx) let ctor = ctor);
+        assert!(IsConstructor(ctor.get()));
+        set_global(cx, global, c"C", ObjectValue(ctor.get()));
+        let v = eval(cx, global, "new C(42).arg");
+        assert_eq!(v.to_int32(), 42);
+    });
+}

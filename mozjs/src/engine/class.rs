@@ -420,6 +420,10 @@ pub(crate) unsafe fn new_object(cx: &mut Cx, clasp: *const root::JSClass, proto:
     if obj.tag() != q::JS_TAG_EXCEPTION {
         let data = ObjectData::new(clasp, cx.current_realm());
         q::JS_SetOpaque(obj, Box::into_raw(data) as *mut c_void);
+        let ops = (*clasp).cOps;
+        if !ops.is_null() && (*ops).construct.is_some() {
+            q::JS_SetConstructorBit(qctx, obj, 1);
+        }
     }
     obj
 }
