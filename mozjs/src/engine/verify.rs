@@ -13,6 +13,8 @@
 //! It also aborts when an object is freed while the autorelease pool holds it, which means some
 //! code released a reference it did not own. Pool references are never marked, so the cycle
 //! collector cannot free such an object.
+//!
+//! References to realms (QuickJS contexts) held by the shim's objects are checked the same way.
 
 use std::cell::RefCell;
 use std::sync::atomic::{AtomicU8, Ordering};
@@ -63,9 +65,20 @@ pub(crate) fn count(v: q::JSValue, delta: i64) {
     if !enabled() {
         return;
     }
-    let Some(p) = gc_pointer(v) else {
-        return;
-    };
+    if let Some(p) = gc_pointer(v) {
+        count_pointer(p, delta);
+    }
+}
+
+/// Records that Rust gained (`delta > 0`) or dropped a reference to the QuickJS context `ctx`.
+#[inline]
+pub(crate) fn count_context(ctx: *mut q::JSContext, delta: i64) {
+    if enabled() {
+        count_pointer(ctx as usize, delta);
+    }
+}
+
+fn count_pointer(p: usize, delta: i64) {
     VERIFIER.with(|verifier| {
         let mut verifier = verifier.borrow_mut();
         let count = verifier.counts.entry(p).or_insert(0);
@@ -131,9 +144,19 @@ pub(crate) unsafe fn mark(v: q::JSValue, mark_func: q::JS_MarkFunc) {
     if !enabled() {
         return;
     }
-    let Some(p) = gc_pointer(v) else {
-        return;
-    };
+    if let Some(p) = gc_pointer(v) {
+        mark_pointer(p, mark_func, || describe(v));
+    }
+}
+
+/// Checks a mark of the QuickJS context `ctx` from a `gc_mark` hook of the shim.
+pub(crate) unsafe fn mark_context(ctx: *mut q::JSContext, mark_func: q::JS_MarkFunc) {
+    if enabled() {
+        mark_pointer(ctx as usize, mark_func, || "QuickJS context".to_owned());
+    }
+}
+
+unsafe fn mark_pointer(p: usize, mark_func: q::JS_MarkFunc, describe: impl FnOnce() -> String) {
     let pass = mark_func.map_or(0, |f| f as usize);
     let violation = VERIFIER.with(|verifier| {
         let mut verifier = verifier.borrow_mut();
@@ -148,7 +171,7 @@ pub(crate) unsafe fn mark(v: q::JSValue, mark_func: q::JS_MarkFunc) {
         (marks > count).then_some((marks, count))
     });
     if let Some((marks, count)) = violation {
-        let class = describe(v);
+        let class = describe();
         eprintln!(
             "QuickJS tracing verifier: {p:#x} ({class}) marked {marks} times from Rust trace hooks \
              in one GC pass, but Rust holds {count} counted references to it\n{}",

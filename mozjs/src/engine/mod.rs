@@ -59,7 +59,7 @@ pub(crate) struct Cx {
     pub rt: *mut q::JSRuntime,
     /// A context without a global of ours, for operations outside any realm.
     pub base_ctx: *mut q::JSContext,
-    /// Entered realms, innermost last.
+    /// Entered realms, innermost last; each holds a reference (see `enter_realm`).
     pub realm_stack: Vec<*mut RealmData>,
     /// Values (and atoms) handed to Rust during the current task; see `retain`.
     pub pool: Vec<q::JSValue>,
@@ -69,7 +69,8 @@ pub(crate) struct Cx {
     pub hooks: promise::RuntimeHooks,
 }
 
-/// What a SpiderMonkey `JS::Realm*` (and `JS::Compartment*`) points to.
+/// What a SpiderMonkey `JS::Realm*` (and `JS::Compartment*`) points to. Owned by its QuickJS
+/// context, and freed with it (see `realm.rs`).
 pub(crate) struct RealmData {
     pub qctx: *mut q::JSContext,
     pub global: *mut root::JSObject,
@@ -104,6 +105,16 @@ impl Cx {
 
     pub fn current_realm(&self) -> *mut RealmData {
         self.realm_stack.last().copied().unwrap_or(ptr::null_mut())
+    }
+
+    /// Makes `realm` current, and keeps it alive, until the matching `leave_realm`.
+    pub unsafe fn enter_realm(&mut self, realm: *mut RealmData) {
+        self.realm_stack.push(hold_realm(realm));
+    }
+
+    pub unsafe fn leave_realm(&mut self) {
+        let realm = self.realm_stack.pop().expect("leaving a realm that was not entered");
+        release_realm(realm);
     }
 
     /// Keeps `v` alive until the pool is drained (end of task), and returns it. Ropes are

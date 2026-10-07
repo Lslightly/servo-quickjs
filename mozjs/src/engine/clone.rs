@@ -374,12 +374,12 @@ impl Writer {
                     let obj = val_obj(item.v);
                     let realm = object_realm(cx, obj);
                     if !realm.is_null() {
-                        cx.realm_stack.push(realm);
+                        cx.enter_realm(realm);
                     }
                     let mut same_process = false;
                     let ok = can_transfer(cx.as_raw(), handle(&obj), &mut same_process, self.closure);
                     if !realm.is_null() {
-                        cx.realm_stack.pop();
+                        cx.leave_realm();
                     }
                     if !ok {
                         return self.report(root::JS_SCERR_TRANSFERABLE);

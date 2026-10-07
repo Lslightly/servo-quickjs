@@ -44,3 +44,9 @@ pub fn drain_autorelease_pool() {
 pub fn autorelease_pool_len() -> usize {
     crate::engine::current().pool.len()
 }
+
+/// The number of realms of the current thread's runtime that have not been freed yet.
+#[doc(hidden)]
+pub fn realm_count() -> usize {
+    crate::engine::all_realms().len()
+}

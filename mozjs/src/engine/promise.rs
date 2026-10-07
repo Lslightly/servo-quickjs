@@ -57,13 +57,13 @@ unsafe fn enter_qctx(cx: &mut Cx, ctx: *mut q::JSContext) -> bool {
     if realm.is_null() {
         return false;
     }
-    cx.realm_stack.push(realm);
+    cx.enter_realm(realm);
     true
 }
 
-fn leave_qctx(cx: &mut Cx, entered: bool) {
+unsafe fn leave_qctx(cx: &mut Cx, entered: bool) {
     if entered {
-        cx.realm_stack.pop();
+        cx.leave_realm();
     }
 }
 
@@ -338,7 +338,8 @@ unsafe fn enqueue_thunk(cx: &mut Cx, queue: &JobQueue, realm: *mut RealmData, jo
     let thunk = cx.adopt(thunk).to_object();
     let data = function_data(thunk).unwrap();
     // The job runs in the context that enqueued it (the base context has no realm).
-    data.realm = realm;
+    let created_in = std::mem::replace(&mut data.realm, super::hold_realm(realm));
+    super::release_realm(created_in);
     data.slots[JOB_FUNC_SLOT] = q::JSValue::mkptr(q::JS_TAG_FLOAT64, job_func.unwrap() as *mut c_void);
     data.slots[JOB_ARGS_SLOT] = args;
 

@@ -168,11 +168,11 @@ fn handle<T>(ptr: &T) -> root::JS::Handle<T> {
 unsafe fn in_realm_of<R>(cx: &mut Cx, ctx: *mut q::JSContext, f: impl FnOnce(*mut root::JSContext) -> R) -> R {
     let realm = q::JS_GetContextOpaque(ctx) as *mut RealmData;
     if !realm.is_null() {
-        cx.realm_stack.push(realm);
+        cx.enter_realm(realm);
     }
     let result = f(cx.as_raw());
     if !realm.is_null() {
-        cx.realm_stack.pop();
+        cx.leave_realm();
     }
     result
 }
