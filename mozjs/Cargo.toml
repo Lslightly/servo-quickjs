@@ -16,6 +16,7 @@ default = ["jit", "libz-sys", "intl"]
 # Accepted for compatibility with Servo's feature forwarding; no effect on QuickJS.
 crown = []
 debugmozjs = []
+# An Intl subset over the OS's ICU (OpenHarmony only).
 intl = []
 jit = []
 jitspew = []

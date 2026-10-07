@@ -183,6 +183,7 @@ pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const 
     if qctx.is_null() {
         return ptr::null_mut();
     }
+    super::intl::install_intl(qctx);
     let class_id = super::class::class_id(cx.rt, clasp);
     assert_eq!(q::JS_SetGlobalObjectClass(qctx, class_id), 0, "global classes cannot be callable");
     let global_val = q::JS_GetGlobalObject(qctx);
