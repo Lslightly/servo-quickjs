@@ -4,7 +4,7 @@
 
 //! Compile options and classic script evaluation.
 
-use std::ffi::{c_char, c_uint, CString};
+use std::ffi::{c_char, c_uint, c_void, CString};
 use std::ptr;
 
 use quickjs_sys as q;
@@ -12,8 +12,6 @@ use quickjs_sys as q;
 use super::{cstring_lossy, Cx};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
-use std::cell::RefCell;
-use std::collections::HashMap;
 
 /// Backs a `JS::ReadOnlyCompileOptions*`: mozjs writes the SpiderMonkey fields directly, so the
 /// real struct comes first.
@@ -216,26 +214,20 @@ pub(crate) unsafe fn CompileFunctionUtf8(cx: *mut root::JSContext, envChain: *co
     compile_function(cx, envChain, self::options(options), name, nargs, argnames, &body)
 }
 
-// Script privates (fetch options of classic scripts): one counted value per compiled script.
-
-thread_local! {
-    static SCRIPT_PRIVATES: RefCell<HashMap<usize, q::JSValue>> = RefCell::new(HashMap::new());
-}
+// Script privates (fetch options of classic scripts), stored by QuickJS (patch Q16) and shared
+// with the eval and Function code the script creates.
 
 pub(crate) unsafe fn SetScriptPrivate(script: *mut root::JSScript, value: *const root::JS::Value) {
-    let rt = super::current().rt;
-    let v = q::JS_DupValueRT(rt, (*value).to_qjs());
-    super::module::record_script_private(script, v);
-    if let Some(old) = SCRIPT_PRIVATES.with(|p| p.borrow_mut().insert(script as usize, v)) {
-        q::JS_FreeValueRT(rt, old);
+    let cx = super::current();
+    let v = (*value).to_qjs();
+    let script = q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, script as *mut c_void);
+    if q::JS_SetScriptPrivateValue(cx.base_ctx, script, q::JS_DupValueRT(cx.rt, v)) == 0 && v.tag() != q::JS_TAG_UNDEFINED {
+        super::module::add_ref_script_private(cx.rt, v);
     }
 }
 
 pub(crate) unsafe fn JS_GetScriptPrivate(script: *mut root::JSScript, dest: root::JS::MutableHandleValue) {
     let cx = super::current();
-    let v = SCRIPT_PRIVATES.with(|p| p.borrow().get(&(script as usize)).copied());
-    *dest.ptr = match v {
-        Some(v) => cx.retain(JSVal::from_qjs(v)),
-        None => JSVal::default(),
-    };
+    let script = q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, script as *mut c_void);
+    *dest.ptr = cx.adopt(q::JS_GetScriptPrivateValue(cx.base_ctx, script));
 }

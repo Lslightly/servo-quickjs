@@ -16,7 +16,7 @@
 
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::ffi::{c_char, c_int, c_void, CStr, CString};
+use std::ffi::{c_char, c_int, c_void, CStr};
 use std::marker::PhantomData;
 use std::ptr;
 use std::sync::OnceLock;
@@ -189,7 +189,9 @@ unsafe fn ensure_exception(ctx: *mut q::JSContext) {
 // Import attributes: HTML supports only `type`, and module types "json" and JavaScript.
 
 /// Throws a SyntaxError (like SpiderMonkey) if `attributes` has a key other than `type`.
-unsafe fn check_attributes(ctx: *mut q::JSContext, attributes: q::JSValue) -> bool {
+/// Whether all import attributes are supported (only `type` is); throws a SyntaxError for
+/// static imports and a TypeError for import(), as SpiderMonkey does.
+unsafe fn check_attributes(ctx: *mut q::JSContext, attributes: q::JSValue, dynamic: bool) -> bool {
     if attributes.tag() != q::JS_TAG_OBJECT {
         return true;
     }
@@ -204,7 +206,11 @@ unsafe fn check_attributes(ctx: *mut q::JSContext, attributes: q::JSValue) -> bo
         let atom = (*tab.add(i)).atom;
         if atom != type_atom {
             let key = q::JS_AtomToCString(ctx, atom);
-            q::JS_ThrowSyntaxError(ctx, c"Unsupported import attribute: %s".as_ptr(), key);
+            if dynamic {
+                q::JS_ThrowTypeError(ctx, c"Unsupported import attribute: %s".as_ptr(), key);
+            } else {
+                q::JS_ThrowSyntaxError(ctx, c"Unsupported import attribute: %s".as_ptr(), key);
+            }
             q::JS_FreeCString(ctx, key);
             ok = false;
             break;
@@ -358,9 +364,14 @@ pub(crate) unsafe fn GetRequestedModuleSpecifier(cx: *mut root::JSContext, modul
     let qctx = cx.qctx();
     let m = module_of(*moduleRecord.ptr).module;
     let attributes = q::JS_GetModuleRequestAttributes(qctx, m, index as c_int);
-    let supported = check_attributes(qctx, attributes);
+    let supported = check_attributes(qctx, attributes, false);
+    let module_type = module_type_of(qctx, attributes);
     q::JS_FreeValue(qctx, attributes);
     if !supported {
+        return ptr::null_mut();
+    }
+    if module_type == root::JS::ModuleType::Unknown {
+        q::JS_ThrowTypeError(qctx, c"invalid module type".as_ptr());
         return ptr::null_mut();
     }
     let atom = q::JS_GetModuleRequestSpecifier(qctx, m, index as c_int);
@@ -504,8 +515,6 @@ struct Hooks {
 
 thread_local! {
     static HOOKS: RefCell<HashMap<usize, Hooks>> = RefCell::new(HashMap::new());
-    /// Private values of classic scripts by file name (see `record_script_private`).
-    static CLASSIC_PRIVATES: RefCell<HashMap<CString, q::JSValue>> = RefCell::new(HashMap::new());
 }
 
 fn hooks(rt: *mut q::JSRuntime) -> Hooks {
@@ -547,6 +556,23 @@ pub(crate) unsafe fn SetScriptPrivateReferenceHooks(rt: *mut root::JSRuntime, ad
         h.add_ref = addRefHook;
         h.release = releaseHook;
     });
+    q::JS_SetScriptPrivateFinalizer(rt as *mut q::JSRuntime, Some(release_script_private));
+}
+
+/// Takes a reference for a script private value stored by QuickJS, like SpiderMonkey's
+/// `ScriptSourceObject::setPrivate`.
+pub(crate) unsafe fn add_ref_script_private(rt: *mut q::JSRuntime, value: q::JSValue) {
+    if let Some(add_ref) = hooks(rt).add_ref {
+        add_ref(&JSVal::from_qjs(value));
+    }
+}
+
+/// `JSScriptPrivateFinalizer`: releases the reference taken by `add_ref_script_private`.
+unsafe extern "C" fn release_script_private(rt: *mut q::JSRuntime, value: q::JSValue) {
+    let release = HOOKS.try_with(|h| h.borrow().get(&(rt as usize)).and_then(|h| h.release));
+    if let Ok(Some(release)) = release {
+        release(&JSVal::from_qjs(value));
+    }
 }
 
 /// `JSImportMetaHook`: Servo's HostPopulateImportMeta, called when import.meta is first used.
@@ -566,33 +592,6 @@ unsafe extern "C" fn import_meta_hook(ctx: *mut q::JSContext, m: *mut q::JSModul
     }
 }
 
-/// Records the private value of a classic script (from `SetScriptPrivate`) for import() and
-/// scripted-caller queries: QuickJS identifies running code only by its file name.
-/// Values with a reference count are not recorded (Servo's are `PrivateValue`s).
-pub(crate) unsafe fn record_script_private(script: *mut root::JSScript, value: q::JSValue) {
-    if value.has_ref_count() {
-        return;
-    }
-    let cx = super::current();
-    let atom = q::JS_GetScriptFileName(cx.base_ctx, q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, script as *mut c_void));
-    if atom == q::JS_ATOM_NULL {
-        return;
-    }
-    let name = q::JS_AtomToCString(cx.base_ctx, atom);
-    q::JS_FreeAtomRT(cx.rt, atom);
-    if name.is_null() {
-        return;
-    }
-    let key = CStr::from_ptr(name).to_owned();
-    q::JS_FreeCString(cx.base_ctx, name);
-    CLASSIC_PRIVATES.with(|p| p.borrow_mut().insert(key, value));
-}
-
-/// The private value of a classic script (not counted), or undefined.
-fn classic_private(name: &CStr) -> q::JSValue {
-    CLASSIC_PRIVATES.with(|p| p.borrow().get(name).copied()).unwrap_or(q::JS_UNDEFINED)
-}
-
 /// The private value of a module (a new reference); C modules (JSON) have none.
 unsafe fn module_private(ctx: *mut q::JSContext, m: *mut q::JSModuleDef) -> q::JSValue {
     if q::JS_IsCModule(m) != 0 {
@@ -602,44 +601,21 @@ unsafe fn module_private(ctx: *mut q::JSContext, m: *mut q::JSModuleDef) -> q::J
     }
 }
 
-unsafe fn value_name(ctx: *mut q::JSContext, name: q::JSValue) -> Option<CString> {
-    if name.tag() != q::JS_TAG_STRING {
-        return None;
-    }
-    let s = q::JS_ToCString(ctx, name);
-    if s.is_null() {
-        let exception = q::JS_GetException(ctx);
-        q::JS_FreeValue(ctx, exception);
-        return None;
-    }
-    let result = CStr::from_ptr(s).to_owned();
-    q::JS_FreeCString(ctx, s);
-    Some(result)
-}
-
-/// The private value of the script or module whose code has file name `filename` in the realm
-/// of `ctx` (e.g. a stack frame's): the first loaded module of that name, else the classic
-/// script's. Retained by the pool; undefined if unknown.
-pub(crate) unsafe fn script_or_module_private(cx: &mut Cx, ctx: *mut q::JSContext, filename: q::JSAtom) -> JSVal {
-    if filename == q::JS_ATOM_NULL {
-        return JSVal::from_qjs(q::JS_UNDEFINED);
+/// The private value of a frame's module `m`, or else of its script (`script_private`,
+/// borrowed). Retained by the pool.
+pub(crate) unsafe fn script_or_module_private(cx: &mut Cx, ctx: *mut q::JSContext, m: *mut q::JSModuleDef, script_private: q::JSValue) -> JSVal {
+    if m.is_null() {
+        return cx.retain(JSVal::from_qjs(script_private));
     }
     let ctx = if ctx.is_null() { cx.qctx() } else { ctx };
-    let m = q::JS_FindLoadedModule(ctx, filename);
-    if !m.is_null() {
-        return cx.adopt(module_private(ctx, m));
-    }
-    let name = q::JS_AtomToValue(ctx, filename);
-    let private = value_name(ctx, name).map_or(q::JS_UNDEFINED, |name| classic_private(&name));
-    q::JS_FreeValue(ctx, name);
-    JSVal::from_qjs(private)
+    cx.adopt(module_private(ctx, m))
 }
 
 /// `JSDynamicImportHook`: Servo's HostImportModuleDynamically, which settles `promise`.
 unsafe extern "C" fn dynamic_import_hook(
     ctx: *mut q::JSContext,
-    basename: q::JSValue,
     m: *mut q::JSModuleDef,
+    script_private: q::JSValue,
     specifier: q::JSValue,
     attributes: q::JSValue,
     promise: q::JSValue,
@@ -652,7 +628,7 @@ unsafe extern "C" fn dynamic_import_hook(
         q::JS_ThrowTypeError(ctx, c"no dynamic import hook".as_ptr());
         return -1;
     };
-    if !check_attributes(ctx, attributes) {
+    if !check_attributes(ctx, attributes, true) {
         return -1;
     }
     let module_type = module_type_of(ctx, attributes);
@@ -661,11 +637,7 @@ unsafe extern "C" fn dynamic_import_hook(
         return -1;
     }
     let request = cx.adopt(request).to_object();
-    let private = if m.is_null() {
-        JSVal::from_qjs(value_name(ctx, basename).map_or(q::JS_UNDEFINED, |name| classic_private(&name)))
-    } else {
-        cx.adopt(module_private(ctx, m))
-    };
+    let private = script_or_module_private(cx, ctx, m, script_private);
     let promise = val_obj(promise);
     let counted = !private.is_undefined();
     if counted {

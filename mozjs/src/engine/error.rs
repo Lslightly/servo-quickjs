@@ -26,6 +26,9 @@ use crate::sys::jsval::JSVal;
 /// A scripted frame of the current stack.
 struct Frame {
     realm: *mut q::JSContext,
+    module: *mut q::JSModuleDef,
+    /// The host-defined value of the frame's script (borrowed), if not a module.
+    script_private: q::JSValue,
     /// The function name (borrowed), or undefined for top-level code.
     name: q::JSValue,
     filename: q::JSAtom,
@@ -53,6 +56,8 @@ unsafe fn scripted_frames(cx: &Cx, max: usize) -> Vec<Frame> {
         if info.is_native == 0 {
             frames.push(Frame {
                 realm: info.realm,
+                module: info.module,
+                script_private: info.script_private,
                 name: info.name,
                 filename: info.filename,
                 line: info.line_num.max(0) as u32,
@@ -88,6 +93,8 @@ unsafe fn scripted_caller(cx: &Cx) -> Option<Frame> {
         }
         caller = Some(Frame {
             realm: info.realm,
+            module: info.module,
+            script_private: info.script_private,
             name: info.name,
             filename: info.filename,
             line: info.line_num.max(0) as u32,
@@ -182,7 +189,7 @@ pub(crate) unsafe fn UnhideScriptedCaller(cx: *mut root::JSContext) {
 pub(crate) unsafe fn JS_GetScriptedCallerPrivate(cx: *mut root::JSContext, dest: root::JS::MutableHandleValue) {
     let cx = Cx::from_raw(cx);
     *dest.ptr = match scripted_caller(cx) {
-        Some(caller) => super::module::script_or_module_private(cx, caller.realm, caller.filename),
+        Some(caller) => super::module::script_or_module_private(cx, caller.realm, caller.module, caller.script_private),
         None => JSVal::from_qjs(q::JS_UNDEFINED),
     };
 }

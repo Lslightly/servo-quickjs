@@ -263,6 +263,22 @@ unsafe fn message(cx: &mut JSContext, error: JSVal) -> String {
     string(get(cx, error.to_object(), c"message").to_string())
 }
 
+unsafe fn error_name(cx: &mut JSContext, error: JSVal) -> String {
+    string(get(cx, error.to_object(), c"name").to_string())
+}
+
+/// Compiles and runs a classic script with private id `id`, like Servo's `evaluate_script`.
+unsafe fn run_classic(cx: &mut JSContext, url: &str, source: &str, id: usize) {
+    let options = CompileOptionsWrapper::new(cx, CString::new(url).unwrap(), 1);
+    let script = mozjs::rust::wrappers2::Compile1(cx, options.ptr, &mut transform_str_to_source_text(source));
+    assert!(!script.is_null());
+    let private = PrivateValue(id as *const c_void);
+    jsapi::SetScriptPrivate(script, &private);
+    rooted!(&in(cx) let script: *mut JSScript = script);
+    rooted!(&in(cx) let mut rval = UndefinedValue());
+    assert!(mozjs::rust::wrappers2::JS_ExecuteScript(cx, script.handle(), rval.handle_mut()));
+}
+
 /// The engine can be initialized once per process; the tests share it and never shut it down.
 fn engine() -> JSEngineHandle {
     static ENGINE: OnceLock<JSEngineHandle> = OnceLock::new();
@@ -522,17 +538,23 @@ fn import_attributes() {
         assert_eq!(GetRequestedModulesCount(cx, root.handle()), 3);
         assert_eq!(GetRequestedModuleType(cx, root.handle(), 0), ModuleType::Unknown);
         assert_eq!(GetRequestedModuleType(cx, root.handle(), 2), ModuleType::JSON);
-        let a = GetRequestedModuleSpecifier(cx, root.handle(), 0);
-        assert_eq!(string(a), "./a.js");
+        // Like SpiderMonkey: a TypeError for a type the host doesn't allow, a SyntaxError for
+        // an unsupported key.
+        assert!(GetRequestedModuleSpecifier(cx, root.handle(), 0).is_null());
+        let error = pending_exception(cx);
+        assert_eq!(error_name(cx, error), "TypeError");
         assert!(GetRequestedModuleSpecifier(cx, root.handle(), 1).is_null());
         let error = pending_exception(cx);
+        assert_eq!(error_name(cx, error), "SyntaxError");
         assert!(message(cx, error).contains("foo"));
+        let c = GetRequestedModuleSpecifier(cx, root.handle(), 2);
+        assert_eq!(string(c), "./c.js");
 
         // Module requests round-trip.
-        rooted!(&in(cx) let specifier = a);
+        rooted!(&in(cx) let specifier = c);
         let request = jsapi::CreateModuleRequest(cx.raw_cx(), specifier.handle().into(), ModuleType::JSON);
         assert!(!request.is_null());
-        assert_eq!(string(jsapi::GetModuleRequestSpecifier(cx.raw_cx(), h(&request))), "./a.js");
+        assert_eq!(string(jsapi::GetModuleRequestSpecifier(cx.raw_cx(), h(&request))), "./c.js");
         assert_eq!(jsapi::GetModuleRequestType(cx.raw_cx(), h(&request)), ModuleType::JSON);
     });
 }
@@ -555,7 +577,11 @@ fn dynamic_import() {
 
         let ns = namespace(cx, &url("main.js"));
         assert_eq!(promise_state(get(cx, ns, c"failed").to_object()), qjs::JS_PROMISE_REJECTED);
-        assert_eq!(promise_state(get(cx, ns, c"unsupported").to_object()), qjs::JS_PROMISE_REJECTED);
+        rooted!(&in(cx) let unsupported = get(cx, ns, c"unsupported").to_object());
+        assert_eq!(promise_state(unsupported.get()), qjs::JS_PROMISE_REJECTED);
+        rooted!(&in(cx) let mut reason = UndefinedValue());
+        mozjs::glue::JS_GetPromiseResult(unsupported.handle().into(), reason.handle_mut().into());
+        assert_eq!(error_name(cx, reason.get()), "TypeError");
         let calls = LOADER.with(|l| l.borrow().dynamic_imports.clone());
         assert_eq!(
             calls,
@@ -595,4 +621,59 @@ fn dynamic_import() {
         let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
         assert_eq!(get(cx, global, c"classicCaller").to_int32(), 77);
     });
+}
+
+thread_local!(static SCRIPT_PRIVATE_REFS: RefCell<HashMap<usize, isize>> = RefCell::new(HashMap::new()));
+
+unsafe extern "C" fn add_ref_private(private: *const Value) {
+    SCRIPT_PRIVATE_REFS.with(|r| *r.borrow_mut().entry(private_id(&*private)).or_default() += 1);
+}
+
+unsafe extern "C" fn release_private(private: *const Value) {
+    SCRIPT_PRIVATE_REFS.with(|r| *r.borrow_mut().entry(private_id(&*private)).or_default() -= 1);
+}
+
+#[test]
+fn script_privates() {
+    with_realm(|cx| unsafe {
+        let rt = jsapi::JS_GetRuntime(cx.raw_cx());
+        jsapi::SetScriptPrivateReferenceHooks(rt, Some(add_ref_private), Some(release_private));
+        // Two inline scripts of one page share its URL but not their privates. Eval and Function
+        // code, and functions they create, use the private of the script that created them.
+        run_classic(
+            cx,
+            "https://test/page.html",
+            "globalThis.fromA = () => import('./a1.js');\n\
+             (0, eval)(\"import('./a2.js')\");\n\
+             eval(\"import('./a3.js')\");\n\
+             Function(\"return import('./a4.js')\")();\n\
+             globalThis.evalFnA = (0, eval)(\"(() => import('./a5.js'))\");\n\
+             globalThis.callersA = [callerId(), (0, eval)('callerId()'), Function('return callerId()')()];",
+            5,
+        );
+        run_classic(cx, "https://test/page.html", "fromA(); evalFnA(); import('./b1.js');", 6);
+        let calls: Vec<_> = LOADER.with(|l| l.borrow().dynamic_imports.iter().map(|c| (c.0, c.1.clone())).collect());
+        let expected = [(5, "./a2.js"), (5, "./a3.js"), (5, "./a4.js"), (5, "./a1.js"), (5, "./a5.js"), (6, "./b1.js")];
+        assert_eq!(calls, expected.map(|(id, s)| (id, s.to_owned())));
+        let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
+        rooted!(&in(cx) let callers = get(cx, global, c"callersA").to_object());
+        for i in 0..3 {
+            let mut v = UndefinedValue();
+            assert!(jsapi::JS_GetElement(cx.raw_cx(), h(&callers.get()), i, mh(&mut v)));
+            assert_eq!(v.to_int32(), 5);
+        }
+
+        // Two inline modules of one page: import.meta of each.
+        for (i, url) in ["https://test/page.html", "https://test/page.html"].iter().enumerate() {
+            rooted!(&in(cx) let module = compile(cx, url, "export const id = import.meta.id;", ModuleType::JavaScript));
+            assert!(ModuleLink(cx, module.handle()));
+            rooted!(&in(cx) let mut promise = UndefinedValue());
+            assert!(ModuleEvaluate(cx, module.handle(), promise.handle_mut()));
+            let ns = GetModuleNamespace(cx, module.handle());
+            assert_eq!(get(cx, ns, c"id").to_int32() as usize, LOADER.with(|l| l.borrow().urls.len()), "module {i}");
+        }
+        SCRIPT_PRIVATE_REFS.with(|r| assert_eq!(*r.borrow(), HashMap::from([(5, 1), (6, 1)])));
+    });
+    // Freeing the scripts releases their privates.
+    SCRIPT_PRIVATE_REFS.with(|r| assert_eq!(*r.borrow(), HashMap::from([(5, 0), (6, 0)])));
 }
