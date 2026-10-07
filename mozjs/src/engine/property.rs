@@ -91,8 +91,28 @@ const WELL_KNOWN_SYMBOLS: [&std::ffi::CStr; 13] = [
     c"matchAll",
 ];
 
+thread_local! {
+    /// Well-known symbols are predefined QuickJS atoms, so their indices are the same in every
+    /// runtime and can be cached.
+    static SYMBOL_ATOMS: std::cell::Cell<[q::JSAtom; 13]> = const { std::cell::Cell::new([0; 13]) };
+}
+
 /// The atom of `Symbol[name]` for SpiderMonkey's `SymbolCode` `code` (atoms are permanent).
 pub(crate) unsafe fn well_known_symbol_atom(cx: &mut Cx, code: usize) -> q::JSAtom {
+    let cached = SYMBOL_ATOMS.with(|c| c.get()[code]);
+    if cached != 0 {
+        return cached;
+    }
+    let atom = lookup_well_known_symbol_atom(cx, code);
+    SYMBOL_ATOMS.with(|c| {
+        let mut atoms = c.get();
+        atoms[code] = atom;
+        c.set(atoms);
+    });
+    atom
+}
+
+unsafe fn lookup_well_known_symbol_atom(cx: &mut Cx, code: usize) -> q::JSAtom {
     let qctx = cx.base_ctx;
     let global = q::JS_GetGlobalObject(qctx);
     let symbol_ctor = q::JS_GetPropertyStr(qctx, global, c"Symbol".as_ptr());
