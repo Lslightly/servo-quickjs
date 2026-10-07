@@ -1079,3 +1079,306 @@ pub(crate) unsafe fn ToJSONMaybeSafely(cx: *mut root::JSContext, input: root::JS
     let value = JSVal::from_qjs(obj_val(*input.ptr));
     stringify(Cx::from_raw(cx), value, ptr::null_mut(), UndefinedValue(), callback, data, false)
 }
+
+// ValueToSource, as SpiderMonkey's `uneval`.
+
+const QJS_CLASS_ARRAY: q::JSClassID = 2;
+const QJS_CLASS_ERROR: q::JSClassID = 3;
+const QJS_CLASS_NUMBER: q::JSClassID = 4;
+const QJS_CLASS_STRING: q::JSClassID = 5;
+const QJS_CLASS_BOOLEAN: q::JSClassID = 6;
+const QJS_CLASS_DATE: q::JSClassID = 10;
+const QJS_CLASS_REGEXP: q::JSClassID = 18;
+
+const MAX_SOURCE_DEPTH: usize = 1000;
+
+fn push_str(out: &mut Vec<u16>, s: &str) {
+    out.extend(s.encode_utf16());
+}
+
+fn push_quoted(out: &mut Vec<u16>, chars: Chars) {
+    let mut s = String::new();
+    escape_into(&mut s, chars, b'"');
+    push_str(out, &s);
+}
+
+/// Calls `f` with the characters of `ToString(v)`.
+unsafe fn with_string_chars(cx: &mut Cx, v: q::JSValue, f: impl FnOnce(Chars)) -> bool {
+    let s = q::JS_ToString(cx.qctx(), v);
+    if s.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    f(Chars::of(s.ptr() as *mut root::JSString));
+    q::JS_FreeValueRT(cx.rt, s);
+    true
+}
+
+unsafe fn append_to_string(cx: &mut Cx, out: &mut Vec<u16>, v: q::JSValue) -> bool {
+    with_string_chars(cx, v, |c| out.extend(c.units()))
+}
+
+unsafe fn value_to_source(cx: &mut Cx, v: q::JSValue, seen: &mut Vec<*mut c_void>, out: &mut Vec<u16>) -> bool {
+    match v.tag() {
+        q::JS_TAG_UNDEFINED => push_str(out, "(void 0)"),
+        q::JS_TAG_STRING | q::JS_TAG_STRING_ROPE => return with_string_chars(cx, v, |c| push_quoted(out, c)),
+        q::JS_TAG_FLOAT64 if v.float64() == 0.0 && v.float64().is_sign_negative() => push_str(out, "-0"),
+        q::JS_TAG_SYMBOL => return symbol_to_source(cx, v, out),
+        q::JS_TAG_BIG_INT | q::JS_TAG_SHORT_BIG_INT => {
+            if !append_to_string(cx, out, v) {
+                return false;
+            }
+            out.push(b'n' as u16);
+        },
+        q::JS_TAG_OBJECT => return object_to_source(cx, v, seen, out),
+        _ => return append_to_string(cx, out, v),
+    }
+    true
+}
+
+/// `Symbol.iterator`, `Symbol.for("key")` or `Symbol("description")`.
+unsafe fn symbol_to_source(cx: &mut Cx, sym: q::JSValue, out: &mut Vec<u16>) -> bool {
+    let qctx = cx.qctx();
+    let atom = q::JS_ValueToAtom(qctx, sym);
+    let well_known = (0..root::JS::SymbolCode::Limit as usize).any(|code| super::well_known_symbol_atom(cx, code) == atom);
+    q::JS_FreeAtomRT(cx.rt, atom);
+    let desc = q::JS_GetPropertyStr(qctx, sym, c"description".as_ptr());
+    if desc.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    let mut ok = true;
+    if well_known {
+        ok = append_to_string(cx, out, desc);
+    } else {
+        let global = q::JS_GetGlobalObject(qctx);
+        let ctor = q::JS_GetPropertyStr(qctx, global, c"Symbol".as_ptr());
+        let key_for = q::JS_GetPropertyStr(qctx, ctor, c"keyFor".as_ptr());
+        let mut args = [sym];
+        let key = q::JS_Call(qctx, key_for, ctor, 1, args.as_mut_ptr());
+        for v in [key_for, ctor, global] {
+            q::JS_FreeValueRT(cx.rt, v);
+        }
+        if key.tag() == q::JS_TAG_EXCEPTION {
+            ok = false;
+        } else {
+            push_str(out, if key.tag() == q::JS_TAG_UNDEFINED { "Symbol(" } else { "Symbol.for(" });
+            if desc.tag() != q::JS_TAG_UNDEFINED {
+                ok = with_string_chars(cx, desc, |c| push_quoted(out, c));
+            }
+            out.push(b')' as u16);
+            q::JS_FreeValueRT(cx.rt, key);
+        }
+    }
+    q::JS_FreeValueRT(cx.rt, desc);
+    ok
+}
+
+unsafe fn object_to_source(cx: &mut Cx, obj: q::JSValue, seen: &mut Vec<*mut c_void>, out: &mut Vec<u16>) -> bool {
+    let qctx = cx.qctx();
+    if seen.contains(&obj.ptr()) {
+        push_str(out, "{}");
+        return true;
+    }
+    if seen.len() >= MAX_SOURCE_DEPTH {
+        q::JS_ThrowInternalError(qctx, c"too much recursion".as_ptr());
+        return false;
+    }
+    let to_source = q::JS_GetPropertyStr(qctx, obj, c"toSource".as_ptr());
+    if to_source.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    if q::JS_IsFunction(qctx, to_source) != 0 {
+        let r = q::JS_Call(qctx, to_source, obj, 0, ptr::null_mut());
+        q::JS_FreeValueRT(cx.rt, to_source);
+        if r.tag() == q::JS_TAG_EXCEPTION {
+            return false;
+        }
+        let ok = append_to_string(cx, out, r);
+        q::JS_FreeValueRT(cx.rt, r);
+        return ok;
+    }
+    q::JS_FreeValueRT(cx.rt, to_source);
+    seen.push(obj.ptr());
+    let ok = builtin_object_to_source(cx, obj, seen, out);
+    seen.pop();
+    ok
+}
+
+unsafe fn builtin_object_to_source(cx: &mut Cx, obj: q::JSValue, seen: &mut Vec<*mut c_void>, out: &mut Vec<u16>) -> bool {
+    let qctx = cx.qctx();
+    if q::JS_IsFunction(qctx, obj) != 0 {
+        return append_to_string(cx, out, obj);
+    }
+    let class = q::JS_GetClassID(obj);
+    match class {
+        QJS_CLASS_ARRAY => array_to_source(cx, obj, seen, out),
+        QJS_CLASS_ERROR => error_to_source(cx, obj, out),
+        QJS_CLASS_REGEXP => append_to_string(cx, out, obj),
+        QJS_CLASS_NUMBER | QJS_CLASS_STRING | QJS_CLASS_BOOLEAN | QJS_CLASS_DATE => {
+            let name = match class {
+                QJS_CLASS_NUMBER => "Number",
+                QJS_CLASS_STRING => "String",
+                QJS_CLASS_BOOLEAN => "Boolean",
+                _ => "Date",
+            };
+            let proto = q::JS_GetClassProto(qctx, class);
+            let value_of = q::JS_GetPropertyStr(qctx, proto, c"valueOf".as_ptr());
+            q::JS_FreeValueRT(cx.rt, proto);
+            let prim = q::JS_Call(qctx, value_of, obj, 0, ptr::null_mut());
+            q::JS_FreeValueRT(cx.rt, value_of);
+            if prim.tag() == q::JS_TAG_EXCEPTION {
+                return false;
+            }
+            push_str(out, &format!("(new {name}("));
+            let ok = value_to_source(cx, prim, seen, out);
+            q::JS_FreeValueRT(cx.rt, prim);
+            push_str(out, "))");
+            ok
+        },
+        _ => plain_object_to_source(cx, obj, seen, out),
+    }
+}
+
+unsafe fn array_to_source(cx: &mut Cx, obj: q::JSValue, seen: &mut Vec<*mut c_void>, out: &mut Vec<u16>) -> bool {
+    let qctx = cx.qctx();
+    let len = q::JS_GetPropertyStr(qctx, obj, c"length".as_ptr());
+    let mut n = 0u32;
+    let r = q::JS_ToUint32(qctx, &mut n, len);
+    q::JS_FreeValueRT(cx.rt, len);
+    if r < 0 {
+        return false;
+    }
+    out.push(b'[' as u16);
+    for i in 0..n {
+        if i > 0 {
+            push_str(out, ", ");
+        }
+        let e = q::JS_GetPropertyUint32(qctx, obj, i);
+        if e.tag() == q::JS_TAG_EXCEPTION {
+            return false;
+        }
+        let ok = value_to_source(cx, e, seen, out);
+        q::JS_FreeValueRT(cx.rt, e);
+        if !ok {
+            return false;
+        }
+    }
+    out.push(b']' as u16);
+    true
+}
+
+/// `(new TypeError("message", "file", line))`.
+unsafe fn error_to_source(cx: &mut Cx, obj: q::JSValue, out: &mut Vec<u16>) -> bool {
+    let qctx = cx.qctx();
+    let mut props = [q::JS_UNDEFINED; 4];
+    for (p, name) in props.iter_mut().zip([c"name", c"message", c"fileName", c"lineNumber"]) {
+        *p = q::JS_GetPropertyStr(qctx, obj, name.as_ptr());
+    }
+    let [name, message, file, line] = props;
+    let mut ok = props.iter().all(|p| p.tag() != q::JS_TAG_EXCEPTION);
+    if ok {
+        push_str(out, "(new ");
+        ok = append_to_string(cx, out, name) && {
+            out.push(b'(' as u16);
+            message.tag() == q::JS_TAG_UNDEFINED || with_string_chars(cx, message, |c| push_quoted(out, c))
+        };
+        if ok && file.tag() == q::JS_TAG_STRING && Chars::of(file.ptr() as *mut root::JSString).len() > 0 {
+            push_str(out, ", ");
+            push_quoted(out, Chars::of(file.ptr() as *mut root::JSString));
+            if line.tag() == q::JS_TAG_INT && line.int() > 0 {
+                push_str(out, &format!(", {}", line.int()));
+            }
+        }
+        push_str(out, "))");
+    }
+    for p in props {
+        q::JS_FreeValueRT(cx.rt, p);
+    }
+    ok
+}
+
+unsafe fn key_to_source(cx: &mut Cx, atom: q::JSAtom, out: &mut Vec<u16>) -> bool {
+    if atom & ATOM_TAG_INT != 0 {
+        push_str(out, &(atom & !ATOM_TAG_INT).to_string());
+        return true;
+    }
+    let key = q::JS_AtomToValue(cx.qctx(), atom);
+    let ok = if key.tag() == q::JS_TAG_SYMBOL {
+        out.push(b'[' as u16);
+        let ok = symbol_to_source(cx, key, out);
+        out.push(b']' as u16);
+        ok
+    } else {
+        with_string_chars(cx, key, |c| {
+            if is_identifier(c.units()) {
+                out.extend(c.units())
+            } else {
+                push_quoted(out, c)
+            }
+        })
+    };
+    q::JS_FreeValueRT(cx.rt, key);
+    ok
+}
+
+/// `({key:value, get accessor() {...}})` over the own enumerable properties.
+unsafe fn plain_object_to_source(cx: &mut Cx, obj: q::JSValue, seen: &mut Vec<*mut c_void>, out: &mut Vec<u16>) -> bool {
+    let qctx = cx.qctx();
+    let mut tab = ptr::null_mut();
+    let mut len = 0;
+    let flags = q::JS_GPN_STRING_MASK | q::JS_GPN_SYMBOL_MASK | q::JS_GPN_ENUM_ONLY;
+    if q::JS_GetOwnPropertyNames(qctx, &mut tab, &mut len, obj, flags as c_int) < 0 {
+        return false;
+    }
+    push_str(out, "({");
+    let mut ok = true;
+    let mut first = true;
+    for prop in raw_slice(tab, len as usize) {
+        let mut desc: q::JSPropertyDescriptor = std::mem::zeroed();
+        let r = q::JS_GetOwnProperty(qctx, &mut desc, obj, prop.atom);
+        if r < 0 {
+            ok = false;
+            break;
+        }
+        if r == 0 {
+            continue;
+        }
+        if desc.flags as u32 & q::JS_PROP_GETSET != 0 {
+            for f in [desc.getter, desc.setter] {
+                if ok && q::JS_IsFunction(qctx, f) != 0 {
+                    if !first {
+                        push_str(out, ", ");
+                    }
+                    first = false;
+                    ok = append_to_string(cx, out, f);
+                }
+            }
+        } else {
+            if !first {
+                push_str(out, ", ");
+            }
+            first = false;
+            ok = key_to_source(cx, prop.atom, out) && {
+                out.push(b':' as u16);
+                value_to_source(cx, desc.value, seen, out)
+            };
+        }
+        for v in [desc.value, desc.getter, desc.setter] {
+            q::JS_FreeValueRT(cx.rt, v);
+        }
+        if !ok {
+            break;
+        }
+    }
+    q::JS_FreePropertyEnum(qctx, tab, len);
+    push_str(out, "})");
+    ok
+}
+
+pub(crate) unsafe fn JS_ValueToSource(cx: *mut root::JSContext, v: root::JS::Handle<root::JS::Value>) -> *mut root::JSString {
+    let cx = Cx::from_raw(cx);
+    let mut out = Vec::new();
+    if !value_to_source(cx, (*v.ptr).to_qjs(), &mut Vec::new(), &mut out) {
+        return ptr::null_mut();
+    }
+    new_utf16_string(cx, &out)
+}
