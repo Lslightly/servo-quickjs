@@ -1625,6 +1625,28 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+pub const JS_COMPILE_DIRECT_EVAL: JSCompileKindEnum = 0;
+pub const JS_COMPILE_INDIRECT_EVAL: JSCompileKindEnum = 1;
+pub const JS_COMPILE_FUNCTION: JSCompileKindEnum = 2;
+pub type JSCompileKindEnum = ::std::os::raw::c_uint;
+pub type JSCanCompileStringsHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        kind: JSCompileKindEnum,
+        code: JSValue,
+        argc: ::std::os::raw::c_int,
+        arg_strings: *mut JSValue,
+        args: *mut JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_SetCanCompileStringsHook(
+        rt: *mut JSRuntime,
+        hook: JSCanCompileStringsHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
 unsafe extern "C" {
     pub fn JS_SetCanBlock(rt: *mut JSRuntime, can_block: ::std::os::raw::c_int);
 }

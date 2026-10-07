@@ -984,6 +984,22 @@ void JS_SetPromiseIsHandled(JSValueConst promise, JS_BOOL is_handled);
 /* return != 0 if the JS code needs to be interrupted */
 typedef int JSInterruptHandler(JSRuntime *rt, void *opaque);
 void JS_SetInterruptHandler(JSRuntime *rt, JSInterruptHandler *cb, void *opaque);
+/* Servo: host check before eval() and the Function constructors compile code
+   (HostEnsureCanCompileStrings). 'code' is the source text. For the Function
+   constructors, 'arg_strings' (converted to strings) and 'args' (as passed) are the
+   parameters followed by the body. Return 1 to allow, 0 to block (an EvalError is
+   thrown) or < 0 on exception. */
+typedef enum JSCompileKindEnum {
+    JS_COMPILE_DIRECT_EVAL,
+    JS_COMPILE_INDIRECT_EVAL,
+    JS_COMPILE_FUNCTION,
+} JSCompileKindEnum;
+typedef int JSCanCompileStringsHook(JSContext *ctx, JSCompileKindEnum kind,
+                                    JSValueConst code, int argc,
+                                    JSValueConst *arg_strings, JSValueConst *args,
+                                    void *opaque);
+void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
+                                 void *opaque);
 /* if can_block is TRUE, Atomics.wait() can be used */
 void JS_SetCanBlock(JSRuntime *rt, JS_BOOL can_block);
 /* select which debug info is stripped from the compiled code */
