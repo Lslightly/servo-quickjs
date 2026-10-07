@@ -264,6 +264,10 @@ pub(crate) unsafe fn call_native(
         return q::JS_ThrowTypeError(ctx, c"not a function".as_ptr());
     };
     let cx = &mut *(q::JS_GetRuntimeOpaque(q::JS_GetRuntime(ctx)) as *mut Cx);
+    // Values handed to Rust during the call are released when it returns, as SpiderMonkey's
+    // rooted values die with the native's frame; otherwise a loop calling natives would grow the
+    // pool until the end of the task.
+    let pool_mark = cx.pool_mark();
     let mut vp: Vec<JSVal> = Vec::with_capacity(argc as usize + 3);
     vp.push(JSVal::from_qjs(func_obj));
     vp.push(if constructing {
@@ -288,7 +292,7 @@ pub(crate) unsafe fn call_native(
     if entered {
         cx.realm_stack.pop();
     }
-    if ok {
+    let result = if ok {
         q::JS_DupValueRT(cx.rt, vp[0].to_qjs())
     } else {
         if q::JS_HasException(ctx) == 0 {
@@ -297,7 +301,9 @@ pub(crate) unsafe fn call_native(
             q::JS_SetUncatchableException(ctx, 1);
         }
         q::JS_EXCEPTION
-    }
+    };
+    cx.drain_pool(pool_mark);
+    result
 }
 
 /// Native functions: `JSNative` plus jit info, realm and SpiderMonkey's two extended slots.

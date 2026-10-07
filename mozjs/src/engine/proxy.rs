@@ -514,11 +514,13 @@ impl ProxyRef {
 }
 
 /// An exotic method call: the proxy, with the realm of the calling code entered (SpiderMonkey
-/// runs traps in the caller's realm).
+/// runs traps in the caller's realm). Values handed to Rust during the trap are released when it
+/// returns, as SpiderMonkey's rooted values die with the trap's frame.
 struct Trap {
     ctx: *mut q::JSContext,
     proxy: ProxyRef,
     entered: bool,
+    pool_mark: (usize, usize),
 }
 
 impl Trap {
@@ -529,7 +531,8 @@ impl Trap {
         if entered {
             cx.realm_stack.push(realm);
         }
-        Trap { ctx, proxy: ProxyRef::new(cx.as_raw(), val_obj(obj)), entered }
+        let pool_mark = cx.pool_mark();
+        Trap { ctx, proxy: ProxyRef::new(cx.as_raw(), val_obj(obj)), entered, pool_mark }
     }
 
     unsafe fn failed(&self) -> c_int {
@@ -540,9 +543,11 @@ impl Trap {
 
 impl Drop for Trap {
     fn drop(&mut self) {
+        let cx = cx_of(self.ctx);
         if self.entered {
-            cx_of(self.ctx).realm_stack.pop();
+            cx.realm_stack.pop();
         }
+        cx.drain_pool(self.pool_mark);
     }
 }
 
