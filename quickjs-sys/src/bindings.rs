@@ -1902,6 +1902,56 @@ unsafe extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
+    pub fn JS_GetPrimitiveObjectData(ctx: *mut JSContext, obj: JSValue) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_NewPrimitiveObject(ctx: *mut JSContext, val: JSValue) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetRegExpOriginal(ctx: *mut JSContext, obj: JSValue, pflags: *mut JSValue)
+        -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_NewRegExpOriginal(ctx: *mut JSContext, source: JSValue, flags: JSValue) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_NewMapOrSet(ctx: *mut JSContext, is_set: ::std::os::raw::c_int) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetMapRecords(ctx: *mut JSContext, obj: JSValue) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_AddMapRecord(
+        ctx: *mut JSContext,
+        obj: JSValue,
+        key: JSValue,
+        value: JSValue,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_NewNativeErrorObject(
+        ctx: *mut JSContext,
+        error_num: ::std::os::raw::c_int,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetBigIntWords(val: JSValue, words: *mut u32, max_words: usize) -> usize;
+}
+unsafe extern "C" {
+    pub fn JS_NewBigIntWords(ctx: *mut JSContext, words: *const u32, count: usize) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetArrayBufferMaxByteLength(obj: JSValue) -> i64;
+}
+unsafe extern "C" {
+    pub fn JS_NewResizableArrayBufferCopy(
+        ctx: *mut JSContext,
+        buf: *const u8,
+        len: usize,
+        max_len: usize,
+    ) -> JSValue;
+}
+unsafe extern "C" {
     pub fn JS_WriteObject(
         ctx: *mut JSContext,
         psize: *mut usize,
