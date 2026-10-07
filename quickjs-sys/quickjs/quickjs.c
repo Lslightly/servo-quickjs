@@ -352,6 +352,11 @@ struct JSRuntime {
     JSValue current_exception;
     /* true if the current exception cannot be catched */
     BOOL current_exception_is_uncatchable : 8;
+    /* Servo: where the current exception was thrown in bytecode */
+    BOOL current_exception_has_location : 8;
+    JSAtom current_exception_filename;
+    int current_exception_line_num;
+    int current_exception_col_num;
     /* true if inside an out of memory error, to avoid recursing */
     BOOL in_out_of_memory : 8;
 
@@ -2419,6 +2424,7 @@ void JS_FreeRuntime(JSRuntime *rt)
     int i;
 
     JS_FreeValueRT(rt, rt->current_exception);
+    JS_FreeAtomRT(rt, rt->current_exception_filename);
 
     list_for_each_safe(el, el1, &rt->job_list) {
         JSJobEntry *e = list_entry(el, JSJobEntry, link);
@@ -7391,6 +7397,7 @@ JSValue JS_Throw(JSContext *ctx, JSValue obj)
     JS_FreeValue(ctx, rt->current_exception);
     rt->current_exception = obj;
     rt->current_exception_is_uncatchable = FALSE;
+    rt->current_exception_has_location = FALSE;
     return JS_EXCEPTION;
 }
 
@@ -20856,6 +20863,15 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValueConst func_obj,
            operation */
         sf->cur_pc = pc;
         build_backtrace(ctx, rt->current_exception, NULL, 0, 0, 0);
+    }
+    /* Servo: remember where the exception was thrown */
+    if (!rt->current_exception_has_location && b->has_debug) {
+        JS_FreeAtomRT(rt, rt->current_exception_filename);
+        rt->current_exception_filename = JS_DupAtom(ctx, b->debug.filename);
+        rt->current_exception_line_num =
+            find_line_num(ctx, b, pc - b->byte_code_buf - 1,
+                          &rt->current_exception_col_num);
+        rt->current_exception_has_location = TRUE;
     }
     if (!rt->current_exception_is_uncatchable) {
         while (sp > stack_buf) {
@@ -62018,4 +62034,64 @@ void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
 {
     rt->can_compile_strings_hook = hook;
     rt->can_compile_strings_opaque = opaque;
+}
+
+/* Servo: the uncatchable-exception flag, exception locations and structured stack frames
+   (Q9). */
+
+BOOL JS_HasUncatchableException(JSContext *ctx)
+{
+    JSRuntime *rt = ctx->rt;
+    return !JS_IsUninitialized(rt->current_exception) &&
+        rt->current_exception_is_uncatchable;
+}
+
+BOOL JS_GetExceptionLocation(JSContext *ctx, JSAtom *pfilename, int *pline_num,
+                             int *pcol_num)
+{
+    JSRuntime *rt = ctx->rt;
+    if (!rt->current_exception_has_location)
+        return FALSE;
+    *pfilename = rt->current_exception_filename;
+    *pline_num = rt->current_exception_line_num;
+    *pcol_num = rt->current_exception_col_num;
+    return TRUE;
+}
+
+void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaque)
+{
+    JSStackFrame *sf;
+    JSStackFrameInfo info;
+    JSObject *p;
+    JSFunctionBytecode *b;
+    JSShapeProperty *prs;
+    JSProperty *pr;
+
+    for(sf = ctx->rt->current_stack_frame; sf != NULL; sf = sf->prev_frame) {
+        memset(&info, 0, sizeof(info));
+        info.frame = sf;
+        info.name = JS_UNDEFINED;
+        if (JS_VALUE_GET_TAG(sf->cur_func) != JS_TAG_OBJECT)
+            continue;
+        p = JS_VALUE_GET_OBJ(sf->cur_func);
+        if (!js_class_has_bytecode(p->class_id)) {
+            info.is_native = TRUE;
+        } else {
+            b = p->u.func.function_bytecode;
+            info.realm = b->realm;
+            if (b->func_name != JS_ATOM__eval_) {
+                prs = find_own_property(&pr, p, JS_ATOM_name);
+                if (prs && (prs->flags & JS_PROP_TMASK) == JS_PROP_NORMAL &&
+                    JS_VALUE_GET_TAG(pr->u.value) == JS_TAG_STRING)
+                    info.name = pr->u.value;
+            }
+            if (b->has_debug) {
+                info.filename = b->debug.filename;
+                info.line_num = find_line_num(ctx, b, sf->cur_pc - b->byte_code_buf - 1,
+                                              &info.col_num);
+            }
+        }
+        if (cb(opaque, &info))
+            break;
+    }
 }

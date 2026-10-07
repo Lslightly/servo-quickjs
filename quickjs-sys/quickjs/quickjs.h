@@ -668,6 +668,26 @@ JSValue JS_Throw(JSContext *ctx, JSValue obj);
 void JS_SetUncatchableException(JSContext *ctx, JS_BOOL flag);
 JSValue JS_GetException(JSContext *ctx);
 JS_BOOL JS_HasException(JSContext *ctx);
+/* Servo: whether the pending exception is uncatchable (e.g. interrupted script) */
+JS_BOOL JS_HasUncatchableException(JSContext *ctx);
+/* Servo: where the last exception was thrown, if in a bytecode function (the
+   innermost such frame it unwound). 'filename' is valid until the next throw. */
+JS_BOOL JS_GetExceptionLocation(JSContext *ctx, JSAtom *pfilename, int *pline_num,
+                                int *pcol_num);
+/* Servo: the frames of the current call stack, innermost first, until 'cb' returns
+   non-zero. 'name' is the function's own "name" data property or JS_UNDEFINED (for
+   top-level code), borrowed. Native frames have 'is_native' set and no location. */
+typedef struct JSStackFrameInfo {
+    const void *frame; /* identifies the frame while it is live */
+    JS_BOOL is_native;
+    JSContext *realm; /* realm of a bytecode function */
+    JSValueConst name;
+    JSAtom filename; /* JS_ATOM_NULL if unknown */
+    int line_num; /* 1-based, 0 if unknown */
+    int col_num; /* 1-based, 0 if unknown */
+} JSStackFrameInfo;
+typedef int JSStackFrameCallback(void *opaque, const JSStackFrameInfo *info);
+void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaque);
 JS_BOOL JS_IsError(JSContext *ctx, JSValueConst val);
 JSValue JS_NewError(JSContext *ctx);
 JSValue __js_printf_like(2, 3) JS_ThrowSyntaxError(JSContext *ctx, const char *fmt, ...);

@@ -904,6 +904,50 @@ unsafe extern "C" {
     pub fn JS_HasException(ctx: *mut JSContext) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
+    pub fn JS_HasUncatchableException(ctx: *mut JSContext) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_GetExceptionLocation(
+        ctx: *mut JSContext,
+        pfilename: *mut JSAtom,
+        pline_num: *mut ::std::os::raw::c_int,
+        pcol_num: *mut ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct JSStackFrameInfo {
+    pub frame: *const ::std::os::raw::c_void,
+    pub is_native: ::std::os::raw::c_int,
+    pub realm: *mut JSContext,
+    pub name: JSValue,
+    pub filename: JSAtom,
+    pub line_num: ::std::os::raw::c_int,
+    pub col_num: ::std::os::raw::c_int,
+}
+impl Default for JSStackFrameInfo {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+pub type JSStackFrameCallback = ::std::option::Option<
+    unsafe extern "C" fn(
+        opaque: *mut ::std::os::raw::c_void,
+        info: *const JSStackFrameInfo,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_IterateStackFrames(
+        ctx: *mut JSContext,
+        cb: JSStackFrameCallback,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+unsafe extern "C" {
     pub fn JS_IsError(ctx: *mut JSContext, val: JSValue) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
