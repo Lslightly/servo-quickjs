@@ -60535,6 +60535,121 @@ static JSValue js_dataview_get_byteOffset(JSContext *ctx, JSValueConst this_val)
     return JS_NewUint32(ctx, ta->offset);
 }
 
+/* Servo: ArrayBuffer and view storage without exceptions or copies, stealing
+   ArrayBuffer contents, and DataView creation. */
+
+JSBufferKind JS_GetBufferInfo(JSValueConst obj, JSBufferInfo *info)
+{
+    JSObject *p;
+    JSArrayBuffer *abuf;
+    JSTypedArray *ta;
+    JSBufferKind kind;
+    BOOL oob;
+
+    if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT)
+        return JS_BUFFER_NONE;
+    p = JS_VALUE_GET_OBJ(obj);
+    info->type = -1;
+    switch (p->class_id) {
+    case JS_CLASS_ARRAY_BUFFER:
+    case JS_CLASS_SHARED_ARRAY_BUFFER:
+        abuf = p->u.array_buffer;
+        info->buffer = obj;
+        info->data = abuf->data;
+        info->byte_offset = 0;
+        info->byte_length = abuf->byte_length;
+        info->detached = abuf->detached;
+        info->shared = abuf->shared;
+        info->resizable = array_buffer_is_resizable(abuf);
+        return p->class_id == JS_CLASS_ARRAY_BUFFER ?
+            JS_BUFFER_ARRAY_BUFFER : JS_BUFFER_SHARED_ARRAY_BUFFER;
+    case JS_CLASS_DATAVIEW:
+        kind = JS_BUFFER_DATA_VIEW;
+        oob = dataview_is_oob(p);
+        break;
+    default:
+        if (p->class_id < JS_CLASS_UINT8C_ARRAY ||
+            p->class_id > JS_CLASS_FLOAT64_ARRAY)
+            return JS_BUFFER_NONE;
+        kind = JS_BUFFER_TYPED_ARRAY;
+        oob = typed_array_is_oob(p);
+        info->type = p->class_id - JS_CLASS_UINT8C_ARRAY;
+        break;
+    }
+    ta = p->u.typed_array;
+    abuf = ta->buffer->u.array_buffer;
+    info->buffer = JS_MKPTR(JS_TAG_OBJECT, ta->buffer);
+    info->detached = abuf->detached;
+    info->shared = abuf->shared;
+    info->resizable = array_buffer_is_resizable(abuf);
+    if (oob) {
+        info->data = NULL;
+        info->byte_offset = 0;
+        info->byte_length = 0;
+    } else {
+        info->data = abuf->data + ta->offset;
+        info->byte_offset = ta->offset;
+        if (!ta->track_rab)
+            info->byte_length = ta->length;
+        else if (kind == JS_BUFFER_DATA_VIEW)
+            info->byte_length = abuf->byte_length - ta->offset;
+        else
+            info->byte_length = (size_t)p->u.array.count <<
+                typed_array_size_log2(p->class_id);
+    }
+    return kind;
+}
+
+uint8_t *JS_StealArrayBuffer(JSContext *ctx, size_t *plen, JSValueConst obj)
+{
+    JSArrayBuffer *abuf = JS_GetOpaque(obj, JS_CLASS_ARRAY_BUFFER);
+    uint8_t *data;
+
+    if (!abuf) {
+        JS_ThrowTypeErrorInvalidClass(ctx, JS_CLASS_ARRAY_BUFFER);
+        return NULL;
+    }
+    if (abuf->detached) {
+        JS_ThrowTypeErrorDetachedArrayBuffer(ctx);
+        return NULL;
+    }
+    if (abuf->free_func == js_array_buffer_free) {
+        data = abuf->data;
+    } else {
+        data = js_malloc(ctx, max_int(abuf->byte_length, 1));
+        if (!data)
+            return NULL;
+        if (abuf->byte_length)
+            memcpy(data, abuf->data, abuf->byte_length);
+        if (abuf->free_func)
+            abuf->free_func(ctx->rt, abuf->opaque, abuf->data);
+    }
+    *plen = abuf->byte_length;
+    abuf->data = NULL;
+    abuf->byte_length = 0;
+    abuf->detached = TRUE;
+    js_array_buffer_update_typed_arrays(abuf);
+    return data;
+}
+
+JSValue JS_NewArrayBufferOwned(JSContext *ctx, uint8_t *buf, size_t len)
+{
+    return js_array_buffer_constructor3(ctx, JS_UNDEFINED, len, NULL,
+                                        JS_CLASS_ARRAY_BUFFER, buf,
+                                        js_array_buffer_free, NULL, FALSE);
+}
+
+JSValue JS_NewDataView(JSContext *ctx, JSValueConst buffer, size_t byte_offset,
+                       size_t byte_length)
+{
+    JSValue args[3];
+
+    args[0] = buffer;
+    args[1] = JS_NewInt64(ctx, byte_offset);
+    args[2] = JS_NewInt64(ctx, byte_length);
+    return js_dataview_constructor(ctx, JS_UNDEFINED, 3, (JSValueConst *)args);
+}
+
 static JSValue js_dataview_getValue(JSContext *ctx,
                                     JSValueConst this_obj,
                                     int argc, JSValueConst *argv, int class_id)

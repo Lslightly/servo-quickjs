@@ -906,6 +906,39 @@ JSValue JS_GetTypedArrayBuffer(JSContext *ctx, JSValueConst obj,
                                size_t *pbyte_offset,
                                size_t *pbyte_length,
                                size_t *pbytes_per_element);
+
+/* Servo: ArrayBuffer and view storage without exceptions or copies, stealing
+   ArrayBuffer contents, and DataView creation. */
+typedef enum JSBufferKind {
+    JS_BUFFER_NONE,
+    JS_BUFFER_ARRAY_BUFFER,
+    JS_BUFFER_SHARED_ARRAY_BUFFER,
+    JS_BUFFER_TYPED_ARRAY,
+    JS_BUFFER_DATA_VIEW,
+} JSBufferKind;
+
+typedef struct JSBufferInfo {
+    JSValueConst buffer; /* the (Shared)ArrayBuffer itself or the view's buffer; not duplicated */
+    uint8_t *data;       /* the object's bytes; NULL if detached or out of bounds */
+    size_t byte_offset;  /* offset of 'data' in 'buffer'; 0 if detached or out of bounds */
+    size_t byte_length;  /* 0 if detached or out of bounds */
+    int type;            /* JSTypedArrayEnum of a typed array, -1 otherwise */
+    JS_BOOL detached;    /* 'buffer' is detached */
+    JS_BOOL shared;      /* 'buffer' is a SharedArrayBuffer */
+    JS_BOOL resizable;   /* 'buffer' is resizable or growable */
+} JSBufferInfo;
+
+/* Fills 'info' if 'obj' is a (Shared)ArrayBuffer, typed array or DataView. 'data' is valid
+   until JS code runs. Never throws. */
+JSBufferKind JS_GetBufferInfo(JSValueConst obj, JSBufferInfo *info);
+/* Detaches a non-shared ArrayBuffer and returns its former contents (never NULL on success),
+   to be freed with js_free_rt(). External contents are copied and released first. */
+uint8_t *JS_StealArrayBuffer(JSContext *ctx, size_t *plen, JSValueConst obj);
+/* An ArrayBuffer that takes ownership of 'buf', allocated with js_malloc_rt(). On failure,
+   'buf' still belongs to the caller. */
+JSValue JS_NewArrayBufferOwned(JSContext *ctx, uint8_t *buf, size_t len);
+JSValue JS_NewDataView(JSContext *ctx, JSValueConst buffer, size_t byte_offset,
+                       size_t byte_length);
 typedef struct {
     void *(*sab_alloc)(void *opaque, size_t size);
     void (*sab_free)(void *opaque, void *ptr);
