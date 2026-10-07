@@ -108,8 +108,10 @@ impl<T> JS::MutableHandle<T> {
 
     pub fn set(&self, v: T)
     where
-        T: Copy,
+        T: Copy + RootKind,
     {
+        // QuickJS: a rooted location keeps its value alive (see `engine::retain_stored`).
+        unsafe { crate::engine::retain_stored(T::KIND, &v as *const T as *const std::ffi::c_void) };
         unsafe { *self.ptr = v }
     }
 

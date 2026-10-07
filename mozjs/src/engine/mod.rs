@@ -197,6 +197,14 @@ pub(crate) fn cstring_lossy(s: *const std::os::raw::c_char) -> CString {
     }
 }
 
+/// Retains a value written to a rooted location (`MutableHandle::set`, `RootedGuard::set`): like
+/// SpiderMonkey's roots, the location keeps it alive, here until the pool is drained.
+pub(crate) unsafe fn retain_stored(kind: root::JS::RootKind, data: *const std::ffi::c_void) {
+    if let Some(cx) = try_current() {
+        retain_rooted(cx.as_raw(), kind, data);
+    }
+}
+
 /// Retains the initial value of a `JS::Rooted<T>` (see `JS::Rooted::add_to_root_stack`).
 pub(crate) unsafe fn retain_rooted(cx: *mut root::JSContext, kind: root::JS::RootKind, data: *const std::ffi::c_void) {
     use root::JS::RootKind;

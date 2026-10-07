@@ -120,6 +120,8 @@ impl<'a, T: 'a + RootKind> RootedGuard<'a, T> {
     }
 
     pub fn set(&mut self, v: T) {
+        // QuickJS: the root keeps its new value alive, like the initial one.
+        unsafe { crate::engine::retain_stored(T::KIND, &v as *const T as *const std::ffi::c_void) };
         // SAFETY: GC does not run during this block
         unsafe { *self.as_mut() = v };
     }
@@ -346,8 +348,10 @@ impl<'a, T> MutableHandle<'a, T> {
 
     pub fn set(&mut self, v: T)
     where
-        T: Copy,
+        T: Copy + RootKind,
     {
+        // QuickJS: a rooted location keeps its value alive (see `engine::retain_stored`).
+        unsafe { crate::engine::retain_stored(T::KIND, &v as *const T as *const std::ffi::c_void) };
         unsafe { *self.ptr.as_mut() = v }
     }
 
