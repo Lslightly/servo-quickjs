@@ -17,3 +17,7 @@ servo cmd="build":
 # Run the shim-backed servoshell headless on a page (`just servo "build --features js-quickjs"` first).
 run page *args:
     {{servo_target}}/debug/servoshell --headless --exit {{args}} {{page}}
+
+# Run WPT tests (e.g. `dom/nodes`) with the shim-backed servoshell and the tracing verifier.
+wpt log *tests:
+    cd {{servo}} && QJS_VERIFY_TRACING=1 PATH=/usr/bin:$PATH ./mach test-wpt --bin {{servo_target}}/debug/servoshell --processes 2 --log-raw {{log}} {{tests}}
