@@ -61688,3 +61688,45 @@ int JS_AddIntrinsicWeakRef(JSContext *ctx)
     JS_FreeValue(ctx, obj);
     return 0;
 }
+
+/* Servo: Latin-1 and UTF-16 string creation and direct access to string data. */
+
+JSValue JS_NewStringLatin1(JSContext *ctx, const uint8_t *buf, size_t len)
+{
+    if (len > JS_STRING_LEN_MAX)
+        return JS_ThrowRangeError(ctx, "invalid string length");
+    return js_new_string8_len(ctx, (const char *)buf, len);
+}
+
+JSValue JS_NewStringUTF16(JSContext *ctx, const uint16_t *buf, size_t len)
+{
+    JSString *str;
+    size_t i;
+
+    if (len > JS_STRING_LEN_MAX)
+        return JS_ThrowRangeError(ctx, "invalid string length");
+    if (len == 0)
+        return JS_AtomToString(ctx, JS_ATOM_empty_string);
+    for (i = 0; i < len; i++) {
+        if (buf[i] >= 0x100)
+            return js_new_string16_len(ctx, buf, len);
+    }
+    str = js_alloc_string(ctx, len, 0);
+    if (!str)
+        return JS_EXCEPTION;
+    for (i = 0; i < len; i++)
+        str->u.str8[i] = buf[i];
+    str->u.str8[len] = '\0';
+    return JS_MKPTR(JS_TAG_STRING, str);
+}
+
+size_t JS_GetStringData(JSValueConst str, const void **pdata, int *pwide)
+{
+    JSString *p = JS_VALUE_GET_STRING(str);
+    *pwide = p->is_wide_char;
+    if (p->is_wide_char)
+        *pdata = p->u.str16;
+    else
+        *pdata = p->u.str8;
+    return p->len;
+}

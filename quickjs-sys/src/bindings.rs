@@ -1043,6 +1043,19 @@ unsafe extern "C" {
     ) -> JSValue;
 }
 unsafe extern "C" {
+    pub fn JS_NewStringLatin1(ctx: *mut JSContext, buf: *const u8, len: usize) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_NewStringUTF16(ctx: *mut JSContext, buf: *const u16, len: usize) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetStringData(
+        str_: JSValue,
+        pdata: *mut *const ::std::os::raw::c_void,
+        pwide: *mut ::std::os::raw::c_int,
+    ) -> usize;
+}
+unsafe extern "C" {
     #[link_name = "JS_NewString__sys"]
     pub fn JS_NewString(ctx: *mut JSContext, str_: *const ::std::os::raw::c_char) -> JSValue;
 }

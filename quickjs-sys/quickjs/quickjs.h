@@ -744,6 +744,11 @@ int JS_ToBigInt128(JSContext *ctx, uint64_t *plow, uint64_t *phigh, JSValueConst
 int JS_ToBigInt128Sat(JSContext *ctx, uint64_t *plow, uint64_t *phigh, JSValueConst val);
 
 JSValue JS_NewStringLen(JSContext *ctx, const char *str1, size_t len1);
+/* Servo: Latin-1 and UTF-16 strings, and direct read access to the characters of a
+   JS_TAG_STRING value (8-bit if *pwide is 0, 16-bit otherwise). */
+JSValue JS_NewStringLatin1(JSContext *ctx, const uint8_t *buf, size_t len);
+JSValue JS_NewStringUTF16(JSContext *ctx, const uint16_t *buf, size_t len);
+size_t JS_GetStringData(JSValueConst str, const void **pdata, int *pwide);
 static inline JSValue JS_NewString(JSContext *ctx, const char *str)
 {
     return JS_NewStringLen(ctx, str, strlen(str));
