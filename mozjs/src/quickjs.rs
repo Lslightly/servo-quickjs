@@ -13,6 +13,7 @@ pub use quickjs_sys as sys;
 ///
 /// # Safety
 /// `obj` must be a live object of the current thread's runtime.
+#[inline]
 pub unsafe fn retain_object(obj: *mut JSObject) {
     crate::engine::retain_object(obj)
 }
@@ -21,12 +22,14 @@ pub unsafe fn retain_object(obj: *mut JSObject) {
 ///
 /// # Safety
 /// The caller must own a reference to `obj`.
+#[inline]
 pub unsafe fn release_object(obj: *mut JSObject) {
     crate::engine::release_object(obj)
 }
 
 /// Whether the current thread's runtime is alive. Destroying it frees every object, after which
 /// `release_object` does nothing and DOM objects must not be touched.
+#[inline]
 pub fn runtime_alive() -> bool {
     crate::engine::try_current().is_some()
 }

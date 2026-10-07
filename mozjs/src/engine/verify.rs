@@ -14,7 +14,8 @@
 //! code released a reference it did not own. Pool references are never marked, so the cycle
 //! collector cannot free such an object.
 
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
+use std::sync::atomic::{AtomicU8, Ordering};
 use std::collections::HashMap;
 
 use quickjs_sys as q;
@@ -31,19 +32,22 @@ struct Verifier {
 }
 
 thread_local! {
-    static ENABLED: Cell<Option<bool>> = const { Cell::new(None) };
     static VERIFIER: RefCell<Verifier> = RefCell::default();
 }
 
+/// 0: not read yet, 1: off, 2: on. Process-wide, as it is checked on every reference count change.
+static ENABLED: AtomicU8 = AtomicU8::new(0);
+
+#[inline]
 fn enabled() -> bool {
-    ENABLED.with(|e| match e.get() {
-        Some(enabled) => enabled,
-        None => {
+    match ENABLED.load(Ordering::Relaxed) {
+        0 => {
             let enabled = std::env::var_os("QJS_VERIFY_TRACING").is_some_and(|v| v != "0");
-            e.set(Some(enabled));
+            ENABLED.store(if enabled { 2 } else { 1 }, Ordering::Relaxed);
             enabled
         },
-    })
+        state => state == 2,
+    }
 }
 
 fn gc_pointer(v: q::JSValue) -> Option<usize> {
@@ -54,6 +58,7 @@ fn gc_pointer(v: q::JSValue) -> Option<usize> {
 }
 
 /// Records that Rust gained (`delta > 0`) or dropped a counted reference to `v`.
+#[inline]
 pub(crate) fn count(v: q::JSValue, delta: i64) {
     if !enabled() {
         return;
@@ -72,6 +77,7 @@ pub(crate) fn count(v: q::JSValue, delta: i64) {
 }
 
 /// Records that the autorelease pool gained (`delta > 0`) or dropped a reference to `v`.
+#[inline]
 pub(crate) fn pooled(v: q::JSValue, delta: i64) {
     if !enabled() {
         return;

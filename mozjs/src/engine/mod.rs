@@ -158,6 +158,7 @@ impl Cx {
 }
 
 /// The runtime of the current thread.
+#[inline]
 pub(crate) fn current<'a>() -> &'a mut Cx {
     let cx = CURRENT.with(|c| c.get());
     assert!(!cx.is_null(), "no QuickJS runtime on this thread");
@@ -166,6 +167,7 @@ pub(crate) fn current<'a>() -> &'a mut Cx {
 
 /// The runtime of the current thread, or `None` once it has been destroyed. Like SpiderMonkey's
 /// shutdown GC, destroying a runtime frees every object, so later releases must do nothing.
+#[inline]
 pub(crate) fn try_current<'a>() -> Option<&'a mut Cx> {
     let cx = CURRENT.with(|c| c.get());
     if cx.is_null() { None } else { Some(unsafe { &mut *cx }) }
@@ -176,10 +178,12 @@ pub(crate) fn set_current(cx: *mut Cx) {
 }
 
 /// The QuickJS object pointer as a value (no reference count change).
+#[inline]
 pub(crate) fn obj_val(obj: *mut root::JSObject) -> q::JSValue {
     q::JSValue::mkptr(q::JS_TAG_OBJECT, obj as *mut _)
 }
 
+#[inline]
 pub(crate) fn val_obj(v: q::JSValue) -> *mut root::JSObject {
     debug_assert_eq!(v.tag(), q::JS_TAG_OBJECT);
     v.ptr() as *mut root::JSObject
@@ -223,12 +227,14 @@ pub(crate) unsafe fn retain_rooted(cx: *mut root::JSContext, kind: root::JS::Roo
 }
 
 /// See `crate::quickjs::retain_object`.
+#[inline]
 pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
     q::JS_DupValueRT(current().rt, obj_val(obj));
     verify::count(obj_val(obj), 1);
 }
 
 /// See `crate::quickjs::release_object`.
+#[inline]
 pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
     if let Some(cx) = try_current() {
         verify::count(obj_val(obj), -1);
