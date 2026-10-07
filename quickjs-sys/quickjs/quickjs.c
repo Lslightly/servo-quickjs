@@ -53870,6 +53870,24 @@ static void promise_reaction_data_free(JSRuntime *rt,
     js_free_rt(rt, rd);
 }
 
+/* Servo: promise jobs are enqueued in the realm of their handler, or else the
+   current realm (NewPromiseReactionJob, NewPromiseResolveThenableJob). The host
+   uses it as the job's entry realm. */
+static int js_enqueue_promise_job(JSContext *ctx, JSJobFunc *job_func, int argc,
+                                  JSValueConst *argv, JSValueConst handler)
+{
+    JSContext *realm = ctx;
+
+    if (JS_IsFunction(ctx, handler)) {
+        realm = JS_GetFunctionRealm(ctx, handler);
+        if (!realm) {
+            JS_FreeValue(ctx, JS_GetException(ctx));
+            realm = ctx;
+        }
+    }
+    return JS_EnqueueJob(realm, job_func, argc, argv);
+}
+
 static JSValue promise_reaction_job(JSContext *ctx, int argc,
                                     JSValueConst *argv)
 {
@@ -53950,7 +53968,7 @@ static void fulfill_or_reject_promise(JSContext *ctx, JSValueConst promise,
         args[2] = rd->handler;
         args[3] = JS_NewBool(ctx, is_reject);
         args[4] = value;
-        JS_EnqueueJob(ctx, promise_reaction_job, 5, args);
+        js_enqueue_promise_job(ctx, promise_reaction_job, 5, args, rd->handler);
         list_del(&rd->link);
         promise_reaction_data_free(ctx->rt, rd);
     }
@@ -54110,7 +54128,7 @@ static JSValue js_promise_resolve_function_call(JSContext *ctx,
         args[0] = s->promise;
         args[1] = resolution;
         args[2] = then;
-        JS_EnqueueJob(ctx, js_promise_resolve_thenable_job, 3, args);
+        js_enqueue_promise_job(ctx, js_promise_resolve_thenable_job, 3, args, then);
         JS_FreeValue(ctx, then);
     }
     return JS_UNDEFINED;
@@ -54714,7 +54732,7 @@ static __exception int perform_promise_then(JSContext *ctx,
         args[2] = rd->handler;
         args[3] = JS_NewBool(ctx, i);
         args[4] = s->promise_result;
-        JS_EnqueueJob(ctx, promise_reaction_job, 5, args);
+        js_enqueue_promise_job(ctx, promise_reaction_job, 5, args, rd->handler);
         for(i = 0; i < 2; i++)
             promise_reaction_data_free(ctx->rt, rd_array[i]);
     }

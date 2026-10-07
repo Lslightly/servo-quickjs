@@ -292,6 +292,33 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
         jsapi::RunJobs(cx.raw_cx());
         assert_eq!(FULFILLED.with(|f| f.borrow().clone()), vec![9]);
 
+        // Jobs belong to the realm of their handler: Servo's entry realm for them.
+        rooted!(&in(cx) let other = JS_NewGlobalObject(
+            cx,
+            &SIMPLE_GLOBAL_CLASS,
+            ptr::null_mut(),
+            OnNewGlobalHookOption::FireOnNewGlobalHook,
+            &*RealmOptions::default(),
+        ));
+        let other_val = ObjectValue(other.get());
+        assert!(jsapi::JS_DefineProperty(
+            cx.raw_cx(),
+            handle(&global.get()),
+            c"other".as_ptr(),
+            handle(&other_val),
+            0
+        ));
+        for (source, realm) in [
+            ("Promise.resolve(1).then(other.Function('return 1'))", other.get()),
+            ("Promise.resolve({ then: other.Function('resolve', 'resolve(1)') })", other.get()),
+            ("Promise.resolve(1).then(() => 1)", global.get()),
+        ] {
+            eval(cx, global, source).unwrap();
+            let job = queue.jobs.borrow().back().unwrap().get();
+            assert_eq!(jsapi::GetNonCCWObjectGlobal(job), realm, "{source}");
+            jsapi::RunJobs(cx.raw_cx());
+        }
+
         // Jobs that were never run are released with the queue.
         eval(cx, global, "Promise.resolve().then(() => {})").unwrap();
         assert_eq!(queue.jobs.borrow().len(), 1);
