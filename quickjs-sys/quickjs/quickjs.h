@@ -977,6 +977,7 @@ typedef struct JSBufferInfo {
     JS_BOOL detached;    /* 'buffer' is detached */
     JS_BOOL shared;      /* 'buffer' is a SharedArrayBuffer */
     JS_BOOL resizable;   /* 'buffer' is resizable or growable */
+    JS_BOOL length_tracking; /* a view whose length follows its resizable buffer */
 } JSBufferInfo;
 
 /* Fills 'info' if 'obj' is a (Shared)ArrayBuffer, typed array or DataView. 'data' is valid
@@ -988,6 +989,7 @@ uint8_t *JS_StealArrayBuffer(JSContext *ctx, size_t *plen, JSValueConst obj);
 /* An ArrayBuffer that takes ownership of 'buf', allocated with js_malloc_rt(). On failure,
    'buf' still belongs to the caller. */
 JSValue JS_NewArrayBufferOwned(JSContext *ctx, uint8_t *buf, size_t len);
+/* A 'byte_length' of SIZE_MAX makes a length-tracking view of a resizable buffer. */
 JSValue JS_NewDataView(JSContext *ctx, JSValueConst buffer, size_t byte_offset,
                        size_t byte_length);
 typedef struct {

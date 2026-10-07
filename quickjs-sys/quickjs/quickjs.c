@@ -60821,6 +60821,7 @@ JSBufferKind JS_GetBufferInfo(JSValueConst obj, JSBufferInfo *info)
         info->detached = abuf->detached;
         info->shared = abuf->shared;
         info->resizable = array_buffer_is_resizable(abuf);
+        info->length_tracking = FALSE;
         return p->class_id == JS_CLASS_ARRAY_BUFFER ?
             JS_BUFFER_ARRAY_BUFFER : JS_BUFFER_SHARED_ARRAY_BUFFER;
     case JS_CLASS_DATAVIEW:
@@ -60842,6 +60843,7 @@ JSBufferKind JS_GetBufferInfo(JSValueConst obj, JSBufferInfo *info)
     info->detached = abuf->detached;
     info->shared = abuf->shared;
     info->resizable = array_buffer_is_resizable(abuf);
+    info->length_tracking = ta->track_rab;
     if (oob) {
         info->data = NULL;
         info->byte_offset = 0;
@@ -60906,7 +60908,7 @@ JSValue JS_NewDataView(JSContext *ctx, JSValueConst buffer, size_t byte_offset,
 
     args[0] = buffer;
     args[1] = JS_NewInt64(ctx, byte_offset);
-    args[2] = JS_NewInt64(ctx, byte_length);
+    args[2] = byte_length == SIZE_MAX ? JS_UNDEFINED : JS_NewInt64(ctx, byte_length);
     return js_dataview_constructor(ctx, JS_UNDEFINED, 3, (JSValueConst *)args);
 }
 

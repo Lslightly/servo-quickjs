@@ -1541,6 +1541,7 @@ pub struct JSBufferInfo {
     pub detached: ::std::os::raw::c_int,
     pub shared: ::std::os::raw::c_int,
     pub resizable: ::std::os::raw::c_int,
+    pub length_tracking: ::std::os::raw::c_int,
 }
 impl Default for JSBufferInfo {
     fn default() -> Self {
