@@ -42,9 +42,9 @@ pub(crate) unsafe fn JS_DestroyContext(cx: *mut root::JSContext) {
     let cx = Box::from_raw(cx as *mut Cx);
     let mut cx = cx;
     cx.drain_pool((0, 0));
-    for mut realm in super::realm::take_all_realms(&mut cx) {
-        if let Some(data) = realm.global_data.take() {
-            data.free(cx.rt);
+    for realm in super::realm::take_all_realms(&mut cx) {
+        if !realm.principals.is_null() {
+            super::JS_DropPrincipals(cx.as_raw(), realm.principals);
         }
         q::JS_FreeContext(realm.qctx);
     }

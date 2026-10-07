@@ -16,7 +16,6 @@ use std::sync::Mutex;
 
 use quickjs_sys as q;
 
-use super::realm::realm_of_global;
 use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::{JSVal, TAG_MAGIC};
@@ -70,6 +69,15 @@ fn with_registry<R>(f: impl FnOnce(&mut Registry) -> R) -> R {
     f(guard.get_or_insert_with(Default::default))
 }
 
+/// A new QuickJS class id (QuickJS's allocator is not thread-safe).
+pub(crate) fn new_class_id() -> q::JSClassID {
+    with_registry(|_| {
+        let mut id = 0;
+        unsafe { q::JS_NewClassID(&mut id) };
+        id
+    })
+}
+
 /// The QuickJS class for `clasp`, registered in `rt` on first use.
 pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass) -> q::JSClassID {
     let id = with_registry(|r| {
@@ -88,7 +96,8 @@ pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass
             finalizer: Some(finalize),
             gc_mark: Some(gc_mark),
             call: if callable { Some(class_call) } else { None },
-            exotic: ptr::null_mut(),
+            // QuickJS: resolve and enumerate hooks (globals) run from exotic methods.
+            exotic: super::proxy::resolve_exotic_methods(clasp),
         };
         assert_eq!(q::JS_NewClass(rt, id, &def), 0);
     }
@@ -99,20 +108,15 @@ fn clasp_of_id(id: q::JSClassID) -> *const root::JSClass {
     with_registry(|r| r.by_id.get(&id).copied().unwrap_or(0) as *const root::JSClass)
 }
 
-/// The object data of `obj`, if it is an object of a SpiderMonkey class (or one of our globals).
+/// The object data of `obj`, if it is an object of a SpiderMonkey class (globals included).
 pub(crate) unsafe fn object_data<'a>(obj: *mut root::JSObject) -> Option<&'a mut ObjectData> {
     let v = obj_val(obj);
     let id = q::JS_GetClassID(v);
-    if !clasp_of_id(id).is_null() {
-        let data = q::JS_GetOpaque(v, id) as *mut ObjectData;
-        return data.as_mut();
+    if clasp_of_id(id).is_null() {
+        return None;
     }
-    let realm = realm_of_global(obj);
-    if realm.is_null() {
-        None
-    } else {
-        (*realm).global_data.as_deref_mut()
-    }
+    let data = q::JS_GetOpaque(v, id) as *mut ObjectData;
+    data.as_mut()
 }
 
 /// Placeholder class reported for objects QuickJS created itself (plain objects, arrays, ...).
@@ -139,6 +143,10 @@ pub(crate) unsafe fn object_class(obj: *mut root::JSObject) -> *const root::JSCl
     if let Some(data) = object_data(obj) {
         return data.clasp;
     }
+    // QuickJS: proxies report the class they were created with.
+    if let Some(clasp) = super::proxy::proxy_class(obj) {
+        return clasp;
+    }
     if q::JS_IsFunction(super::current().base_ctx, obj_val(obj)) != 0 {
         return &FUNCTION_CLASS;
     }
@@ -154,6 +162,10 @@ pub(crate) unsafe fn object_realm(cx: &Cx, obj: *mut root::JSObject) -> *mut Rea
     }
     if let Some(data) = function_data(obj) {
         return data.realm;
+    }
+    // QuickJS: proxies record their realm.
+    if let Some(realm) = super::proxy::proxy_realm(obj) {
+        return realm;
     }
     super::realm::realm_of_object(cx, obj)
 }
