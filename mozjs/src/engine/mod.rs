@@ -161,6 +161,13 @@ pub(crate) fn current<'a>() -> &'a mut Cx {
     unsafe { &mut *cx }
 }
 
+/// The runtime of the current thread, or `None` once it has been destroyed. Like SpiderMonkey's
+/// shutdown GC, destroying a runtime frees every object, so later releases must do nothing.
+pub(crate) fn try_current<'a>() -> Option<&'a mut Cx> {
+    let cx = CURRENT.with(|c| c.get());
+    if cx.is_null() { None } else { Some(unsafe { &mut *cx }) }
+}
+
 pub(crate) fn set_current(cx: *mut Cx) {
     CURRENT.with(|c| c.set(cx));
 }
@@ -219,7 +226,9 @@ pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
 
 /// See `crate::quickjs::release_object`.
 pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
-    q::JS_FreeValueRT(current().rt, obj_val(obj));
+    if let Some(cx) = try_current() {
+        q::JS_FreeValueRT(cx.rt, obj_val(obj));
+    }
 }
 
 pub(crate) fn drain_current_pool() {

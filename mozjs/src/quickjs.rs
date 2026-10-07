@@ -25,6 +25,12 @@ pub unsafe fn release_object(obj: *mut JSObject) {
     crate::engine::release_object(obj)
 }
 
+/// Whether the current thread's runtime is alive. Destroying it frees every object, after which
+/// `release_object` does nothing and DOM objects must not be touched.
+pub fn runtime_alive() -> bool {
+    crate::engine::try_current().is_some()
+}
+
 /// Releases every value the engine handed to Rust during the current task. Call between tasks,
 /// when no raw JavaScript values are held on the stack.
 pub fn drain_autorelease_pool() {

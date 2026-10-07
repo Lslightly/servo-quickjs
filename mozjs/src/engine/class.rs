@@ -495,7 +495,9 @@ pub(crate) unsafe fn InitRealmStandardClasses(cx: *mut root::JSContext) -> bool 
 // Write barriers: `Heap<T>` holds one reference to its value.
 
 unsafe fn barrier(prev: q::JSValue, next: q::JSValue) {
-    let cx = super::current();
+    let Some(cx) = super::try_current() else {
+        return;
+    };
     if next.has_ref_count() {
         q::JS_DupValueRT(cx.rt, next);
     }
@@ -540,7 +542,9 @@ pub(crate) unsafe fn heap_symbol_barrier(prev: *mut root::JS::Symbol, next: *mut
 
 /// Barrier for `Heap<jsid>`: string and symbol ids hold an atom reference.
 pub(crate) unsafe fn heap_id_barrier(prev: root::jsid, next: root::jsid) {
-    let cx = super::current();
+    let Some(cx) = super::try_current() else {
+        return;
+    };
     if next.is_string() || next.is_symbol() {
         q::JS_DupAtom(cx.base_ctx, next.to_atom());
     }
