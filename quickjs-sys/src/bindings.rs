@@ -476,6 +476,13 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn JS_SetContextOpaque(ctx: *mut JSContext, opaque: *mut ::std::os::raw::c_void);
 }
+pub type JSContextFinalizer = ::std::option::Option<unsafe extern "C" fn(ctx: *mut JSContext)>;
+unsafe extern "C" {
+    pub fn JS_SetContextFinalizer(rt: *mut JSRuntime, finalizer: JSContextFinalizer);
+}
+unsafe extern "C" {
+    pub fn JS_MarkContextRef(rt: *mut JSRuntime, ctx: *mut JSContext, mark_func: JS_MarkFunc);
+}
 unsafe extern "C" {
     pub fn JS_GetRuntime(ctx: *mut JSContext) -> *mut JSRuntime;
 }

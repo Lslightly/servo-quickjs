@@ -377,6 +377,8 @@ struct JSRuntime {
     void *can_compile_strings_opaque;
     /* Servo: debug hook called when an object is freed */
     JSFreeObjectHook *free_object_hook;
+    /* Servo: called when a context is freed */
+    JSContextFinalizer *context_finalizer;
 
     JSModuleNormalizeFunc *module_normalize_func;
     BOOL module_loader_has_attr;
@@ -2879,6 +2881,10 @@ void JS_FreeContext(JSContext *ctx)
     js_free_shape_null(ctx->rt, ctx->mapped_arguments_shape);
     js_free_shape_null(ctx->rt, ctx->regexp_shape);
     js_free_shape_null(ctx->rt, ctx->regexp_result_shape);
+
+    /* Servo: the embedder frees its data of the context (Q15) */
+    if (rt->context_finalizer)
+        rt->context_finalizer(ctx);
 
     list_del(&ctx->link);
     remove_gc_object(&ctx->header);
@@ -62644,4 +62650,20 @@ JSContext *JS_GetObjectRealm(JSValueConst obj)
     default:
         return NULL;
     }
+}
+
+/* Servo: embedder data that lives as long as a context (Q15). The finalizer runs
+   when a context is freed, after it released its values. An object that holds a
+   context reference (JS_DupContext) marks it from its class gc_mark with
+   JS_MarkContextRef, so that the cycle collector can free a context together
+   with its global object. */
+
+void JS_SetContextFinalizer(JSRuntime *rt, JSContextFinalizer *finalizer)
+{
+    rt->context_finalizer = finalizer;
+}
+
+void JS_MarkContextRef(JSRuntime *rt, JSContext *ctx, JS_MarkFunc *mark_func)
+{
+    mark_func(rt, &ctx->header);
 }
