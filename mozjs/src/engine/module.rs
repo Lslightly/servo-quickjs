@@ -419,7 +419,7 @@ unsafe extern "C" fn resolve_imported_module(ctx: *mut q::JSContext, m: *mut q::
         return ptr::null_mut();
     }
     let request = cx.adopt(request).to_object();
-    let private = cx.adopt(q::JS_GetModulePrivateValue(ctx, m));
+    let private = cx.adopt(module_private(ctx, m));
     let result = in_realm_of(cx, ctx, |raw| hook(raw, handle(&private), handle(&request)));
     if result.is_null() {
         ensure_exception(ctx);
@@ -504,7 +504,7 @@ struct Hooks {
 
 thread_local! {
     static HOOKS: RefCell<HashMap<usize, Hooks>> = RefCell::new(HashMap::new());
-    /// Private values of classic scripts by file name, for import() (see `classic_private`).
+    /// Private values of classic scripts by file name (see `record_script_private`).
     static CLASSIC_PRIVATES: RefCell<HashMap<CString, q::JSValue>> = RefCell::new(HashMap::new());
 }
 
@@ -556,7 +556,7 @@ unsafe extern "C" fn import_meta_hook(ctx: *mut q::JSContext, m: *mut q::JSModul
     let Some(hook) = hooks(cx.rt).metadata else {
         return 0;
     };
-    let private = cx.adopt(q::JS_GetModulePrivateValue(ctx, m));
+    let private = cx.adopt(module_private(ctx, m));
     let meta = val_obj(meta);
     if in_realm_of(cx, ctx, |raw| hook(raw, handle(&private), handle(&meta))) {
         0
@@ -566,8 +566,8 @@ unsafe extern "C" fn import_meta_hook(ctx: *mut q::JSContext, m: *mut q::JSModul
     }
 }
 
-/// Records the private value of a classic script (from `SetScriptPrivate`), so that import()
-/// in that script finds it: QuickJS identifies the calling script only by its file name.
+/// Records the private value of a classic script (from `SetScriptPrivate`) for import() and
+/// scripted-caller queries: QuickJS identifies running code only by its file name.
 /// Values with a reference count are not recorded (Servo's are `PrivateValue`s).
 pub(crate) unsafe fn record_script_private(script: *mut root::JSScript, value: q::JSValue) {
     if value.has_ref_count() {
@@ -588,19 +588,51 @@ pub(crate) unsafe fn record_script_private(script: *mut root::JSScript, value: q
     CLASSIC_PRIVATES.with(|p| p.borrow_mut().insert(key, value));
 }
 
-unsafe fn classic_private(ctx: *mut q::JSContext, basename: q::JSValue) -> q::JSValue {
-    if basename.tag() != q::JS_TAG_STRING {
-        return q::JS_UNDEFINED;
+/// The private value of a classic script (not counted), or undefined.
+fn classic_private(name: &CStr) -> q::JSValue {
+    CLASSIC_PRIVATES.with(|p| p.borrow().get(name).copied()).unwrap_or(q::JS_UNDEFINED)
+}
+
+/// The private value of a module (a new reference); C modules (JSON) have none.
+unsafe fn module_private(ctx: *mut q::JSContext, m: *mut q::JSModuleDef) -> q::JSValue {
+    if q::JS_IsCModule(m) != 0 {
+        q::JS_UNDEFINED
+    } else {
+        q::JS_GetModulePrivateValue(ctx, m)
     }
-    let name = q::JS_ToCString(ctx, basename);
-    if name.is_null() {
+}
+
+unsafe fn value_name(ctx: *mut q::JSContext, name: q::JSValue) -> Option<CString> {
+    if name.tag() != q::JS_TAG_STRING {
+        return None;
+    }
+    let s = q::JS_ToCString(ctx, name);
+    if s.is_null() {
         let exception = q::JS_GetException(ctx);
         q::JS_FreeValue(ctx, exception);
-        return q::JS_UNDEFINED;
+        return None;
     }
-    let value = CLASSIC_PRIVATES.with(|p| p.borrow().get(CStr::from_ptr(name)).copied());
-    q::JS_FreeCString(ctx, name);
-    value.unwrap_or(q::JS_UNDEFINED)
+    let result = CStr::from_ptr(s).to_owned();
+    q::JS_FreeCString(ctx, s);
+    Some(result)
+}
+
+/// The private value of the script or module whose code has file name `filename` in the realm
+/// of `ctx` (e.g. a stack frame's): the first loaded module of that name, else the classic
+/// script's. Retained by the pool; undefined if unknown.
+pub(crate) unsafe fn script_or_module_private(cx: &mut Cx, ctx: *mut q::JSContext, filename: q::JSAtom) -> JSVal {
+    if filename == q::JS_ATOM_NULL {
+        return JSVal::from_qjs(q::JS_UNDEFINED);
+    }
+    let ctx = if ctx.is_null() { cx.qctx() } else { ctx };
+    let m = q::JS_FindLoadedModule(ctx, filename);
+    if !m.is_null() {
+        return cx.adopt(module_private(ctx, m));
+    }
+    let name = q::JS_AtomToValue(ctx, filename);
+    let private = value_name(ctx, name).map_or(q::JS_UNDEFINED, |name| classic_private(&name));
+    q::JS_FreeValue(ctx, name);
+    JSVal::from_qjs(private)
 }
 
 /// `JSDynamicImportHook`: Servo's HostImportModuleDynamically, which settles `promise`.
@@ -630,9 +662,9 @@ unsafe extern "C" fn dynamic_import_hook(
     }
     let request = cx.adopt(request).to_object();
     let private = if m.is_null() {
-        JSVal::from_qjs(classic_private(ctx, basename))
+        JSVal::from_qjs(value_name(ctx, basename).map_or(q::JS_UNDEFINED, |name| classic_private(&name)))
     } else {
-        cx.adopt(q::JS_GetModulePrivateValue(ctx, m))
+        cx.adopt(module_private(ctx, m))
     };
     let promise = val_obj(promise);
     let counted = !private.is_undefined();

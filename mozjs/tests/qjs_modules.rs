@@ -43,6 +43,8 @@ struct Loader {
     urls: Vec<String>,
     /// import() calls seen by the dynamic import hook: (referencing private id, specifier, type).
     dynamic_imports: Vec<(usize, String, ModuleType)>,
+    /// The promises of those calls, for the host to settle.
+    import_promises: Vec<Box<Heap<*mut JSObject>>>,
     /// Rejection tracker calls: (promise, handled).
     rejections: Vec<(*mut c_void, bool)>,
 }
@@ -162,10 +164,24 @@ unsafe extern "C" fn resolve_hook(cx: *mut RawJSContext, private: jsapi::HandleV
     found
 }
 
-/// Servo's HostPopulateImportMeta: `import.meta.id` is the module's private id.
+/// Servo's HostPopulateImportMeta: `import.meta.url`, and `import.meta.id`, the module's
+/// private id.
 unsafe extern "C" fn metadata_hook(cx: *mut RawJSContext, private: jsapi::HandleValue, meta: jsapi::Handle<*mut JSObject>) -> bool {
-    let id = Int32Value(private_id(&*private.ptr) as i32);
-    jsapi::JS_DefineProperty(cx, meta, c"id".as_ptr(), h(&id), jsapi::JSPROP_ENUMERATE as u32)
+    let id = private_id(&*private.ptr);
+    let url = LOADER.with(|l| l.borrow().urls[id - 1].clone());
+    let url = jsapi::JS_NewStringCopyN(cx, url.as_ptr() as *const _, url.len());
+    let id = Int32Value(id as i32);
+    jsapi::JS_DefineProperty4(cx, meta, c"url".as_ptr(), h(&url), jsapi::JSPROP_ENUMERATE as u32) &&
+        jsapi::JS_DefineProperty(cx, meta, c"id".as_ptr(), h(&id), jsapi::JSPROP_ENUMERATE as u32)
+}
+
+/// Returns the private id of the innermost script or module.
+unsafe extern "C" fn caller_id(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
+    let args = jsapi::CallArgs::from_vp(vp, argc);
+    let mut private = UndefinedValue();
+    mozjs::glue::JS_GetScriptedCallerPrivate(cx, mh(&mut private));
+    args.rval().set(Int32Value(private_id(&private) as i32));
+    true
 }
 
 /// Records the call; throws for specifiers starting with "throw".
@@ -174,7 +190,11 @@ unsafe extern "C" fn dynamic_import_hook(cx: *mut RawJSContext, private: jsapi::
     let specifier = string(jsapi::GetModuleRequestSpecifier(cx, request));
     let module_type = jsapi::GetModuleRequestType(cx, request);
     let id = private_id(&*private.ptr);
-    LOADER.with(|l| l.borrow_mut().dynamic_imports.push((id, specifier.clone(), module_type)));
+    LOADER.with(|l| {
+        let mut l = l.borrow_mut();
+        l.dynamic_imports.push((id, specifier.clone(), module_type));
+        l.import_promises.push(Heap::boxed(*promise.ptr));
+    });
     if specifier.starts_with("throw") {
         let error = Int32Value(42);
         jsapi::JS_SetPendingException(cx, h(&error), jsapi::ExceptionStackBehavior::Capture);
@@ -193,6 +213,8 @@ unsafe fn install_hooks(cx: &mut JSContext) {
     jsapi::SetModuleMetadataHook(rt, Some(metadata_hook));
     jsapi::SetModuleDynamicImportHook(rt, Some(dynamic_import_hook));
     assert!(jsapi::GetModuleResolveHook(rt).is_some());
+    let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
+    assert!(!jsapi::JS_DefineFunction(cx.raw_cx(), h(&global), c"callerId".as_ptr(), Some(caller_id), 0, 0).is_null());
     qjs::JS_SetHostPromiseRejectionTracker(rt as *mut qjs::JSRuntime, Some(rejection_tracker), ptr::null_mut());
 }
 
@@ -281,7 +303,7 @@ fn module_graph() {
         ("root.js", "import { a, c } from './a.js';\nimport { b } from './b.js';\nexport const sum = a + b + c;\nexport const id = import.meta.id;\nexport const sameMeta = import.meta === import.meta;"),
         ("a.js", "export { c } from './c.js';\nexport const a = 1;"),
         ("b.js", "export const b = 2;"),
-        ("c.js", "export const c = 4;\nexport const metaId = import.meta.id;\nexport const keys = Object.keys(import.meta).join();"),
+        ("c.js", "export const c = 4;\nexport const metaId = import.meta.id;\nexport const metaUrl = import.meta.url;\nexport const keys = Object.keys(import.meta).join();\nexport const caller = callerId();"),
     ]);
     with_realm(|cx| unsafe {
         let root_url = url("root.js");
@@ -315,7 +337,9 @@ fn module_graph() {
         let c_id = LOADER.with(|l| l.borrow().urls.iter().position(|u| *u == url("c.js")).unwrap() + 1);
         let ns = namespace(cx, &url("c.js"));
         assert_eq!(get(cx, ns, c"metaId").to_int32(), c_id as i32);
-        assert_eq!(string(get(cx, ns, c"keys").to_string()), "id");
+        assert_eq!(string(get(cx, ns, c"keys").to_string()), "url,id");
+        assert_eq!(string(get(cx, ns, c"metaUrl").to_string()), url("c.js"));
+        assert_eq!(get(cx, ns, c"caller").to_int32(), c_id as i32);
 
         let mut private = UndefinedValue();
         mozjs::glue::JS_GetModulePrivate(record(&root_url), mh(&mut private));
@@ -515,10 +539,13 @@ fn import_attributes() {
 
 #[test]
 fn dynamic_import() {
-    add_sources(&[(
-        "main.js",
-        "export const ok = import('./dyn.json', { with: { type: 'json' } });\nexport const failed = import('throw.js');\nexport const unsupported = import('./x.js', { with: { foo: 'bar' } });",
-    )]);
+    add_sources(&[
+        (
+            "main.js",
+            "export const ok = import('./dyn.js').then(ns => ns.value * 2);\nexport const failed = import('throw.js');\nexport const unsupported = import('./x.js', { with: { foo: 'bar' } });\nexport const json = import('./x.json', { with: { type: 'json' } });",
+        ),
+        ("dyn.js", "export const value = 21;"),
+    ]);
     with_realm(|cx| unsafe {
         rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
         assert!(ModuleLink(cx, root.handle()));
@@ -527,16 +554,36 @@ fn dynamic_import() {
         assert_eq!(promise_state(promise.get().to_object()), qjs::JS_PROMISE_FULFILLED);
 
         let ns = namespace(cx, &url("main.js"));
-        // The host settles this one later.
-        assert_eq!(promise_state(get(cx, ns, c"ok").to_object()), qjs::JS_PROMISE_PENDING);
         assert_eq!(promise_state(get(cx, ns, c"failed").to_object()), qjs::JS_PROMISE_REJECTED);
         assert_eq!(promise_state(get(cx, ns, c"unsupported").to_object()), qjs::JS_PROMISE_REJECTED);
         let calls = LOADER.with(|l| l.borrow().dynamic_imports.clone());
-        assert_eq!(calls, vec![(1, "./dyn.json".to_owned(), ModuleType::JSON), (1, "throw.js".to_owned(), ModuleType::JavaScript)]);
+        assert_eq!(
+            calls,
+            vec![
+                (1, "./dyn.js".to_owned(), ModuleType::JavaScript),
+                (1, "throw.js".to_owned(), ModuleType::JavaScript),
+                (1, "./x.json".to_owned(), ModuleType::JSON),
+            ]
+        );
+
+        // Servo's ContinueDynamicImport: load, link and evaluate, then resolve with the namespace.
+        rooted!(&in(cx) let dyn_root = load_graph(cx, &url("dyn.js")));
+        assert!(ModuleLink(cx, dyn_root.handle()));
+        rooted!(&in(cx) let mut evaluated = UndefinedValue());
+        assert!(ModuleEvaluate(cx, dyn_root.handle(), evaluated.handle_mut()));
+        rooted!(&in(cx) let dyn_ns = mozjs::jsval::ObjectValue(GetModuleNamespace(cx, dyn_root.handle())));
+        rooted!(&in(cx) let import_promise = LOADER.with(|l| l.borrow().import_promises[0].get()));
+        assert!(mozjs::rust::wrappers2::ResolvePromise(cx, import_promise.handle(), dyn_ns.handle()));
+        run_jobs(cx);
+        rooted!(&in(cx) let ok = get(cx, ns, c"ok").to_object());
+        assert_eq!(promise_state(ok.get()), qjs::JS_PROMISE_FULFILLED);
+        rooted!(&in(cx) let mut result = UndefinedValue());
+        mozjs::glue::JS_GetPromiseResult(ok.handle().into(), result.handle_mut().into());
+        assert_eq!(result.get().to_int32(), 42);
 
         // From a classic script, with its script private.
         let options = CompileOptionsWrapper::new(cx, c"https://test/classic.js".to_owned(), 1);
-        let script = mozjs::rust::wrappers2::Compile1(cx, options.ptr, &mut transform_str_to_source_text("globalThis.p = import('./from-classic.js');"));
+        let script = mozjs::rust::wrappers2::Compile1(cx, options.ptr, &mut transform_str_to_source_text("globalThis.p = import('./from-classic.js');\nglobalThis.classicCaller = callerId();"));
         assert!(!script.is_null());
         let private = PrivateValue(77 as *const c_void);
         jsapi::SetScriptPrivate(script, &private);
@@ -545,5 +592,7 @@ fn dynamic_import() {
         assert!(mozjs::rust::wrappers2::JS_ExecuteScript(cx, script.handle(), rval.handle_mut()));
         let calls = LOADER.with(|l| l.borrow().dynamic_imports.clone());
         assert_eq!(calls.last().unwrap(), &(77, "./from-classic.js".to_owned(), ModuleType::JavaScript));
+        let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
+        assert_eq!(get(cx, global, c"classicCaller").to_int32(), 77);
     });
 }
