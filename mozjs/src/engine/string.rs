@@ -14,7 +14,7 @@ use std::{ptr, slice};
 
 use quickjs_sys as q;
 
-use super::Cx;
+use super::{obj_val, Cx};
 use crate::sys::glue;
 use crate::sys::jsapi as root;
 use crate::sys::jsval::StringValue;
@@ -576,4 +576,195 @@ pub(crate) unsafe fn JS_PutEscapedString(cx: *mut root::JSContext, buffer: *mut 
 
 pub(crate) unsafe fn JS_PutEscapedLinearString(buffer: *mut ::std::os::raw::c_char, size: usize, str_: *mut root::JSLinearString, quote: ::std::os::raw::c_char) -> usize {
     put_escaped(buffer, size, Chars::of(str_ as *mut root::JSString), quote)
+}
+
+// Value conversions.
+
+unsafe fn to_number(cx: &Cx, v: q::JSValue) -> Option<f64> {
+    let mut d = 0.0;
+    (q::JS_ToFloat64(cx.qctx(), &mut d, v) >= 0).then_some(d)
+}
+
+/// `d` modulo 2^bits, the integer conversion of ECMAScript's ToInt32/ToUint8/... and of
+/// SpiderMonkey's ToInt64/ToUint64.
+fn modular(d: f64, bits: u32) -> u64 {
+    if !d.is_finite() {
+        return 0;
+    }
+    let r = d.trunc() % 2f64.powi(bits as i32);
+    let n = if r < 0.0 { ((-r) as u64).wrapping_neg() } else { r as u64 };
+    if bits == 64 {
+        n
+    } else {
+        n & ((1 << bits) - 1)
+    }
+}
+
+unsafe fn to_modular(cx: *mut root::JSContext, v: root::JS::HandleValue, bits: u32) -> Option<u64> {
+    to_number(Cx::from_raw(cx), (*v.ptr).to_qjs()).map(|d| modular(d, bits))
+}
+
+pub(crate) unsafe fn ToBooleanSlow(v: root::JS::HandleValue) -> bool {
+    q::JS_ToBool(super::current().qctx(), (*v.ptr).to_qjs()) > 0
+}
+
+pub(crate) unsafe fn ToNumberSlow(cx: *mut root::JSContext, v: root::JS::HandleValue, dp: *mut f64) -> bool {
+    match to_number(Cx::from_raw(cx), (*v.ptr).to_qjs()) {
+        Some(d) => {
+            *dp = d;
+            true
+        },
+        None => false,
+    }
+}
+
+pub(crate) unsafe fn ToInt8Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut i8) -> bool {
+    to_modular(cx, v, 8).map(|n| *out = n as u8 as i8).is_some()
+}
+
+pub(crate) unsafe fn ToUint8Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut u8) -> bool {
+    to_modular(cx, v, 8).map(|n| *out = n as u8).is_some()
+}
+
+pub(crate) unsafe fn ToInt16Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut i16) -> bool {
+    to_modular(cx, v, 16).map(|n| *out = n as u16 as i16).is_some()
+}
+
+pub(crate) unsafe fn ToUint16Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut u16) -> bool {
+    to_modular(cx, v, 16).map(|n| *out = n as u16).is_some()
+}
+
+pub(crate) unsafe fn ToInt32Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut i32) -> bool {
+    to_modular(cx, v, 32).map(|n| *out = n as u32 as i32).is_some()
+}
+
+pub(crate) unsafe fn ToUint32Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut u32) -> bool {
+    to_modular(cx, v, 32).map(|n| *out = n as u32).is_some()
+}
+
+pub(crate) unsafe fn ToInt64Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut i64) -> bool {
+    to_modular(cx, v, 64).map(|n| *out = n as i64).is_some()
+}
+
+pub(crate) unsafe fn ToUint64Slow(cx: *mut root::JSContext, v: root::JS::HandleValue, out: *mut u64) -> bool {
+    to_modular(cx, v, 64).map(|n| *out = n).is_some()
+}
+
+pub(crate) unsafe fn ToStringSlow(cx: *mut root::JSContext, v: root::JS::HandleValue) -> *mut root::JSString {
+    let cx = Cx::from_raw(cx);
+    let s = q::JS_ToString(cx.qctx(), (*v.ptr).to_qjs());
+    adopt_string(cx, s)
+}
+
+pub(crate) unsafe fn ToObjectSlow(cx: *mut root::JSContext, v: root::JS::HandleValue, reportScanStack: bool) -> *mut root::JSObject {
+    let _ = reportScanStack;
+    let mut obj = ptr::null_mut();
+    let objp = root::JS::MutableHandle { _phantom_0: std::marker::PhantomData, ptr: &mut obj };
+    if super::JS_ValueToObject(cx, v, objp) {
+        obj
+    } else {
+        ptr::null_mut()
+    }
+}
+
+/// OrdinaryToPrimitive; a new reference or `JS_EXCEPTION`.
+unsafe fn ordinary_to_primitive(cx: &mut Cx, obj: q::JSValue, hint: root::JSType) -> q::JSValue {
+    let qctx = cx.qctx();
+    let methods = if hint == root::JSType::JSTYPE_STRING { [c"toString", c"valueOf"] } else { [c"valueOf", c"toString"] };
+    for name in methods {
+        let method = q::JS_GetPropertyStr(qctx, obj, name.as_ptr());
+        if method.tag() == q::JS_TAG_EXCEPTION {
+            return method;
+        }
+        if q::JS_IsFunction(qctx, method) != 0 {
+            let r = q::JS_Call(qctx, method, obj, 0, ptr::null_mut());
+            q::JS_FreeValueRT(cx.rt, method);
+            if r.tag() != q::JS_TAG_OBJECT {
+                return r;
+            }
+            q::JS_FreeValueRT(cx.rt, r);
+        } else {
+            q::JS_FreeValueRT(cx.rt, method);
+        }
+    }
+    q::JS_ThrowTypeError(qctx, c"can't convert object to primitive type".as_ptr())
+}
+
+/// ToPrimitive of an object (`hint` `JSTYPE_UNDEFINED` is "default"); a new reference or
+/// `JS_EXCEPTION`.
+unsafe fn to_primitive(cx: &mut Cx, obj: q::JSValue, hint: root::JSType) -> q::JSValue {
+    let qctx = cx.qctx();
+    let atom = super::well_known_symbol_atom(cx, root::JS::SymbolCode::toPrimitive as usize);
+    let exotic = q::JS_GetProperty(qctx, obj, atom);
+    match exotic.tag() {
+        q::JS_TAG_EXCEPTION => return exotic,
+        q::JS_TAG_UNDEFINED | q::JS_TAG_NULL => {
+            let hint = if hint == root::JSType::JSTYPE_STRING { hint } else { root::JSType::JSTYPE_NUMBER };
+            return ordinary_to_primitive(cx, obj, hint);
+        },
+        _ => {},
+    }
+    if q::JS_IsFunction(qctx, exotic) == 0 {
+        q::JS_FreeValueRT(cx.rt, exotic);
+        return q::JS_ThrowTypeError(qctx, c"Symbol.toPrimitive is not a function".as_ptr());
+    }
+    let hint_name = match hint {
+        root::JSType::JSTYPE_STRING => c"string",
+        root::JSType::JSTYPE_NUMBER => c"number",
+        _ => c"default",
+    };
+    let mut arg = [q::JS_NewString(qctx, hint_name.as_ptr())];
+    let r = q::JS_Call(qctx, exotic, obj, 1, arg.as_mut_ptr());
+    q::JS_FreeValueRT(cx.rt, arg[0]);
+    q::JS_FreeValueRT(cx.rt, exotic);
+    if r.tag() == q::JS_TAG_OBJECT {
+        q::JS_FreeValueRT(cx.rt, r);
+        return q::JS_ThrowTypeError(qctx, c"can't convert object to primitive type".as_ptr());
+    }
+    r
+}
+
+pub(crate) unsafe fn ToPrimitive(cx: *mut root::JSContext, obj: root::JS::HandleObject, hint: root::JSType, vp: root::JS::MutableHandleValue) -> bool {
+    let cx = Cx::from_raw(cx);
+    let r = to_primitive(cx, obj_val(*obj.ptr), hint);
+    if r.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    *vp.ptr = cx.adopt(r);
+    true
+}
+
+pub(crate) unsafe fn OrdinaryToPrimitive(cx: *mut root::JSContext, obj: root::JS::HandleObject, type_: root::JSType, vp: root::JS::MutableHandleValue) -> bool {
+    let cx = Cx::from_raw(cx);
+    let r = ordinary_to_primitive(cx, obj_val(*obj.ptr), type_);
+    if r.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    *vp.ptr = cx.adopt(r);
+    true
+}
+
+pub(crate) unsafe fn JS_TypeOfValue(cx: *mut root::JSContext, v: root::JS::Handle<root::JS::Value>) -> root::JSType {
+    use root::JSType::*;
+    let v = (*v.ptr).to_qjs();
+    match v.tag() {
+        q::JS_TAG_UNDEFINED => JSTYPE_UNDEFINED,
+        q::JS_TAG_BOOL => JSTYPE_BOOLEAN,
+        q::JS_TAG_INT | q::JS_TAG_FLOAT64 => JSTYPE_NUMBER,
+        q::JS_TAG_STRING | q::JS_TAG_STRING_ROPE => JSTYPE_STRING,
+        q::JS_TAG_SYMBOL => JSTYPE_SYMBOL,
+        q::JS_TAG_BIG_INT | q::JS_TAG_SHORT_BIG_INT => JSTYPE_BIGINT,
+        q::JS_TAG_OBJECT if q::JS_IsFunction(Cx::from_raw(cx).qctx(), v) != 0 => JSTYPE_FUNCTION,
+        _ => JSTYPE_OBJECT,
+    }
+}
+
+pub(crate) unsafe fn SameValue(cx: *mut root::JSContext, v1: root::JS::Handle<root::JS::Value>, v2: root::JS::Handle<root::JS::Value>, same: *mut bool) -> bool {
+    *same = q::JS_SameValue(Cx::from_raw(cx).qctx(), (*v1.ptr).to_qjs(), (*v2.ptr).to_qjs()) != 0;
+    true
+}
+
+pub(crate) unsafe fn StrictlyEqual(cx: *mut root::JSContext, v1: root::JS::Handle<root::JS::Value>, v2: root::JS::Handle<root::JS::Value>, equal: *mut bool) -> bool {
+    *equal = q::JS_StrictEq(Cx::from_raw(cx).qctx(), (*v1.ptr).to_qjs(), (*v2.ptr).to_qjs()) != 0;
+    true
 }
