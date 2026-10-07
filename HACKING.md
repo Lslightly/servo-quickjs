@@ -10,7 +10,7 @@ Design: `docs/design.md`. Read it first.
   - Otherwise its body panics with "`NAME` is not implemented".
 - To implement `NAME`:
   1. Run `python3 tools/sig.py NAME`. It prints the exact signature.
-  2. Paste it into the engine module for its area. Engine modules alias the jsapi module as `root`.
+  2. Paste it into the engine module for its area. Engine modules alias the jsapi module as `root`; types that exist only in the glue bindings (e.g. `GetSize`, `ProxyTraps`) are in `crate::sys::glue`.
   3. Write the body. Rebuilding picks it up.
 - Helpers that are not SpiderMonkey functions should be `pub(crate) fn` or `pub(crate) unsafe fn` with a name that is not a SpiderMonkey function name.
 - The Rust layers copied from mozjs (`mozjs/src/*.rs`, `mozjs/src/sys/*.rs`) may be changed where they depend on SpiderMonkey internals. Mark each such change with a `QuickJS:` comment.
