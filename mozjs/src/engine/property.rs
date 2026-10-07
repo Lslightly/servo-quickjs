@@ -609,16 +609,22 @@ unsafe fn define_function(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom
     f.to_object() as *mut root::JSFunction
 }
 
-/// The function for a self-hosted name in a spec; only `$ArrayValues` (`Array.prototype.values`,
-/// used for iterable DOM interfaces) is supported.
+/// The function for a self-hosted name in a spec. Only the `Array.prototype` methods that
+/// iterable DOM interfaces use are supported.
 unsafe fn self_hosted(cx: &mut Cx, name: *const c_char) -> q::JSValue {
     let name = std::ffi::CStr::from_ptr(name);
-    assert_eq!(name, c"$ArrayValues", "unsupported self-hosted function {name:?}");
+    let method = match name.to_bytes() {
+        b"$ArrayValues" => c"values",
+        b"ArrayKeys" => c"keys",
+        b"ArrayEntries" => c"entries",
+        b"ArrayForEach" => c"forEach",
+        _ => panic!("unsupported self-hosted function {name:?}"),
+    };
     let qctx = cx.qctx();
     let proto = q::JS_GetClassProto(qctx, 2 /* JS_CLASS_ARRAY */);
-    let values = q::JS_GetPropertyStr(qctx, proto, c"values".as_ptr());
+    let f = q::JS_GetPropertyStr(qctx, proto, method.as_ptr());
     q::JS_FreeValue(qctx, proto);
-    values
+    f
 }
 
 pub(crate) unsafe fn JS_DefineFunctions(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, fs: *const root::JSFunctionSpec) -> bool {
