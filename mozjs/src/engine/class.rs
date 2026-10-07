@@ -24,6 +24,7 @@ use crate::sys::jsval::{JSVal, TAG_MAGIC};
 /// Per-object state of objects whose class is a SpiderMonkey `JSClass`.
 pub(crate) struct ObjectData {
     pub clasp: *const root::JSClass,
+    /// Held (`hold_realm`) and marked.
     pub realm: *mut RealmData,
     /// Reserved slots; reference-counted values.
     pub slots: Box<[q::JSValue]>,
@@ -34,7 +35,7 @@ impl ObjectData {
         let count = unsafe { reserved_slot_count(clasp) };
         Box::new(ObjectData {
             clasp,
-            realm,
+            realm: unsafe { super::hold_realm(realm) },
             slots: vec![q::JS_UNDEFINED; count].into_boxed_slice(),
         })
     }
@@ -43,6 +44,7 @@ impl ObjectData {
         for v in self.slots.iter() {
             q::JS_FreeValueRT(rt, *v);
         }
+        super::release_realm(self.realm);
     }
 }
 
@@ -234,6 +236,7 @@ unsafe extern "C" fn gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS
             q::JS_MarkValue(rt, *v, mark);
         }
     }
+    super::mark_realm(rt, (*data).realm, mark);
     let ops = (*(*data).clasp).cOps;
     if !ops.is_null() {
         if let Some(trace) = (*ops).trace {
@@ -298,11 +301,11 @@ pub(crate) unsafe fn call_native(
     }
     let entered = !realm.is_null();
     if entered {
-        cx.realm_stack.push(realm);
+        cx.enter_realm(realm);
     }
     let ok = native(cx.as_raw(), argc as u32, vp.as_mut_ptr());
     if entered {
-        cx.realm_stack.pop();
+        cx.leave_realm();
     }
     let result = if ok {
         q::JS_DupValueRT(cx.rt, vp[0].to_qjs())
@@ -322,6 +325,7 @@ pub(crate) unsafe fn call_native(
 pub(crate) struct FunctionData {
     pub native: root::JSNative,
     pub info: *const root::JSJitInfo,
+    /// Held (`hold_realm`) and marked.
     pub realm: *mut RealmData,
     pub slots: [q::JSValue; 2],
 }
@@ -363,6 +367,7 @@ unsafe extern "C" fn function_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
         for v in data.slots.iter() {
             q::JS_FreeValueRT(rt, *v);
         }
+        super::release_realm(data.realm);
     }
 }
 
@@ -374,6 +379,7 @@ unsafe extern "C" fn function_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, ma
                 q::JS_MarkValue(rt, *v, mark);
             }
         }
+        super::mark_realm(rt, (*data).realm, mark);
     }
 }
 
@@ -409,7 +415,7 @@ pub(crate) unsafe fn new_function(
     let data = Box::new(FunctionData {
         native,
         info,
-        realm: cx.current_realm(),
+        realm: super::hold_realm(cx.current_realm()),
         slots: [q::JS_UNDEFINED; 2],
     });
     q::JS_SetOpaque(f, Box::into_raw(data) as *mut c_void);

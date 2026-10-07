@@ -31,7 +31,7 @@ use std::sync::OnceLock;
 use quickjs_sys as q;
 
 use super::class::{self, Tracer};
-use super::realm::{all_realms, realm_of_global};
+use super::realm::{for_each_realm, realm_of_global};
 use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::glue;
 use crate::sys::jsapi as root;
@@ -168,6 +168,7 @@ static WINDOW_PROXY_CLASS: root::JSClass = proxy_class_def(c"Proxy", 1);
 struct ProxyData {
     handler: *const ProxyHandler,
     clasp: *const root::JSClass,
+    /// Held (`hold_realm`) and marked.
     realm: *mut RealmData,
     /// The target of wrappers, the expando object of DOM proxies.
     private: q::JSValue,
@@ -239,7 +240,7 @@ unsafe fn new_proxy(
     let data = Box::new(ProxyData {
         handler,
         clasp,
-        realm: cx.current_realm(),
+        realm: super::hold_realm(cx.current_realm()),
         private: q::JS_DupValueRT(cx.rt, private),
         slots: vec![q::JS_UNDEFINED; reserved_slots(clasp)].into_boxed_slice(),
     });
@@ -260,6 +261,7 @@ unsafe extern "C" fn proxy_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
     for v in data.slots.iter() {
         q::JS_FreeValueRT(rt, *v);
     }
+    super::release_realm(data.realm);
 }
 
 unsafe extern "C" fn proxy_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
@@ -272,6 +274,7 @@ unsafe extern "C" fn proxy_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark:
             q::JS_MarkValue(rt, *v, mark);
         }
     }
+    super::mark_realm(rt, (*data).realm, mark);
     if let Some(trace) = (*(*data).handler).traps.trace {
         let mut tracer = Tracer { rt, mark };
         trace(&mut tracer as *mut Tracer as *mut root::JSTracer, val_obj(val));
@@ -529,7 +532,7 @@ impl Trap {
         let realm = q::JS_GetContextOpaque(ctx) as *mut RealmData;
         let entered = !realm.is_null();
         if entered {
-            cx.realm_stack.push(realm);
+            cx.enter_realm(realm);
         }
         let pool_mark = cx.pool_mark();
         Trap { ctx, proxy: ProxyRef::new(cx.as_raw(), val_obj(obj)), entered, pool_mark }
@@ -545,7 +548,7 @@ impl Drop for Trap {
     fn drop(&mut self) {
         let cx = cx_of(self.ctx);
         if self.entered {
-            cx.realm_stack.pop();
+            unsafe { cx.leave_realm() };
         }
         cx.drain_pool(self.pool_mark);
     }
@@ -1131,11 +1134,7 @@ pub(crate) unsafe fn JS_IterateCompartments(cx: *mut root::JSContext, data: *mut
     let Some(callback) = compartmentCallback else {
         return;
     };
-    for realm in all_realms() {
-        if callback(cx, data, realm as *mut root::JS::Compartment) == root::JS::CompartmentIterResult::Stop {
-            break;
-        }
-    }
+    for_each_realm(|realm| callback(cx, data, realm as *mut root::JS::Compartment) != root::JS::CompartmentIterResult::Stop);
 }
 
 pub(crate) unsafe fn JS_IterateCompartmentsInZone(cx: *mut root::JSContext, zone: *mut root::JS::Zone, data: *mut ::std::os::raw::c_void, compartmentCallback: root::JSIterateCompartmentCallback) {
@@ -1147,9 +1146,12 @@ unsafe fn iterate_realms(cx: *mut root::JSContext, data: *mut c_void, callback: 
     let Some(callback) = callback else {
         return;
     };
-    for realm in all_realms().into_iter().filter(|realm| filter(*realm)) {
-        callback(cx, data, realm as *mut root::JS::Realm, ptr::null());
-    }
+    for_each_realm(|realm| {
+        if filter(realm) {
+            callback(cx, data, realm as *mut root::JS::Realm, ptr::null());
+        }
+        true
+    });
 }
 
 pub(crate) unsafe fn IterateRealms(cx: *mut root::JSContext, data: *mut ::std::os::raw::c_void, realmCallback: root::JS::IterateRealmCallback) {
@@ -1261,8 +1263,8 @@ pub(crate) unsafe fn SetRealmPrincipals(realm: *mut root::JS::Realm, principals:
     }
 }
 
-// Runtime and realm callbacks. Realms live until their runtime is destroyed, so the realm and
-// compartment callbacks are never called.
+// Runtime and realm callbacks. Servo sets no realm or compartment destroy callbacks, so they are
+// not called.
 
 thread_local! {
     static DOM_CALLBACKS: Cell<*const root::js::DOMCallbacks> = const { Cell::new(ptr::null()) };
@@ -1344,9 +1346,9 @@ thread_local! {
 unsafe fn in_object_realm<R>(ctx: *mut q::JSContext, obj: *mut root::JSObject, f: impl FnOnce(*mut root::JSContext) -> R) -> R {
     let cx = cx_of(ctx);
     let realm = class::object_realm(cx, obj);
-    cx.realm_stack.push(realm);
+    cx.enter_realm(realm);
     let r = f(cx.as_raw());
-    cx_of(ctx).realm_stack.pop();
+    cx_of(ctx).leave_realm();
     r
 }
 

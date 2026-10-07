@@ -10,7 +10,7 @@ fn main() {
         .allowlist_var("JS_.*")
         // Reference counting is inlined in Rust (quickjs-sys/src/lib.rs): an FFI call per count
         // change showed up in profiles of DOM access.
-        .blocklist_function("JS_(Dup|Free)Value(RT)?")
+        .blocklist_function("JS_(Dup|Free)Value(RT)?|JS_(Dup|Free)Context")
         .wrap_static_fns(true)
         .wrap_static_fns_path(out.join("static_wrappers"))
         .wrap_static_fns_suffix("__sys")

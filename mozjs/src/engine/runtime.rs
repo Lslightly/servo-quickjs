@@ -24,6 +24,7 @@ pub(crate) unsafe fn JS_NewContext(maxbytes: u32, parentRuntime: *mut root::JSRu
         return ptr::null_mut();
     }
     super::verify::install(rt);
+    q::JS_SetContextFinalizer(rt, Some(super::context_finalized));
     let base_ctx = q::JS_NewContext(rt);
     let cx = Box::into_raw(Box::new(Cx {
         rt,
@@ -40,17 +41,15 @@ pub(crate) unsafe fn JS_NewContext(maxbytes: u32, parentRuntime: *mut root::JSRu
 }
 
 pub(crate) unsafe fn JS_DestroyContext(cx: *mut root::JSContext) {
-    let cx = Box::from_raw(cx as *mut Cx);
-    let mut cx = cx;
-    cx.drain_pool((0, 0));
-    for realm in super::realm::take_all_realms(&mut cx) {
-        if !realm.principals.is_null() {
-            super::JS_DropPrincipals(cx.as_raw(), realm.principals);
-        }
-        q::JS_FreeContext(realm.qctx);
+    let mut cx = Box::from_raw(cx as *mut Cx);
+    while !cx.realm_stack.is_empty() {
+        cx.leave_realm();
     }
+    cx.drain_pool((0, 0));
     q::JS_FreeContext(cx.base_ctx);
+    // Frees every object and realm (realms with their contexts, patch Q15).
     q::JS_FreeRuntime(cx.rt);
+    super::realm::forget_leaked_realms();
     set_current(ptr::null_mut());
     super::verify::reset();
 }

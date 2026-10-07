@@ -90,6 +90,32 @@ pub unsafe fn JS_FreeValue(ctx: *mut JSContext, v: JSValue) {
     }
 }
 
+unsafe extern "C" {
+    #[link_name = "JS_FreeContext"]
+    fn JS_FreeContext_out_of_line(ctx: *mut JSContext);
+}
+
+/// `JS_DupContext`, inlined (contexts carry the same reference count header as values): entering
+/// a realm counts its context, on every native call and proxy trap.
+#[inline(always)]
+pub unsafe fn JS_DupContext(ctx: *mut JSContext) -> *mut JSContext {
+    unsafe { *(ctx as *mut i32).sub(1) += 1 };
+    ctx
+}
+
+/// `JS_FreeContext`, with the count decremented inline unless the context is freed.
+#[inline(always)]
+pub unsafe fn JS_FreeContext(ctx: *mut JSContext) {
+    unsafe {
+        let count = (ctx as *mut i32).sub(1);
+        if *count > 1 {
+            *count -= 1;
+        } else {
+            JS_FreeContext_out_of_line(ctx);
+        }
+    }
+}
+
 pub const JS_NULL: JSValue = JSValue::mkval(JS_TAG_NULL, 0);
 pub const JS_UNDEFINED: JSValue = JSValue::mkval(JS_TAG_UNDEFINED, 0);
 pub const JS_FALSE: JSValue = JSValue::mkval(JS_TAG_BOOL, 0);
