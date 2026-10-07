@@ -7905,7 +7905,8 @@ static inline __exception int js_poll_interrupts(JSContext *ctx)
     }
 }
 
-static void JS_SetImmutablePrototype(JSContext *ctx, JSValueConst obj)
+/* Servo: exported (mozjs shim's JS_SetImmutablePrototype). */
+void JS_SetImmutablePrototype(JSContext *ctx, JSValueConst obj)
 {
     JSObject *p;
     if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT)
@@ -8067,6 +8068,19 @@ JSValue JS_GetPrototype(JSContext *ctx, JSValueConst obj)
         val = JS_DupValue(ctx, JS_GetPrototypePrimitive(ctx, obj));
     }
     return val;
+}
+
+/* Servo: the prototype stored in the object's shape, without calling the
+   get_prototype exotic hook (SpiderMonkey's static prototype). */
+JSValue JS_GetStaticPrototype(JSContext *ctx, JSValueConst obj)
+{
+    JSObject *p;
+    if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT)
+        return JS_NULL;
+    p = JS_VALUE_GET_OBJ(obj)->shape->proto;
+    if (!p)
+        return JS_NULL;
+    return JS_DupValue(ctx, JS_MKPTR(JS_TAG_OBJECT, p));
 }
 
 static JSValue JS_GetPrototypeFree(JSContext *ctx, JSValue obj)
@@ -20895,7 +20909,8 @@ static JSValue JS_CallFree(JSContext *ctx, JSValue func_obj, JSValueConst this_o
 
 /* warning: the refcount of the context is not incremented. Return
    NULL in case of exception (case of revoked proxy only) */
-static JSContext *JS_GetFunctionRealm(JSContext *ctx, JSValueConst func_obj)
+/* Servo: exported (mozjs shim's GetFunctionRealm). */
+JSContext *JS_GetFunctionRealm(JSContext *ctx, JSValueConst func_obj)
 {
     JSObject *p;
     JSContext *realm;

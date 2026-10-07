@@ -816,6 +816,11 @@ int JS_PreventExtensions(JSContext *ctx, JSValueConst obj);
 int JS_DeleteProperty(JSContext *ctx, JSValueConst obj, JSAtom prop, int flags);
 int JS_SetPrototype(JSContext *ctx, JSValueConst obj, JSValueConst proto_val);
 JSValue JS_GetPrototype(JSContext *ctx, JSValueConst val);
+/* Servo: prototype access without exotic hooks, immutable prototypes and the realm
+   of a function (for the mozjs shim). */
+JSValue JS_GetStaticPrototype(JSContext *ctx, JSValueConst obj);
+void JS_SetImmutablePrototype(JSContext *ctx, JSValueConst obj);
+JSContext *JS_GetFunctionRealm(JSContext *ctx, JSValueConst func_obj);
 
 #define JS_GPN_STRING_MASK  (1 << 0)
 #define JS_GPN_SYMBOL_MASK  (1 << 1)
