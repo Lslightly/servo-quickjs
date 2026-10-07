@@ -19,7 +19,7 @@ use std::ptr;
 use quickjs_sys as q;
 
 use super::class::{adopt_object, function_data, object_data, QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT};
-use super::property::{data_flags, Atom};
+use super::property::{data_flags, well_known_symbol_atom, Atom};
 use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
@@ -39,6 +39,7 @@ const CLASS_SHARED_ARRAY_BUFFER: q::JSClassID = 20;
 const CLASS_BIG_INT: q::JSClassID = 34;
 const CLASS_MAP: q::JSClassID = 35;
 const CLASS_SET: q::JSClassID = 36;
+const CLASS_WEAKMAP: q::JSClassID = 37;
 const CLASS_ITERATOR: q::JSClassID = 39;
 const CLASS_MAP_ITERATOR: q::JSClassID = 43;
 const CLASS_SET_ITERATOR: q::JSClassID = 44;
@@ -772,4 +773,419 @@ pub(crate) unsafe fn CallJitMethodOp(info: *const root::JSJitInfo, cx: *mut root
 pub(crate) unsafe fn Construct1(cx: *mut root::JSContext, fun: root::JS::Handle<root::JS::Value>, args: *const root::JS::HandleValueArray, objp: root::JS::MutableHandle<*mut root::JSObject>) -> bool {
     let no_new_target: *mut root::JSObject = ptr::null_mut();
     super::Construct(cx, fun, root::JS::Handle::from_marked_location(&no_new_target), args, objp)
+}
+
+// Intrinsics of the current realm.
+
+/// `%Class.prototype%[name]` of the current realm (a new reference).
+unsafe fn intrinsic(cx: &mut Cx, class: q::JSClassID, name: &CStr) -> q::JSValue {
+    let qctx = cx.qctx();
+    let proto = q::JS_GetClassProto(qctx, class);
+    let v = q::JS_GetPropertyStr(qctx, proto, name.as_ptr());
+    q::JS_FreeValueRT(cx.rt, proto);
+    v
+}
+
+/// Calls `%Class.prototype%[name]` on `this` (a new reference or `JS_EXCEPTION`).
+unsafe fn call_method(cx: &mut Cx, class: q::JSClassID, name: &CStr, this: q::JSValue, args: &[q::JSValue]) -> q::JSValue {
+    let f = intrinsic(cx, class, name);
+    if is_exception(f) {
+        return f;
+    }
+    let mut argv = args.to_vec();
+    let r = q::JS_Call(cx.qctx(), f, this, argv.len() as c_int, argv.as_mut_ptr());
+    q::JS_FreeValueRT(cx.rt, f);
+    r
+}
+
+/// Calls the getter `%Class.prototype%[name]` with receiver `this`.
+unsafe fn call_getter(cx: &mut Cx, class: q::JSClassID, name: &CStr, this: q::JSValue) -> q::JSValue {
+    let qctx = cx.qctx();
+    let proto = q::JS_GetClassProto(qctx, class);
+    let atom = Atom::from_cstr(cx, name.as_ptr());
+    let v = q::JS_GetPropertyInternal(qctx, proto, atom.atom, this, 0);
+    q::JS_FreeValueRT(cx.rt, proto);
+    v
+}
+
+/// `new %Class%(...args)` (a new reference or `JS_EXCEPTION`).
+unsafe fn construct_intrinsic(cx: &mut Cx, class: q::JSClassID, args: &[q::JSValue]) -> q::JSValue {
+    let ctor = intrinsic(cx, class, c"constructor");
+    if is_exception(ctor) {
+        return ctor;
+    }
+    let mut argv = args.to_vec();
+    let r = q::JS_CallConstructor(cx.qctx(), ctor, argv.len() as c_int, argv.as_mut_ptr());
+    q::JS_FreeValueRT(cx.rt, ctor);
+    r
+}
+
+unsafe fn method_value(cx: *mut root::JSContext, class: q::JSClassID, name: &CStr, obj: root::JS::HandleObject, args: &[q::JSValue], rval: root::JS::MutableHandleValue) -> bool {
+    let cx = Cx::from_raw(cx);
+    let r = call_method(cx, class, name, obj_val(*obj.ptr), args);
+    set_result(cx, r, rval)
+}
+
+unsafe fn method_bool(cx: *mut root::JSContext, class: q::JSClassID, name: &CStr, obj: root::JS::HandleObject, args: &[q::JSValue], rval: *mut bool) -> bool {
+    let cx = Cx::from_raw(cx);
+    let r = call_method(cx, class, name, obj_val(*obj.ptr), args);
+    if is_exception(r) {
+        return false;
+    }
+    *rval = q::JS_ToBool(cx.qctx(), r) > 0;
+    q::JS_FreeValueRT(cx.rt, r);
+    true
+}
+
+unsafe fn method_void(cx: *mut root::JSContext, class: q::JSClassID, name: &CStr, obj: root::JS::HandleObject, args: &[q::JSValue]) -> bool {
+    let cx = Cx::from_raw(cx);
+    let r = call_method(cx, class, name, obj_val(*obj.ptr), args);
+    if is_exception(r) {
+        return false;
+    }
+    q::JS_FreeValueRT(cx.rt, r);
+    true
+}
+
+unsafe fn size(cx: *mut root::JSContext, class: q::JSClassID, obj: root::JS::HandleObject) -> u32 {
+    let cx = Cx::from_raw(cx);
+    let r = call_getter(cx, class, c"size", obj_val(*obj.ptr));
+    if is_exception(r) {
+        return 0;
+    }
+    let mut n = 0u32;
+    q::JS_ToUint32(cx.qctx(), &mut n, r);
+    q::JS_FreeValueRT(cx.rt, r);
+    n
+}
+
+unsafe fn new_intrinsic(cx: *mut root::JSContext, class: q::JSClassID) -> *mut root::JSObject {
+    let cx = Cx::from_raw(cx);
+    let obj = construct_intrinsic(cx, class, &[]);
+    adopt_object(cx, obj)
+}
+
+// Map, Set and WeakMap.
+
+pub(crate) unsafe fn NewMapObject(cx: *mut root::JSContext) -> *mut root::JSObject {
+    new_intrinsic(cx, CLASS_MAP)
+}
+
+pub(crate) unsafe fn IsMapObject(cx: *mut root::JSContext, obj: root::JS::HandleObject, isMap: *mut bool) -> bool {
+    let _ = cx;
+    *isMap = class_of(*obj.ptr) == CLASS_MAP;
+    true
+}
+
+pub(crate) unsafe fn MapSize(cx: *mut root::JSContext, obj: root::JS::HandleObject) -> u32 {
+    size(cx, CLASS_MAP, obj)
+}
+
+pub(crate) unsafe fn MapGet(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_MAP, c"get", obj, &[(*key.ptr).to_qjs()], rval)
+}
+
+pub(crate) unsafe fn MapHas(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue, rval: *mut bool) -> bool {
+    method_bool(cx, CLASS_MAP, c"has", obj, &[(*key.ptr).to_qjs()], rval)
+}
+
+pub(crate) unsafe fn MapSet(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue, val: root::JS::HandleValue) -> bool {
+    method_void(cx, CLASS_MAP, c"set", obj, &[(*key.ptr).to_qjs(), (*val.ptr).to_qjs()])
+}
+
+pub(crate) unsafe fn MapDelete(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue, rval: *mut bool) -> bool {
+    method_bool(cx, CLASS_MAP, c"delete", obj, &[(*key.ptr).to_qjs()], rval)
+}
+
+pub(crate) unsafe fn MapClear(cx: *mut root::JSContext, obj: root::JS::HandleObject) -> bool {
+    method_void(cx, CLASS_MAP, c"clear", obj, &[])
+}
+
+pub(crate) unsafe fn MapKeys(cx: *mut root::JSContext, obj: root::JS::HandleObject, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_MAP, c"keys", obj, &[], rval)
+}
+
+pub(crate) unsafe fn MapValues(cx: *mut root::JSContext, obj: root::JS::HandleObject, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_MAP, c"values", obj, &[], rval)
+}
+
+pub(crate) unsafe fn MapEntries(cx: *mut root::JSContext, obj: root::JS::HandleObject, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_MAP, c"entries", obj, &[], rval)
+}
+
+pub(crate) unsafe fn MapForEach(cx: *mut root::JSContext, obj: root::JS::HandleObject, callbackFn: root::JS::HandleValue, thisVal: root::JS::HandleValue) -> bool {
+    method_void(cx, CLASS_MAP, c"forEach", obj, &[(*callbackFn.ptr).to_qjs(), (*thisVal.ptr).to_qjs()])
+}
+
+pub(crate) unsafe fn NewSetObject(cx: *mut root::JSContext) -> *mut root::JSObject {
+    new_intrinsic(cx, CLASS_SET)
+}
+
+pub(crate) unsafe fn IsSetObject(cx: *mut root::JSContext, obj: root::JS::HandleObject, isSet: *mut bool) -> bool {
+    let _ = cx;
+    *isSet = class_of(*obj.ptr) == CLASS_SET;
+    true
+}
+
+pub(crate) unsafe fn SetSize(cx: *mut root::JSContext, obj: root::JS::HandleObject) -> u32 {
+    size(cx, CLASS_SET, obj)
+}
+
+pub(crate) unsafe fn SetHas(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue, rval: *mut bool) -> bool {
+    method_bool(cx, CLASS_SET, c"has", obj, &[(*key.ptr).to_qjs()], rval)
+}
+
+pub(crate) unsafe fn SetAdd(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue) -> bool {
+    method_void(cx, CLASS_SET, c"add", obj, &[(*key.ptr).to_qjs()])
+}
+
+pub(crate) unsafe fn SetDelete(cx: *mut root::JSContext, obj: root::JS::HandleObject, key: root::JS::HandleValue, rval: *mut bool) -> bool {
+    method_bool(cx, CLASS_SET, c"delete", obj, &[(*key.ptr).to_qjs()], rval)
+}
+
+pub(crate) unsafe fn SetClear(cx: *mut root::JSContext, obj: root::JS::HandleObject) -> bool {
+    method_void(cx, CLASS_SET, c"clear", obj, &[])
+}
+
+pub(crate) unsafe fn SetKeys(cx: *mut root::JSContext, obj: root::JS::HandleObject, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_SET, c"keys", obj, &[], rval)
+}
+
+pub(crate) unsafe fn SetValues(cx: *mut root::JSContext, obj: root::JS::HandleObject, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_SET, c"values", obj, &[], rval)
+}
+
+pub(crate) unsafe fn SetEntries(cx: *mut root::JSContext, obj: root::JS::HandleObject, rval: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_SET, c"entries", obj, &[], rval)
+}
+
+pub(crate) unsafe fn SetForEach(cx: *mut root::JSContext, obj: root::JS::HandleObject, callbackFn: root::JS::HandleValue, thisVal: root::JS::HandleValue) -> bool {
+    method_void(cx, CLASS_SET, c"forEach", obj, &[(*callbackFn.ptr).to_qjs(), (*thisVal.ptr).to_qjs()])
+}
+
+pub(crate) unsafe fn NewWeakMapObject(cx: *mut root::JSContext) -> *mut root::JSObject {
+    new_intrinsic(cx, CLASS_WEAKMAP)
+}
+
+pub(crate) unsafe fn GetWeakMapEntry(cx: *mut root::JSContext, mapObj: root::JS::HandleObject, key: root::JS::HandleValue, val: root::JS::MutableHandleValue) -> bool {
+    method_value(cx, CLASS_WEAKMAP, c"get", mapObj, &[(*key.ptr).to_qjs()], val)
+}
+
+pub(crate) unsafe fn SetWeakMapEntry(cx: *mut root::JSContext, mapObj: root::JS::HandleObject, key: root::JS::HandleValue, val: root::JS::HandleValue) -> bool {
+    method_void(cx, CLASS_WEAKMAP, c"set", mapObj, &[(*key.ptr).to_qjs(), (*val.ptr).to_qjs()])
+}
+
+// Date.
+
+pub(crate) unsafe fn NewDateObject(cx: *mut root::JSContext, time: root::JS::ClippedTime) -> *mut root::JSObject {
+    let cx = Cx::from_raw(cx);
+    let date = q::JS_NewDate(cx.qctx(), time.t);
+    adopt_object(cx, date)
+}
+
+pub(crate) unsafe fn ObjectIsDate(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, isDate: *mut bool) -> bool {
+    let _ = cx;
+    *isDate = class_of(*obj.ptr) == CLASS_DATE;
+    true
+}
+
+pub(crate) unsafe fn DateGetMsecSinceEpoch(cx: *mut root::JSContext, obj: root::JS::HandleObject, msecSinceEpoch: *mut f64) -> bool {
+    let cx = Cx::from_raw(cx);
+    let t = call_method(cx, CLASS_DATE, c"getTime", obj_val(*obj.ptr), &[]);
+    if is_exception(t) {
+        return false;
+    }
+    let r = q::JS_ToFloat64(cx.qctx(), msecSinceEpoch, t);
+    q::JS_FreeValueRT(cx.rt, t);
+    ok(r)
+}
+
+// RegExp.
+
+/// The flags string of SpiderMonkey `RegExpFlags`, in `RegExp.prototype.flags` order.
+fn regexp_flags(flags: root::JS::RegExpFlags) -> Vec<u8> {
+    const FLAGS: [(u8, u8); 8] = [(64, b'd'), (2, b'g'), (1, b'i'), (4, b'm'), (32, b's'), (16, b'u'), (128, b'v'), (8, b'y')];
+    FLAGS.iter().filter(|(bit, _)| flags.flags_ & bit != 0).map(|(_, c)| *c).collect()
+}
+
+/// `new RegExp(source, flags)` (a new reference or `JS_EXCEPTION`).
+unsafe fn new_regexp(cx: &mut Cx, chars: *const u16, length: usize, flags: root::JS::RegExpFlags) -> q::JSValue {
+    let qctx = cx.qctx();
+    let source = q::JS_NewStringUTF16(qctx, chars, length);
+    if is_exception(source) {
+        return source;
+    }
+    let flags = regexp_flags(flags);
+    let flags = q::JS_NewStringLen(qctx, flags.as_ptr() as *const _, flags.len());
+    let re = construct_intrinsic(cx, CLASS_REGEXP, &[source, flags]);
+    q::JS_FreeValueRT(cx.rt, source);
+    q::JS_FreeValueRT(cx.rt, flags);
+    re
+}
+
+pub(crate) unsafe fn NewUCRegExpObject(cx: *mut root::JSContext, chars: *const u16, length: usize, flags: root::JS::RegExpFlags) -> *mut root::JSObject {
+    let cx = Cx::from_raw(cx);
+    let re = new_regexp(cx, chars, length, flags);
+    adopt_object(cx, re)
+}
+
+pub(crate) unsafe fn ObjectIsRegExp(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, isRegExp: *mut bool) -> bool {
+    let _ = cx;
+    *isRegExp = class_of(*obj.ptr) == CLASS_REGEXP;
+    true
+}
+
+/// Stores the syntax error of an invalid pattern in `error` (undefined if it is valid).
+pub(crate) unsafe fn CheckRegExpSyntax(cx: *mut root::JSContext, chars: *const u16, length: usize, flags: root::JS::RegExpFlags, error: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let re = new_regexp(cx, chars, length, flags);
+    if is_exception(re) {
+        let exception = q::JS_GetException(cx.qctx());
+        *error.ptr = cx.adopt(exception);
+    } else {
+        q::JS_FreeValueRT(cx.rt, re);
+        *error.ptr = JSVal::from_qjs(q::JS_UNDEFINED);
+    }
+    true
+}
+
+/// `ToNumber(obj[name])`, or `None` with an exception pending.
+unsafe fn number_property(cx: &mut Cx, obj: q::JSValue, name: &CStr) -> Option<f64> {
+    let v = q::JS_GetPropertyStr(cx.qctx(), obj, name.as_ptr());
+    if is_exception(v) {
+        return None;
+    }
+    let mut n = 0f64;
+    let r = q::JS_ToFloat64(cx.qctx(), &mut n, v);
+    q::JS_FreeValueRT(cx.rt, v);
+    if r < 0 { None } else { Some(n) }
+}
+
+/// The length of the matched substring of a match array.
+unsafe fn match_length(cx: &mut Cx, result: q::JSValue) -> Option<f64> {
+    let matched = q::JS_GetPropertyUint32(cx.qctx(), result, 0);
+    if is_exception(matched) {
+        return None;
+    }
+    let len = number_property(cx, matched, c"length");
+    q::JS_FreeValueRT(cx.rt, matched);
+    len
+}
+
+/// Matches `reobj` against `chars` from `*indexp` with `RegExp.prototype.exec`, leaving its
+/// `lastIndex` unchanged. On a match `*indexp` is the end of the match and `rval` is `true` (if
+/// `test`) or the match array; otherwise `rval` is null.
+pub(crate) unsafe fn ExecuteRegExpNoStatics(cx: *mut root::JSContext, reobj: root::JS::Handle<*mut root::JSObject>, chars: *const u16, length: usize, indexp: *mut usize, test: bool, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let qctx = cx.qctx();
+    let re = obj_val(*reobj.ptr);
+    let input = q::JS_NewStringUTF16(qctx, chars, length);
+    if is_exception(input) {
+        return false;
+    }
+    let last_index = Atom::from_cstr(cx, c"lastIndex".as_ptr());
+    let saved = q::JS_GetProperty(qctx, re, last_index.atom);
+    if is_exception(saved) || q::JS_SetProperty(qctx, re, last_index.atom, q::JS_NewInt64(qctx, *indexp as i64)) < 0 {
+        q::JS_FreeValueRT(cx.rt, saved);
+        q::JS_FreeValueRT(cx.rt, input);
+        return false;
+    }
+    let result = call_method(cx, CLASS_REGEXP, c"exec", re, &[input]);
+    q::JS_FreeValueRT(cx.rt, input);
+    let restored = q::JS_SetProperty(qctx, re, last_index.atom, saved) >= 0;
+    if is_exception(result) || !restored {
+        q::JS_FreeValueRT(cx.rt, result);
+        return false;
+    }
+    if result.tag() != q::JS_TAG_OBJECT {
+        q::JS_FreeValueRT(cx.rt, result);
+        *rval.ptr = JSVal::from_qjs(q::JS_NULL);
+        return true;
+    }
+    let (Some(start), Some(len)) = (number_property(cx, result, c"index"), match_length(cx, result)) else {
+        q::JS_FreeValueRT(cx.rt, result);
+        return false;
+    };
+    *indexp = (start + len) as usize;
+    if test {
+        q::JS_FreeValueRT(cx.rt, result);
+        *rval.ptr = JSVal::from_qjs(q::JS_TRUE);
+        return true;
+    }
+    *rval.ptr = cx.adopt(result);
+    true
+}
+
+// for-of iteration.
+
+pub(crate) unsafe fn JS_ForOfIteratorInit(iterator: *mut root::JS::ForOfIterator, iterable: root::JS::HandleValue, nonIterableBehavior: root::JS::ForOfIterator_NonIterableBehavior) -> bool {
+    let it = &mut *iterator;
+    let cx = Cx::from_raw(it.cx_);
+    let qctx = cx.qctx();
+    let iterable = (*iterable.ptr).to_qjs();
+    let atom = well_known_symbol_atom(cx, root::JS::SymbolCode::iterator as usize);
+    let method = q::JS_GetProperty(qctx, iterable, atom);
+    if is_exception(method) {
+        return false;
+    }
+    if method.tag() == q::JS_TAG_UNDEFINED && nonIterableBehavior == root::JS::ForOfIterator_NonIterableBehavior::AllowNonIterable {
+        return true;
+    }
+    if q::JS_IsFunction(qctx, method) == 0 {
+        q::JS_FreeValueRT(cx.rt, method);
+        q::JS_ThrowTypeError(qctx, c"value is not iterable".as_ptr());
+        return false;
+    }
+    let iter = q::JS_Call(qctx, method, iterable, 0, ptr::null_mut());
+    q::JS_FreeValueRT(cx.rt, method);
+    if is_exception(iter) {
+        return false;
+    }
+    if iter.tag() != q::JS_TAG_OBJECT {
+        q::JS_FreeValueRT(cx.rt, iter);
+        q::JS_ThrowTypeError(qctx, c"iterator is not an object".as_ptr());
+        return false;
+    }
+    let next = q::JS_GetPropertyStr(qctx, iter, c"next".as_ptr());
+    let iter = cx.adopt(iter);
+    if is_exception(next) {
+        return false;
+    }
+    it.iterator.data = iter.to_object();
+    it.nextMethod.data = cx.adopt(next);
+    true
+}
+
+pub(crate) unsafe fn JS_ForOfIteratorNext(iterator: *mut root::JS::ForOfIterator, val: root::JS::MutableHandleValue, done: *mut bool) -> bool {
+    let it = &mut *iterator;
+    let cx = Cx::from_raw(it.cx_);
+    let qctx = cx.qctx();
+    let result = q::JS_Call(qctx, it.nextMethod.data.to_qjs(), obj_val(it.iterator.data), 0, ptr::null_mut());
+    if is_exception(result) {
+        return false;
+    }
+    if result.tag() != q::JS_TAG_OBJECT {
+        q::JS_FreeValueRT(cx.rt, result);
+        q::JS_ThrowTypeError(qctx, c"iterator result is not an object".as_ptr());
+        return false;
+    }
+    let is_done = q::JS_GetPropertyStr(qctx, result, c"done".as_ptr());
+    if is_exception(is_done) {
+        q::JS_FreeValueRT(cx.rt, result);
+        return false;
+    }
+    *done = q::JS_ToBool(qctx, is_done) > 0;
+    q::JS_FreeValueRT(cx.rt, is_done);
+    if *done {
+        q::JS_FreeValueRT(cx.rt, result);
+        *val.ptr = JSVal::from_qjs(q::JS_UNDEFINED);
+        return true;
+    }
+    let value = q::JS_GetPropertyStr(qctx, result, c"value".as_ptr());
+    q::JS_FreeValueRT(cx.rt, result);
+    set_result(cx, value, val)
+}
+
+pub(crate) unsafe fn JS_ForOfIteratorValueIsIterable(iterator: *const root::JS::ForOfIterator) -> bool {
+    !(*iterator).iterator.data.is_null()
 }
