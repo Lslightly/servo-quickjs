@@ -348,6 +348,9 @@ static inline JSValue __JS_NewShortBigInt(JSContext *ctx, int64_t d)
 /* Servo: with JS_EVAL_TYPE_MODULE and JS_EVAL_FLAG_COMPILE_ONLY, do not load the
    requested modules; JS_LinkModule() resolves them later */
 #define JS_EVAL_FLAG_NO_RESOLVE (1 << 8)
+/* Servo: the script's errors are muted (HTML "muted errors"); eval and Function
+   code inherit it */
+#define JS_EVAL_FLAG_MUTED_ERRORS (1 << 9)
 
 typedef JSValue JSCFunction(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 typedef JSValue JSCFunctionMagic(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv, int magic);
@@ -694,6 +697,7 @@ typedef struct JSStackFrameInfo {
     JSContext *realm; /* realm of a bytecode function */
     struct JSModuleDef *module;
     JSValueConst script_private; /* borrowed */
+    JS_BOOL muted_errors; /* see JS_EVAL_FLAG_MUTED_ERRORS */
     JSValueConst name;
     JSAtom filename; /* JS_ATOM_NULL if unknown */
     int line_num; /* 1-based, 0 if unknown */

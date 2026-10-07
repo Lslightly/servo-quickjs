@@ -717,6 +717,7 @@ typedef struct JSScriptOrModule {
     int ref_count;
     JSModuleDef *module; /* NULL for scripts; cleared when the module is freed */
     JSValue private_value; /* host-defined value of a script */
+    BOOL muted_errors; /* JS_EVAL_FLAG_MUTED_ERRORS */
 } JSScriptOrModule;
 
 typedef struct JSFunctionBytecode {
@@ -37672,6 +37673,7 @@ static JSValue __JS_EvalInternal(JSContext *ctx, JSValueConst this_obj,
         fd->script_or_module = js_new_script_or_module(ctx, m);
         if (!fd->script_or_module)
             goto fail;
+        fd->script_or_module->muted_errors = (flags & JS_EVAL_FLAG_MUTED_ERRORS) != 0;
         if (m)
             m->script_or_module = js_dup_script_or_module(fd->script_or_module);
     }
@@ -62239,6 +62241,7 @@ void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaqu
             info.realm = b->realm;
             if (b->script_or_module) {
                 info.module = b->script_or_module->module;
+                info.muted_errors = b->script_or_module->muted_errors;
                 if (!info.module)
                     info.script_private = b->script_or_module->private_value;
             }
@@ -62434,6 +62437,7 @@ static JSScriptOrModule *js_new_script_or_module(JSContext *ctx, JSModuleDef *m)
     sm->ref_count = 1;
     sm->module = m;
     sm->private_value = JS_UNDEFINED;
+    sm->muted_errors = FALSE;
     return sm;
 }
 

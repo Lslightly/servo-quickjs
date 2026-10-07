@@ -173,6 +173,7 @@ pub const JS_EVAL_FLAG_COMPILE_ONLY: u32 = 32;
 pub const JS_EVAL_FLAG_BACKTRACE_BARRIER: u32 = 64;
 pub const JS_EVAL_FLAG_ASYNC: u32 = 128;
 pub const JS_EVAL_FLAG_NO_RESOLVE: u32 = 256;
+pub const JS_EVAL_FLAG_MUTED_ERRORS: u32 = 512;
 pub const JS_ATOM_NULL: u32 = 0;
 pub const JS_CALL_FLAG_CONSTRUCTOR: u32 = 1;
 pub const JS_INVALID_CLASS_ID: u32 = 0;
@@ -924,6 +925,7 @@ pub struct JSStackFrameInfo {
     pub realm: *mut JSContext,
     pub module: *mut JSModuleDef,
     pub script_private: JSValue,
+    pub muted_errors: ::std::os::raw::c_int,
     pub name: JSValue,
     pub filename: JSAtom,
     pub line_num: ::std::os::raw::c_int,
