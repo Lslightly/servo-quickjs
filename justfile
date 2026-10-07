@@ -13,3 +13,7 @@ test *args:
 # Build Servo's servoshell (in the quickjs-spike worktree) against the shim.
 servo cmd="build":
     cd {{servo}} && PATH=/usr/bin:$PATH LIBCLANG_PATH=/usr/lib/llvm-18/lib CARGO_TARGET_DIR={{servo_target}} cargo {{cmd}} -p servoshell --config '{{patch}}'
+
+# Run the shim-backed servoshell headless on a page (`just servo "build --features js-quickjs"` first).
+run page *args:
+    {{servo_target}}/debug/servoshell --headless --exit {{args}} {{page}}
