@@ -7,5 +7,9 @@ description = "Raw bindings to Bellard's QuickJS, vendored with Servo patches"
 links = "quickjs"
 build = "build.rs"
 
+[features]
+# Print objects still alive when a runtime is freed (QuickJS DUMP_LEAKS).
+dump-leaks = []
+
 [build-dependencies]
 cc = "1.2"

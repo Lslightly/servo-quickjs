@@ -19,6 +19,9 @@ fn main() {
         .flag_if_supported("-Wno-format-truncation")
         .flag_if_supported("-Wno-infinite-recursion")
         .warnings(false);
+    if std::env::var_os("CARGO_FEATURE_DUMP_LEAKS").is_some() {
+        build.define("DUMP_LEAKS", "1");
+    }
     build.compile("quickjs");
     println!("cargo:rerun-if-changed=quickjs");
     println!("cargo:rerun-if-changed=src/static_wrappers.c");
