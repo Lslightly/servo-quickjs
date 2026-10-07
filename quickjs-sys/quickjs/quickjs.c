@@ -384,6 +384,11 @@ struct JSRuntime {
     } u;
     JSModuleCheckSupportedImportAttributes *module_check_attrs;
     void *module_loader_opaque;
+    /* Servo: host hooks for import.meta and import() */
+    JSImportMetaHook *import_meta_hook;
+    void *import_meta_opaque;
+    JSDynamicImportHook *dynamic_import_hook;
+    void *dynamic_import_opaque;
     /* timestamp for internal use in module evaluation */
     int64_t module_async_evaluation_next_timestamp;
 
@@ -1352,6 +1357,10 @@ static void js_mark_module_def(JSRuntime *rt, JSModuleDef *m,
                                JS_MarkFunc *mark_func);
 static JSValue js_import_meta(JSContext *ctx);
 static JSValue js_dynamic_import(JSContext *ctx, JSValueConst specifier, JSValueConst options);
+/* Servo: defined with the module loading patch at the end of the file */
+static int js_servo_dynamic_import(JSContext *ctx, JSValueConst basename,
+                                   JSValueConst specifier, JSValueConst attributes,
+                                   JSValueConst promise);
 static void free_var_ref(JSRuntime *rt, JSVarRef *var_ref);
 static JSValue js_new_promise_capability(JSContext *ctx,
                                          JSValue *resolving_funcs,
@@ -31182,6 +31191,12 @@ JSValue JS_GetImportMeta(JSContext *ctx, JSModuleDef *m)
         obj = JS_NewObjectProto(ctx, JS_NULL);
         if (JS_IsException(obj))
             return JS_EXCEPTION;
+        /* Servo: let the host populate import.meta */
+        if (ctx->rt->import_meta_hook &&
+            ctx->rt->import_meta_hook(ctx, m, obj, ctx->rt->import_meta_opaque) < 0) {
+            JS_FreeValue(ctx, obj);
+            return JS_EXCEPTION;
+        }
         m->meta_obj = obj;
     }
     return JS_DupValue(ctx, obj);
@@ -31424,6 +31439,18 @@ static JSValue js_dynamic_import(JSContext *ctx, JSValueConst specifier, JSValue
             }
             JS_FreeValue(ctx, attributes_obj);
         }
+    }
+
+    /* Servo: the host loads the module and settles the promise */
+    if (ctx->rt->dynamic_import_hook) {
+        if (js_servo_dynamic_import(ctx, basename_val, specifier_str, attributes, promise) < 0) {
+            err = JS_GetException(ctx);
+            ret = JS_Call(ctx, resolving_funcs[1], JS_UNDEFINED,
+                          1, (JSValueConst *)&err);
+            JS_FreeValue(ctx, ret);
+            JS_FreeValue(ctx, err);
+        }
+        goto done;
     }
 
     args[0] = resolving_funcs[0];
@@ -31686,6 +31713,9 @@ static int js_execute_sync_module(JSContext *ctx, JSModuleDef *m,
             JS_FreeValue(ctx, promise);
         } else if (state == JS_PROMISE_REJECTED) {
             *pvalue = JS_PromiseResult(ctx, promise);
+            /* Servo: the error goes to the evaluation promise, so this
+               internal promise must not be reported as unhandled */
+            JS_MarkPromiseHandled(ctx, promise);
             JS_FreeValue(ctx, promise);
             return -1;
         } else {
@@ -37595,7 +37625,8 @@ static JSValue __JS_EvalInternal(JSContext *ctx, JSValueConst this_obj,
     /* Could add a flag to avoid resolution if necessary */
     if (m) {
         m->func_obj = fun_obj;
-        if (js_resolve_module(ctx, m) < 0)
+        /* Servo: JS_EVAL_FLAG_NO_RESOLVE leaves the requests to JS_LinkModule() */
+        if (!(flags & JS_EVAL_FLAG_NO_RESOLVE) && js_resolve_module(ctx, m) < 0)
             goto fail1;
         fun_obj = JS_NewModuleValue(ctx, m);
     }
@@ -62154,4 +62185,148 @@ JSValue JS_GetGlobalThis(JSContext *ctx)
 JS_BOOL JS_IsStrictMode(JSContext *ctx)
 {
     return is_strict_mode(ctx);
+}
+
+/* Servo: host-driven module loading (Q7). The host compiles modules with
+   JS_EVAL_FLAG_NO_RESOLVE, loads their requests itself and links them with
+   JS_LinkModule(), which resolves requests through a callback instead of the
+   module loader. */
+
+int JS_GetModuleRequestCount(JSModuleDef *m)
+{
+    return m->req_module_entries_count;
+}
+
+JSAtom JS_GetModuleRequestSpecifier(JSContext *ctx, JSModuleDef *m, int idx)
+{
+    if (idx < 0 || idx >= m->req_module_entries_count)
+        return JS_ATOM_NULL;
+    return JS_DupAtom(ctx, m->req_module_entries[idx].module_name);
+}
+
+JSValue JS_GetModuleRequestAttributes(JSContext *ctx, JSModuleDef *m, int idx)
+{
+    if (idx < 0 || idx >= m->req_module_entries_count)
+        return JS_UNDEFINED;
+    return JS_DupValue(ctx, m->req_module_entries[idx].attributes);
+}
+
+JS_BOOL JS_IsModuleLinked(JSModuleDef *m)
+{
+    return m->status != JS_MODULE_STATUS_UNLINKED &&
+        m->status != JS_MODULE_STATUS_LINKING;
+}
+
+/* Sets the module of every unresolved request reachable from 'm'. A module is
+   marked resolved only once its whole graph is, so that a failed call can be
+   retried. */
+static int js_host_resolve_module_graph(JSContext *ctx, JSModuleDef *m,
+                                        JSModuleResolveFunc *resolve, void *opaque)
+{
+    ExecModuleList list_s, *list = &list_s;
+    JSModuleDef *m1;
+    int i, j, ret = -1;
+
+    if (m->resolved)
+        return 0;
+    list->tab = NULL;
+    list->count = 0;
+    list->size = 0;
+    if (js_resize_array(ctx, (void **)&list->tab, sizeof(list->tab[0]),
+                        &list->size, 1))
+        return -1;
+    list->tab[list->count++] = m;
+    for(i = 0; i < list->count; i++) {
+        m1 = list->tab[i];
+        for(j = 0; j < m1->req_module_entries_count; j++) {
+            JSReqModuleEntry *rme = &m1->req_module_entries[j];
+            if (!rme->module) {
+                rme->module = resolve(ctx, m1, j, opaque);
+                if (!rme->module)
+                    goto done;
+            }
+            if (!rme->module->resolved &&
+                !find_in_exec_module_list(list, rme->module)) {
+                if (js_resize_array(ctx, (void **)&list->tab, sizeof(list->tab[0]),
+                                    &list->size, list->count + 1))
+                    goto done;
+                list->tab[list->count++] = rme->module;
+            }
+        }
+    }
+    for(i = 0; i < list->count; i++)
+        list->tab[i]->resolved = TRUE;
+    ret = 0;
+ done:
+    js_free(ctx, list->tab);
+    return ret;
+}
+
+int JS_LinkModule(JSContext *ctx, JSModuleDef *m,
+                  JSModuleResolveFunc *resolve, void *opaque)
+{
+    if (js_host_resolve_module_graph(ctx, m, resolve, opaque) < 0)
+        return -1;
+    if (js_create_module_function(ctx, m) < 0)
+        return -1;
+    return js_link_module(ctx, m);
+}
+
+JSAtom JS_GetScriptFileName(JSContext *ctx, JSValueConst script)
+{
+    JSFunctionBytecode *b;
+
+    if (JS_VALUE_GET_TAG(script) != JS_TAG_FUNCTION_BYTECODE)
+        return JS_ATOM_NULL;
+    b = JS_VALUE_GET_PTR(script);
+    if (!b->has_debug)
+        return JS_ATOM_NULL;
+    return JS_DupAtom(ctx, b->debug.filename);
+}
+
+void JS_SetImportMetaHook(JSRuntime *rt, JSImportMetaHook *hook, void *opaque)
+{
+    rt->import_meta_hook = hook;
+    rt->import_meta_opaque = opaque;
+}
+
+void JS_SetDynamicImportHook(JSRuntime *rt, JSDynamicImportHook *hook, void *opaque)
+{
+    rt->dynamic_import_hook = hook;
+    rt->dynamic_import_opaque = opaque;
+}
+
+static int js_servo_dynamic_import(JSContext *ctx, JSValueConst basename,
+                                   JSValueConst specifier, JSValueConst attributes,
+                                   JSValueConst promise)
+{
+    JSModuleDef *m = NULL;
+    JSAtom name;
+
+    if (JS_IsString(basename)) {
+        name = JS_ValueToAtom(ctx, basename);
+        if (name == JS_ATOM_NULL)
+            return -1;
+        m = js_find_loaded_module(ctx, name);
+        JS_FreeAtom(ctx, name);
+    }
+    return ctx->rt->dynamic_import_hook(ctx, basename, m, specifier, attributes,
+                                        promise, ctx->rt->dynamic_import_opaque);
+}
+
+/* Marks a settled promise as handled, telling the rejection tracker like
+   adding a reaction would (without adding one). */
+void JS_MarkPromiseHandled(JSContext *ctx, JSValueConst promise)
+{
+    JSPromiseData *s = JS_GetOpaque(promise, JS_CLASS_PROMISE);
+    JSRuntime *rt = ctx->rt;
+
+    if (!s || s->promise_state == JS_PROMISE_PENDING)
+        return;
+    if (s->promise_state == JS_PROMISE_REJECTED && !s->is_handled &&
+        rt->host_promise_rejection_tracker) {
+        rt->host_promise_rejection_tracker(ctx, promise, s->promise_result, TRUE,
+                                           rt->host_promise_rejection_tracker_opaque);
+    }
+    s->is_handled = TRUE;
 }
