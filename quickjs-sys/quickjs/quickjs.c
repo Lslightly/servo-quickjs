@@ -551,6 +551,8 @@ struct JSContext {
 
     JSValue global_obj; /* global object */
     JSValue global_var_obj; /* contains the global let/const definitions */
+    /* Servo: 'this' of global code and sloppy-mode functions; JS_UNDEFINED means global_obj */
+    JSValue global_this;
 
     uint64_t random_state;
 
@@ -568,6 +570,12 @@ struct JSContext {
                              const char *filename, int flags, int scope_idx);
     void *user_opaque;
 };
+
+/* Servo: see JS_SetGlobalThis() */
+static inline JSValueConst js_global_this(JSContext *ctx)
+{
+    return JS_IsUndefined(ctx->global_this) ? ctx->global_obj : ctx->global_this;
+}
 
 typedef union JSFloat64Union {
     double d;
@@ -789,6 +797,8 @@ typedef struct JSTypedArray {
 } JSTypedArray;
 
 typedef struct JSGlobalObject {
+    /* Servo: aliases JSObject.u.opaque for globals of an embedder class (JS_SetGlobalObjectClass) */
+    void *opaque;
     JSValue uninitialized_vars; /* hidden object containing the list of uninitialized variables */
 } JSGlobalObject;
 
@@ -1016,6 +1026,7 @@ struct JSObject {
     uint8_t has_immutable_prototype : 1; /* cannot modify the prototype */
     uint8_t tmp_mark : 1; /* used in JS_WriteObjectRec() */
     uint8_t is_HTMLDDA : 1; /* specific annex B IsHtmlDDA behavior */
+    uint8_t is_global_object : 1; /* Servo: u.global_object is used, whatever the class */
     uint16_t class_id; /* see JS_CLASS_x */
     /* count the number of weak references to this object. The object
        structure is freed only if header.ref_count = 0 and
@@ -2632,6 +2643,7 @@ JSContext *JS_NewContextRaw(JSRuntime *rt)
     ctx->iterator_ctor = JS_NULL;
     ctx->regexp_ctor = JS_NULL;
     ctx->promise_ctor = JS_NULL;
+    ctx->global_this = JS_UNDEFINED; /* Servo */
     init_list_head(&ctx->loaded_modules);
 
     if (JS_AddIntrinsicBasicObjects(ctx)) {
@@ -2744,6 +2756,7 @@ static void JS_MarkContext(JSRuntime *rt, JSContext *ctx,
 
     JS_MarkValue(rt, ctx->global_obj, mark_func);
     JS_MarkValue(rt, ctx->global_var_obj, mark_func);
+    JS_MarkValue(rt, ctx->global_this, mark_func); /* Servo */
 
     JS_MarkValue(rt, ctx->throw_type_error, mark_func);
     JS_MarkValue(rt, ctx->eval_obj, mark_func);
@@ -2819,6 +2832,7 @@ void JS_FreeContext(JSContext *ctx)
 
     JS_FreeValue(ctx, ctx->global_obj);
     JS_FreeValue(ctx, ctx->global_var_obj);
+    JS_FreeValue(ctx, ctx->global_this); /* Servo */
 
     JS_FreeValue(ctx, ctx->throw_type_error);
     JS_FreeValue(ctx, ctx->eval_obj);
@@ -5669,6 +5683,7 @@ static JSValue JS_NewObjectFromShape(JSContext *ctx, JSShape *sh, JSClassID clas
     p->has_immutable_prototype = 0;
     p->tmp_mark = 0;
     p->is_HTMLDDA = 0;
+    p->is_global_object = 0;
     p->weakref_count = 0;
     p->u.opaque = NULL;
     p->shape = sh;
@@ -5752,6 +5767,7 @@ static JSValue JS_NewObjectFromShape(JSContext *ctx, JSShape *sh, JSClassID clas
         p->u.regexp.bytecode = NULL;
         break;
     case JS_CLASS_GLOBAL_OBJECT:
+        p->is_global_object = 1;
         p->u.global_object.uninitialized_vars = JS_UNDEFINED;
         break;
     default:
@@ -6404,6 +6420,9 @@ static void free_object(JSRuntime *rt, JSObject *p)
     finalizer = rt->class_array[p->class_id].finalizer;
     if (finalizer)
         (*finalizer)(rt, JS_MKPTR(JS_TAG_OBJECT, p));
+    /* Servo: global object of an embedder class */
+    if (unlikely(p->is_global_object && p->class_id != JS_CLASS_GLOBAL_OBJECT))
+        js_global_object_finalizer(rt, JS_MKPTR(JS_TAG_OBJECT, p));
 
     /* fail safe */
     p->class_id = 0;
@@ -6646,6 +6665,9 @@ static void mark_children(JSRuntime *rt, JSGCObjectHeader *gp,
                 gc_mark = rt->class_array[p->class_id].gc_mark;
                 if (gc_mark)
                     gc_mark(rt, JS_MKPTR(JS_TAG_OBJECT, p), mark_func);
+                /* Servo: global object of an embedder class */
+                if (unlikely(p->is_global_object && p->class_id != JS_CLASS_GLOBAL_OBJECT))
+                    js_global_object_mark(rt, JS_MKPTR(JS_TAG_OBJECT, p), mark_func);
             }
         }
         break;
@@ -8245,7 +8267,7 @@ static int JS_AutoInitProperty(JSContext *ctx, JSObject *p, JSAtom prop,
         prs->flags |= JS_PROP_VARREF;
         pr->u.var_ref = JS_VALUE_GET_PTR(val);
         js_rc(pr->u.var_ref)->ref_count++;
-    } else if (p->class_id == JS_CLASS_GLOBAL_OBJECT) {
+    } else if (p->is_global_object /* Servo */) {
         JSVarRef *var_ref;
         /* in the global object we use references */
         var_ref = js_create_var_ref(ctx, FALSE);
@@ -8676,35 +8698,8 @@ static int __exception JS_GetOwnPropertyNamesInternal(JSContext *ctx,
     exotic_keys_count = 0;
     exotic_count = 0;
     tab_exotic = NULL;
-    sh = p->shape;
-    for(i = 0, prs = get_shape_prop(sh); i < sh->prop_count; i++, prs++) {
-        atom = prs->atom;
-        if (atom != JS_ATOM_NULL) {
-            is_enumerable = ((prs->flags & JS_PROP_ENUMERABLE) != 0);
-            kind = JS_AtomGetKind(ctx, atom);
-            if ((!(flags & JS_GPN_ENUM_ONLY) || is_enumerable) &&
-                ((flags >> kind) & 1) != 0) {
-                /* need to raise an exception in case of the module
-                   name space (implicit GetOwnProperty) */
-                if (unlikely((prs->flags & JS_PROP_TMASK) == JS_PROP_VARREF) &&
-                    (flags & (JS_GPN_SET_ENUM | JS_GPN_ENUM_ONLY))) {
-                    JSVarRef *var_ref = p->prop[i].u.var_ref;
-                    if (unlikely(JS_IsUninitialized(*var_ref->pvalue))) {
-                        JS_ThrowReferenceErrorUninitialized(ctx, prs->atom);
-                        return -1;
-                    }
-                }
-                if (JS_AtomIsArrayIndex(ctx, &num_key, atom)) {
-                    num_keys_count++;
-                } else if (kind == JS_ATOM_KIND_STRING) {
-                    str_keys_count++;
-                } else {
-                    sym_keys_count++;
-                }
-            }
-        }
-    }
-
+    /* Servo: exotic keys are computed first, so that get_own_property_names and
+       get_own_property may define own properties (lazily resolved globals) */
     if (p->is_exotic) {
         if (p->fast_array) {
             if (flags & JS_GPN_STRING_MASK) {
@@ -8745,6 +8740,36 @@ static int __exception JS_GetOwnPropertyNamesInternal(JSContext *ctx,
                             exotic_keys_count++;
                         }
                     }
+                }
+            }
+        }
+    }
+
+    sh = p->shape;
+    for(i = 0, prs = get_shape_prop(sh); i < sh->prop_count; i++, prs++) {
+        atom = prs->atom;
+        if (atom != JS_ATOM_NULL) {
+            is_enumerable = ((prs->flags & JS_PROP_ENUMERABLE) != 0);
+            kind = JS_AtomGetKind(ctx, atom);
+            if ((!(flags & JS_GPN_ENUM_ONLY) || is_enumerable) &&
+                ((flags >> kind) & 1) != 0) {
+                /* need to raise an exception in case of the module
+                   name space (implicit GetOwnProperty) */
+                if (unlikely((prs->flags & JS_PROP_TMASK) == JS_PROP_VARREF) &&
+                    (flags & (JS_GPN_SET_ENUM | JS_GPN_ENUM_ONLY))) {
+                    JSVarRef *var_ref = p->prop[i].u.var_ref;
+                    if (unlikely(JS_IsUninitialized(*var_ref->pvalue))) {
+                        JS_ThrowReferenceErrorUninitialized(ctx, prs->atom);
+                        JS_FreePropertyEnum(ctx, tab_exotic, exotic_count); /* Servo */
+                        return -1;
+                    }
+                }
+                if (JS_AtomIsArrayIndex(ctx, &num_key, atom)) {
+                    num_keys_count++;
+                } else if (kind == JS_ATOM_KIND_STRING) {
+                    str_keys_count++;
+                } else {
+                    sym_keys_count++;
                 }
             }
         }
@@ -9399,7 +9424,7 @@ static int delete_property(JSContext *ctx, JSObject *p, JSAtom atom)
             sh->deleted_prop_count++;
             /* free the entry */
             pr1 = &p->prop[h - 1];
-            if (unlikely(p->class_id == JS_CLASS_GLOBAL_OBJECT)) {
+            if (unlikely(p->is_global_object /* Servo */)) {
                 if ((pr->flags & JS_PROP_TMASK) == JS_PROP_VARREF)
                     if (remove_global_object_property(ctx, p, pr, pr1))
                         return -1;
@@ -9932,7 +9957,7 @@ int JS_SetPropertyInternal(JSContext *ctx, JSValueConst obj,
                 goto generic_create_prop;
             }
         } else {
-            if (unlikely(p->class_id == JS_CLASS_GLOBAL_OBJECT))
+            if (unlikely(p->is_global_object /* Servo */))
                 goto generic_create_prop;
             if (unlikely(!p->extensible)) {
                 JS_FreeValue(ctx, val);
@@ -10272,7 +10297,7 @@ static int JS_CreateProperty(JSContext *ctx, JSObject *p,
             JS_PROP_GETSET;
     } else {
         prop_flags = flags & JS_PROP_C_W_E;
-        if (p->class_id == JS_CLASS_GLOBAL_OBJECT) {
+        if (p->is_global_object /* Servo */) {
             JSObject *p1 = JS_VALUE_GET_OBJ(p->u.global_object.uninitialized_vars);
             JSShapeProperty *prs1;
             JSProperty *pr1;
@@ -10307,7 +10332,7 @@ static int JS_CreateProperty(JSContext *ctx, JSObject *p,
             pr->u.getset.setter =
                 JS_VALUE_GET_OBJ(JS_DupValue(ctx, setter));
         }
-    } else if (p->class_id == JS_CLASS_GLOBAL_OBJECT) {
+    } else if (p->is_global_object /* Servo */) {
         if (delete_obj)
             delete_property(ctx, delete_obj, prop);
         pr->u.var_ref = var_ref;
@@ -10470,7 +10495,7 @@ int JS_DefineProperty(JSContext *ctx, JSValueConst this_obj,
                         return -1;
                     /* convert to getset */
                     if ((prs->flags & JS_PROP_TMASK) == JS_PROP_VARREF) {
-                        if (unlikely(p->class_id == JS_CLASS_GLOBAL_OBJECT)) {
+                        if (unlikely(p->is_global_object /* Servo */)) {
                             if (remove_global_object_property(ctx, p, prs, pr))
                                 return -1;
                         }
@@ -10513,7 +10538,7 @@ int JS_DefineProperty(JSContext *ctx, JSValueConst this_obj,
                 if ((prs->flags & JS_PROP_TMASK) == JS_PROP_GETSET) {
                     /* convert to data descriptor */
                     JSVarRef *var_ref;
-                    if (unlikely(p->class_id == JS_CLASS_GLOBAL_OBJECT)) {
+                    if (unlikely(p->is_global_object /* Servo */)) {
                         var_ref = js_global_object_find_uninitialized_var(ctx, p, prop, FALSE);
                         if (!var_ref)
                             return -1;
@@ -10570,7 +10595,7 @@ int JS_DefineProperty(JSContext *ctx, JSValueConst this_obj,
                         }
                         if (js_shape_prepare_update(ctx, p, &prs))
                             return -1;
-                        if (p->class_id == JS_CLASS_GLOBAL_OBJECT) {
+                        if (p->is_global_object /* Servo */) {
                             pr->u.var_ref->is_const = TRUE; /* mark as read-only */
                             prs->flags &= ~JS_PROP_WRITABLE;
                         } else {
@@ -18130,7 +18155,7 @@ static JSValue JS_CallInternal(JSContext *caller_ctx, JSValueConst func_obj,
                     if (likely(tag == JS_TAG_OBJECT))
                         goto normal_this;
                     if (tag == JS_TAG_NULL || tag == JS_TAG_UNDEFINED) {
-                        val = JS_DupValue(ctx, ctx->global_obj);
+                        val = JS_DupValue(ctx, js_global_this(ctx)); /* Servo */
                     } else {
                         val = JS_ToObject(ctx, this_obj);
                         if (JS_IsException(val))
@@ -37468,7 +37493,7 @@ static JSValue JS_EvalFunctionInternal(JSContext *ctx, JSValue fun_obj,
 
 JSValue JS_EvalFunction(JSContext *ctx, JSValue fun_obj)
 {
-    return JS_EvalFunctionInternal(ctx, fun_obj, ctx->global_obj, NULL, NULL);
+    return JS_EvalFunctionInternal(ctx, fun_obj, js_global_this(ctx), NULL, NULL); /* Servo */
 }
 
 /* 'input' must be zero terminated i.e. input[input_len] = '\0'. */
@@ -37683,8 +37708,8 @@ JSValue JS_EvalThis(JSContext *ctx, JSValueConst this_obj,
 JSValue JS_Eval(JSContext *ctx, const char *input, size_t input_len,
                 const char *filename, int eval_flags)
 {
-    return JS_EvalThis(ctx, ctx->global_obj, input, input_len, filename,
-                       eval_flags);
+    return JS_EvalThis(ctx, js_global_this(ctx), input, input_len, filename,
+                       eval_flags); /* Servo */
 }
 
 int JS_ResolveModule(JSContext *ctx, JSValueConst obj)
@@ -40206,8 +40231,8 @@ static JSValue JS_NewCConstructor(JSContext *ctx, int class_id, const char *name
 static JSValue js_global_eval(JSContext *ctx, JSValueConst this_val,
                               int argc, JSValueConst *argv)
 {
-    return JS_EvalObject(ctx, ctx->global_obj, argv[0], JS_EVAL_TYPE_INDIRECT, -1,
-                         JS_COMPILE_INDIRECT_EVAL);
+    return JS_EvalObject(ctx, js_global_this(ctx), argv[0], JS_EVAL_TYPE_INDIRECT, -1,
+                         JS_COMPILE_INDIRECT_EVAL); /* Servo */
 }
 
 static JSValue js_global_isNaN(JSContext *ctx, JSValueConst this_val,
@@ -62094,4 +62119,39 @@ void JS_IterateStackFrames(JSContext *ctx, JSStackFrameCallback *cb, void *opaqu
         if (cb(opaque, &info))
             break;
     }
+}
+
+/* Servo: the global object as an instance of an embedder class, and a global 'this'
+   distinct from the global object (the HTML WindowProxy). */
+
+int JS_SetGlobalObjectClass(JSContext *ctx, JSClassID class_id)
+{
+    JSRuntime *rt = ctx->rt;
+    JSObject *p = JS_VALUE_GET_OBJ(ctx->global_obj);
+
+    if (!JS_IsRegisteredClass(rt, class_id) || rt->class_array[class_id].call)
+        return -1;
+    p->class_id = class_id;
+    p->is_exotic = rt->class_array[class_id].exotic != NULL;
+    p->u.global_object.opaque = NULL;
+    return 0;
+}
+
+void JS_SetGlobalThis(JSContext *ctx, JSValue this_val)
+{
+    JS_FreeValue(ctx, ctx->global_this);
+    ctx->global_this = this_val;
+    JS_DefinePropertyValue(ctx, ctx->global_obj, JS_ATOM_globalThis,
+                           JS_DupValue(ctx, js_global_this(ctx)),
+                           JS_PROP_CONFIGURABLE | JS_PROP_WRITABLE);
+}
+
+JSValue JS_GetGlobalThis(JSContext *ctx)
+{
+    return JS_DupValue(ctx, js_global_this(ctx));
+}
+
+JS_BOOL JS_IsStrictMode(JSContext *ctx)
+{
+    return is_strict_mode(ctx);
 }

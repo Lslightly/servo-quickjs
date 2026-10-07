@@ -1370,6 +1370,21 @@ unsafe extern "C" {
     pub fn JS_GetGlobalObject(ctx: *mut JSContext) -> JSValue;
 }
 unsafe extern "C" {
+    pub fn JS_SetGlobalObjectClass(
+        ctx: *mut JSContext,
+        class_id: JSClassID,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_SetGlobalThis(ctx: *mut JSContext, this_val: JSValue);
+}
+unsafe extern "C" {
+    pub fn JS_GetGlobalThis(ctx: *mut JSContext) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_IsStrictMode(ctx: *mut JSContext) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
     pub fn JS_IsInstanceOf(
         ctx: *mut JSContext,
         val: JSValue,

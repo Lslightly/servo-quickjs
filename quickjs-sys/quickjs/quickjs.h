@@ -875,6 +875,19 @@ JSValue JS_EvalThis(JSContext *ctx, JSValueConst this_obj,
                     const char *input, size_t input_len,
                     const char *filename, int eval_flags);
 JSValue JS_GetGlobalObject(JSContext *ctx);
+/* Servo: make the global object an instance of the (non-callable) class 'class_id': its
+   finalizer, gc_mark, exotic methods and opaque (JS_SetOpaque) apply, and it keeps the
+   semantics of a global object. Call it right after JS_NewContext(). Returns -1 if the
+   class is not registered or callable. */
+int JS_SetGlobalObjectClass(JSContext *ctx, JSClassID class_id);
+/* Servo: 'this' in global code, in indirect eval and in sloppy-mode functions called with
+   an undefined 'this', and the value of globalThis (the HTML WindowProxy). JS_UNDEFINED
+   means the global object. JS_SetGlobalThis takes ownership of 'this_val'. */
+void JS_SetGlobalThis(JSContext *ctx, JSValue this_val);
+JSValue JS_GetGlobalThis(JSContext *ctx);
+/* Servo: TRUE if the running function is strict mode code (for exotic methods receiving
+   JS_PROP_THROW_STRICT) */
+JS_BOOL JS_IsStrictMode(JSContext *ctx);
 int JS_IsInstanceOf(JSContext *ctx, JSValueConst val, JSValueConst obj);
 int JS_DefineProperty(JSContext *ctx, JSValueConst this_obj,
                       JSAtom prop, JSValueConst val,
