@@ -42,7 +42,6 @@ use crate::jsapi::glue::{DeleteRealmOptions, JS_Init, JS_NewRealmOptions};
 use crate::jsapi::js;
 use crate::jsapi::js::frontend::InitialStencilAndDelazifications;
 use crate::jsapi::mozilla::Utf8Unit;
-use crate::jsapi::shadow::BaseShape;
 use crate::jsapi::HandleObjectVector as RawHandleObjectVector;
 use crate::jsapi::JS_AddExtraGCRootsTracer;
 use crate::jsapi::MutableHandleIdVector as RawMutableHandleIdVector;
@@ -914,26 +913,18 @@ pub static SIMPLE_GLOBAL_CLASS: JSClass = JSClass {
 };
 
 #[inline]
-unsafe fn get_object_group(obj: *mut JSObject) -> *mut BaseShape {
-    assert!(!obj.is_null());
-    let obj = obj as *mut Object;
-    (*(*obj).shape).base
-}
-
-#[inline]
 pub unsafe fn get_object_class(obj: *mut JSObject) -> *const JSClass {
-    (*get_object_group(obj)).clasp as *const _
+    crate::engine::object_class(obj)
 }
 
 #[inline]
 pub unsafe fn get_object_realm(obj: *mut JSObject) -> *mut Realm {
-    (*get_object_group(obj)).realm
+    crate::engine::GetObjectRealmOrNull(obj)
 }
 
 #[inline]
 pub unsafe fn get_context_realm(cx: *mut JSContext) -> *mut Realm {
-    let cx = cx as *mut RootingContext;
-    (*cx).realm_
+    crate::engine::GetCurrentRealmOrNull(cx)
 }
 
 #[inline]

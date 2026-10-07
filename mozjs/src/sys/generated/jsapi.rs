@@ -3136,7 +3136,7 @@ pub mod root {
                 trc: *mut root::JSTracer,
                 length: usize,
                 elements: *mut root::JS::Value,
-            ) { qjs_todo!("TraceValueArray") }
+            ) { crate::engine::TraceValueArray(trc, length, elements) }
 
                 #[repr(C)]
         #[derive(Debug, Copy, Clone)]
@@ -5116,7 +5116,7 @@ pub mod root {
         pub unsafe extern "C" fn GetRealmGlobalOrNull(realm: *mut root::JS::Realm) -> *mut root::JSObject { crate::engine::GetRealmGlobalOrNull(realm) }
 
         
-        pub unsafe extern "C" fn InitRealmStandardClasses(cx: *mut root::JSContext) -> bool { qjs_todo!("InitRealmStandardClasses") }
+        pub unsafe extern "C" fn InitRealmStandardClasses(cx: *mut root::JSContext) -> bool { crate::engine::InitRealmStandardClasses(cx) }
 
         
         pub unsafe extern "C" fn MaybeFreezeCtorAndPrototype(
@@ -5186,28 +5186,28 @@ pub mod root {
                 objp: *mut *mut root::JSObject,
                 prev: *mut root::JSObject,
                 next: *mut root::JSObject,
-            ) { qjs_todo!("HeapObjectWriteBarriers") }
+            ) { crate::engine::HeapObjectWriteBarriers(objp, prev, next) }
 
         
         pub unsafe extern "C" fn HeapStringWriteBarriers(
                 objp: *mut *mut root::JSString,
                 prev: *mut root::JSString,
                 next: *mut root::JSString,
-            ) { qjs_todo!("HeapStringWriteBarriers") }
+            ) { crate::engine::HeapStringWriteBarriers(objp, prev, next) }
 
         
         pub unsafe extern "C" fn HeapBigIntWriteBarriers(
                 bip: *mut *mut root::JS::BigInt,
                 prev: *mut root::JS::BigInt,
                 next: *mut root::JS::BigInt,
-            ) { qjs_todo!("HeapBigIntWriteBarriers") }
+            ) { crate::engine::HeapBigIntWriteBarriers(bip, prev, next) }
 
         
         pub unsafe extern "C" fn HeapScriptWriteBarriers(
                 objp: *mut *mut root::JSScript,
                 prev: *mut root::JSScript,
                 next: *mut root::JSScript,
-            ) { qjs_todo!("HeapScriptWriteBarriers") }
+            ) { crate::engine::HeapScriptWriteBarriers(objp, prev, next) }
 
         #[doc = " SafelyInitialized<T>::create() creates a safely-initialized |T|, suitable for\n use as a default value in situations requiring a safe but arbitrary |T|\n value. Implemented as a static method of a struct to allow partial\n specialization for subclasses via the Enable template parameter."]
         #[repr(C)]
@@ -5357,19 +5357,19 @@ pub mod root {
                 valuep: *mut root::JS::Value,
                 prev: *const root::JS::Value,
                 next: *const root::JS::Value,
-            ) { qjs_todo!("HeapValueWriteBarriers") }
+            ) { crate::engine::HeapValueWriteBarriers(valuep, prev, next) }
 
                 
-                pub static NullHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
+                pub static NullHandleValue: root::JS::HandleValue = root::JS::Handle { _phantom_0: ::std::marker::PhantomData, ptr: &root::JS::Value { asBits_: 0, tag: 2 } as *const root::JS::Value };
 
         
-        pub static UndefinedHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
+        pub static UndefinedHandleValue: root::JS::HandleValue = root::JS::Handle { _phantom_0: ::std::marker::PhantomData, ptr: &root::JS::Value { asBits_: 0, tag: 3 } as *const root::JS::Value };
 
         
-        pub static TrueHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
+        pub static TrueHandleValue: root::JS::HandleValue = root::JS::Handle { _phantom_0: ::std::marker::PhantomData, ptr: &root::JS::Value { asBits_: 1, tag: 1 } as *const root::JS::Value };
 
         
-        pub static FalseHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
+        pub static FalseHandleValue: root::JS::HandleValue = root::JS::Handle { _phantom_0: ::std::marker::PhantomData, ptr: &root::JS::Value { asBits_: 0, tag: 1 } as *const root::JS::Value };
 
                 pub type GCVector_ElementType<T> = T;
         #[repr(C)]
@@ -5400,7 +5400,7 @@ pub mod root {
                 fun: root::JS::Handle<root::JS::Value>,
                 args: *const root::JS::HandleValueArray,
                 rval: root::JS::MutableHandle<root::JS::Value>,
-            ) -> bool { qjs_todo!("Call") }
+            ) -> bool { crate::engine::Call(cx, thisv, fun, args, rval) }
 
         #[doc = " Invoke a constructor. This is the C++ equivalent of\n `rval = Reflect.construct(fun, args, newTarget)`.\n\n Construct() takes a `newTarget` argument that most callers don't need.\n Consider using the four-argument Construct signature instead. (But if you're\n implementing a subclass or a proxy handler's construct() method, this is the\n right function to call.)\n\n Implements: ES6 7.3.13 Construct(F, [argumentsList], [newTarget]).\n Use this function to invoke the [[Construct]] internal method."]
         pub unsafe extern "C" fn Construct(
@@ -5409,7 +5409,7 @@ pub mod root {
                 newTarget: root::JS::Handle<*mut root::JSObject>,
                 args: *const root::JS::HandleValueArray,
                 objp: root::JS::MutableHandle<*mut root::JSObject>,
-            ) -> bool { qjs_todo!("Construct") }
+            ) -> bool { crate::engine::Construct(cx, fun, newTarget, args, objp) }
 
         #[doc = " Invoke a constructor. This is the C++ equivalent of\n `rval = new fun(...args)`.\n\n Implements: ES6 7.3.13 Construct(F, [argumentsList], [newTarget]), when\n newTarget is omitted."]
         pub unsafe extern "C" fn Construct1(
@@ -6397,7 +6397,7 @@ pub mod root {
         pub unsafe extern "C" fn CurrentGlobalOrNull(cx: *mut root::JSContext) -> *mut root::JSObject { crate::engine::CurrentGlobalOrNull(cx) }
 
         #[doc = " Get the current realm's global. Returns nullptr if no realm has been\n entered."]
-        pub unsafe extern "C" fn CurrentGlobal(cx: *mut root::JSContext) -> *const *mut root::JSObject { qjs_todo!("CurrentGlobal") }
+        pub unsafe extern "C" fn CurrentGlobal(cx: *mut root::JSContext) -> *const *mut root::JSObject { crate::engine::CurrentGlobal(cx) }
 
         #[doc = " Get the global object associated with an object's realm. The object must not\n be a cross-compartment wrapper (because CCWs are shared by all realms in the\n compartment)."]
         pub unsafe extern "C" fn GetNonCCWObjectGlobal(obj: *mut root::JSObject) -> *mut root::JSObject { crate::engine::GetNonCCWObjectGlobal(obj) }
@@ -7078,7 +7078,7 @@ pub mod root {
         pub unsafe extern "C" fn GetWellKnownSymbol(
                 cx: *mut root::JSContext,
                 which: root::JS::SymbolCode,
-            ) -> *mut root::JS::Symbol { qjs_todo!("GetWellKnownSymbol") }
+            ) -> *mut root::JS::Symbol { crate::engine::GetWellKnownSymbol(cx, which) }
 
         pub type IterateRealmCallback = ::std::option::Option<
             unsafe extern "C" fn(
@@ -9404,7 +9404,7 @@ pub mod root {
                 cx: *mut root::JSContext,
                 obj: root::JS::Handle<*mut root::JSObject>,
                 lengthp: *mut u32,
-            ) -> bool { qjs_todo!("GetArrayLength") }
+            ) -> bool { crate::engine::GetArrayLength(cx, obj, lengthp) }
 
         #[doc = " Perform |obj.length = length| as if in strict mode code, with a fast path for\n the case where |obj| is an Array.\n\n This operation is exactly and only assigning to a \"length\" property.  In\n general, it can invoke an existing \"length\" setter, throw if the property is\n non-writable, or do anything else a property-set operation might do."]
         pub unsafe extern "C" fn SetArrayLength(
@@ -10518,7 +10518,7 @@ pub mod root {
             fval: root::JS::Handle<root::JS::Value>,
             args: *const root::JS::HandleValueArray,
             rval: root::JS::MutableHandle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_CallFunctionValue") }
+        ) -> bool { crate::engine::JS_CallFunctionValue(cx, obj, fval, args, rval) }
 
     
     pub unsafe extern "C" fn JS_CallFunction(
@@ -10536,7 +10536,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             args: *const root::JS::HandleValueArray,
             rval: root::JS::MutableHandle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_CallFunctionName") }
+        ) -> bool { crate::engine::JS_CallFunctionName(cx, obj, name, args, rval) }
 
     #[doc = " DEPRECATED\n\n Allocate memory sufficient to contain the characters of |str| truncated to\n Latin-1 and a trailing null terminator, fill the memory with the characters\n interpreted in that manner plus the null terminator, and return a pointer to\n the memory.\n\n This function *loses information* when it copies the characters of |str| if\n |str| contains code units greater than 0xFF.  Additionally, users that\n depend on null-termination will misinterpret the copied characters if |str|\n contains any nulls.  Avoid using this function if possible, because it will\n eventually be removed."]
     pub unsafe extern "C" fn JS_EncodeStringToLatin1(
@@ -11660,7 +11660,7 @@ pub mod root {
             id: root::JS::Handle<root::jsid>,
             desc: root::JS::Handle<root::JS::PropertyDescriptor>,
             result: *mut root::JS::ObjectOpResult,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById") }
+        ) -> bool { crate::engine::JS_DefinePropertyById(cx, obj, id, desc, result) }
 
     #[doc = " Define a property on obj, throwing a TypeError if the attempt fails.\n This is the C++ equivalent of `Object.defineProperty(obj, id, desc)`."]
     pub unsafe extern "C" fn JS_DefinePropertyById1(
@@ -11668,7 +11668,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             desc: root::JS::Handle<root::JS::PropertyDescriptor>,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById1") }
+        ) -> bool { crate::engine::JS_DefinePropertyById1(cx, obj, id, desc) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById2(
@@ -11677,7 +11677,7 @@ pub mod root {
             id: root::JS::Handle<root::jsid>,
             value: root::JS::Handle<root::JS::Value>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById2") }
+        ) -> bool { crate::engine::JS_DefinePropertyById2(cx, obj, id, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById3(
@@ -11687,7 +11687,7 @@ pub mod root {
             getter: root::JSNative,
             setter: root::JSNative,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById3") }
+        ) -> bool { crate::engine::JS_DefinePropertyById3(cx, obj, id, getter, setter, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById4(
@@ -11697,7 +11697,7 @@ pub mod root {
             getter: root::JS::Handle<*mut root::JSObject>,
             setter: root::JS::Handle<*mut root::JSObject>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById4") }
+        ) -> bool { crate::engine::JS_DefinePropertyById4(cx, obj, id, getter, setter, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById5(
@@ -11706,7 +11706,7 @@ pub mod root {
             id: root::JS::Handle<root::jsid>,
             value: root::JS::Handle<*mut root::JSObject>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById5") }
+        ) -> bool { crate::engine::JS_DefinePropertyById5(cx, obj, id, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById6(
@@ -11715,7 +11715,7 @@ pub mod root {
             id: root::JS::Handle<root::jsid>,
             value: root::JS::Handle<*mut root::JSString>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById6") }
+        ) -> bool { crate::engine::JS_DefinePropertyById6(cx, obj, id, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById7(
@@ -11724,7 +11724,7 @@ pub mod root {
             id: root::JS::Handle<root::jsid>,
             value: i32,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById7") }
+        ) -> bool { crate::engine::JS_DefinePropertyById7(cx, obj, id, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById8(
@@ -11733,7 +11733,7 @@ pub mod root {
             id: root::JS::Handle<root::jsid>,
             value: u32,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefinePropertyById8") }
+        ) -> bool { crate::engine::JS_DefinePropertyById8(cx, obj, id, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefinePropertyById9(
@@ -11751,7 +11751,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             value: root::JS::Handle<root::JS::Value>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty") }
+        ) -> bool { crate::engine::JS_DefineProperty(cx, obj, name, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty1(
@@ -11761,7 +11761,7 @@ pub mod root {
             getter: root::JSNative,
             setter: root::JSNative,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty1") }
+        ) -> bool { crate::engine::JS_DefineProperty1(cx, obj, name, getter, setter, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty2(
@@ -11771,7 +11771,7 @@ pub mod root {
             getter: root::JS::Handle<*mut root::JSObject>,
             setter: root::JS::Handle<*mut root::JSObject>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty2") }
+        ) -> bool { crate::engine::JS_DefineProperty2(cx, obj, name, getter, setter, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty3(
@@ -11780,7 +11780,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             value: root::JS::Handle<*mut root::JSObject>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty3") }
+        ) -> bool { crate::engine::JS_DefineProperty3(cx, obj, name, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty4(
@@ -11789,7 +11789,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             value: root::JS::Handle<*mut root::JSString>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty4") }
+        ) -> bool { crate::engine::JS_DefineProperty4(cx, obj, name, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty5(
@@ -11798,7 +11798,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             value: i32,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty5") }
+        ) -> bool { crate::engine::JS_DefineProperty5(cx, obj, name, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty6(
@@ -11807,7 +11807,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             value: u32,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty6") }
+        ) -> bool { crate::engine::JS_DefineProperty6(cx, obj, name, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineProperty7(
@@ -11816,7 +11816,7 @@ pub mod root {
             name: *const ::std::os::raw::c_char,
             value: f64,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineProperty7") }
+        ) -> bool { crate::engine::JS_DefineProperty7(cx, obj, name, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineUCProperty(
@@ -11826,7 +11826,7 @@ pub mod root {
             namelen: usize,
             desc: root::JS::Handle<root::JS::PropertyDescriptor>,
             result: *mut root::JS::ObjectOpResult,
-        ) -> bool { qjs_todo!("JS_DefineUCProperty") }
+        ) -> bool { crate::engine::JS_DefineUCProperty(cx, obj, name, namelen, desc, result) }
 
     
     pub unsafe extern "C" fn JS_DefineUCProperty1(
@@ -11915,7 +11915,7 @@ pub mod root {
             index: u32,
             value: root::JS::Handle<root::JS::Value>,
             attrs: ::std::os::raw::c_uint,
-        ) -> bool { qjs_todo!("JS_DefineElement") }
+        ) -> bool { crate::engine::JS_DefineElement(cx, obj, index, value, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineElement1(
@@ -11978,7 +11978,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             foundp: *mut bool,
-        ) -> bool { qjs_todo!("JS_HasPropertyById") }
+        ) -> bool { crate::engine::JS_HasPropertyById(cx, obj, id, foundp) }
 
     
     pub unsafe extern "C" fn JS_HasProperty(
@@ -11986,7 +11986,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             name: *const ::std::os::raw::c_char,
             foundp: *mut bool,
-        ) -> bool { qjs_todo!("JS_HasProperty") }
+        ) -> bool { crate::engine::JS_HasProperty(cx, obj, name, foundp) }
 
     
     pub unsafe extern "C" fn JS_HasUCProperty(
@@ -12011,7 +12011,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             foundp: *mut bool,
-        ) -> bool { qjs_todo!("JS_HasOwnPropertyById") }
+        ) -> bool { crate::engine::JS_HasOwnPropertyById(cx, obj, id, foundp) }
 
     
     pub unsafe extern "C" fn JS_HasOwnProperty(
@@ -12019,7 +12019,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             name: *const ::std::os::raw::c_char,
             foundp: *mut bool,
-        ) -> bool { qjs_todo!("JS_HasOwnProperty") }
+        ) -> bool { crate::engine::JS_HasOwnProperty(cx, obj, name, foundp) }
 
     #[doc = " Get the value of the property `obj[id]`, or undefined if no such property\n exists. This is the C++ equivalent of `vp = Reflect.get(obj, id, receiver)`.\n\n Most callers don't need the `receiver` argument. Consider using\n JS_GetProperty instead. (But if you're implementing a proxy handler's set()\n method, it's often correct to call this function and pass the receiver\n through.)\n\n Implements: ES6 [[Get]] internal method."]
     pub unsafe extern "C" fn JS_ForwardGetPropertyTo(
@@ -12045,7 +12045,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             vp: root::JS::MutableHandleValue,
-        ) -> bool { qjs_todo!("JS_GetPropertyById") }
+        ) -> bool { crate::engine::JS_GetPropertyById(cx, obj, id, vp) }
 
     
     pub unsafe extern "C" fn JS_GetProperty(
@@ -12053,7 +12053,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             name: *const ::std::os::raw::c_char,
             vp: root::JS::MutableHandleValue,
-        ) -> bool { qjs_todo!("JS_GetProperty") }
+        ) -> bool { crate::engine::JS_GetProperty(cx, obj, name, vp) }
 
     
     pub unsafe extern "C" fn JS_GetUCProperty(
@@ -12062,7 +12062,7 @@ pub mod root {
             name: *const u16,
             namelen: usize,
             vp: root::JS::MutableHandleValue,
-        ) -> bool { qjs_todo!("JS_GetUCProperty") }
+        ) -> bool { crate::engine::JS_GetUCProperty(cx, obj, name, namelen, vp) }
 
     
     pub unsafe extern "C" fn JS_GetElement(
@@ -12070,7 +12070,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             index: u32,
             vp: root::JS::MutableHandleValue,
-        ) -> bool { qjs_todo!("JS_GetElement") }
+        ) -> bool { crate::engine::JS_GetElement(cx, obj, index, vp) }
 
     #[doc = " Perform the same property assignment as `Reflect.set(obj, id, v, receiver)`.\n\n This function has a `receiver` argument that most callers don't need.\n Consider using JS_SetProperty instead.\n\n Implements: ES6 [[Set]] internal method."]
     pub unsafe extern "C" fn JS_ForwardSetPropertyTo(
@@ -12088,7 +12088,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             v: root::JS::Handle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_SetPropertyById") }
+        ) -> bool { crate::engine::JS_SetPropertyById(cx, obj, id, v) }
 
     
     pub unsafe extern "C" fn JS_SetProperty(
@@ -12096,7 +12096,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             name: *const ::std::os::raw::c_char,
             v: root::JS::Handle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_SetProperty") }
+        ) -> bool { crate::engine::JS_SetProperty(cx, obj, name, v) }
 
     
     pub unsafe extern "C" fn JS_SetUCProperty(
@@ -12105,7 +12105,7 @@ pub mod root {
             name: *const u16,
             namelen: usize,
             v: root::JS::Handle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_SetUCProperty") }
+        ) -> bool { crate::engine::JS_SetUCProperty(cx, obj, name, namelen, v) }
 
     
     pub unsafe extern "C" fn JS_SetElement(
@@ -12113,7 +12113,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             index: u32,
             v: root::JS::Handle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_SetElement") }
+        ) -> bool { crate::engine::JS_SetElement(cx, obj, index, v) }
 
     
     pub unsafe extern "C" fn JS_SetElement1(
@@ -12161,7 +12161,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             result: *mut root::JS::ObjectOpResult,
-        ) -> bool { qjs_todo!("JS_DeletePropertyById") }
+        ) -> bool { crate::engine::JS_DeletePropertyById(cx, obj, id, result) }
 
     
     pub unsafe extern "C" fn JS_DeleteProperty(
@@ -12169,7 +12169,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             name: *const ::std::os::raw::c_char,
             result: *mut root::JS::ObjectOpResult,
-        ) -> bool { qjs_todo!("JS_DeleteProperty") }
+        ) -> bool { crate::engine::JS_DeleteProperty(cx, obj, name, result) }
 
     
     pub unsafe extern "C" fn JS_DeleteUCProperty(
@@ -12230,7 +12230,7 @@ pub mod root {
             cx: *mut root::JSContext,
             obj: root::JS::Handle<*mut root::JSObject>,
             ps: *const root::JSPropertySpec,
-        ) -> bool { qjs_todo!("JS_DefineProperties") }
+        ) -> bool { crate::engine::JS_DefineProperties(cx, obj, ps) }
 
     
     pub unsafe extern "C" fn JS_AlreadyHasOwnPropertyById(
@@ -12238,7 +12238,7 @@ pub mod root {
             obj: root::JS::Handle<*mut root::JSObject>,
             id: root::JS::Handle<root::jsid>,
             foundp: *mut bool,
-        ) -> bool { qjs_todo!("JS_AlreadyHasOwnPropertyById") }
+        ) -> bool { crate::engine::JS_AlreadyHasOwnPropertyById(cx, obj, id, foundp) }
 
     
     pub unsafe extern "C" fn JS_AlreadyHasOwnProperty(
@@ -12270,7 +12270,7 @@ pub mod root {
             cx: *mut root::JSContext,
             obj: root::JS::Handle<*mut root::JSObject>,
             fs: *const root::JSFunctionSpec,
-        ) -> bool { qjs_todo!("JS_DefineFunctions") }
+        ) -> bool { crate::engine::JS_DefineFunctions(cx, obj, fs) }
 
     
     pub unsafe extern "C" fn JS_DefineFunction(
@@ -12280,7 +12280,7 @@ pub mod root {
             call: root::JSNative,
             nargs: ::std::os::raw::c_uint,
             attrs: ::std::os::raw::c_uint,
-        ) -> *mut root::JSFunction { qjs_todo!("JS_DefineFunction") }
+        ) -> *mut root::JSFunction { crate::engine::JS_DefineFunction(cx, obj, name, call, nargs, attrs) }
 
     
     pub unsafe extern "C" fn JS_DefineUCFunction(
@@ -12301,7 +12301,7 @@ pub mod root {
             call: root::JSNative,
             nargs: ::std::os::raw::c_uint,
             attrs: ::std::os::raw::c_uint,
-        ) -> *mut root::JSFunction { qjs_todo!("JS_DefineFunctionById") }
+        ) -> *mut root::JSFunction { crate::engine::JS_DefineFunctionById(cx, obj, id, call, nargs, attrs) }
 
     #[doc = " The property is visible in for/in loops."]
     pub const JSPROP_ENUMERATE: u8 = 1;
@@ -12742,7 +12742,7 @@ pub mod root {
             cx: *mut root::JSContext,
             v: root::JS::HandleValue,
             objp: root::JS::MutableHandleObject,
-        ) -> bool { qjs_todo!("JS_ValueToObject") }
+        ) -> bool { crate::engine::JS_ValueToObject(cx, v, objp) }
 
     
     pub unsafe extern "C" fn JS_ValueToFunction(
@@ -12947,7 +12947,7 @@ pub mod root {
     pub unsafe extern "C" fn JS_NewObject(
             cx: *mut root::JSContext,
             clasp: *const root::JSClass,
-        ) -> *mut root::JSObject { qjs_todo!("JS_NewObject") }
+        ) -> *mut root::JSObject { crate::engine::JS_NewObject(cx, clasp) }
 
     
     pub unsafe extern "C" fn JS_IsNative(obj: *mut root::JSObject) -> bool { qjs_todo!("JS_IsNative") }
@@ -12957,10 +12957,10 @@ pub mod root {
             cx: *mut root::JSContext,
             clasp: *const root::JSClass,
             proto: root::JS::Handle<*mut root::JSObject>,
-        ) -> *mut root::JSObject { qjs_todo!("JS_NewObjectWithGivenProto") }
+        ) -> *mut root::JSObject { crate::engine::JS_NewObjectWithGivenProto(cx, clasp, proto) }
 
     #[doc = " Creates a new plain object, like `new Object()`, with Object.prototype as\n [[Prototype]]."]
-    pub unsafe extern "C" fn JS_NewPlainObject(cx: *mut root::JSContext) -> *mut root::JSObject { qjs_todo!("JS_NewPlainObject") }
+    pub unsafe extern "C" fn JS_NewPlainObject(cx: *mut root::JSContext) -> *mut root::JSObject { crate::engine::JS_NewPlainObject(cx) }
 
     #[doc = " Freeze obj, and all objects it refers to, recursively. This will not recurse\n through non-extensible objects, on the assumption that those are already\n deep-frozen."]
     pub unsafe extern "C" fn JS_DeepFreezeObject(
@@ -12979,7 +12979,7 @@ pub mod root {
             cx: *mut root::JSContext,
             obj: root::JS::HandleObject,
             result: root::JS::MutableHandleObject,
-        ) -> bool { qjs_todo!("JS_GetPrototype") }
+        ) -> bool { crate::engine::JS_GetPrototype(cx, obj, result) }
 
     #[doc = " If |obj| (underneath any functionally-transparent wrapper proxies) has as\n its [[GetPrototypeOf]] trap the ordinary [[GetPrototypeOf]] behavior defined\n for ordinary objects, set |*isOrdinary = true| and store |obj|'s prototype\n in |result|.  Otherwise set |*isOrdinary = false|.  In case of error, both\n outparams have unspecified value."]
     pub unsafe extern "C" fn JS_GetPrototypeIfOrdinary(
@@ -12994,7 +12994,7 @@ pub mod root {
             cx: *mut root::JSContext,
             obj: root::JS::HandleObject,
             proto: root::JS::HandleObject,
-        ) -> bool { qjs_todo!("JS_SetPrototype") }
+        ) -> bool { crate::engine::JS_SetPrototype(cx, obj, proto) }
 
     #[doc = " Determine whether obj is extensible. Extensible objects can have new\n properties defined on them. Inextensible objects can't, and their\n [[Prototype]] slot is fixed as well.\n\n Implements: ES6 [[IsExtensible]] internal method."]
     pub unsafe extern "C" fn JS_IsExtensible(
@@ -13028,7 +13028,7 @@ pub mod root {
     pub unsafe extern "C" fn JS_SetAllNonReservedSlotsToUndefined(obj: root::JS::HandleObject) { qjs_todo!("JS_SetAllNonReservedSlotsToUndefined") }
 
     
-    pub unsafe extern "C" fn JS_SetReservedSlot(obj: *mut root::JSObject, index: u32, v: *const root::JS::Value) { qjs_todo!("JS_SetReservedSlot") }
+    pub unsafe extern "C" fn JS_SetReservedSlot(obj: *mut root::JSObject, index: u32, v: *const root::JS::Value) { crate::engine::JS_SetReservedSlot(obj, index, v) }
 
     
     pub unsafe extern "C" fn JS_InitReservedSlot(
@@ -13048,10 +13048,10 @@ pub mod root {
             nargs: ::std::os::raw::c_uint,
             flags: ::std::os::raw::c_uint,
             name: *const ::std::os::raw::c_char,
-        ) -> *mut root::JSFunction { qjs_todo!("JS_NewFunction") }
+        ) -> *mut root::JSFunction { crate::engine::JS_NewFunction(cx, call, nargs, flags, name) }
 
     
-    pub unsafe extern "C" fn JS_GetFunctionObject(fun: *mut root::JSFunction) -> *mut root::JSObject { qjs_todo!("JS_GetFunctionObject") }
+    pub unsafe extern "C" fn JS_GetFunctionObject(fun: *mut root::JSFunction) -> *mut root::JSObject { crate::engine::JS_GetFunctionObject(fun) }
 
     #[doc = " Return the function's identifier as a JSString, or null if fun is unnamed.\n\n The returned string lives as long as fun, so you don't need to root a saved\n reference to it if fun is well-connected or rooted, and provided you bound\n the use of the saved reference by fun's lifetime.\n\n This function returns false if any error happens while generating the\n function name string for a function with lazy name."]
     pub unsafe extern "C" fn JS_GetFunctionId(
@@ -15647,7 +15647,7 @@ pub mod root {
                 desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
                 holder: root::JS::MutableHandle<*mut root::JSObject>,
                 isNone: *mut bool,
-            ) -> bool { qjs_todo!("JS_GetPropertyDescriptor") }
+            ) -> bool { crate::engine::JS_GetPropertyDescriptor(cx, obj, name, desc, holder, isNone) }
 
         
         pub unsafe extern "C" fn JS_GetOwnPropertyDescriptorById(
@@ -15656,7 +15656,7 @@ pub mod root {
                 id: root::JS::HandleId,
                 desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
                 isNone: *mut bool,
-            ) -> bool { qjs_todo!("JS_GetOwnPropertyDescriptorById") }
+            ) -> bool { crate::engine::JS_GetOwnPropertyDescriptorById(cx, obj, id, desc, isNone) }
 
         
         pub unsafe extern "C" fn JS_GetOwnPropertyDescriptor(
@@ -15665,7 +15665,7 @@ pub mod root {
                 name: *const ::std::os::raw::c_char,
                 desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
                 isNone: *mut bool,
-            ) -> bool { qjs_todo!("JS_GetOwnPropertyDescriptor") }
+            ) -> bool { crate::engine::JS_GetOwnPropertyDescriptor(cx, obj, name, desc, isNone) }
 
         
         pub unsafe extern "C" fn JS_GetOwnUCPropertyDescriptor(
@@ -15685,7 +15685,7 @@ pub mod root {
                 desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
                 holder: root::JS::MutableHandleObject,
                 isNone: *mut bool,
-            ) -> bool { qjs_todo!("JS_GetPropertyDescriptorById") }
+            ) -> bool { crate::engine::JS_GetPropertyDescriptorById(cx, obj, id, desc, holder, isNone) }
 
         
         pub unsafe extern "C" fn JS_GetUCPropertyDescriptor(

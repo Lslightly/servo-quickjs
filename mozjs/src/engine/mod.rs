@@ -20,14 +20,18 @@ use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
 mod atom;
+mod class;
 mod eval;
 mod exception;
+mod property;
 mod realm;
 mod runtime;
 
 pub(crate) use atom::*;
+pub(crate) use class::*;
 pub(crate) use eval::*;
 pub(crate) use exception::*;
+pub(crate) use property::*;
 pub(crate) use realm::*;
 pub(crate) use runtime::*;
 
@@ -50,6 +54,8 @@ pub(crate) struct RealmData {
     pub global: *mut root::JSObject,
     pub private: *mut std::os::raw::c_void,
     pub principals: *mut root::JSPrincipals,
+    /// Reserved slots of the global (QuickJS's global object has no opaque of ours yet).
+    pub global_data: Option<Box<class::ObjectData>>,
 }
 
 thread_local!(static CURRENT: Cell<*mut Cx> = const { Cell::new(ptr::null_mut()) });

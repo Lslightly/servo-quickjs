@@ -81,6 +81,21 @@ def param_names(params):
 
 FN = re.compile(r"(?s)^(?P<attrs>.*?)(?P<vis>pub )fn (?P<name>\w+)\s*\((?P<params>.*)\)(?P<ret>\s*->\s*.*?)?;\s*$")
 STATIC = re.compile(r"(?s)^(?P<attrs>.*?)pub static (?P<mut>mut )?(?P<name>\w+):\s*(?P<ty>.*?);\s*$")
+def handle_value(tag, bits):
+    return (
+        "root::JS::Handle { _phantom_0: ::std::marker::PhantomData, "
+        f"ptr: &root::JS::Value {{ asBits_: {bits}, tag: {tag} }} as *const root::JS::Value }}"
+    )
+
+
+# Statics whose zeroed value would be wrong; values use QuickJS tags (null 2, undefined 3, bool 1).
+STATIC_INIT = {
+    "NullHandleValue": handle_value(2, 0),
+    "UndefinedHandleValue": handle_value(3, 0),
+    "TrueHandleValue": handle_value(1, 1),
+    "FalseHandleValue": handle_value(1, 0),
+}
+
 LINK_NAME = re.compile(r'#\[link_name = "(?:[^"\\]|\\.)*"\]\s*')
 
 
@@ -106,7 +121,8 @@ def convert_item(item, indent, implemented, stats):
         attrs = LINK_NAME.sub("", m.group("attrs"))
         # Raw pointers are never `Sync`; everything else gets an `unsafe impl Sync` in `sys`.
         mut = "mut " if m.group("mut") or m.group("ty").lstrip().startswith("*") else ""
-        return f"{indent}{attrs.strip()}\n{indent}pub static {mut}{m.group('name')}: {m.group('ty')} = unsafe {{ ::core::mem::zeroed() }};\n"
+        init = STATIC_INIT.get(m.group("name"), "unsafe { ::core::mem::zeroed() }")
+        return f"{indent}{attrs.strip()}\n{indent}pub static {mut}{m.group('name')}: {m.group('ty')} = {init};\n"
     raise ValueError("unrecognised extern item: " + text[:300])
 
 

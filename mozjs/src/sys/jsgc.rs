@@ -214,7 +214,9 @@ impl Initialize for *mut JS::Symbol {
 }
 
 impl GCMethods for *mut JS::Symbol {
-    unsafe fn post_barrier(_: *mut *mut JS::Symbol, _: *mut JS::Symbol, _: *mut JS::Symbol) {}
+    unsafe fn post_barrier(_: *mut *mut JS::Symbol, prev: *mut JS::Symbol, next: *mut JS::Symbol) {
+        crate::engine::heap_symbol_barrier(prev, next);
+    }
 }
 
 impl Initialize for *mut JS::BigInt {
@@ -248,7 +250,9 @@ impl Initialize for jsid {
 }
 
 impl GCMethods for jsid {
-    unsafe fn post_barrier(_: *mut jsid, _: jsid, _: jsid) {}
+    unsafe fn post_barrier(_: *mut jsid, prev: jsid, next: jsid) {
+        crate::engine::heap_id_barrier(prev, next);
+    }
 }
 
 impl Initialize for JS::Value {

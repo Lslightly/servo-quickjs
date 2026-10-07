@@ -866,28 +866,28 @@ pub mod root {
             trc: *mut root::JSTracer,
             valuep: *mut root::JS::Heap<root::JS::Value>,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallValueTracer") }
+        ) { crate::engine::CallValueTracer(trc, valuep, name) }
 
     
     pub unsafe extern "C" fn CallIdTracer(
             trc: *mut root::JSTracer,
             idp: *mut root::JS::Heap<root::jsid>,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallIdTracer") }
+        ) { crate::engine::CallIdTracer(trc, idp, name) }
 
     
     pub unsafe extern "C" fn CallObjectTracer(
             trc: *mut root::JSTracer,
             objp: *mut root::JS::Heap<*mut root::JSObject>,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallObjectTracer") }
+        ) { crate::engine::CallObjectTracer(trc, objp, name) }
 
     
     pub unsafe extern "C" fn CallStringTracer(
             trc: *mut root::JSTracer,
             strp: *mut root::JS::Heap<*mut root::JSString>,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallStringTracer") }
+        ) { crate::engine::CallStringTracer(trc, strp, name) }
 
     
     pub unsafe extern "C" fn CallSymbolTracer(
@@ -908,14 +908,14 @@ pub mod root {
             trc: *mut root::JSTracer,
             scriptp: *mut root::JS::Heap<*mut root::JSScript>,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallScriptTracer") }
+        ) { crate::engine::CallScriptTracer(trc, scriptp, name) }
 
     
     pub unsafe extern "C" fn CallFunctionTracer(
             trc: *mut root::JSTracer,
             funp: *mut root::JS::Heap<*mut root::JSFunction>,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallFunctionTracer") }
+        ) { crate::engine::CallFunctionTracer(trc, funp, name) }
 
     
     pub unsafe extern "C" fn CallUnbarrieredObjectTracer(
@@ -929,14 +929,14 @@ pub mod root {
             trc: *mut root::JSTracer,
             objp: *mut *mut root::JSObject,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallObjectRootTracer") }
+        ) { crate::engine::CallObjectRootTracer(trc, objp, name) }
 
     
     pub unsafe extern "C" fn CallValueRootTracer(
             trc: *mut root::JSTracer,
             valp: *mut root::JS::Value,
             name: *const ::std::os::raw::c_char,
-        ) { qjs_todo!("CallValueRootTracer") }
+        ) { crate::engine::CallValueRootTracer(trc, valp, name) }
 
     
     pub unsafe extern "C" fn CallPropertyDescriptorTracer(
@@ -1075,7 +1075,7 @@ pub mod root {
     pub unsafe extern "C" fn JS_GetEmptyStringValue(cx: *mut root::JSContext, dest: *mut root::JS::Value) { qjs_todo!("JS_GetEmptyStringValue") }
 
     
-    pub unsafe extern "C" fn JS_GetReservedSlot(obj: *mut root::JSObject, index: u32, dest: *mut root::JS::Value) { qjs_todo!("JS_GetReservedSlot") }
+    pub unsafe extern "C" fn JS_GetReservedSlot(obj: *mut root::JSObject, index: u32, dest: *mut root::JS::Value) { crate::engine::JS_GetReservedSlot(obj, index, dest) }
 
     
     pub unsafe extern "C" fn JS_GetRegExpFlags(

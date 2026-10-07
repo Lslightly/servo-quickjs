@@ -48,7 +48,7 @@ pub(crate) unsafe fn DeleteRealmOptions(options: *mut root::JS::RealmOptions) {
 
 pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const root::JSClass, principals: *mut root::JSPrincipals, hookOption: root::JS::OnNewGlobalHookOption, options: *const root::JS::RealmOptions) -> *mut root::JSObject {
     // TODO(qjs): make the global an instance of `clasp` (patch Q1) so it gets slots and hooks.
-    let _ = (clasp, hookOption, options);
+    let _ = (hookOption, options);
     let cx = Cx::from_raw(cx);
     let qctx = q::JS_NewContext(cx.rt);
     if qctx.is_null() {
@@ -63,7 +63,9 @@ pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const 
         global,
         private: ptr::null_mut(),
         principals,
+        global_data: None,
     }));
+    (*realm).global_data = Some(super::class::ObjectData::new(clasp, realm));
     q::JS_SetContextOpaque(qctx, realm as *mut _);
     GLOBALS.with(|g| g.borrow_mut().insert(global as usize, realm));
     global

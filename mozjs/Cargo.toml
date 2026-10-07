@@ -7,6 +7,10 @@ license = "MPL-2.0"
 description = "The mozjs (SpiderMonkey) API implemented on QuickJS, for Servo"
 publish = false
 
+[lib]
+# The bindgen doc comments contain C++ snippets.
+doctest = false
+
 [features]
 default = ["jit", "libz-sys", "intl"]
 # Accepted for compatibility with Servo's feature forwarding; no effect on QuickJS.
