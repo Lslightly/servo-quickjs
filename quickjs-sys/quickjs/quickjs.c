@@ -1424,6 +1424,9 @@ static void map_delete_weakrefs(JSRuntime *rt, JSWeakRefHeader *wh);
 static void weakref_delete_weakref(JSRuntime *rt, JSWeakRefHeader *wh);
 static void finrec_delete_weakref(JSRuntime *rt, JSWeakRefHeader *wh);
 static void JS_RunGCInternal(JSRuntime *rt, BOOL remove_weak_objects);
+#ifndef DUMP_LEAKS
+static void gc_free_all(JSRuntime *rt); /* Servo */
+#endif
 static JSValue js_array_from_iterator(JSContext *ctx, uint32_t *plen,
                                       JSValueConst obj, JSValueConst method);
 static int js_string_find_invalid_codepoint(JSString *p);
@@ -2458,6 +2461,12 @@ void JS_FreeRuntime(JSRuntime *rt)
     /* don't remove the weak objects to avoid create new jobs with
        FinalizationRegistry */
     JS_RunGCInternal(rt, FALSE);
+
+#ifndef DUMP_LEAKS
+    /* Servo: like SpiderMonkey when a runtime is destroyed, free the
+       objects the embedder still references */
+    gc_free_all(rt);
+#endif
 
 #ifdef DUMP_LEAKS
     /* leaking objects */
@@ -6881,6 +6890,25 @@ static void gc_free_cycles(JSRuntime *rt)
 
     init_list_head(&rt->gc_zero_ref_count_list);
 }
+
+#ifndef DUMP_LEAKS
+/* Servo: free every remaining GC object, whatever its reference count. Their
+   memory is released at the end, so finalizers may still release references
+   to the other objects being freed. */
+static void gc_free_all(JSRuntime *rt)
+{
+    struct list_head *el, *el1;
+    JSGCObjectHeader *p;
+
+    init_list_head(&rt->tmp_obj_list);
+    list_for_each_safe(el, el1, &rt->gc_obj_list) {
+        p = list_entry(el, JSGCObjectHeader, link);
+        list_del(&p->link);
+        list_add_tail(&p->link, &rt->tmp_obj_list);
+    }
+    gc_free_cycles(rt);
+}
+#endif
 
 static void JS_RunGCInternal(JSRuntime *rt, BOOL remove_weak_objects)
 {
