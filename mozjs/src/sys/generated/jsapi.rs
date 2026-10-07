@@ -212,51 +212,25 @@ pub mod root {
         pub struct input_iterator_tag {
             pub _bindgen_opaque_blob: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of input_iterator_tag"][::std::mem::size_of::<input_iterator_tag>() - 1usize];
-            ["Alignment of input_iterator_tag"]
-                [::std::mem::align_of::<input_iterator_tag>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[repr(align(1))]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct output_iterator_tag {
             pub _bindgen_opaque_blob: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of output_iterator_tag"][::std::mem::size_of::<output_iterator_tag>() - 1usize];
-            ["Alignment of output_iterator_tag"]
-                [::std::mem::align_of::<output_iterator_tag>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[repr(align(1))]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct forward_iterator_tag {
             pub _bindgen_opaque_blob: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of forward_iterator_tag"]
-                [::std::mem::size_of::<forward_iterator_tag>() - 1usize];
-            ["Alignment of forward_iterator_tag"]
-                [::std::mem::align_of::<forward_iterator_tag>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[repr(align(1))]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct random_access_iterator_tag {
             pub _bindgen_opaque_blob: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of random_access_iterator_tag"]
-                [::std::mem::size_of::<random_access_iterator_tag>() - 1usize];
-            ["Alignment of random_access_iterator_tag"]
-                [::std::mem::align_of::<random_access_iterator_tag>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct reverse_iterator {
             pub _address: u8,
@@ -276,12 +250,7 @@ pub mod root {
         pub struct nothrow_t {
             pub _bindgen_opaque_blob: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of nothrow_t"][::std::mem::size_of::<nothrow_t>() - 1usize];
-            ["Alignment of nothrow_t"][::std::mem::align_of::<nothrow_t>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct allocator {
             pub _address: u8,
@@ -448,65 +417,7 @@ pub mod root {
         pub _mode: ::std::os::raw::c_int,
         pub _unused2: [::std::os::raw::c_char; 20usize],
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of _IO_FILE"][::std::mem::size_of::<_IO_FILE>() - 216usize];
-        ["Alignment of _IO_FILE"][::std::mem::align_of::<_IO_FILE>() - 8usize];
-        ["Offset of field: _IO_FILE::_flags"][::std::mem::offset_of!(_IO_FILE, _flags) - 0usize];
-        ["Offset of field: _IO_FILE::_IO_read_ptr"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_read_ptr) - 8usize];
-        ["Offset of field: _IO_FILE::_IO_read_end"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_read_end) - 16usize];
-        ["Offset of field: _IO_FILE::_IO_read_base"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_read_base) - 24usize];
-        ["Offset of field: _IO_FILE::_IO_write_base"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_write_base) - 32usize];
-        ["Offset of field: _IO_FILE::_IO_write_ptr"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_write_ptr) - 40usize];
-        ["Offset of field: _IO_FILE::_IO_write_end"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_write_end) - 48usize];
-        ["Offset of field: _IO_FILE::_IO_buf_base"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_buf_base) - 56usize];
-        ["Offset of field: _IO_FILE::_IO_buf_end"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_buf_end) - 64usize];
-        ["Offset of field: _IO_FILE::_IO_save_base"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_save_base) - 72usize];
-        ["Offset of field: _IO_FILE::_IO_backup_base"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_backup_base) - 80usize];
-        ["Offset of field: _IO_FILE::_IO_save_end"]
-            [::std::mem::offset_of!(_IO_FILE, _IO_save_end) - 88usize];
-        ["Offset of field: _IO_FILE::_markers"]
-            [::std::mem::offset_of!(_IO_FILE, _markers) - 96usize];
-        ["Offset of field: _IO_FILE::_chain"][::std::mem::offset_of!(_IO_FILE, _chain) - 104usize];
-        ["Offset of field: _IO_FILE::_fileno"]
-            [::std::mem::offset_of!(_IO_FILE, _fileno) - 112usize];
-        ["Offset of field: _IO_FILE::_flags2"]
-            [::std::mem::offset_of!(_IO_FILE, _flags2) - 116usize];
-        ["Offset of field: _IO_FILE::_old_offset"]
-            [::std::mem::offset_of!(_IO_FILE, _old_offset) - 120usize];
-        ["Offset of field: _IO_FILE::_cur_column"]
-            [::std::mem::offset_of!(_IO_FILE, _cur_column) - 128usize];
-        ["Offset of field: _IO_FILE::_vtable_offset"]
-            [::std::mem::offset_of!(_IO_FILE, _vtable_offset) - 130usize];
-        ["Offset of field: _IO_FILE::_shortbuf"]
-            [::std::mem::offset_of!(_IO_FILE, _shortbuf) - 131usize];
-        ["Offset of field: _IO_FILE::_lock"][::std::mem::offset_of!(_IO_FILE, _lock) - 136usize];
-        ["Offset of field: _IO_FILE::_offset"]
-            [::std::mem::offset_of!(_IO_FILE, _offset) - 144usize];
-        ["Offset of field: _IO_FILE::_codecvt"]
-            [::std::mem::offset_of!(_IO_FILE, _codecvt) - 152usize];
-        ["Offset of field: _IO_FILE::_wide_data"]
-            [::std::mem::offset_of!(_IO_FILE, _wide_data) - 160usize];
-        ["Offset of field: _IO_FILE::_freeres_list"]
-            [::std::mem::offset_of!(_IO_FILE, _freeres_list) - 168usize];
-        ["Offset of field: _IO_FILE::_freeres_buf"]
-            [::std::mem::offset_of!(_IO_FILE, _freeres_buf) - 176usize];
-        ["Offset of field: _IO_FILE::__pad5"][::std::mem::offset_of!(_IO_FILE, __pad5) - 184usize];
-        ["Offset of field: _IO_FILE::_mode"][::std::mem::offset_of!(_IO_FILE, _mode) - 192usize];
-        ["Offset of field: _IO_FILE::_unused2"]
-            [::std::mem::offset_of!(_IO_FILE, _unused2) - 196usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct __pthread_rwlock_arch_t {
         pub __readers: ::std::os::raw::c_uint,
@@ -522,56 +433,14 @@ pub mod root {
         pub __pad2: ::std::os::raw::c_ulong,
         pub __flags: ::std::os::raw::c_uint,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of __pthread_rwlock_arch_t"]
-            [::std::mem::size_of::<__pthread_rwlock_arch_t>() - 56usize];
-        ["Alignment of __pthread_rwlock_arch_t"]
-            [::std::mem::align_of::<__pthread_rwlock_arch_t>() - 8usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__readers"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __readers) - 0usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__writers"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __writers) - 4usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__wrphase_futex"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __wrphase_futex) - 8usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__writers_futex"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __writers_futex) - 12usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad3"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad3) - 16usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad4"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad4) - 20usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__cur_writer"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __cur_writer) - 24usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__shared"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __shared) - 28usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__rwelision"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __rwelision) - 32usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad1"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad1) - 33usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad2"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad2) - 40usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__flags"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __flags) - 48usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Copy, Clone)]
     pub union pthread_rwlock_t {
         pub __data: root::__pthread_rwlock_arch_t,
         pub __size: [::std::os::raw::c_char; 56usize],
         pub __align: ::std::os::raw::c_long,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of pthread_rwlock_t"][::std::mem::size_of::<pthread_rwlock_t>() - 56usize];
-        ["Alignment of pthread_rwlock_t"][::std::mem::align_of::<pthread_rwlock_t>() - 8usize];
-        ["Offset of field: pthread_rwlock_t::__data"]
-            [::std::mem::offset_of!(pthread_rwlock_t, __data) - 0usize];
-        ["Offset of field: pthread_rwlock_t::__size"]
-            [::std::mem::offset_of!(pthread_rwlock_t, __size) - 0usize];
-        ["Offset of field: pthread_rwlock_t::__align"]
-            [::std::mem::offset_of!(pthread_rwlock_t, __align) - 0usize];
-    };
-    pub mod mozilla {
+        pub mod mozilla {
         #[allow(unused_imports)]
         use self::super::super::root;
         pub mod detail {
@@ -594,14 +463,7 @@ pub mod root {
             pub struct HasPointerTypeHelper {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of HasPointerTypeHelper"]
-                    [::std::mem::size_of::<HasPointerTypeHelper>() - 1usize];
-                ["Alignment of HasPointerTypeHelper"]
-                    [::std::mem::align_of::<HasPointerTypeHelper>() - 1usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct HasPointerType {
                 pub _address: u8,
@@ -640,16 +502,7 @@ pub mod root {
                 pub mBuf: *mut ::std::os::raw::c_char,
                 pub mBufLen: usize,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of SprintfAppend"][::std::mem::size_of::<SprintfAppend>() - 32usize];
-                ["Alignment of SprintfAppend"][::std::mem::align_of::<SprintfAppend>() - 8usize];
-                ["Offset of field: SprintfAppend::mBuf"]
-                    [::std::mem::offset_of!(SprintfAppend, mBuf) - 16usize];
-                ["Offset of field: SprintfAppend::mBufLen"]
-                    [::std::mem::offset_of!(SprintfAppend, mBufLen) - 24usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct LazyAssertedCastT<From> {
                 pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<From>>,
@@ -660,44 +513,12 @@ pub mod root {
             pub struct AllowDeprecatedAbsFixed {
                 pub _base: root::std::false_type,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbsFixed_open0_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbsFixed_open0_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbsFixed_open0_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbsFixed_open0_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-            };
-            #[repr(C)]
+                                    #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct AllowDeprecatedAbs {
                 pub _base: root::mozilla::detail::AllowDeprecatedAbsFixed,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbs_open0_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbs_open0_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbs_open0_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbs_open0_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-            };
-            #[repr(C)]
+                                    #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct AbsReturnType {
                 pub _address: u8,
@@ -707,40 +528,12 @@ pub mod root {
             pub struct FloatingPointTrait {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: FloatingPointTrait_open0_float_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-                ["Align of template specialization: FloatingPointTrait_open0_float_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: FloatingPointTrait_open0_double_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-                ["Align of template specialization: FloatingPointTrait_open0_double_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-            };
-            #[repr(C)]
+                                    #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct FuzzyEqualsEpsilon {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: FuzzyEqualsEpsilon_open0_float_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::FuzzyEqualsEpsilon>() - 1usize];
-                ["Align of template specialization: FuzzyEqualsEpsilon_open0_float_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::FuzzyEqualsEpsilon>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: FuzzyEqualsEpsilon_open0_double_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::FuzzyEqualsEpsilon>() - 1usize];
-                ["Align of template specialization: FuzzyEqualsEpsilon_open0_double_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::FuzzyEqualsEpsilon>() - 1usize];
-            };
-            #[repr(C)]
+                                    #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct MaybePoisoner {
                 pub _address: u8,
@@ -763,21 +556,7 @@ pub mod root {
                 pub _address: u8,
             }
             pub type MakeUnsignedChar_Type = u8;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: MakeUnsignedChar_open0_char16_t_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-                ["Align of template specialization: MakeUnsignedChar_open0_char16_t_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: MakeUnsignedChar_open0_char32_t_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-                ["Align of template specialization: MakeUnsignedChar_open0_char32_t_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-            };
-            #[repr(C)]
+                                    #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct WrapToSignedHelper {
                 pub _address: u8,
@@ -889,14 +668,7 @@ pub mod root {
             pub struct HasFreeLSB {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: HasFreeLSB_open0_ptr_void_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-                ["Align of template specialization: HasFreeLSB_open0_ptr_void_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct SelectResultImpl {
                 pub _address: u8,
@@ -907,35 +679,7 @@ pub mod root {
             pub struct IsResult {
                 pub _base: root::std::false_type,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: UnusedZero_open0_Error_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::UnusedZero>() - 1usize];
-                ["Align of template specialization: UnusedZero_open0_Error_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::UnusedZero>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: UnusedZero_open0_OOM_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::UnusedZero>() - 1usize];
-                ["Align of template specialization: UnusedZero_open0_OOM_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::UnusedZero>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: HasFreeLSB_open0_Error_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-                ["Align of template specialization: HasFreeLSB_open0_Error_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: HasFreeLSB_open0_OOM_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-                ["Align of template specialization: HasFreeLSB_open0_OOM_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-            };
-            pub type IntrinsicBase_ValueType = u8;
+                                                            pub type IntrinsicBase_ValueType = u8;
             pub type IntrinsicBase_OrderedOp = u8;
             pub type IntrinsicMemoryOps_Base = u8;
             pub type IntrinsicAddSub_Base = u8;
@@ -1088,19 +832,7 @@ pub mod root {
             pub struct RefCountLogger_ReleaseLogger {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of RefCountLogger_ReleaseLogger"]
-                    [::std::mem::size_of::<RefCountLogger_ReleaseLogger>() - 1usize];
-                ["Alignment of RefCountLogger_ReleaseLogger"]
-                    [::std::mem::align_of::<RefCountLogger_ReleaseLogger>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of RefCountLogger"][::std::mem::size_of::<RefCountLogger>() - 1usize];
-                ["Alignment of RefCountLogger"][::std::mem::align_of::<RefCountLogger>() - 1usize];
-            };
-            #[repr(u32)]
+                                    #[repr(u32)]
             #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
             pub enum RefCountAtomicity {
                 AtomicRefCount = 0,
@@ -1117,14 +849,7 @@ pub mod root {
             pub struct HasReceiverTypeHelper {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of HasReceiverTypeHelper"]
-                    [::std::mem::size_of::<HasReceiverTypeHelper>() - 1usize];
-                ["Alignment of HasReceiverTypeHelper"]
-                    [::std::mem::align_of::<HasReceiverTypeHelper>() - 1usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct HasReceiverType {
                 pub _address: u8,
@@ -1160,36 +885,16 @@ pub mod root {
             pub struct MutexImpl_PlatformData {
                 _unused: [u8; 0],
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of MutexImpl"][::std::mem::size_of::<MutexImpl>() - 40usize];
-                ["Alignment of MutexImpl"][::std::mem::align_of::<MutexImpl>() - 8usize];
-                ["Offset of field: MutexImpl::platformData_"]
-                    [::std::mem::offset_of!(MutexImpl, platformData_) - 0usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             pub struct RWLockImpl {
                 pub mRWLock: root::pthread_rwlock_t,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of RWLockImpl"][::std::mem::size_of::<RWLockImpl>() - 56usize];
-                ["Alignment of RWLockImpl"][::std::mem::align_of::<RWLockImpl>() - 8usize];
-                ["Offset of field: RWLockImpl::mRWLock"]
-                    [::std::mem::offset_of!(RWLockImpl, mRWLock) - 0usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct UnsupportedType {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of UnsupportedType"][::std::mem::size_of::<UnsupportedType>() - 1usize];
-                ["Alignment of UnsupportedType"]
-                    [::std::mem::align_of::<UnsupportedType>() - 1usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct IsSupportedPass2 {
                 pub _address: u8,
@@ -1199,137 +904,7 @@ pub mod root {
             pub struct IsSupported {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_signed_char_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_signed_char_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_unsigned_char_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_unsigned_char_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_short_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_short_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_unsigned_short_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_unsigned_short_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_unsigned_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_unsigned_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupported_open0_unsigned_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupported>() - 1usize];
-                ["Align of template specialization: IsSupported_open0_unsigned_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupported>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_char_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_char_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_signed_char_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_signed_char_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_unsigned_char_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_unsigned_char_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_short_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_short_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_unsigned_short_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_unsigned_short_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: detail :: IsSupportedPass2 > () - 1usize] ;
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_unsigned_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_unsigned_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_unsigned_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_unsigned_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_long_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_long_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_unsigned_long_long_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: detail :: IsSupportedPass2 > () - 1usize] ;
-                ["Align of template specialization: IsSupportedPass2_open0_unsigned_long_long_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: detail :: IsSupportedPass2 > () - 1usize] ;
-            };
-            pub type TwiceBiggerType_Type = u8;
+                                                                                                                                                                                                                                                pub type TwiceBiggerType_Type = u8;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct CastToCheckedIntImpl {
@@ -1337,21 +912,7 @@ pub mod root {
             }
             #[doc = " @class CheckedInt\n @brief Integer wrapper class checking for integer overflow and other errors\n @param T the integer type to wrap. Can be any type among the following:\n            - any basic integer type such as |int|\n            - any stdint type such as |int8_t|\n\n This class implements guarded integer arithmetic. Do a computation, check\n that isValid() returns true, you then have a guarantee that no problem, such\n as integer overflow, happened during this computation, and you can call\n value() to get the plain integer value.\n\n The arithmetic operators in this class are guaranteed not to raise a signal\n (e.g. in case of a division by zero).\n\n For example, suppose that you want to implement a function that computes\n (aX+aY)/aZ, that doesn't crash if aZ==0, and that reports on error (divide by\n zero or integer overflow). You could code it as follows:\n@code\nbool computeXPlusYOverZ(int aX, int aY, int aZ, int* aResult)\n{\nCheckedInt<int> checkedResult = (CheckedInt<int>(aX) + aY) / aZ;\nif (checkedResult.isValid()) {\naResult = checkedResult.value();\nreturn true;\n} else {\nreturn false;\n}\n}\n@endcode\n\n Implicit conversion from plain integers to checked integers is allowed. The\n plain integer is checked to be in range before being casted to the\n destination type. This means that the following lines all compile, and the\n resulting CheckedInts are correctly detected as valid or invalid:\n @code\n// 1 is of type int, is found to be in range for uint8_t, x is valid\nCheckedInt<uint8_t> x(1);\n// -1 is of type int, is found not to be in range for uint8_t, x is invalid\nCheckedInt<uint8_t> x(-1);\n// -1 is of type int, is found to be in range for int8_t, x is valid\nCheckedInt<int8_t> x(-1);\n// 1000 is of type int16_t, is found not to be in range for int8_t,\n// x is invalid\nCheckedInt<int8_t> x(int16_t(1000));\n// 3123456789 is of type uint32_t, is found not to be in range for int32_t,\n// x is invalid\nCheckedInt<int32_t> x(uint32_t(3123456789));\n @endcode\n Implicit conversion from\n checked integers to plain integers is not allowed. As shown in the\n above example, to get the value of a checked integer as a normal integer,\n call value().\n\n Arithmetic operations between checked and plain integers is allowed; the\n result type is the type of the checked integer.\n\n Checked integers of different types cannot be used in the same arithmetic\n expression.\n\n There are convenience typedefs for all stdint types, of the following form\n (these are just 2 examples):\n@code\ntypedef CheckedInt<int32_t> CheckedInt32;\ntypedef CheckedInt<uint16_t> CheckedUint16;\n@endcode"]
             pub type CastToCheckedIntImpl_ReturnType<T> = root::mozilla::CheckedInt<T>;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: HasFreeLSB_open0_ptr_JSString_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-                ["Align of template specialization: HasFreeLSB_open0_ptr_JSString_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: HasFreeLSB_open0_ptr_JSObject_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-                ["Align of template specialization: HasFreeLSB_open0_ptr_JSObject_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
-            };
-        }
+                                }
         pub mod tl {
             #[allow(unused_imports)]
             use self::super::super::super::root;
@@ -1391,23 +952,12 @@ pub mod root {
         pub struct MallocAllocPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MallocAllocPolicy"][::std::mem::size_of::<MallocAllocPolicy>() - 1usize];
-            ["Alignment of MallocAllocPolicy"]
-                [::std::mem::align_of::<MallocAllocPolicy>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NeverAllocPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of NeverAllocPolicy"][::std::mem::size_of::<NeverAllocPolicy>() - 1usize];
-            ["Alignment of NeverAllocPolicy"][::std::mem::align_of::<NeverAllocPolicy>() - 1usize];
-        };
-        #[doc = " CompactPair is the logical concatenation of an instance of A with an instance\n B. Space is conserved when possible.  Neither A nor B may be a final class.\n\n In general if space conservation is not critical is preferred to use\n std::pair.\n\n It's typically clearer to have individual A and B member fields.  Except if\n you want the space-conserving qualities of CompactPair, you're probably\n better off not using this!\n\n No guarantees are provided about the memory layout of A and B, the order of\n initialization or destruction of A and B, and so on.  (This is approximately\n required to optimize space usage.)  The first/second names are merely\n conceptual!"]
+                #[doc = " CompactPair is the logical concatenation of an instance of A with an instance\n B. Space is conserved when possible.  Neither A nor B may be a final class.\n\n In general if space conservation is not critical is preferred to use\n std::pair.\n\n It's typically clearer to have individual A and B member fields.  Except if\n you want the space-conserving qualities of CompactPair, you're probably\n better off not using this!\n\n No guarantees are provided about the memory layout of A and B, the order of\n initialization or destruction of A and B, and so on.  (This is approximately\n required to optimize space usage.)  The first/second names are merely\n conceptual!"]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct CompactPair {
@@ -1437,14 +987,7 @@ pub mod root {
             pub vtable_: *const PrintfTarget__bindgen_vtable,
             pub mEmitted: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PrintfTarget"][::std::mem::size_of::<PrintfTarget>() - 16usize];
-            ["Alignment of PrintfTarget"][::std::mem::align_of::<PrintfTarget>() - 8usize];
-            ["Offset of field: PrintfTarget::mEmitted"]
-                [::std::mem::offset_of!(PrintfTarget, mEmitted) - 8usize];
-        };
-        pub type SmprintfPolicyPointer = u8;
+                pub type SmprintfPolicyPointer = u8;
         pub type SmprintfPointer = u8;
         #[repr(C)]
         #[derive(Debug, PartialEq)]
@@ -1487,37 +1030,18 @@ pub mod root {
             pub mValue: usize,
         }
         pub const CorruptionCanaryForStatics_kCanarySet: usize = 252382987;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CorruptionCanaryForStatics"]
-                [::std::mem::size_of::<CorruptionCanaryForStatics>() - 8usize];
-            ["Alignment of CorruptionCanaryForStatics"]
-                [::std::mem::align_of::<CorruptionCanaryForStatics>() - 8usize];
-            ["Offset of field: CorruptionCanaryForStatics::mValue"]
-                [::std::mem::offset_of!(CorruptionCanaryForStatics, mValue) - 0usize];
-        };
-        #[doc = " This class is designed to cause crashes when various kinds of memory\n corruption are observed. For instance, let's say we have a class C where we\n suspect out-of-bounds writes to some members.  We can insert a member of type\n Poison near the members we suspect are being corrupted by out-of-bounds\n writes.  Or perhaps we have a class K we suspect is subject to use-after-free\n violations, in which case it doesn't particularly matter where in the class\n we add the member of type Poison.\n\n In either case, we then insert calls to Check() throughout the code.  Doing\n so enables us to narrow down the location where the corruption is occurring.\n A pleasant side-effect of these additional Check() calls is that crash\n signatures may become more regular, as crashes will ideally occur\n consolidated at the point of a Check(), rather than scattered about at\n various uses of the corrupted memory."]
+                #[doc = " This class is designed to cause crashes when various kinds of memory\n corruption are observed. For instance, let's say we have a class C where we\n suspect out-of-bounds writes to some members.  We can insert a member of type\n Poison near the members we suspect are being corrupted by out-of-bounds\n writes.  Or perhaps we have a class K we suspect is subject to use-after-free\n violations, in which case it doesn't particularly matter where in the class\n we add the member of type Poison.\n\n In either case, we then insert calls to Check() throughout the code.  Doing\n so enables us to narrow down the location where the corruption is occurring.\n A pleasant side-effect of these additional Check() calls is that crash\n signatures may become more regular, as crashes will ideally occur\n consolidated at the point of a Check(), rather than scattered about at\n various uses of the corrupted memory."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct CorruptionCanary {
             pub _base: root::mozilla::CorruptionCanaryForStatics,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CorruptionCanary"][::std::mem::size_of::<CorruptionCanary>() - 8usize];
-            ["Alignment of CorruptionCanary"][::std::mem::align_of::<CorruptionCanary>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Nothing {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Nothing"][::std::mem::size_of::<Nothing>() - 1usize];
-            ["Alignment of Nothing"][::std::mem::align_of::<Nothing>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Maybe {
             pub _address: u8,
@@ -1569,13 +1093,7 @@ pub mod root {
             pub struct SpanKnownBounds {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of SpanKnownBounds"][::std::mem::size_of::<SpanKnownBounds>() - 1usize];
-                ["Alignment of SpanKnownBounds"]
-                    [::std::mem::align_of::<SpanKnownBounds>() - 1usize];
-            };
-            pub type span_iterator_element_type_ = root::__BindgenOpaqueArray<u8, 0usize>;
+                        pub type span_iterator_element_type_ = root::__BindgenOpaqueArray<u8, 0usize>;
             pub type span_iterator_iterator_category = root::std::random_access_iterator_tag;
             pub type span_iterator_value_type = u8;
             pub type span_iterator_difference_type = isize;
@@ -1637,14 +1155,7 @@ pub mod root {
         pub struct BaseTimeDurationPlatformUtils {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of BaseTimeDurationPlatformUtils"]
-                [::std::mem::size_of::<BaseTimeDurationPlatformUtils>() - 1usize];
-            ["Alignment of BaseTimeDurationPlatformUtils"]
-                [::std::mem::align_of::<BaseTimeDurationPlatformUtils>() - 1usize];
-        };
-        #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a int64_t in units of\n PR_TicksPerSecond() when building with NSPR interval timers, or a\n system-dependent unit when building with system clocks.  The\n system-dependent unit must be constant, otherwise the semantics of\n this class would be broken.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
+                #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a int64_t in units of\n PR_TicksPerSecond() when building with NSPR interval timers, or a\n system-dependent unit when building with system clocks.  The\n system-dependent unit must be constant, otherwise the semantics of\n this class would be broken.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BaseTimeDuration {
@@ -1661,14 +1172,7 @@ pub mod root {
         pub struct TimeDurationValueCalculator {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TimeDurationValueCalculator"]
-                [::std::mem::size_of::<TimeDurationValueCalculator>() - 1usize];
-            ["Alignment of TimeDurationValueCalculator"]
-                [::std::mem::align_of::<TimeDurationValueCalculator>() - 1usize];
-        };
-        #[doc = " Specialization of BaseTimeDuration that uses TimeDurationValueCalculator for\n arithmetic on the mValue member.\n\n Use this class for time durations that are *not* expected to hold values of\n Forever (or the negative equivalent) or when such time duration are *not*\n expected to be used in arithmetic operations."]
+                #[doc = " Specialization of BaseTimeDuration that uses TimeDurationValueCalculator for\n arithmetic on the mValue member.\n\n Use this class for time durations that are *not* expected to hold values of\n Forever (or the negative equivalent) or when such time duration are *not*\n expected to be used in arithmetic operations."]
         pub type TimeDuration = root::mozilla::BaseTimeDuration;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -1678,27 +1182,13 @@ pub mod root {
         }
         #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a int64_t in units of\n PR_TicksPerSecond() when building with NSPR interval timers, or a\n system-dependent unit when building with system clocks.  The\n system-dependent unit must be constant, otherwise the semantics of\n this class would be broken.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
         pub type TimeStamp_DurationType = root::mozilla::TimeDuration;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TimeStamp"][::std::mem::size_of::<TimeStamp>() - 8usize];
-            ["Alignment of TimeStamp"][::std::mem::align_of::<TimeStamp>() - 8usize];
-            ["Offset of field: TimeStamp::mValue"]
-                [::std::mem::offset_of!(TimeStamp, mValue) - 0usize];
-        };
-        #[doc = " A code unit within a UTF-8 encoded string.  (A code unit is the smallest\n unit within the Unicode encoding of a string.  For UTF-8 this is an 8-bit\n number; for UTF-16 it would be a 16-bit number.)\n\n This is *not* the same as a single code point: in UTF-8, non-ASCII code\n points are constituted by multiple code units."]
+                #[doc = " A code unit within a UTF-8 encoded string.  (A code unit is the smallest\n unit within the Unicode encoding of a string.  For UTF-8 this is an 8-bit\n number; for UTF-16 it would be a 16-bit number.)\n\n This is *not* the same as a single code point: in UTF-8, non-ASCII code\n points are constituted by multiple code units."]
         #[repr(C)]
         #[derive(Copy, Clone)]
         pub union Utf8Unit {
             pub mValue: ::std::os::raw::c_char,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Utf8Unit"][::std::mem::size_of::<Utf8Unit>() - 1usize];
-            ["Alignment of Utf8Unit"][::std::mem::align_of::<Utf8Unit>() - 1usize];
-            ["Offset of field: Utf8Unit::mValue"]
-                [::std::mem::offset_of!(Utf8Unit, mValue) - 0usize];
-        };
-        pub type HashNumber = u32;
+                pub type HashNumber = u32;
         #[doc = " A pseudorandom function mapping 32-bit integers to 32-bit integers.\n\n This is for when you're feeding private data (like pointer values or credit\n card numbers) to a non-crypto hash function (like HashBytes) and then using\n the hash code for something that untrusted parties could observe (like a JS\n Map). Plug in a HashCodeScrambler before that last step to avoid leaking the\n private data.\n\n By itself, this does not prevent hash-flooding DoS attacks, because an\n attacker can still generate many values with exactly equal hash codes by\n attacking the non-crypto hash function alone. Equal hash codes will, of\n course, still be equal however much you scramble them.\n\n The algorithm is SipHash-1-3. See <https://131002.net/siphash/>."]
         #[repr(C)]
         #[repr(align(8))]
@@ -1712,20 +1202,7 @@ pub mod root {
         pub struct HashCodeScrambler_SipHasher {
             pub _bindgen_opaque_blob: [u64; 4usize],
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HashCodeScrambler_SipHasher"]
-                [::std::mem::size_of::<HashCodeScrambler_SipHasher>() - 32usize];
-            ["Alignment of HashCodeScrambler_SipHasher"]
-                [::std::mem::align_of::<HashCodeScrambler_SipHasher>() - 8usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HashCodeScrambler"][::std::mem::size_of::<HashCodeScrambler>() - 16usize];
-            ["Alignment of HashCodeScrambler"]
-                [::std::mem::align_of::<HashCodeScrambler>() - 8usize];
-        };
-        pub mod ipc {
+                        pub mod ipc {
             #[allow(unused_imports)]
             use self::super::super::super::root;
             #[repr(C)]
@@ -1757,24 +1234,13 @@ pub mod root {
         pub struct Ok {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Ok"][::std::mem::size_of::<Ok>() - 1usize];
-            ["Alignment of Ok"][::std::mem::align_of::<Ok>() - 1usize];
-        };
-        #[doc = " A tag used to differentiate between GenericErrorResult created by the Err\n function (completely new error) and GenericErrorResult created by the\n Result::propagateErr function (propagated error). This can be used to track\n error propagation and eventually produce error stacks for logging/debugging\n purposes."]
+                #[doc = " A tag used to differentiate between GenericErrorResult created by the Err\n function (completely new error) and GenericErrorResult created by the\n Result::propagateErr function (propagated error). This can be used to track\n error propagation and eventually produce error stacks for logging/debugging\n purposes."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ErrorPropagationTag {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ErrorPropagationTag"][::std::mem::size_of::<ErrorPropagationTag>() - 1usize];
-            ["Alignment of ErrorPropagationTag"]
-                [::std::mem::align_of::<ErrorPropagationTag>() - 1usize];
-        };
-        #[doc = " Result<V, E> represents the outcome of an operation that can either succeed\n or fail. It contains either a success value of type V or an error value of\n type E.\n\n All Result methods are const, so results are basically immutable.\n This is just like Variant<V, E> but with a slightly different API, and the\n following cases are optimized so Result can be stored more efficiently:\n\n - If both the success and error types do not use their least significant bit,\n are trivially copyable and destructible, Result<V, E> is guaranteed to be as\n large as the larger type. This is determined via the HasFreeLSB trait. By\n default, empty classes (in particular Ok) and aligned pointer types are\n assumed to have a free LSB, but you can specialize this trait for other\n types. If the success type is empty, the representation is guaranteed to be\n all zero bits on success. Do not change this representation! There is JIT\n code that depends on it. (Implementation note: The lowest bit is used as a\n tag bit: 0 to indicate the Result's bits are a success value, 1 to indicate\n the Result's bits (with the 1 masked out) encode an error value)\n\n - Else, if the error type can't have a all-zero bits representation and is\n not larger than a pointer, a CompactPair is used to represent this rather\n than a Variant. This has shown to be better optimizable, and the template\n code is much simpler than that of Variant, so it should also compile faster.\n Whether an error type can't be all-zero bits, is determined via the\n UnusedZero trait. MFBT doesn't declare any public type UnusedZero, but\n nsresult is declared UnusedZero in XPCOM.\n\n The purpose of Result is to reduce the screwups caused by using `false` or\n `nullptr` to indicate errors.\n What screwups? See <https://bugzilla.mozilla.org/show_bug.cgi?id=912928> for\n a partial list.\n\n Result<const V, E> or Result<V, const E> are not meaningful. The success or\n error values in a Result instance are non-modifiable in-place anyway. This\n guarantee must also be maintained when evolving Result. They can be\n unwrap()ped, but this loses const qualification. However, Result<const V, E>\n or Result<V, const E> may be misleading and prevent movability. Just use\n Result<V, E>. (Result<const V*, E> may make sense though, just Result<const\n V* const, E> is not possible.)"]
+                #[doc = " Result<V, E> represents the outcome of an operation that can either succeed\n or fail. It contains either a success value of type V or an error value of\n type E.\n\n All Result methods are const, so results are basically immutable.\n This is just like Variant<V, E> but with a slightly different API, and the\n following cases are optimized so Result can be stored more efficiently:\n\n - If both the success and error types do not use their least significant bit,\n are trivially copyable and destructible, Result<V, E> is guaranteed to be as\n large as the larger type. This is determined via the HasFreeLSB trait. By\n default, empty classes (in particular Ok) and aligned pointer types are\n assumed to have a free LSB, but you can specialize this trait for other\n types. If the success type is empty, the representation is guaranteed to be\n all zero bits on success. Do not change this representation! There is JIT\n code that depends on it. (Implementation note: The lowest bit is used as a\n tag bit: 0 to indicate the Result's bits are a success value, 1 to indicate\n the Result's bits (with the 1 masked out) encode an error value)\n\n - Else, if the error type can't have a all-zero bits representation and is\n not larger than a pointer, a CompactPair is used to represent this rather\n than a Variant. This has shown to be better optimizable, and the template\n code is much simpler than that of Variant, so it should also compile faster.\n Whether an error type can't be all-zero bits, is determined via the\n UnusedZero trait. MFBT doesn't declare any public type UnusedZero, but\n nsresult is declared UnusedZero in XPCOM.\n\n The purpose of Result is to reduce the screwups caused by using `false` or\n `nullptr` to indicate errors.\n What screwups? See <https://bugzilla.mozilla.org/show_bug.cgi?id=912928> for\n a partial list.\n\n Result<const V, E> or Result<V, const E> are not meaningful. The success or\n error values in a Result instance are non-modifiable in-place anyway. This\n guarantee must also be maintained when evolving Result. They can be\n unwrap()ped, but this loses const qualification. However, Result<const V, E>\n or Result<V, const E> may be misleading and prevent movability. Just use\n Result<V, E>. (Result<const V*, E> may make sense though, just Result<const\n V* const, E> is not possible.)"]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Result {
@@ -1921,12 +1387,7 @@ pub mod root {
         pub struct ReentrancyGuard {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ReentrancyGuard"][::std::mem::size_of::<ReentrancyGuard>() - 1usize];
-            ["Alignment of ReentrancyGuard"][::std::mem::align_of::<ReentrancyGuard>() - 1usize];
-        };
-        #[doc = " Opaque<T> is a replacement for integral T in cases where only comparisons\n must be supported, and it's desirable to prevent accidental dependency on\n exact values."]
+                #[doc = " Opaque<T> is a replacement for integral T in cases where only comparisons\n must be supported, and it's desirable to prevent accidental dependency on\n exact values."]
         pub type Generation = root::mozilla::Opaque<u64>;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -1983,33 +1444,14 @@ pub mod root {
             pub _address: u8,
         }
         pub type DefaultHasher_Lookup<Key> = Key;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: DefaultHasher_open0_double_void_close0"]
-                [::std::mem::size_of::<root::mozilla::DefaultHasher>() - 1usize];
-            ["Align of template specialization: DefaultHasher_open0_double_void_close0"]
-                [::std::mem::align_of::<root::mozilla::DefaultHasher>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: DefaultHasher_open0_float_void_close0"]
-                [::std::mem::size_of::<root::mozilla::DefaultHasher>() - 1usize];
-            ["Align of template specialization: DefaultHasher_open0_float_void_close0"]
-                [::std::mem::align_of::<root::mozilla::DefaultHasher>() - 1usize];
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct CStringHasher {
             pub _address: u8,
         }
         pub type CStringHasher_Key = *const ::std::os::raw::c_char;
         pub type CStringHasher_Lookup = *const ::std::os::raw::c_char;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CStringHasher"][::std::mem::size_of::<CStringHasher>() - 1usize];
-            ["Alignment of CStringHasher"][::std::mem::align_of::<CStringHasher>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct FallibleHashMethods {
             pub _address: u8,
@@ -2035,41 +1477,19 @@ pub mod root {
         pub struct FailureLatch {
             pub vtable_: *const FailureLatch__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of FailureLatch"][::std::mem::size_of::<FailureLatch>() - 8usize];
-            ["Alignment of FailureLatch"][::std::mem::align_of::<FailureLatch>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct FailureLatchInfallibleSource {
             pub _base: root::mozilla::FailureLatch,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of FailureLatchInfallibleSource"]
-                [::std::mem::size_of::<FailureLatchInfallibleSource>() - 8usize];
-            ["Alignment of FailureLatchInfallibleSource"]
-                [::std::mem::align_of::<FailureLatchInfallibleSource>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct FailureLatchSource {
             pub _base: root::mozilla::FailureLatch,
             pub mFailed: bool,
             pub mReason: root::std::string,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of FailureLatchSource"][::std::mem::size_of::<FailureLatchSource>() - 48usize];
-            ["Alignment of FailureLatchSource"]
-                [::std::mem::align_of::<FailureLatchSource>() - 8usize];
-            ["Offset of field: FailureLatchSource::mFailed"]
-                [::std::mem::offset_of!(FailureLatchSource, mFailed) - 8usize];
-            ["Offset of field: FailureLatchSource::mReason"]
-                [::std::mem::offset_of!(FailureLatchSource, mReason) - 16usize];
-        };
-        pub type Vector_Impl = u8;
+                pub type Vector_Impl = u8;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Vector_CapacityAndReserved {
@@ -2104,12 +1524,7 @@ pub mod root {
         pub struct JSONWriteFunc {
             pub vtable_: *const JSONWriteFunc__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JSONWriteFunc"][::std::mem::size_of::<JSONWriteFunc>() - 8usize];
-            ["Alignment of JSONWriteFunc"][::std::mem::align_of::<JSONWriteFunc>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct JSONWriter {
             pub mMaybeOwnedWriter: u64,
@@ -2124,18 +1539,7 @@ pub mod root {
             pub mStringSpan: root::__BindgenOpaqueArray<u64, 2usize>,
             pub mOwnedStr: u64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JSONWriter_EscapedString"]
-                [::std::mem::size_of::<JSONWriter_EscapedString>() - 24usize];
-            ["Alignment of JSONWriter_EscapedString"]
-                [::std::mem::align_of::<JSONWriter_EscapedString>() - 8usize];
-            ["Offset of field: JSONWriter_EscapedString::mStringSpan"]
-                [::std::mem::offset_of!(JSONWriter_EscapedString, mStringSpan) - 0usize];
-            ["Offset of field: JSONWriter_EscapedString::mOwnedStr"]
-                [::std::mem::offset_of!(JSONWriter_EscapedString, mOwnedStr) - 16usize];
-        };
-        #[repr(u32)]
+                #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum JSONWriter_CollectionStyle {
             MultiLineStyle = 0,
@@ -2189,22 +1593,7 @@ pub mod root {
         
         pub static JSONWriter_scTrueString: root::__BindgenOpaqueArray<u64, 2usize> = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JSONWriter"][::std::mem::size_of::<JSONWriter>() - 88usize];
-            ["Alignment of JSONWriter"][::std::mem::align_of::<JSONWriter>() - 8usize];
-            ["Offset of field: JSONWriter::mMaybeOwnedWriter"]
-                [::std::mem::offset_of!(JSONWriter, mMaybeOwnedWriter) - 0usize];
-            ["Offset of field: JSONWriter::mWriter"]
-                [::std::mem::offset_of!(JSONWriter, mWriter) - 8usize];
-            ["Offset of field: JSONWriter::mNeedComma"]
-                [::std::mem::offset_of!(JSONWriter, mNeedComma) - 16usize];
-            ["Offset of field: JSONWriter::mNeedNewlines"]
-                [::std::mem::offset_of!(JSONWriter, mNeedNewlines) - 48usize];
-            ["Offset of field: JSONWriter::mDepth"]
-                [::std::mem::offset_of!(JSONWriter, mDepth) - 80usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NotNull<T> {
             pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
@@ -2227,28 +1616,14 @@ pub mod root {
         pub struct ProportionValue_Internal {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProportionValue_Internal"]
-                [::std::mem::size_of::<ProportionValue_Internal>() - 1usize];
-            ["Alignment of ProportionValue_Internal"]
-                [::std::mem::align_of::<ProportionValue_Internal>() - 1usize];
-        };
-        pub const ProportionValue_scFractionalBits: ::std::os::raw::c_uint = 31;
+                pub const ProportionValue_scFractionalBits: ::std::os::raw::c_uint = 31;
         pub const ProportionValue_scMaxU: root::mozilla::ProportionValue_UnderlyingType =
             2147483648;
         pub const ProportionValue_scMaxD: f64 = 2147483648.0;
         pub const ProportionValue_scInvMaxD: f64 = 0.0000000004656612873077393;
         pub const ProportionValue_scInvalidU: root::mozilla::ProportionValue_UnderlyingType =
             4294967295;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProportionValue"][::std::mem::size_of::<ProportionValue>() - 4usize];
-            ["Alignment of ProportionValue"][::std::mem::align_of::<ProportionValue>() - 4usize];
-            ["Offset of field: ProportionValue::mIntegralValue"]
-                [::std::mem::offset_of!(ProportionValue, mIntegralValue) - 0usize];
-        };
-        pub mod literals {
+                pub mod literals {
             #[allow(unused_imports)]
             use self::super::super::super::root;
         }
@@ -2277,34 +1652,10 @@ pub mod root {
         
         pub static mut ProgressLogger_SharedProgress_NO_LOCATION_UPDATE: *const ::std::os::raw::c_char = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProgressLogger_SharedProgress"]
-                [::std::mem::size_of::<ProgressLogger_SharedProgress>() - 24usize];
-            ["Alignment of ProgressLogger_SharedProgress"]
-                [::std::mem::align_of::<ProgressLogger_SharedProgress>() - 8usize];
-            ["Offset of field: ProgressLogger_SharedProgress::mProgress"]
-                [::std::mem::offset_of!(ProgressLogger_SharedProgress, mProgress) - 8usize];
-            ["Offset of field: ProgressLogger_SharedProgress::mLastLocation"]
-                [::std::mem::offset_of!(ProgressLogger_SharedProgress, mLastLocation) - 16usize];
-        };
-        
-        pub static mut ProgressLogger_NO_LOCATION_UPDATE: *const ::std::os::raw::c_char = unsafe { ::core::mem::zeroed() };
+                
+                pub static mut ProgressLogger_NO_LOCATION_UPDATE: *const ::std::os::raw::c_char = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProgressLogger"][::std::mem::size_of::<ProgressLogger>() - 24usize];
-            ["Alignment of ProgressLogger"][::std::mem::align_of::<ProgressLogger>() - 8usize];
-            ["Offset of field: ProgressLogger::mGlobalProgressOrNull"]
-                [::std::mem::offset_of!(ProgressLogger, mGlobalProgressOrNull) - 0usize];
-            ["Offset of field: ProgressLogger::mLocalStartInGlobalSpace"]
-                [::std::mem::offset_of!(ProgressLogger, mLocalStartInGlobalSpace) - 8usize];
-            ["Offset of field: ProgressLogger::mLocalToGlobalMultiplier"]
-                [::std::mem::offset_of!(ProgressLogger, mLocalToGlobalMultiplier) - 12usize];
-            ["Offset of field: ProgressLogger::mLocationAtDestruction"]
-                [::std::mem::offset_of!(ProgressLogger, mLocationAtDestruction) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct ProgressLogger_IndexAndProgressLoggerRange {
             pub mGlobalProgressOrNull: root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>,
             pub mLoopStartInGlobalSpace: root::mozilla::ProportionValue,
@@ -2317,31 +1668,12 @@ pub mod root {
             pub index: u32,
             pub progressLogger: root::mozilla::ProgressLogger,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger"]
-                [::std::mem::size_of::<
-                    ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger,
-                >() - 32usize];
-            ["Alignment of ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger"]
-                [::std::mem::align_of::<
-                    ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger,
-                >() - 8usize];
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger::index"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger , index) - 0usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger::progressLogger"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLogger , progressLogger) - 8usize] ;
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator {
             pub mIndex: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator"] [:: std :: mem :: size_of :: < ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator > () - 4usize] ;
-            ["Alignment of ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator"] [:: std :: mem :: align_of :: < ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator > () - 4usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator::mIndex"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerEndIterator , mIndex) - 0usize] ;
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator {
             pub mGlobalProgressOrNull: root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>,
             pub mLoopStartInGlobalSpace: root::mozilla::ProportionValue,
@@ -2349,36 +1681,7 @@ pub mod root {
             pub mIndex: u32,
             pub mLocationOrNullEmptyToIgnoreAtEdges: *const ::std::os::raw::c_char,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator"]
-                [::std::mem::size_of::<
-                    ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator,
-                >() - 32usize];
-            ["Alignment of ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator"] [:: std :: mem :: align_of :: < ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator > () - 8usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator::mGlobalProgressOrNull"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator , mGlobalProgressOrNull) - 0usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator::mLoopStartInGlobalSpace"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator , mLoopStartInGlobalSpace) - 8usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator::mLoopIncrementInGlobalSpace"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator , mLoopIncrementInGlobalSpace) - 12usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator::mIndex"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator , mIndex) - 16usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator::mLocationOrNullEmptyToIgnoreAtEdges"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange_IndexAndProgressLoggerIterator , mLocationOrNullEmptyToIgnoreAtEdges) - 24usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProgressLogger_IndexAndProgressLoggerRange"]
-                [::std::mem::size_of::<ProgressLogger_IndexAndProgressLoggerRange>() - 32usize];
-            ["Alignment of ProgressLogger_IndexAndProgressLoggerRange"]
-                [::std::mem::align_of::<ProgressLogger_IndexAndProgressLoggerRange>() - 8usize];
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange::mGlobalProgressOrNull"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange , mGlobalProgressOrNull) - 0usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange::mLoopStartInGlobalSpace"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange , mLoopStartInGlobalSpace) - 8usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange::mLoopIncrementInGlobalSpace"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange , mLoopIncrementInGlobalSpace) - 12usize] ;
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange::mLoopCount"][::std::mem::offset_of!(
-                ProgressLogger_IndexAndProgressLoggerRange,
-                mLoopCount
-            )
-                - 16usize];
-            ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange::mLocationOrNullEmptyToIgnoreAtEdges"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange , mLocationOrNullEmptyToIgnoreAtEdges) - 24usize] ;
-        };
-        pub type fallible_t = root::std::nothrow_t;
+                        pub type fallible_t = root::std::nothrow_t;
         pub type UniqueFreePtr = u8;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -2393,26 +1696,12 @@ pub mod root {
         pub struct ProfileBufferBlockIndex {
             pub mBlockIndex: root::mozilla::ProfileBufferIndex,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferBlockIndex"]
-                [::std::mem::size_of::<ProfileBufferBlockIndex>() - 8usize];
-            ["Alignment of ProfileBufferBlockIndex"]
-                [::std::mem::align_of::<ProfileBufferBlockIndex>() - 8usize];
-            ["Offset of field: ProfileBufferBlockIndex::mBlockIndex"]
-                [::std::mem::offset_of!(ProfileBufferBlockIndex, mBlockIndex) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct unused_t {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of unused_t"][::std::mem::size_of::<unused_t>() - 1usize];
-            ["Alignment of unused_t"][::std::mem::align_of::<unused_t>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ProfileBufferEntryReader {
             pub mCurrentSpan: root::mozilla::ProfileBufferEntryReader_SpanOfConstBytes,
@@ -2438,41 +1727,7 @@ pub mod root {
             pub mFirstOrOnly: root::mozilla::ProfileBufferEntryReader_SpanOfConstBytes,
             pub mSecondOrEmpty: root::mozilla::ProfileBufferEntryReader_SpanOfConstBytes,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferEntryReader_DoubleSpanOfConstBytes"][::std::mem::size_of::<
-                ProfileBufferEntryReader_DoubleSpanOfConstBytes,
-            >() - 32usize];
-            ["Alignment of ProfileBufferEntryReader_DoubleSpanOfConstBytes"][::std::mem::align_of::<
-                ProfileBufferEntryReader_DoubleSpanOfConstBytes,
-            >() - 8usize];
-            ["Offset of field: ProfileBufferEntryReader_DoubleSpanOfConstBytes::mFirstOrOnly"][::std::mem::offset_of!(
-                ProfileBufferEntryReader_DoubleSpanOfConstBytes,
-                mFirstOrOnly
-            )
-                - 0usize];
-            ["Offset of field: ProfileBufferEntryReader_DoubleSpanOfConstBytes::mSecondOrEmpty"][::std::mem::offset_of!(
-                ProfileBufferEntryReader_DoubleSpanOfConstBytes,
-                mSecondOrEmpty
-            )
-                - 16usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferEntryReader"]
-                [::std::mem::size_of::<ProfileBufferEntryReader>() - 48usize];
-            ["Alignment of ProfileBufferEntryReader"]
-                [::std::mem::align_of::<ProfileBufferEntryReader>() - 8usize];
-            ["Offset of field: ProfileBufferEntryReader::mCurrentSpan"]
-                [::std::mem::offset_of!(ProfileBufferEntryReader, mCurrentSpan) - 0usize];
-            ["Offset of field: ProfileBufferEntryReader::mNextSpanOrEmpty"]
-                [::std::mem::offset_of!(ProfileBufferEntryReader, mNextSpanOrEmpty) - 16usize];
-            ["Offset of field: ProfileBufferEntryReader::mCurrentBlockIndex"]
-                [::std::mem::offset_of!(ProfileBufferEntryReader, mCurrentBlockIndex) - 32usize];
-            ["Offset of field: ProfileBufferEntryReader::mNextBlockIndex"]
-                [::std::mem::offset_of!(ProfileBufferEntryReader, mNextBlockIndex) - 40usize];
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ProfileBufferEntryWriter {
             pub mCurrentSpan: root::mozilla::ProfileBufferEntryWriter_SpanOfBytes,
@@ -2490,22 +1745,7 @@ pub mod root {
         pub type ProfileBufferEntryWriter_reference =
             *mut root::mozilla::ProfileBufferEntryWriter_Byte;
         pub type ProfileBufferEntryWriter_iterator_category = root::std::output_iterator_tag;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferEntryWriter"]
-                [::std::mem::size_of::<ProfileBufferEntryWriter>() - 48usize];
-            ["Alignment of ProfileBufferEntryWriter"]
-                [::std::mem::align_of::<ProfileBufferEntryWriter>() - 8usize];
-            ["Offset of field: ProfileBufferEntryWriter::mCurrentSpan"]
-                [::std::mem::offset_of!(ProfileBufferEntryWriter, mCurrentSpan) - 0usize];
-            ["Offset of field: ProfileBufferEntryWriter::mNextSpanOrEmpty"]
-                [::std::mem::offset_of!(ProfileBufferEntryWriter, mNextSpanOrEmpty) - 16usize];
-            ["Offset of field: ProfileBufferEntryWriter::mCurrentBlockIndex"]
-                [::std::mem::offset_of!(ProfileBufferEntryWriter, mCurrentBlockIndex) - 32usize];
-            ["Offset of field: ProfileBufferEntryWriter::mNextBlockIndex"]
-                [::std::mem::offset_of!(ProfileBufferEntryWriter, mNextBlockIndex) - 40usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ProfileBufferEntryWriter_Serializer {
             pub _address: u8,
@@ -2515,36 +1755,12 @@ pub mod root {
         pub struct ProfileBufferEntryReader_Deserializer {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_ProfileBufferBlockIndex_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_ProfileBufferBlockIndex_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryReader_Deserializer_open0_ProfileBufferBlockIndex_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryReader_Deserializer_open0_ProfileBufferBlockIndex_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ProfileBufferUnownedCString {
             pub mCString: *const ::std::os::raw::c_char,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferUnownedCString"]
-                [::std::mem::size_of::<ProfileBufferUnownedCString>() - 8usize];
-            ["Alignment of ProfileBufferUnownedCString"]
-                [::std::mem::align_of::<ProfileBufferUnownedCString>() - 8usize];
-            ["Offset of field: ProfileBufferUnownedCString::mCString"]
-                [::std::mem::offset_of!(ProfileBufferUnownedCString, mCString) - 0usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_ProfileBufferUnownedCString_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_ProfileBufferUnownedCString_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ProfileBufferRawPointer<T> {
             pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
@@ -2565,39 +1781,13 @@ pub mod root {
                 pub mFailureLatch: u64,
             }
             pub const ChunkedJSONWriteFunc_kChunkSize: usize = 2097152;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ChunkedJSONWriteFunc"]
-                    [::std::mem::size_of::<ChunkedJSONWriteFunc>() - 88usize];
-                ["Alignment of ChunkedJSONWriteFunc"]
-                    [::std::mem::align_of::<ChunkedJSONWriteFunc>() - 8usize];
-                ["Offset of field: ChunkedJSONWriteFunc::mChunkPtr"]
-                    [::std::mem::offset_of!(ChunkedJSONWriteFunc, mChunkPtr) - 16usize];
-                ["Offset of field: ChunkedJSONWriteFunc::mChunkEnd"]
-                    [::std::mem::offset_of!(ChunkedJSONWriteFunc, mChunkEnd) - 24usize];
-                ["Offset of field: ChunkedJSONWriteFunc::mChunkList"]
-                    [::std::mem::offset_of!(ChunkedJSONWriteFunc, mChunkList) - 32usize];
-                ["Offset of field: ChunkedJSONWriteFunc::mChunkLengths"]
-                    [::std::mem::offset_of!(ChunkedJSONWriteFunc, mChunkLengths) - 56usize];
-                ["Offset of field: ChunkedJSONWriteFunc::mFailureLatch"]
-                    [::std::mem::offset_of!(ChunkedJSONWriteFunc, mFailureLatch) - 80usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, PartialEq)]
             pub struct OStreamJSONWriteFunc {
                 pub _base: root::mozilla::JSONWriteFunc,
                 pub mStream: *mut root::std::ostream,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of OStreamJSONWriteFunc"]
-                    [::std::mem::size_of::<OStreamJSONWriteFunc>() - 16usize];
-                ["Alignment of OStreamJSONWriteFunc"]
-                    [::std::mem::align_of::<OStreamJSONWriteFunc>() - 8usize];
-                ["Offset of field: OStreamJSONWriteFunc::mStream"]
-                    [::std::mem::offset_of!(OStreamJSONWriteFunc, mStream) - 8usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, PartialEq)]
             pub struct SpliceableJSONWriter {
                 pub _base: root::mozilla::JSONWriter,
@@ -2605,64 +1795,25 @@ pub mod root {
                 pub mFailureLatch: u64,
                 pub mUniqueStrings: *mut root::mozilla::baseprofiler::UniqueJSONStrings,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of SpliceableJSONWriter"]
-                    [::std::mem::size_of::<SpliceableJSONWriter>() - 112usize];
-                ["Alignment of SpliceableJSONWriter"]
-                    [::std::mem::align_of::<SpliceableJSONWriter>() - 8usize];
-                ["Offset of field: SpliceableJSONWriter::mFailureLatch"]
-                    [::std::mem::offset_of!(SpliceableJSONWriter, mFailureLatch) - 96usize];
-                ["Offset of field: SpliceableJSONWriter::mUniqueStrings"]
-                    [::std::mem::offset_of!(SpliceableJSONWriter, mUniqueStrings) - 104usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, PartialEq)]
             pub struct SpliceableChunkedJSONWriter {
                 pub _base: root::mozilla::baseprofiler::SpliceableJSONWriter,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of SpliceableChunkedJSONWriter"]
-                    [::std::mem::size_of::<SpliceableChunkedJSONWriter>() - 112usize];
-                ["Alignment of SpliceableChunkedJSONWriter"]
-                    [::std::mem::align_of::<SpliceableChunkedJSONWriter>() - 8usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, PartialEq)]
             pub struct JSONSchemaWriter {
                 pub mWriter: *mut root::mozilla::JSONWriter,
                 pub mIndex: u32,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of JSONSchemaWriter"][::std::mem::size_of::<JSONSchemaWriter>() - 16usize];
-                ["Alignment of JSONSchemaWriter"]
-                    [::std::mem::align_of::<JSONSchemaWriter>() - 8usize];
-                ["Offset of field: JSONSchemaWriter::mWriter"]
-                    [::std::mem::offset_of!(JSONSchemaWriter, mWriter) - 0usize];
-                ["Offset of field: JSONSchemaWriter::mIndex"]
-                    [::std::mem::offset_of!(JSONSchemaWriter, mIndex) - 8usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, PartialEq)]
             pub struct UniqueJSONStrings {
                 pub _base: root::mozilla::FailureLatch,
                 pub mStringTableWriter: root::mozilla::baseprofiler::SpliceableChunkedJSONWriter,
                 pub mStringHashToIndexMap: root::__BindgenOpaqueArray<u64, 3usize>,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of UniqueJSONStrings"]
-                    [::std::mem::size_of::<UniqueJSONStrings>() - 144usize];
-                ["Alignment of UniqueJSONStrings"]
-                    [::std::mem::align_of::<UniqueJSONStrings>() - 8usize];
-                ["Offset of field: UniqueJSONStrings::mStringTableWriter"]
-                    [::std::mem::offset_of!(UniqueJSONStrings, mStringTableWriter) - 8usize];
-                ["Offset of field: UniqueJSONStrings::mStringHashToIndexMap"]
-                    [::std::mem::offset_of!(UniqueJSONStrings, mStringHashToIndexMap) - 120usize];
-            };
-            impl root::mozilla::baseprofiler::ProfilingCategoryPair {
+                        impl root::mozilla::baseprofiler::ProfilingCategoryPair {
                 pub const LAST: root::mozilla::baseprofiler::ProfilingCategoryPair =
                     ProfilingCategoryPair::TELEMETRY;
             }
@@ -2778,40 +1929,14 @@ pub mod root {
                 pub mColor: *const ::std::os::raw::c_char,
                 pub mSubcategoryNames: root::__BindgenOpaqueArray<u64, 2usize>,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProfilingCategoryInfo"]
-                    [::std::mem::size_of::<ProfilingCategoryInfo>() - 32usize];
-                ["Alignment of ProfilingCategoryInfo"]
-                    [::std::mem::align_of::<ProfilingCategoryInfo>() - 8usize];
-                ["Offset of field: ProfilingCategoryInfo::mName"]
-                    [::std::mem::offset_of!(ProfilingCategoryInfo, mName) - 0usize];
-                ["Offset of field: ProfilingCategoryInfo::mColor"]
-                    [::std::mem::offset_of!(ProfilingCategoryInfo, mColor) - 8usize];
-                ["Offset of field: ProfilingCategoryInfo::mSubcategoryNames"]
-                    [::std::mem::offset_of!(ProfilingCategoryInfo, mSubcategoryNames) - 16usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ProfilingCategoryPairInfo {
                 pub mCategory: root::mozilla::baseprofiler::ProfilingCategory,
                 pub mSubcategoryIndex: u32,
                 pub mLabel: *const ::std::os::raw::c_char,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProfilingCategoryPairInfo"]
-                    [::std::mem::size_of::<ProfilingCategoryPairInfo>() - 16usize];
-                ["Alignment of ProfilingCategoryPairInfo"]
-                    [::std::mem::align_of::<ProfilingCategoryPairInfo>() - 8usize];
-                ["Offset of field: ProfilingCategoryPairInfo::mCategory"]
-                    [::std::mem::offset_of!(ProfilingCategoryPairInfo, mCategory) - 0usize];
-                ["Offset of field: ProfilingCategoryPairInfo::mSubcategoryIndex"]
-                    [::std::mem::offset_of!(ProfilingCategoryPairInfo, mSubcategoryIndex) - 4usize];
-                ["Offset of field: ProfilingCategoryPairInfo::mLabel"]
-                    [::std::mem::offset_of!(ProfilingCategoryPairInfo, mLabel) - 8usize];
-            };
-            pub mod detail {
+                        pub mod detail {
                 #[allow(unused_imports)]
                 use self::super::super::super::super::root;
                 pub type ProcessIdType = ::std::os::raw::c_int;
@@ -2823,110 +1948,41 @@ pub mod root {
                     pub mOwningThreadId: u64,
                     pub mName: *const ::std::os::raw::c_char,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerMutex"]
-                        [::std::mem::size_of::<BaseProfilerMutex>() - 56usize];
-                    ["Alignment of BaseProfilerMutex"]
-                        [::std::mem::align_of::<BaseProfilerMutex>() - 8usize];
-                    ["Offset of field: BaseProfilerMutex::mOwningThreadId"]
-                        [::std::mem::offset_of!(BaseProfilerMutex, mOwningThreadId) - 40usize];
-                    ["Offset of field: BaseProfilerMutex::mName"]
-                        [::std::mem::offset_of!(BaseProfilerMutex, mName) - 48usize];
-                };
-                #[repr(C)]
+                                #[repr(C)]
                 #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerAutoLock {
                     pub mMutex: *mut root::mozilla::baseprofiler::detail::BaseProfilerMutex,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerAutoLock"]
-                        [::std::mem::size_of::<BaseProfilerAutoLock>() - 8usize];
-                    ["Alignment of BaseProfilerAutoLock"]
-                        [::std::mem::align_of::<BaseProfilerAutoLock>() - 8usize];
-                    ["Offset of field: BaseProfilerAutoLock::mMutex"]
-                        [::std::mem::offset_of!(BaseProfilerAutoLock, mMutex) - 0usize];
-                };
-                #[repr(C)]
+                                #[repr(C)]
                 #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerMaybeMutex {
                     pub _base: root::mozilla::detail::MutexImpl,
                     pub mMaybeMutex: root::__BindgenOpaqueArray<u64, 8usize>,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerMaybeMutex"]
-                        [::std::mem::size_of::<BaseProfilerMaybeMutex>() - 104usize];
-                    ["Alignment of BaseProfilerMaybeMutex"]
-                        [::std::mem::align_of::<BaseProfilerMaybeMutex>() - 8usize];
-                    ["Offset of field: BaseProfilerMaybeMutex::mMaybeMutex"]
-                        [::std::mem::offset_of!(BaseProfilerMaybeMutex, mMaybeMutex) - 40usize];
-                };
-                #[repr(C)]
+                                #[repr(C)]
                 #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerMaybeAutoLock {
                     pub mMaybeMutex:
                         *mut root::mozilla::baseprofiler::detail::BaseProfilerMaybeMutex,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerMaybeAutoLock"]
-                        [::std::mem::size_of::<BaseProfilerMaybeAutoLock>() - 8usize];
-                    ["Alignment of BaseProfilerMaybeAutoLock"]
-                        [::std::mem::align_of::<BaseProfilerMaybeAutoLock>() - 8usize];
-                    ["Offset of field: BaseProfilerMaybeAutoLock::mMaybeMutex"]
-                        [::std::mem::offset_of!(BaseProfilerMaybeAutoLock, mMaybeMutex) - 0usize];
-                };
-                #[repr(C)]
+                                #[repr(C)]
                 pub struct BaseProfilerSharedMutex {
                     pub _base: root::mozilla::detail::RWLockImpl,
                     pub mOwningThreadId: u64,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerSharedMutex"]
-                        [::std::mem::size_of::<BaseProfilerSharedMutex>() - 64usize];
-                    ["Alignment of BaseProfilerSharedMutex"]
-                        [::std::mem::align_of::<BaseProfilerSharedMutex>() - 8usize];
-                    ["Offset of field: BaseProfilerSharedMutex::mOwningThreadId"][::std::mem::offset_of!(
-                        BaseProfilerSharedMutex,
-                        mOwningThreadId
-                    ) - 56usize];
-                };
-                #[repr(C)]
+                                #[repr(C)]
                 #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerAutoLockExclusive {
                     pub mSharedMutex:
                         *mut root::mozilla::baseprofiler::detail::BaseProfilerSharedMutex,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerAutoLockExclusive"]
-                        [::std::mem::size_of::<BaseProfilerAutoLockExclusive>() - 8usize];
-                    ["Alignment of BaseProfilerAutoLockExclusive"]
-                        [::std::mem::align_of::<BaseProfilerAutoLockExclusive>() - 8usize];
-                    ["Offset of field: BaseProfilerAutoLockExclusive::mSharedMutex"][::std::mem::offset_of!(
-                        BaseProfilerAutoLockExclusive,
-                        mSharedMutex
-                    ) - 0usize];
-                };
-                #[repr(C)]
+                                #[repr(C)]
                 #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerAutoLockShared {
                     pub mSharedMutex:
                         *mut root::mozilla::baseprofiler::detail::BaseProfilerSharedMutex,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of BaseProfilerAutoLockShared"]
-                        [::std::mem::size_of::<BaseProfilerAutoLockShared>() - 8usize];
-                    ["Alignment of BaseProfilerAutoLockShared"]
-                        [::std::mem::align_of::<BaseProfilerAutoLockShared>() - 8usize];
-                    ["Offset of field: BaseProfilerAutoLockShared::mSharedMutex"]
-                        [::std::mem::offset_of!(BaseProfilerAutoLockShared, mSharedMutex) - 0usize];
-                };
-            }
+                            }
             #[repr(C)]
             #[repr(align(4))]
             #[derive(Debug, Copy, Clone, PartialEq)]
@@ -2936,15 +1992,8 @@ pub mod root {
             pub type BaseProfilerProcessId_NativeType =
                 root::mozilla::baseprofiler::detail::ProcessIdType;
             pub type BaseProfilerProcessId_NumberType = root::std::conditional_t;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of BaseProfilerProcessId"]
-                    [::std::mem::size_of::<BaseProfilerProcessId>() - 4usize];
-                ["Alignment of BaseProfilerProcessId"]
-                    [::std::mem::align_of::<BaseProfilerProcessId>() - 4usize];
-            };
-            
-            pub static BaseProfilerProcessId_scUnspecified: root::mozilla::baseprofiler::BaseProfilerProcessId_NumberType = unsafe { ::core::mem::zeroed() };
+                        
+                        pub static BaseProfilerProcessId_scUnspecified: root::mozilla::baseprofiler::BaseProfilerProcessId_NumberType = unsafe { ::core::mem::zeroed() };
 
             #[repr(C)]
             #[repr(align(8))]
@@ -2955,15 +2004,8 @@ pub mod root {
             pub type BaseProfilerThreadId_NativeType =
                 root::mozilla::baseprofiler::detail::ThreadIdType;
             pub type BaseProfilerThreadId_NumberType = root::std::conditional_t;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of BaseProfilerThreadId"]
-                    [::std::mem::size_of::<BaseProfilerThreadId>() - 8usize];
-                ["Alignment of BaseProfilerThreadId"]
-                    [::std::mem::align_of::<BaseProfilerThreadId>() - 8usize];
-            };
-            
-            pub static BaseProfilerThreadId_scUnspecified: root::mozilla::baseprofiler::BaseProfilerThreadId_NumberType = unsafe { ::core::mem::zeroed() };
+                        
+                        pub static BaseProfilerThreadId_scUnspecified: root::mozilla::baseprofiler::BaseProfilerThreadId_NumberType = unsafe { ::core::mem::zeroed() };
 
             pub mod category {
                 #[allow(unused_imports)]
@@ -2978,12 +2020,7 @@ pub mod root {
                 pub struct NoPayload {
                     pub _address: u8,
                 }
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of NoPayload"][::std::mem::size_of::<NoPayload>() - 1usize];
-                    ["Alignment of NoPayload"][::std::mem::align_of::<NoPayload>() - 1usize];
-                };
-            }
+                            }
         }
         #[repr(C)]
         #[derive(Debug, PartialEq)]
@@ -3001,20 +2038,7 @@ pub mod root {
             pub mSpan: root::mozilla::ProfileBufferChunk_SpanOfBytes,
             pub mBlockRangeIndex: root::mozilla::ProfileBufferBlockIndex,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferChunk_ReserveReturn"]
-                [::std::mem::size_of::<ProfileBufferChunk_ReserveReturn>() - 24usize];
-            ["Alignment of ProfileBufferChunk_ReserveReturn"]
-                [::std::mem::align_of::<ProfileBufferChunk_ReserveReturn>() - 8usize];
-            ["Offset of field: ProfileBufferChunk_ReserveReturn::mSpan"]
-                [::std::mem::offset_of!(ProfileBufferChunk_ReserveReturn, mSpan) - 0usize];
-            ["Offset of field: ProfileBufferChunk_ReserveReturn::mBlockRangeIndex"][::std::mem::offset_of!(
-                ProfileBufferChunk_ReserveReturn,
-                mBlockRangeIndex
-            ) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ProfileBufferChunk_Header {
             pub mOffsetFirstBlock: root::mozilla::ProfileBufferChunk_Length,
@@ -3027,59 +2051,13 @@ pub mod root {
             pub mProcessId: ::std::os::raw::c_int,
             pub mPADDING: ::std::os::raw::c_int,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferChunk_Header"]
-                [::std::mem::size_of::<ProfileBufferChunk_Header>() - 48usize];
-            ["Alignment of ProfileBufferChunk_Header"]
-                [::std::mem::align_of::<ProfileBufferChunk_Header>() - 8usize];
-            ["Offset of field: ProfileBufferChunk_Header::mOffsetFirstBlock"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mOffsetFirstBlock) - 0usize];
-            ["Offset of field: ProfileBufferChunk_Header::mOffsetPastLastBlock"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mOffsetPastLastBlock) - 4usize];
-            ["Offset of field: ProfileBufferChunk_Header::mStartTimeStamp"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mStartTimeStamp) - 8usize];
-            ["Offset of field: ProfileBufferChunk_Header::mDoneTimeStamp"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mDoneTimeStamp) - 16usize];
-            ["Offset of field: ProfileBufferChunk_Header::mBufferBytes"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mBufferBytes) - 24usize];
-            ["Offset of field: ProfileBufferChunk_Header::mBlockCount"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mBlockCount) - 28usize];
-            ["Offset of field: ProfileBufferChunk_Header::mRangeStart"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mRangeStart) - 32usize];
-            ["Offset of field: ProfileBufferChunk_Header::mProcessId"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mProcessId) - 40usize];
-            ["Offset of field: ProfileBufferChunk_Header::mPADDING"]
-                [::std::mem::offset_of!(ProfileBufferChunk_Header, mPADDING) - 44usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ProfileBufferChunk_InternalHeader {
             pub mHeader: root::mozilla::ProfileBufferChunk_Header,
             pub mNext: u64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferChunk_InternalHeader"]
-                [::std::mem::size_of::<ProfileBufferChunk_InternalHeader>() - 56usize];
-            ["Alignment of ProfileBufferChunk_InternalHeader"]
-                [::std::mem::align_of::<ProfileBufferChunk_InternalHeader>() - 8usize];
-            ["Offset of field: ProfileBufferChunk_InternalHeader::mHeader"]
-                [::std::mem::offset_of!(ProfileBufferChunk_InternalHeader, mHeader) - 0usize];
-            ["Offset of field: ProfileBufferChunk_InternalHeader::mNext"]
-                [::std::mem::offset_of!(ProfileBufferChunk_InternalHeader, mNext) - 48usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferChunk"][::std::mem::size_of::<ProfileBufferChunk>() - 64usize];
-            ["Alignment of ProfileBufferChunk"]
-                [::std::mem::align_of::<ProfileBufferChunk>() - 8usize];
-            ["Offset of field: ProfileBufferChunk::mInternalHeader"]
-                [::std::mem::offset_of!(ProfileBufferChunk, mInternalHeader) - 0usize];
-            ["Offset of field: ProfileBufferChunk::mBuffer"]
-                [::std::mem::offset_of!(ProfileBufferChunk, mBuffer) - 56usize];
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ScopeExit<ExitFunction> {
             pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<ExitFunction>>,
@@ -3095,14 +2073,7 @@ pub mod root {
         }
         pub const ProfileBufferChunkManager_scExpectedMaximumStackSize:
             root::mozilla::ProfileBufferChunk_Length = 131072;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferChunkManager"]
-                [::std::mem::size_of::<ProfileBufferChunkManager>() - 8usize];
-            ["Alignment of ProfileBufferChunkManager"]
-                [::std::mem::align_of::<ProfileBufferChunkManager>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ProfileBufferChunkManagerSingle {
             pub _base: root::mozilla::ProfileBufferChunkManager,
@@ -3112,25 +2083,7 @@ pub mod root {
             pub mChunkDestroyedCallback: root::__BindgenOpaqueArray<u64, 4usize>,
         }
         pub type ProfileBufferChunkManagerSingle_Length = root::mozilla::ProfileBufferChunk_Length;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileBufferChunkManagerSingle"]
-                [::std::mem::size_of::<ProfileBufferChunkManagerSingle>() - 64usize];
-            ["Alignment of ProfileBufferChunkManagerSingle"]
-                [::std::mem::align_of::<ProfileBufferChunkManagerSingle>() - 8usize];
-            ["Offset of field: ProfileBufferChunkManagerSingle::mInitialChunk"]
-                [::std::mem::offset_of!(ProfileBufferChunkManagerSingle, mInitialChunk) - 8usize];
-            ["Offset of field: ProfileBufferChunkManagerSingle::mReleasedChunk"]
-                [::std::mem::offset_of!(ProfileBufferChunkManagerSingle, mReleasedChunk) - 16usize];
-            ["Offset of field: ProfileBufferChunkManagerSingle::mBufferBytes"]
-                [::std::mem::offset_of!(ProfileBufferChunkManagerSingle, mBufferBytes) - 24usize];
-            ["Offset of field: ProfileBufferChunkManagerSingle::mChunkDestroyedCallback"][::std::mem::offset_of!(
-                ProfileBufferChunkManagerSingle,
-                mChunkDestroyedCallback
-            )
-                - 32usize];
-        };
-        pub mod profiler {
+                pub mod profiler {
             #[allow(unused_imports)]
             use self::super::super::super::root;
             pub mod detail {
@@ -3145,19 +2098,7 @@ pub mod root {
                 }
                 pub type InChunkPointer_Byte = root::mozilla::ProfileBufferChunk_Byte;
                 pub type InChunkPointer_Length = root::mozilla::ProfileBufferChunk_Length;
-                #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-                const _: () = {
-                    ["Size of InChunkPointer"][::std::mem::size_of::<InChunkPointer>() - 24usize];
-                    ["Alignment of InChunkPointer"]
-                        [::std::mem::align_of::<InChunkPointer>() - 8usize];
-                    ["Offset of field: InChunkPointer::mChunk"]
-                        [::std::mem::offset_of!(InChunkPointer, mChunk) - 0usize];
-                    ["Offset of field: InChunkPointer::mNextChunkGroup"]
-                        [::std::mem::offset_of!(InChunkPointer, mNextChunkGroup) - 8usize];
-                    ["Offset of field: InChunkPointer::mOffsetInChunk"]
-                        [::std::mem::offset_of!(InChunkPointer, mOffsetInChunk) - 16usize];
-                };
-            }
+                            }
         }
         #[repr(C)]
         #[derive(Debug, PartialEq)]
@@ -3193,24 +2134,7 @@ pub mod root {
             pub mClearedBlockCount: u64,
             pub mFailedPutBytes: u64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileChunkedBuffer_State"]
-                [::std::mem::size_of::<ProfileChunkedBuffer_State>() - 40usize];
-            ["Alignment of ProfileChunkedBuffer_State"]
-                [::std::mem::align_of::<ProfileChunkedBuffer_State>() - 8usize];
-            ["Offset of field: ProfileChunkedBuffer_State::mRangeStart"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_State, mRangeStart) - 0usize];
-            ["Offset of field: ProfileChunkedBuffer_State::mRangeEnd"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_State, mRangeEnd) - 8usize];
-            ["Offset of field: ProfileChunkedBuffer_State::mPushedBlockCount"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_State, mPushedBlockCount) - 16usize];
-            ["Offset of field: ProfileChunkedBuffer_State::mClearedBlockCount"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_State, mClearedBlockCount) - 24usize];
-            ["Offset of field: ProfileChunkedBuffer_State::mFailedPutBytes"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_State, mFailedPutBytes) - 32usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ProfileChunkedBuffer_BlockIterator {
             pub mNextBlockPointer: root::mozilla::profiler::detail::InChunkPointer,
@@ -3218,49 +2142,14 @@ pub mod root {
             pub mCurrentEntry: root::mozilla::ProfileBufferEntryReader,
             pub mBuffer: u64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileChunkedBuffer_BlockIterator"]
-                [::std::mem::size_of::<ProfileChunkedBuffer_BlockIterator>() - 88usize];
-            ["Alignment of ProfileChunkedBuffer_BlockIterator"]
-                [::std::mem::align_of::<ProfileChunkedBuffer_BlockIterator>() - 8usize];
-            ["Offset of field: ProfileChunkedBuffer_BlockIterator::mNextBlockPointer"][::std::mem::offset_of!(
-                ProfileChunkedBuffer_BlockIterator,
-                mNextBlockPointer
-            ) - 0usize];
-            ["Offset of field: ProfileChunkedBuffer_BlockIterator::mCurrentBlockIndex"][::std::mem::offset_of!(
-                ProfileChunkedBuffer_BlockIterator,
-                mCurrentBlockIndex
-            )
-                - 24usize];
-            ["Offset of field: ProfileChunkedBuffer_BlockIterator::mCurrentEntry"][::std::mem::offset_of!(
-                ProfileChunkedBuffer_BlockIterator,
-                mCurrentEntry
-            ) - 32usize];
-            ["Offset of field: ProfileChunkedBuffer_BlockIterator::mBuffer"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_BlockIterator, mBuffer) - 80usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ProfileChunkedBuffer_Reader {
             pub mBuffer: *const root::mozilla::ProfileChunkedBuffer,
             pub mChunks0: *const root::mozilla::ProfileBufferChunk,
             pub mChunks1: *const root::mozilla::ProfileBufferChunk,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileChunkedBuffer_Reader"]
-                [::std::mem::size_of::<ProfileChunkedBuffer_Reader>() - 24usize];
-            ["Alignment of ProfileChunkedBuffer_Reader"]
-                [::std::mem::align_of::<ProfileChunkedBuffer_Reader>() - 8usize];
-            ["Offset of field: ProfileChunkedBuffer_Reader::mBuffer"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_Reader, mBuffer) - 0usize];
-            ["Offset of field: ProfileChunkedBuffer_Reader::mChunks0"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_Reader, mChunks0) - 8usize];
-            ["Offset of field: ProfileChunkedBuffer_Reader::mChunks1"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer_Reader, mChunks1) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ProfileChunkedBuffer_RequestedChunkRefCountedHolder {
             pub mRequestMutex: root::mozilla::baseprofiler::detail::BaseProfilerMutex,
@@ -3275,84 +2164,7 @@ pub mod root {
             Requested = 1,
             Fulfilled = 2,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileChunkedBuffer_RequestedChunkRefCountedHolder"][::std::mem::size_of::<
-                ProfileChunkedBuffer_RequestedChunkRefCountedHolder,
-            >() - 72usize];
-            ["Alignment of ProfileChunkedBuffer_RequestedChunkRefCountedHolder"]
-                [::std::mem::align_of::<ProfileChunkedBuffer_RequestedChunkRefCountedHolder>()
-                    - 8usize];
-            ["Offset of field: ProfileChunkedBuffer_RequestedChunkRefCountedHolder::mRequestMutex"] [:: std :: mem :: offset_of ! (ProfileChunkedBuffer_RequestedChunkRefCountedHolder , mRequestMutex) - 0usize] ;
-            ["Offset of field: ProfileChunkedBuffer_RequestedChunkRefCountedHolder::mRefCount"][::std::mem::offset_of!(
-                ProfileChunkedBuffer_RequestedChunkRefCountedHolder,
-                mRefCount
-            )
-                - 56usize];
-            ["Offset of field: ProfileChunkedBuffer_RequestedChunkRefCountedHolder::mState"][::std::mem::offset_of!(
-                ProfileChunkedBuffer_RequestedChunkRefCountedHolder,
-                mState
-            )
-                - 60usize];
-            ["Offset of field: ProfileChunkedBuffer_RequestedChunkRefCountedHolder::mRequestedChunk"] [:: std :: mem :: offset_of ! (ProfileChunkedBuffer_RequestedChunkRefCountedHolder , mRequestedChunk) - 64usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfileChunkedBuffer"]
-                [::std::mem::size_of::<ProfileChunkedBuffer>() - 192usize];
-            ["Alignment of ProfileChunkedBuffer"]
-                [::std::mem::align_of::<ProfileChunkedBuffer>() - 8usize];
-            ["Offset of field: ProfileChunkedBuffer::mMutex"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mMutex) - 0usize];
-            ["Offset of field: ProfileChunkedBuffer::mChunkManager"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mChunkManager) - 104usize];
-            ["Offset of field: ProfileChunkedBuffer::mOwnedChunkManager"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mOwnedChunkManager) - 112usize];
-            ["Offset of field: ProfileChunkedBuffer::mCurrentChunk"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mCurrentChunk) - 120usize];
-            ["Offset of field: ProfileChunkedBuffer::mNextChunks"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mNextChunks) - 128usize];
-            ["Offset of field: ProfileChunkedBuffer::mRequestedChunkHolder"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mRequestedChunkHolder) - 136usize];
-            ["Offset of field: ProfileChunkedBuffer::mNextChunkRangeStart"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mNextChunkRangeStart) - 144usize];
-            ["Offset of field: ProfileChunkedBuffer::mRangeStart"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mRangeStart) - 152usize];
-            ["Offset of field: ProfileChunkedBuffer::mRangeEnd"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mRangeEnd) - 160usize];
-            ["Offset of field: ProfileChunkedBuffer::mPushedBlockCount"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mPushedBlockCount) - 168usize];
-            ["Offset of field: ProfileChunkedBuffer::mClearedBlockCount"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mClearedBlockCount) - 176usize];
-            ["Offset of field: ProfileChunkedBuffer::mFailedPutBytes"]
-                [::std::mem::offset_of!(ProfileChunkedBuffer, mFailedPutBytes) - 184usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_ProfileChunkedBuffer_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_ProfileChunkedBuffer_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryReader_Deserializer_open0_ProfileChunkedBuffer_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryReader_Deserializer_open0_ProfileChunkedBuffer_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_ptr_ProfileChunkedBuffer_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_ptr_ProfileChunkedBuffer_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: ProfileBufferEntryReader_Deserializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryReader_Deserializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-        };
-        impl root::mozilla::ProfilerStringView_Ownership {
+                                                                impl root::mozilla::ProfilerStringView_Ownership {
             pub const Reference: root::mozilla::ProfilerStringView_Ownership =
                 ProfilerStringView_Ownership::Literal;
         }
@@ -3370,25 +2182,13 @@ pub mod root {
         pub struct MarkerCategory {
             pub mCategoryPair: root::mozilla::baseprofiler::ProfilingCategoryPair,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerCategory"][::std::mem::size_of::<MarkerCategory>() - 4usize];
-            ["Alignment of MarkerCategory"][::std::mem::align_of::<MarkerCategory>() - 4usize];
-            ["Offset of field: MarkerCategory::mCategoryPair"]
-                [::std::mem::offset_of!(MarkerCategory, mCategoryPair) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[repr(align(8))]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MarkerThreadId {
             pub _bindgen_opaque_blob: u64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerThreadId"][::std::mem::size_of::<MarkerThreadId>() - 8usize];
-            ["Alignment of MarkerThreadId"][::std::mem::align_of::<MarkerThreadId>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MarkerTiming {
             pub mStartTime: root::mozilla::TimeStamp,
@@ -3403,50 +2203,20 @@ pub mod root {
             IntervalStart = 2,
             IntervalEnd = 3,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerTiming"][::std::mem::size_of::<MarkerTiming>() - 24usize];
-            ["Alignment of MarkerTiming"][::std::mem::align_of::<MarkerTiming>() - 8usize];
-            ["Offset of field: MarkerTiming::mStartTime"]
-                [::std::mem::offset_of!(MarkerTiming, mStartTime) - 0usize];
-            ["Offset of field: MarkerTiming::mEndTime"]
-                [::std::mem::offset_of!(MarkerTiming, mEndTime) - 8usize];
-            ["Offset of field: MarkerTiming::mPhase"]
-                [::std::mem::offset_of!(MarkerTiming, mPhase) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct MarkerStack {
             pub mCaptureOptions: root::mozilla::StackCaptureOptions,
             pub mOptionalChunkedBufferStorage: u64,
             pub mChunkedBuffer: *mut root::mozilla::ProfileChunkedBuffer,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerStack"][::std::mem::size_of::<MarkerStack>() - 24usize];
-            ["Alignment of MarkerStack"][::std::mem::align_of::<MarkerStack>() - 8usize];
-            ["Offset of field: MarkerStack::mCaptureOptions"]
-                [::std::mem::offset_of!(MarkerStack, mCaptureOptions) - 0usize];
-            ["Offset of field: MarkerStack::mOptionalChunkedBufferStorage"]
-                [::std::mem::offset_of!(MarkerStack, mOptionalChunkedBufferStorage) - 8usize];
-            ["Offset of field: MarkerStack::mChunkedBuffer"]
-                [::std::mem::offset_of!(MarkerStack, mChunkedBuffer) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MarkerInnerWindowId {
             pub mInnerWindowId: u64,
         }
         pub const MarkerInnerWindowId_scNoId: u64 = 0;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerInnerWindowId"][::std::mem::size_of::<MarkerInnerWindowId>() - 8usize];
-            ["Alignment of MarkerInnerWindowId"]
-                [::std::mem::align_of::<MarkerInnerWindowId>() - 8usize];
-            ["Offset of field: MarkerInnerWindowId::mInnerWindowId"]
-                [::std::mem::offset_of!(MarkerInnerWindowId, mInnerWindowId) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct MarkerOptions {
             pub mThreadId: root::mozilla::MarkerThreadId,
@@ -3454,20 +2224,7 @@ pub mod root {
             pub mStack: root::mozilla::MarkerStack,
             pub mInnerWindowId: root::mozilla::MarkerInnerWindowId,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerOptions"][::std::mem::size_of::<MarkerOptions>() - 64usize];
-            ["Alignment of MarkerOptions"][::std::mem::align_of::<MarkerOptions>() - 8usize];
-            ["Offset of field: MarkerOptions::mThreadId"]
-                [::std::mem::offset_of!(MarkerOptions, mThreadId) - 0usize];
-            ["Offset of field: MarkerOptions::mTiming"]
-                [::std::mem::offset_of!(MarkerOptions, mTiming) - 8usize];
-            ["Offset of field: MarkerOptions::mStack"]
-                [::std::mem::offset_of!(MarkerOptions, mStack) - 32usize];
-            ["Offset of field: MarkerOptions::mInnerWindowId"]
-                [::std::mem::offset_of!(MarkerOptions, mInnerWindowId) - 56usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct MarkerSchema {
             pub mLocations: root::__BindgenOpaqueArray<u64, 3usize>,
@@ -3506,14 +2263,7 @@ pub mod root {
         pub struct MarkerSchema_SpecialFrontendLocation {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerSchema_SpecialFrontendLocation"]
-                [::std::mem::size_of::<MarkerSchema_SpecialFrontendLocation>() - 1usize];
-            ["Alignment of MarkerSchema_SpecialFrontendLocation"]
-                [::std::mem::align_of::<MarkerSchema_SpecialFrontendLocation>() - 1usize];
-        };
-        #[repr(i32)]
+                #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum MarkerSchema_Format {
             Url = 0,
@@ -3559,24 +2309,7 @@ pub mod root {
             pub Fmt: root::mozilla::MarkerSchema_Format,
             pub Flags: root::mozilla::MarkerSchema_PayloadFlags,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerSchema_PayloadField"]
-                [::std::mem::size_of::<MarkerSchema_PayloadField>() - 32usize];
-            ["Alignment of MarkerSchema_PayloadField"]
-                [::std::mem::align_of::<MarkerSchema_PayloadField>() - 8usize];
-            ["Offset of field: MarkerSchema_PayloadField::Key"]
-                [::std::mem::offset_of!(MarkerSchema_PayloadField, Key) - 0usize];
-            ["Offset of field: MarkerSchema_PayloadField::InputTy"]
-                [::std::mem::offset_of!(MarkerSchema_PayloadField, InputTy) - 8usize];
-            ["Offset of field: MarkerSchema_PayloadField::Label"]
-                [::std::mem::offset_of!(MarkerSchema_PayloadField, Label) - 16usize];
-            ["Offset of field: MarkerSchema_PayloadField::Fmt"]
-                [::std::mem::offset_of!(MarkerSchema_PayloadField, Fmt) - 24usize];
-            ["Offset of field: MarkerSchema_PayloadField::Flags"]
-                [::std::mem::offset_of!(MarkerSchema_PayloadField, Flags) - 28usize];
-        };
-        #[repr(i32)]
+                #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum MarkerSchema_Searchable {
             NotSearchable = 0,
@@ -3611,39 +2344,13 @@ pub mod root {
             pub mFormat: root::mozilla::MarkerSchema_Format,
             pub mSearchable: root::__BindgenOpaqueArray<u32, 2usize>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerSchema_DynamicData"]
-                [::std::mem::size_of::<MarkerSchema_DynamicData>() - 88usize];
-            ["Alignment of MarkerSchema_DynamicData"]
-                [::std::mem::align_of::<MarkerSchema_DynamicData>() - 8usize];
-            ["Offset of field: MarkerSchema_DynamicData::mKey"]
-                [::std::mem::offset_of!(MarkerSchema_DynamicData, mKey) - 0usize];
-            ["Offset of field: MarkerSchema_DynamicData::mLabel"]
-                [::std::mem::offset_of!(MarkerSchema_DynamicData, mLabel) - 32usize];
-            ["Offset of field: MarkerSchema_DynamicData::mFormat"]
-                [::std::mem::offset_of!(MarkerSchema_DynamicData, mFormat) - 72usize];
-            ["Offset of field: MarkerSchema_DynamicData::mSearchable"]
-                [::std::mem::offset_of!(MarkerSchema_DynamicData, mSearchable) - 76usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MarkerSchema_StaticData {
             pub mLabel: root::std::string,
             pub mValue: root::std::string,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerSchema_StaticData"]
-                [::std::mem::size_of::<MarkerSchema_StaticData>() - 64usize];
-            ["Alignment of MarkerSchema_StaticData"]
-                [::std::mem::align_of::<MarkerSchema_StaticData>() - 8usize];
-            ["Offset of field: MarkerSchema_StaticData::mLabel"]
-                [::std::mem::offset_of!(MarkerSchema_StaticData, mLabel) - 0usize];
-            ["Offset of field: MarkerSchema_StaticData::mValue"]
-                [::std::mem::offset_of!(MarkerSchema_StaticData, mValue) - 32usize];
-        };
-        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
+                #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
         pub type MarkerSchema_DataRow = root::__BindgenOpaqueArray<u64, 12usize>;
         pub type MarkerSchema_DataRowVector = root::__BindgenOpaqueArray<u64, 3usize>;
         #[repr(C)]
@@ -3653,39 +2360,7 @@ pub mod root {
             pub mType: root::mozilla::MarkerSchema_GraphType,
             pub mColor: root::__BindgenOpaqueArray<u32, 2usize>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerSchema_GraphData"]
-                [::std::mem::size_of::<MarkerSchema_GraphData>() - 48usize];
-            ["Alignment of MarkerSchema_GraphData"]
-                [::std::mem::align_of::<MarkerSchema_GraphData>() - 8usize];
-            ["Offset of field: MarkerSchema_GraphData::mKey"]
-                [::std::mem::offset_of!(MarkerSchema_GraphData, mKey) - 0usize];
-            ["Offset of field: MarkerSchema_GraphData::mType"]
-                [::std::mem::offset_of!(MarkerSchema_GraphData, mType) - 32usize];
-            ["Offset of field: MarkerSchema_GraphData::mColor"]
-                [::std::mem::offset_of!(MarkerSchema_GraphData, mColor) - 36usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MarkerSchema"][::std::mem::size_of::<MarkerSchema>() - 176usize];
-            ["Alignment of MarkerSchema"][::std::mem::align_of::<MarkerSchema>() - 8usize];
-            ["Offset of field: MarkerSchema::mLocations"]
-                [::std::mem::offset_of!(MarkerSchema, mLocations) - 0usize];
-            ["Offset of field: MarkerSchema::mChartLabel"]
-                [::std::mem::offset_of!(MarkerSchema, mChartLabel) - 24usize];
-            ["Offset of field: MarkerSchema::mTooltipLabel"]
-                [::std::mem::offset_of!(MarkerSchema, mTooltipLabel) - 56usize];
-            ["Offset of field: MarkerSchema::mTableLabel"]
-                [::std::mem::offset_of!(MarkerSchema, mTableLabel) - 88usize];
-            ["Offset of field: MarkerSchema::mIsStackBased"]
-                [::std::mem::offset_of!(MarkerSchema, mIsStackBased) - 120usize];
-            ["Offset of field: MarkerSchema::mData"]
-                [::std::mem::offset_of!(MarkerSchema, mData) - 128usize];
-            ["Offset of field: MarkerSchema::mGraphs"]
-                [::std::mem::offset_of!(MarkerSchema, mGraphs) - 152usize];
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BaseMarkerType {
             pub _address: u8,
@@ -3742,16 +2417,7 @@ pub mod root {
             pub mRefCount: u32,
             pub mStorageSize: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of StringBuffer"][::std::mem::size_of::<StringBuffer>() - 8usize];
-            ["Alignment of StringBuffer"][::std::mem::align_of::<StringBuffer>() - 4usize];
-            ["Offset of field: StringBuffer::mRefCount"]
-                [::std::mem::offset_of!(StringBuffer, mRefCount) - 0usize];
-            ["Offset of field: StringBuffer::mStorageSize"]
-                [::std::mem::offset_of!(StringBuffer, mStorageSize) - 4usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BufferList {
             pub _address: u8,
@@ -3771,12 +2437,7 @@ pub mod root {
             pub mDataEnd: *mut ::std::os::raw::c_char,
             pub mAbsoluteOffset: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: RefPtrTraits_open0_InitialStencilAndDelazifications_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: RefPtrTraits > () - 1usize] ;
-            ["Align of template specialization: RefPtrTraits_open0_InitialStencilAndDelazifications_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: RefPtrTraits > () - 1usize] ;
-        };
-    }
+            }
     #[doc = " already_AddRefed cooperates with reference counting smart pointers to enable\n you to assign in a pointer _without_ |AddRef|ing it.  You might want to use\n this as a return type from a function that returns an already |AddRef|ed\n pointer.  Or, you might want to use this as a parameter type in a function\n that wants to force a transfer-of-ownership from a RefPtr in the caller (for\n example, if the function expects callers to pass in a newly-created object,\n which the function then takes ownership of).\n\n TODO Move already_AddRefed to namespace mozilla.  This has not yet been done\n because of the sheer number of usages of already_AddRefed.\n\n When should you use already_AddRefed<>?\n * Ensure a consumer takes ownership of a reference\n * Pass ownership without calling AddRef/Release (sometimes required in\n   off-main-thread code)\n * The ref pointer type you're using doesn't support move construction\n\n Otherwise, use std::move(RefPtr/nsCOMPtr/etc)."]
     #[repr(C)]
     #[derive(Debug, PartialEq)]
@@ -3911,20 +2572,7 @@ pub mod root {
                 pub kind: root::js::gc::ChunkKind,
                 pub nurseryChunkIndex: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ChunkBase"][::std::mem::size_of::<ChunkBase>() - 24usize];
-                ["Alignment of ChunkBase"][::std::mem::align_of::<ChunkBase>() - 8usize];
-                ["Offset of field: ChunkBase::storeBuffer"]
-                    [::std::mem::offset_of!(ChunkBase, storeBuffer) - 0usize];
-                ["Offset of field: ChunkBase::runtime"]
-                    [::std::mem::offset_of!(ChunkBase, runtime) - 8usize];
-                ["Offset of field: ChunkBase::kind"]
-                    [::std::mem::offset_of!(ChunkBase, kind) - 16usize];
-                ["Offset of field: ChunkBase::nurseryChunkIndex"]
-                    [::std::mem::offset_of!(ChunkBase, nurseryChunkIndex) - 17usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ArenaChunkInfo {
                 pub next: *mut root::js::gc::ArenaChunk,
@@ -3933,22 +2581,7 @@ pub mod root {
                 pub numArenasFreeCommitted: u32,
                 pub isCurrentChunk: bool,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ArenaChunkInfo"][::std::mem::size_of::<ArenaChunkInfo>() - 32usize];
-                ["Alignment of ArenaChunkInfo"][::std::mem::align_of::<ArenaChunkInfo>() - 8usize];
-                ["Offset of field: ArenaChunkInfo::next"]
-                    [::std::mem::offset_of!(ArenaChunkInfo, next) - 0usize];
-                ["Offset of field: ArenaChunkInfo::prev"]
-                    [::std::mem::offset_of!(ArenaChunkInfo, prev) - 8usize];
-                ["Offset of field: ArenaChunkInfo::numArenasFree"]
-                    [::std::mem::offset_of!(ArenaChunkInfo, numArenasFree) - 16usize];
-                ["Offset of field: ArenaChunkInfo::numArenasFreeCommitted"]
-                    [::std::mem::offset_of!(ArenaChunkInfo, numArenasFreeCommitted) - 20usize];
-                ["Offset of field: ArenaChunkInfo::isCurrentChunk"]
-                    [::std::mem::offset_of!(ArenaChunkInfo, isCurrentChunk) - 24usize];
-            };
-            #[doc = " Atomic<T> implementation for integral types.\n\n In addition to atomic store and load operations, compound assignment and\n increment/decrement operators are implemented which perform the\n corresponding read-modify-write operation atomically.  Finally, an atomic\n swap method is provided."]
+                        #[doc = " Atomic<T> implementation for integral types.\n\n In addition to atomic store and load operations, compound assignment and\n increment/decrement operators are implemented which perform the\n corresponding read-modify-write operation atomically.  Finally, an atomic\n swap method is provided."]
             pub type MarkBitmapWord = u64;
             #[repr(u32)]
             #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -3989,20 +2622,7 @@ pub mod root {
                 pub freeCommittedArenas: root::js::gc::ChunkArenaBitmap,
                 pub decommittedPages: root::js::gc::ChunkPageBitmap,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ArenaChunkBase"][::std::mem::size_of::<ArenaChunkBase>() - 16256usize];
-                ["Alignment of ArenaChunkBase"][::std::mem::align_of::<ArenaChunkBase>() - 64usize];
-                ["Offset of field: ArenaChunkBase::info"]
-                    [::std::mem::offset_of!(ArenaChunkBase, info) - 24usize];
-                ["Offset of field: ArenaChunkBase::markBits"]
-                    [::std::mem::offset_of!(ArenaChunkBase, markBits) - 64usize];
-                ["Offset of field: ArenaChunkBase::freeCommittedArenas"]
-                    [::std::mem::offset_of!(ArenaChunkBase, freeCommittedArenas) - 16192usize];
-                ["Offset of field: ArenaChunkBase::decommittedPages"]
-                    [::std::mem::offset_of!(ArenaChunkBase, decommittedPages) - 16224usize];
-            };
-            pub mod detail {
+                        pub mod detail {
                 #[allow(unused_imports)]
                 use self::super::super::super::super::root;
                 
@@ -4021,19 +2641,8 @@ pub mod root {
                 pub bytes: usize,
                 pub operations: u64,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProfilerMemoryCounts"]
-                    [::std::mem::size_of::<ProfilerMemoryCounts>() - 16usize];
-                ["Alignment of ProfilerMemoryCounts"]
-                    [::std::mem::align_of::<ProfilerMemoryCounts>() - 8usize];
-                ["Offset of field: ProfilerMemoryCounts::bytes"]
-                    [::std::mem::offset_of!(ProfilerMemoryCounts, bytes) - 0usize];
-                ["Offset of field: ProfilerMemoryCounts::operations"]
-                    [::std::mem::offset_of!(ProfilerMemoryCounts, operations) - 8usize];
-            };
-            
-            pub unsafe extern "C" fn GetProfilerMemoryCounts() -> root::js::gc::ProfilerMemoryCounts { qjs_todo!("GetProfilerMemoryCounts") }
+                        
+                        pub unsafe extern "C" fn GetProfilerMemoryCounts() -> root::js::gc::ProfilerMemoryCounts { qjs_todo!("GetProfilerMemoryCounts") }
 
             
             pub unsafe extern "C" fn TraceExternalEdge(
@@ -4129,17 +2738,7 @@ pub mod root {
                 pub count: usize,
                 pub nbytes: usize,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of SharedMemoryUse"][::std::mem::size_of::<SharedMemoryUse>() - 16usize];
-                ["Alignment of SharedMemoryUse"]
-                    [::std::mem::align_of::<SharedMemoryUse>() - 8usize];
-                ["Offset of field: SharedMemoryUse::count"]
-                    [::std::mem::offset_of!(SharedMemoryUse, count) - 0usize];
-                ["Offset of field: SharedMemoryUse::nbytes"]
-                    [::std::mem::offset_of!(SharedMemoryUse, nbytes) - 8usize];
-            };
-            pub type SharedMemoryMap = u8;
+                        pub type SharedMemoryMap = u8;
         }
         pub mod jit {
             #[allow(unused_imports)]
@@ -4197,15 +2796,8 @@ pub mod root {
         
         pub static mut AutoEnterOOMUnsafeRegion_annotateOOMSizeCallback: u64 = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoEnterOOMUnsafeRegion"]
-                [::std::mem::size_of::<AutoEnterOOMUnsafeRegion>() - 1usize];
-            ["Alignment of AutoEnterOOMUnsafeRegion"]
-                [::std::mem::align_of::<AutoEnterOOMUnsafeRegion>() - 1usize];
-        };
-        
-        pub unsafe extern "C" fn InitMallocAllocator() { qjs_todo!("InitMallocAllocator") }
+                
+                pub unsafe extern "C" fn InitMallocAllocator() { qjs_todo!("InitMallocAllocator") }
 
         
         pub unsafe extern "C" fn ShutDownMallocAllocator() { qjs_todo!("ShutDownMallocAllocator") }
@@ -4230,60 +2822,28 @@ pub mod root {
         pub struct ArenaAllocPolicyBase {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ArenaAllocPolicyBase"]
-                [::std::mem::size_of::<ArenaAllocPolicyBase>() - 1usize];
-            ["Alignment of ArenaAllocPolicyBase"]
-                [::std::mem::align_of::<ArenaAllocPolicyBase>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct AllocPolicyBase {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AllocPolicyBase"][::std::mem::size_of::<AllocPolicyBase>() - 1usize];
-            ["Alignment of AllocPolicyBase"][::std::mem::align_of::<AllocPolicyBase>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BackgroundAllocPolicyBase {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of BackgroundAllocPolicyBase"]
-                [::std::mem::size_of::<BackgroundAllocPolicyBase>() - 1usize];
-            ["Alignment of BackgroundAllocPolicyBase"]
-                [::std::mem::align_of::<BackgroundAllocPolicyBase>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct SystemAllocPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of SystemAllocPolicy"][::std::mem::size_of::<SystemAllocPolicy>() - 1usize];
-            ["Alignment of SystemAllocPolicy"]
-                [::std::mem::align_of::<SystemAllocPolicy>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BackgroundSystemAllocPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of BackgroundSystemAllocPolicy"]
-                [::std::mem::size_of::<BackgroundSystemAllocPolicy>() - 1usize];
-            ["Alignment of BackgroundSystemAllocPolicy"]
-                [::std::mem::align_of::<BackgroundSystemAllocPolicy>() - 1usize];
-        };
-        
-        pub unsafe extern "C" fn ReportOutOfMemory(cx: *mut root::JSContext) { qjs_todo!("ReportOutOfMemory") }
+                
+                pub unsafe extern "C" fn ReportOutOfMemory(cx: *mut root::JSContext) { qjs_todo!("ReportOutOfMemory") }
 
         
         pub unsafe extern "C" fn ReportOutOfMemory1(fc: *mut root::js::FrontendContext) { qjs_todo!("ReportOutOfMemory1") }
@@ -4297,25 +2857,12 @@ pub mod root {
             pub context_bits_: usize,
         }
         pub const TempAllocPolicy_JsContextTag: usize = 1;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TempAllocPolicy"][::std::mem::size_of::<TempAllocPolicy>() - 8usize];
-            ["Alignment of TempAllocPolicy"][::std::mem::align_of::<TempAllocPolicy>() - 8usize];
-            ["Offset of field: TempAllocPolicy::context_bits_"]
-                [::std::mem::offset_of!(TempAllocPolicy, context_bits_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MallocAllocPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MallocAllocPolicy"][::std::mem::size_of::<MallocAllocPolicy>() - 1usize];
-            ["Alignment of MallocAllocPolicy"]
-                [::std::mem::align_of::<MallocAllocPolicy>() - 1usize];
-        };
-        pub type HashNumber = root::mozilla::HashNumber;
+                pub type HashNumber = root::mozilla::HashNumber;
         pub type DefaultHasher = root::mozilla::DefaultHasher;
         pub type PointerHasher = root::mozilla::PointerHasher;
         pub type HashSet = u8;
@@ -4405,17 +2952,7 @@ pub mod root {
             pub profilingStack_: *mut root::ProfilingStack,
             pub profilingStackIfEnabled_: *mut root::ProfilingStack,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of GeckoProfilerThread"][::std::mem::size_of::<GeckoProfilerThread>() - 16usize];
-            ["Alignment of GeckoProfilerThread"]
-                [::std::mem::align_of::<GeckoProfilerThread>() - 8usize];
-            ["Offset of field: GeckoProfilerThread::profilingStack_"]
-                [::std::mem::offset_of!(GeckoProfilerThread, profilingStack_) - 0usize];
-            ["Offset of field: GeckoProfilerThread::profilingStackIfEnabled_"]
-                [::std::mem::offset_of!(GeckoProfilerThread, profilingStackIfEnabled_) - 8usize];
-        };
-        pub type UniquePtr = u8;
+                pub type UniquePtr = u8;
         pub mod detail {
             #[allow(unused_imports)]
             use self::super::super::super::root;
@@ -4436,64 +2973,26 @@ pub mod root {
             pub struct TypeIsGCThing {
                 pub _base: root::std::false_type,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: TypeIsGCThing_open0_Value_close0"]
-                    [::std::mem::size_of::<root::js::detail::TypeIsGCThing>() - 1usize];
-                ["Align of template specialization: TypeIsGCThing_open0_Value_close0"]
-                    [::std::mem::align_of::<root::js::detail::TypeIsGCThing>() - 1usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ProxyReservedSlots {
                 pub slots: [root::JS::Value; 1usize],
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProxyReservedSlots"]
-                    [::std::mem::size_of::<ProxyReservedSlots>() - 8usize];
-                ["Alignment of ProxyReservedSlots"]
-                    [::std::mem::align_of::<ProxyReservedSlots>() - 8usize];
-                ["Offset of field: ProxyReservedSlots::slots"]
-                    [::std::mem::offset_of!(ProxyReservedSlots, slots) - 0usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ProxyValueArray {
                 pub expandoSlot: root::JS::Value,
                 pub privateSlot: root::JS::Value,
                 pub reservedSlots: root::js::detail::ProxyReservedSlots,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProxyValueArray"][::std::mem::size_of::<ProxyValueArray>() - 24usize];
-                ["Alignment of ProxyValueArray"]
-                    [::std::mem::align_of::<ProxyValueArray>() - 8usize];
-                ["Offset of field: ProxyValueArray::expandoSlot"]
-                    [::std::mem::offset_of!(ProxyValueArray, expandoSlot) - 0usize];
-                ["Offset of field: ProxyValueArray::privateSlot"]
-                    [::std::mem::offset_of!(ProxyValueArray, privateSlot) - 8usize];
-                ["Offset of field: ProxyValueArray::reservedSlots"]
-                    [::std::mem::offset_of!(ProxyValueArray, reservedSlots) - 16usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ProxyDataLayout {
                 pub reservedSlots: *mut root::js::detail::ProxyReservedSlots,
                 pub handler: *const root::js::BaseProxyHandler,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProxyDataLayout"][::std::mem::size_of::<ProxyDataLayout>() - 16usize];
-                ["Alignment of ProxyDataLayout"]
-                    [::std::mem::align_of::<ProxyDataLayout>() - 8usize];
-                ["Offset of field: ProxyDataLayout::reservedSlots"]
-                    [::std::mem::offset_of!(ProxyDataLayout, reservedSlots) - 0usize];
-                ["Offset of field: ProxyDataLayout::handler"]
-                    [::std::mem::offset_of!(ProxyDataLayout, handler) - 8usize];
-            };
-            
-            pub unsafe extern "C" fn SetValueInProxy(slot: *mut root::JS::Value, value: *const root::JS::Value) { qjs_todo!("SetValueInProxy") }
+                        
+                        pub unsafe extern "C" fn SetValueInProxy(slot: *mut root::JS::Value, value: *const root::JS::Value) { qjs_todo!("SetValueInProxy") }
 
             
             pub unsafe extern "C" fn IsWindowSlow(obj: *mut root::JSObject) -> bool { qjs_todo!("IsWindowSlow") }
@@ -4547,94 +3046,7 @@ pub mod root {
         pub struct IsHeapConstructibleType {
             pub _base: root::std::false_type,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_BigInt_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_BigInt_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_Symbol_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_Symbol_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_JSAtom_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_JSAtom_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_JSFunction_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_JSFunction_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_JSLinearString_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_JSLinearString_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_JSObject_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_JSObject_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_JSScript_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_JSScript_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_ptr_JSString_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_ptr_JSString_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_Value_void_close0"]
-                [::std::mem::size_of::<root::js::IsHeapConstructibleType>() - 1usize];
-            ["Align of template specialization: IsHeapConstructibleType_open0_Value_void_close0"]
-                [::std::mem::align_of::<root::js::IsHeapConstructibleType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsHeapConstructibleType_open0_PropertyKey_void_close0"] [:: std :: mem :: size_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-            ["Align of template specialization: IsHeapConstructibleType_open0_PropertyKey_void_close0"] [:: std :: mem :: align_of :: < root :: js :: IsHeapConstructibleType > () - 1usize] ;
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_ptr_JSObject_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_ptr_JSObject_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_ptr_JSFunction_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_ptr_JSFunction_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_ptr_JSString_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_ptr_JSString_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_ptr_JSScript_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_ptr_JSScript_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_ptr_BigInt_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_ptr_BigInt_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[repr(C)]
+                                                                                                                                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct StableCellHasher {
             pub _address: u8,
@@ -4648,65 +3060,30 @@ pub mod root {
         pub struct VirtualTraceable {
             pub vtable_: *const VirtualTraceable__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of VirtualTraceable"][::std::mem::size_of::<VirtualTraceable>() - 8usize];
-            ["Alignment of VirtualTraceable"][::std::mem::align_of::<VirtualTraceable>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct StackRootedBase {
             pub stack: *mut *mut root::js::StackRootedBase,
             pub prev: *mut root::js::StackRootedBase,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of StackRootedBase"][::std::mem::size_of::<StackRootedBase>() - 16usize];
-            ["Alignment of StackRootedBase"][::std::mem::align_of::<StackRootedBase>() - 8usize];
-            ["Offset of field: StackRootedBase::stack"]
-                [::std::mem::offset_of!(StackRootedBase, stack) - 0usize];
-            ["Offset of field: StackRootedBase::prev"]
-                [::std::mem::offset_of!(StackRootedBase, prev) - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct PersistentRootedBase {
             pub _base: root::mozilla::LinkedListElement,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PersistentRootedBase"]
-                [::std::mem::size_of::<PersistentRootedBase>() - 24usize];
-            ["Alignment of PersistentRootedBase"]
-                [::std::mem::align_of::<PersistentRootedBase>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct StackRootedTraceableBase {
             pub _base: root::js::StackRootedBase,
             pub _base_1: root::js::VirtualTraceable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of StackRootedTraceableBase"]
-                [::std::mem::size_of::<StackRootedTraceableBase>() - 24usize];
-            ["Alignment of StackRootedTraceableBase"]
-                [::std::mem::align_of::<StackRootedTraceableBase>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct PersistentRootedTraceableBase {
             pub _base: root::js::PersistentRootedBase,
             pub _base_1: root::js::VirtualTraceable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PersistentRootedTraceableBase"]
-                [::std::mem::size_of::<PersistentRootedTraceableBase>() - 32usize];
-            ["Alignment of PersistentRootedTraceableBase"]
-                [::std::mem::align_of::<PersistentRootedTraceableBase>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TypedRootedGCThingBase<Base> {
             pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<Base>>,
@@ -4746,14 +3123,7 @@ pub mod root {
         pub struct JSONPrinter {
             _unused: [u8; 0],
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_Value_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_Value_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MutableValueOperations {
             pub _address: u8,
@@ -4768,14 +3138,7 @@ pub mod root {
                 elements: *mut root::JS::Value,
             ) { qjs_todo!("TraceValueArray") }
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: BarrierMethods_open0_PropertyKey_void_close0"]
-                [::std::mem::size_of::<root::js::BarrierMethods>() - 1usize];
-            ["Align of template specialization: BarrierMethods_open0_PropertyKey_void_close0"]
-                [::std::mem::align_of::<root::js::BarrierMethods>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone)]
         pub struct PropertyResult {
             _unused: [u8; 0],
@@ -4854,20 +3217,7 @@ pub mod root {
             CheckHasElemPreserveHoles = 0,
             GetElement = 1,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ElementAdder"][::std::mem::size_of::<ElementAdder>() - 40usize];
-            ["Alignment of ElementAdder"][::std::mem::align_of::<ElementAdder>() - 8usize];
-            ["Offset of field: ElementAdder::resObj_"]
-                [::std::mem::offset_of!(ElementAdder, resObj_) - 0usize];
-            ["Offset of field: ElementAdder::vp_"]
-                [::std::mem::offset_of!(ElementAdder, vp_) - 24usize];
-            ["Offset of field: ElementAdder::index_"]
-                [::std::mem::offset_of!(ElementAdder, index_) - 32usize];
-            ["Offset of field: ElementAdder::getBehavior_"]
-                [::std::mem::offset_of!(ElementAdder, getBehavior_) - 36usize];
-        };
-        pub type GetElementsOp = ::std::option::Option<
+                pub type GetElementsOp = ::std::option::Option<
             unsafe extern "C" fn(
                 cx: *mut root::JSContext,
                 obj: root::JS::HandleObject,
@@ -4906,41 +3256,13 @@ pub mod root {
         pub const ClassSpec_ProtoKeyWidth: usize = 7;
         pub const ClassSpec_ProtoKeyMask: usize = 127;
         pub const ClassSpec_DontDefineConstructor: usize = 128;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ClassSpec"][::std::mem::size_of::<ClassSpec>() - 64usize];
-            ["Alignment of ClassSpec"][::std::mem::align_of::<ClassSpec>() - 8usize];
-            ["Offset of field: ClassSpec::createConstructor"]
-                [::std::mem::offset_of!(ClassSpec, createConstructor) - 0usize];
-            ["Offset of field: ClassSpec::createPrototype"]
-                [::std::mem::offset_of!(ClassSpec, createPrototype) - 8usize];
-            ["Offset of field: ClassSpec::constructorFunctions"]
-                [::std::mem::offset_of!(ClassSpec, constructorFunctions) - 16usize];
-            ["Offset of field: ClassSpec::constructorProperties"]
-                [::std::mem::offset_of!(ClassSpec, constructorProperties) - 24usize];
-            ["Offset of field: ClassSpec::prototypeFunctions"]
-                [::std::mem::offset_of!(ClassSpec, prototypeFunctions) - 32usize];
-            ["Offset of field: ClassSpec::prototypeProperties"]
-                [::std::mem::offset_of!(ClassSpec, prototypeProperties) - 40usize];
-            ["Offset of field: ClassSpec::finishInit"]
-                [::std::mem::offset_of!(ClassSpec, finishInit) - 48usize];
-            ["Offset of field: ClassSpec::flags"]
-                [::std::mem::offset_of!(ClassSpec, flags) - 56usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ClassExtension {
             #[doc = " Optional hook called when an object is moved by generational or\n compacting GC.\n\n There may exist weak pointers to an object that are not traced through\n when the normal trace APIs are used, for example objects in the wrapper\n cache. This hook allows these pointers to be updated.\n\n Note that this hook can be called before JS_NewObject() returns if a GC\n is triggered during construction of the object. This can happen for\n global objects for example.\n\n The function should return the difference between nursery bytes used and\n tenured bytes used, which may be nonzero e.g. if some nursery-allocated\n data beyond the actual GC thing is moved into malloced memory.\n\n This is used to compute the nursery promotion rate."]
             pub objectMovedOp: root::JSObjectMovedOp,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ClassExtension"][::std::mem::size_of::<ClassExtension>() - 8usize];
-            ["Alignment of ClassExtension"][::std::mem::align_of::<ClassExtension>() - 8usize];
-            ["Offset of field: ClassExtension::objectMovedOp"]
-                [::std::mem::offset_of!(ClassExtension, objectMovedOp) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ObjectOps {
             pub lookupProperty: root::js::LookupPropertyOp,
@@ -4953,30 +3275,7 @@ pub mod root {
             pub getElements: root::js::GetElementsOp,
             pub funToString: root::JSFunToStringOp,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ObjectOps"][::std::mem::size_of::<ObjectOps>() - 72usize];
-            ["Alignment of ObjectOps"][::std::mem::align_of::<ObjectOps>() - 8usize];
-            ["Offset of field: ObjectOps::lookupProperty"]
-                [::std::mem::offset_of!(ObjectOps, lookupProperty) - 0usize];
-            ["Offset of field: ObjectOps::defineProperty"]
-                [::std::mem::offset_of!(ObjectOps, defineProperty) - 8usize];
-            ["Offset of field: ObjectOps::hasProperty"]
-                [::std::mem::offset_of!(ObjectOps, hasProperty) - 16usize];
-            ["Offset of field: ObjectOps::getProperty"]
-                [::std::mem::offset_of!(ObjectOps, getProperty) - 24usize];
-            ["Offset of field: ObjectOps::setProperty"]
-                [::std::mem::offset_of!(ObjectOps, setProperty) - 32usize];
-            ["Offset of field: ObjectOps::getOwnPropertyDescriptor"]
-                [::std::mem::offset_of!(ObjectOps, getOwnPropertyDescriptor) - 40usize];
-            ["Offset of field: ObjectOps::deleteProperty"]
-                [::std::mem::offset_of!(ObjectOps, deleteProperty) - 48usize];
-            ["Offset of field: ObjectOps::getElements"]
-                [::std::mem::offset_of!(ObjectOps, getElements) - 56usize];
-            ["Offset of field: ObjectOps::funToString"]
-                [::std::mem::offset_of!(ObjectOps, funToString) - 64usize];
-        };
-        #[repr(i32)]
+                #[repr(i32)]
         #[doc = " Enumeration describing possible values of the [[Class]] internal property\n value of objects."]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum ESClass {
@@ -5183,14 +3482,7 @@ pub mod root {
             pub _address: u8,
         }
         pub type InefficientNonFlatteningStringHashPolicy_Lookup = *mut root::JSString;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of InefficientNonFlatteningStringHashPolicy"]
-                [::std::mem::size_of::<InefficientNonFlatteningStringHashPolicy>() - 1usize];
-            ["Alignment of InefficientNonFlatteningStringHashPolicy"]
-                [::std::mem::align_of::<InefficientNonFlatteningStringHashPolicy>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct BaseProxyHandler__bindgen_vtable(::std::os::raw::c_void);
         #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -5224,31 +3516,13 @@ pub mod root {
             ENUMERATE = 8,
             GET_PROPERTY_DESCRIPTOR = 16,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of BaseProxyHandler"][::std::mem::size_of::<BaseProxyHandler>() - 18usize];
-            ["Alignment of BaseProxyHandler"][::std::mem::align_of::<BaseProxyHandler>() - 1usize];
-            ["Offset of field: BaseProxyHandler::mFamily"]
-                [::std::mem::offset_of!(BaseProxyHandler, mFamily) - 8usize];
-            ["Offset of field: BaseProxyHandler::mHasPrototype"]
-                [::std::mem::offset_of!(BaseProxyHandler, mHasPrototype) - 16usize];
-            ["Offset of field: BaseProxyHandler::mHasSecurityPolicy"]
-                [::std::mem::offset_of!(BaseProxyHandler, mHasSecurityPolicy) - 17usize];
-        };
-        #[repr(C, packed)]
+                #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NurseryAllocableProxyHandler {
             pub _base: root::js::BaseProxyHandler,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of NurseryAllocableProxyHandler"]
-                [::std::mem::size_of::<NurseryAllocableProxyHandler>() - 18usize];
-            ["Alignment of NurseryAllocableProxyHandler"]
-                [::std::mem::align_of::<NurseryAllocableProxyHandler>() - 1usize];
-        };
-        
-        pub static ProxyClass: root::JSClass = unsafe { ::core::mem::zeroed() };
+                
+                pub static ProxyClass: root::JSClass = unsafe { ::core::mem::zeroed() };
 
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -5256,17 +3530,8 @@ pub mod root {
             pub lazyProto_: bool,
             pub clasp_: *const root::JSClass,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProxyOptions"][::std::mem::size_of::<ProxyOptions>() - 16usize];
-            ["Alignment of ProxyOptions"][::std::mem::align_of::<ProxyOptions>() - 8usize];
-            ["Offset of field: ProxyOptions::lazyProto_"]
-                [::std::mem::offset_of!(ProxyOptions, lazyProto_) - 0usize];
-            ["Offset of field: ProxyOptions::clasp_"]
-                [::std::mem::offset_of!(ProxyOptions, clasp_) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn NewProxyObject(
+                
+                pub unsafe extern "C" fn NewProxyObject(
                 cx: *mut root::JSContext,
                 handler: *const root::js::BaseProxyHandler,
                 priv_: root::JS::HandleValue,
@@ -5292,27 +3557,13 @@ pub mod root {
             pub rv: bool,
         }
         pub type AutoEnterPolicy_Action = root::js::BaseProxyHandler_Action;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoEnterPolicy"][::std::mem::size_of::<AutoEnterPolicy>() - 16usize];
-            ["Alignment of AutoEnterPolicy"][::std::mem::align_of::<AutoEnterPolicy>() - 8usize];
-            ["Offset of field: AutoEnterPolicy::allow"]
-                [::std::mem::offset_of!(AutoEnterPolicy, allow) - 8usize];
-            ["Offset of field: AutoEnterPolicy::rv"]
-                [::std::mem::offset_of!(AutoEnterPolicy, rv) - 9usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct AutoWaivePolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoWaivePolicy"][::std::mem::size_of::<AutoWaivePolicy>() - 1usize];
-            ["Alignment of AutoWaivePolicy"][::std::mem::align_of::<AutoWaivePolicy>() - 1usize];
-        };
-        
-        pub static ProxyClassOps: root::JSClassOps = unsafe { ::core::mem::zeroed() };
+                
+                pub static ProxyClassOps: root::JSClassOps = unsafe { ::core::mem::zeroed() };
 
         
         pub static ProxyClassExtension: root::js::ClassExtension = unsafe { ::core::mem::zeroed() };
@@ -5347,16 +3598,7 @@ pub mod root {
         pub struct SharedArrayRawBufferRefs {
             pub refs_: root::__BindgenOpaqueArray<u64, 3usize>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of SharedArrayRawBufferRefs"]
-                [::std::mem::size_of::<SharedArrayRawBufferRefs>() - 24usize];
-            ["Alignment of SharedArrayRawBufferRefs"]
-                [::std::mem::align_of::<SharedArrayRawBufferRefs>() - 8usize];
-            ["Offset of field: SharedArrayRawBufferRefs::refs_"]
-                [::std::mem::offset_of!(SharedArrayRawBufferRefs, refs_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BufferIterator {
             pub _address: u8,
@@ -5367,26 +3609,12 @@ pub mod root {
             pub _base: root::js::ProxyOptions,
             pub proto_: root::__BindgenOpaqueArray<u64, 4usize>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of WrapperOptions"][::std::mem::size_of::<WrapperOptions>() - 48usize];
-            ["Alignment of WrapperOptions"][::std::mem::align_of::<WrapperOptions>() - 8usize];
-            ["Offset of field: WrapperOptions::proto_"]
-                [::std::mem::offset_of!(WrapperOptions, proto_) - 16usize];
-        };
-        #[repr(C, packed)]
+                #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ForwardingProxyHandler {
             pub _base: root::js::BaseProxyHandler,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ForwardingProxyHandler"]
-                [::std::mem::size_of::<ForwardingProxyHandler>() - 18usize];
-            ["Alignment of ForwardingProxyHandler"]
-                [::std::mem::align_of::<ForwardingProxyHandler>() - 1usize];
-        };
-        #[repr(C, packed)]
+                #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Wrapper {
             pub _base: root::js::ForwardingProxyHandler,
@@ -5412,13 +3640,7 @@ pub mod root {
         
         pub static mut Wrapper_defaultProto: *mut root::JSObject = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Wrapper"][::std::mem::size_of::<Wrapper>() - 22usize];
-            ["Alignment of Wrapper"][::std::mem::align_of::<Wrapper>() - 1usize];
-            ["Offset of field: Wrapper::mFlags"][::std::mem::offset_of!(Wrapper, mFlags) - 18usize];
-        };
-        #[repr(C, packed)]
+                #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct CrossCompartmentWrapper {
             pub _base: root::js::Wrapper,
@@ -5429,14 +3651,7 @@ pub mod root {
         
         pub static CrossCompartmentWrapper_singletonWithPrototype: root::js::CrossCompartmentWrapper = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CrossCompartmentWrapper"]
-                [::std::mem::size_of::<CrossCompartmentWrapper>() - 22usize];
-            ["Alignment of CrossCompartmentWrapper"]
-                [::std::mem::align_of::<CrossCompartmentWrapper>() - 1usize];
-        };
-        #[repr(C, packed)]
+                #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct OpaqueCrossCompartmentWrapper {
             pub _base: root::js::CrossCompartmentWrapper,
@@ -5444,14 +3659,7 @@ pub mod root {
         
         pub static OpaqueCrossCompartmentWrapper_singleton: root::js::OpaqueCrossCompartmentWrapper = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of OpaqueCrossCompartmentWrapper"]
-                [::std::mem::size_of::<OpaqueCrossCompartmentWrapper>() - 22usize];
-            ["Alignment of OpaqueCrossCompartmentWrapper"]
-                [::std::mem::align_of::<OpaqueCrossCompartmentWrapper>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct SecurityWrapper__bindgen_vtable(::std::os::raw::c_void);
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -5673,15 +3881,8 @@ pub mod root {
             pub vtable_: *const WeakMapTracer__bindgen_vtable,
             pub runtime: *mut root::JSRuntime,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of WeakMapTracer"][::std::mem::size_of::<WeakMapTracer>() - 16usize];
-            ["Alignment of WeakMapTracer"][::std::mem::align_of::<WeakMapTracer>() - 8usize];
-            ["Offset of field: WeakMapTracer::runtime"]
-                [::std::mem::offset_of!(WeakMapTracer, runtime) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn TraceWeakMaps(trc: *mut root::js::WeakMapTracer) { qjs_todo!("TraceWeakMaps") }
+                
+                pub unsafe extern "C" fn TraceWeakMaps(trc: *mut root::js::WeakMapTracer) { qjs_todo!("TraceWeakMaps") }
 
         
         pub unsafe extern "C" fn AreGCGrayBitsValid(rt: *mut root::JSRuntime) -> bool { qjs_todo!("AreGCGrayBitsValid") }
@@ -5856,16 +4057,7 @@ pub mod root {
             pub instanceClassMatchesProto: root::js::DOMInstanceClassHasProtoAtDepth,
             pub instanceClassIsError: root::js::DOMInstanceClassIsError,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JSDOMCallbacks"][::std::mem::size_of::<JSDOMCallbacks>() - 16usize];
-            ["Alignment of JSDOMCallbacks"][::std::mem::align_of::<JSDOMCallbacks>() - 8usize];
-            ["Offset of field: JSDOMCallbacks::instanceClassMatchesProto"]
-                [::std::mem::offset_of!(JSDOMCallbacks, instanceClassMatchesProto) - 0usize];
-            ["Offset of field: JSDOMCallbacks::instanceClassIsError"]
-                [::std::mem::offset_of!(JSDOMCallbacks, instanceClassIsError) - 8usize];
-        };
-        pub type DOMCallbacks = root::js::JSDOMCallbacks;
+                pub type DOMCallbacks = root::js::JSDOMCallbacks;
         
         pub unsafe extern "C" fn SetDOMCallbacks(
                 cx: *mut root::JSContext,
@@ -5903,38 +4095,19 @@ pub mod root {
         pub struct CompartmentFilter {
             pub vtable_: *const CompartmentFilter__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CompartmentFilter"][::std::mem::size_of::<CompartmentFilter>() - 8usize];
-            ["Alignment of CompartmentFilter"]
-                [::std::mem::align_of::<CompartmentFilter>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct AllCompartments {
             pub _base: root::js::CompartmentFilter,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AllCompartments"][::std::mem::size_of::<AllCompartments>() - 8usize];
-            ["Alignment of AllCompartments"][::std::mem::align_of::<AllCompartments>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct SingleCompartment {
             pub _base: root::js::CompartmentFilter,
             pub ours: *mut root::JS::Compartment,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of SingleCompartment"][::std::mem::size_of::<SingleCompartment>() - 16usize];
-            ["Alignment of SingleCompartment"]
-                [::std::mem::align_of::<SingleCompartment>() - 8usize];
-            ["Offset of field: SingleCompartment::ours"]
-                [::std::mem::offset_of!(SingleCompartment, ours) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn NukeCrossCompartmentWrappers(
+                
+                pub unsafe extern "C" fn NukeCrossCompartmentWrappers(
                 cx: *mut root::JSContext,
                 sourceFilter: *const root::js::CompartmentFilter,
                 target: *mut root::JS::Realm,
@@ -5983,22 +4156,8 @@ pub mod root {
         pub struct ScriptEnvironmentPreparer_Closure {
             pub vtable_: *const ScriptEnvironmentPreparer_Closure__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ScriptEnvironmentPreparer_Closure"]
-                [::std::mem::size_of::<ScriptEnvironmentPreparer_Closure>() - 8usize];
-            ["Alignment of ScriptEnvironmentPreparer_Closure"]
-                [::std::mem::align_of::<ScriptEnvironmentPreparer_Closure>() - 8usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ScriptEnvironmentPreparer"]
-                [::std::mem::size_of::<ScriptEnvironmentPreparer>() - 8usize];
-            ["Alignment of ScriptEnvironmentPreparer"]
-                [::std::mem::align_of::<ScriptEnvironmentPreparer>() - 8usize];
-        };
-        
-        pub unsafe extern "C" fn PrepareScriptEnvironmentAndInvoke(
+                        
+                        pub unsafe extern "C" fn PrepareScriptEnvironmentAndInvoke(
                 cx: *mut root::JSContext,
                 global: root::JS::HandleObject,
                 closure: *mut root::js::ScriptEnvironmentPreparer_Closure,
@@ -6017,15 +4176,8 @@ pub mod root {
         pub struct AllocationMetadataBuilder {
             pub vtable_: *const AllocationMetadataBuilder__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AllocationMetadataBuilder"]
-                [::std::mem::size_of::<AllocationMetadataBuilder>() - 8usize];
-            ["Alignment of AllocationMetadataBuilder"]
-                [::std::mem::align_of::<AllocationMetadataBuilder>() - 8usize];
-        };
-        #[doc = " Specify a callback to invoke when creating each JS object in the current\n compartment, which may return a metadata object to associate with the\n object."]
-        pub unsafe extern "C" fn SetAllocationMetadataBuilder(
+                #[doc = " Specify a callback to invoke when creating each JS object in the current\n compartment, which may return a metadata object to associate with the\n object."]
+                pub unsafe extern "C" fn SetAllocationMetadataBuilder(
                 cx: *mut root::JSContext,
                 callback: *const root::js::AllocationMetadataBuilder,
             ) { qjs_todo!("SetAllocationMetadataBuilder") }
@@ -6070,19 +4222,8 @@ pub mod root {
             pub context_: *mut root::JSContext,
             pub prevAllowContentJS_: bool,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoAssertNoContentJS"]
-                [::std::mem::size_of::<AutoAssertNoContentJS>() - 16usize];
-            ["Alignment of AutoAssertNoContentJS"]
-                [::std::mem::align_of::<AutoAssertNoContentJS>() - 8usize];
-            ["Offset of field: AutoAssertNoContentJS::context_"]
-                [::std::mem::offset_of!(AutoAssertNoContentJS, context_) - 0usize];
-            ["Offset of field: AutoAssertNoContentJS::prevAllowContentJS_"]
-                [::std::mem::offset_of!(AutoAssertNoContentJS, prevAllowContentJS_) - 8usize];
-        };
-        #[doc = " This function reports memory used by a zone in bytes, this includes:\n  * The size of this JS GC zone.\n  * Malloc memory referred to from this zone.\n  * JIT memory for this zone.\n\n Note that malloc memory referred to from this zone can include\n SharedArrayBuffers which may also be referred to from other zones. Adding the\n memory usage of multiple zones may lead to an over-estimate."]
-        pub unsafe extern "C" fn GetMemoryUsageForZone(zone: *mut root::JS::Zone) -> u64 { qjs_todo!("GetMemoryUsageForZone") }
+                #[doc = " This function reports memory used by a zone in bytes, this includes:\n  * The size of this JS GC zone.\n  * Malloc memory referred to from this zone.\n  * JIT memory for this zone.\n\n Note that malloc memory referred to from this zone can include\n SharedArrayBuffers which may also be referred to from other zones. Adding the\n memory usage of multiple zones may lead to an over-estimate."]
+                pub unsafe extern "C" fn GetMemoryUsageForZone(zone: *mut root::JS::Zone) -> u64 { qjs_todo!("GetMemoryUsageForZone") }
 
         #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -6104,15 +4245,8 @@ pub mod root {
         pub struct CompartmentTransplantCallback {
             pub vtable_: *const CompartmentTransplantCallback__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CompartmentTransplantCallback"]
-                [::std::mem::size_of::<CompartmentTransplantCallback>() - 8usize];
-            ["Alignment of CompartmentTransplantCallback"]
-                [::std::mem::align_of::<CompartmentTransplantCallback>() - 8usize];
-        };
-        
-        pub unsafe extern "C" fn RemapRemoteWindowProxies(
+                
+                pub unsafe extern "C" fn RemapRemoteWindowProxies(
                 cx: *mut root::JSContext,
                 callback: *mut root::js::CompartmentTransplantCallback,
                 newTarget: root::JS::MutableHandleObject,
@@ -6140,23 +4274,12 @@ pub mod root {
             Unspecified = 2,
             OOM = 4,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Error"][::std::mem::size_of::<Error>() - 8usize];
-            ["Alignment of Error"][::std::mem::align_of::<Error>() - 8usize];
-            ["Offset of field: Error::kind"][::std::mem::offset_of!(Error, kind) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct OOM {
             pub _base: root::JS::Error,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of OOM"][::std::mem::size_of::<OOM>() - 8usize];
-            ["Alignment of OOM"][::std::mem::align_of::<OOM>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct UnusedZero {
             pub _address: u8,
@@ -6283,210 +4406,7 @@ pub mod root {
         pub struct IsBaseTraceType {
             pub _base: root::std::false_type,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_BaseShape_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_BaseShape_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_JitCode_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_JitCode_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_Scope_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_Scope_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_JSObject_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_JSObject_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_BaseScript_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_BaseScript_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_Shape_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_Shape_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_JSString_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_JSString_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_Symbol_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_Symbol_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_BigInt_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_BigInt_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_RegExpShared_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_RegExpShared_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_GetterSetter_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_GetterSetter_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_PropMap_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_PropMap_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_SmallBuffer_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_SmallBuffer_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_BaseShape_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_BaseShape_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_JitCode_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_JitCode_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_Scope_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_Scope_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_JSObject_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_JSObject_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_BaseScript_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_BaseScript_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_Shape_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_Shape_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_JSString_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_JSString_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_Symbol_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_Symbol_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_BigInt_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_BigInt_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_RegExpShared_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_RegExpShared_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_GetterSetter_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_GetterSetter_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_PropMap_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_PropMap_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_SmallBuffer_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_SmallBuffer_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_JSLinearString_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_JSLinearString_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_JSFunction_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_JSFunction_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_JSScript_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_JSScript_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[repr(i8)]
+                                                                                                                                                                                                                                                #[repr(i8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum RootKind {
             BaseShape = 0,
@@ -6512,40 +4432,12 @@ pub mod root {
         pub struct MapTypeToRootKind {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToRootKind_open0_ptr_Realm_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToRootKind>() - 1usize];
-            ["Align of template specialization: MapTypeToRootKind_open0_ptr_Realm_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToRootKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToRootKind_open0_Value_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToRootKind>() - 1usize];
-            ["Align of template specialization: MapTypeToRootKind_open0_Value_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToRootKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: MapTypeToRootKind_open0_PropertyKey_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToRootKind>() - 1usize];
-            ["Align of template specialization: MapTypeToRootKind_open0_PropertyKey_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToRootKind>() - 1usize];
-        };
-        #[repr(C)]
+                                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoEnterCycleCollection {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoEnterCycleCollection"]
-                [::std::mem::size_of::<AutoEnterCycleCollection>() - 1usize];
-            ["Alignment of AutoEnterCycleCollection"]
-                [::std::mem::align_of::<AutoEnterCycleCollection>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct DeletePolicy {
             pub _address: u8,
@@ -6555,12 +4447,7 @@ pub mod root {
         pub struct FreePolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of FreePolicy"][::std::mem::size_of::<FreePolicy>() - 1usize];
-            ["Alignment of FreePolicy"][::std::mem::align_of::<FreePolicy>() - 1usize];
-        };
-        pub type UniqueChars = u64;
+                pub type UniqueChars = u64;
         pub type UniqueTwoByteChars = u8;
         pub type UniqueLatin1Chars = u64;
         pub type UniqueWideChars = u8;
@@ -6585,25 +4472,12 @@ pub mod root {
             pub struct IncludeUsedRval {
                 pub usedRval_: bool,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of IncludeUsedRval"][::std::mem::size_of::<IncludeUsedRval>() - 1usize];
-                ["Alignment of IncludeUsedRval"]
-                    [::std::mem::align_of::<IncludeUsedRval>() - 1usize];
-                ["Offset of field: IncludeUsedRval::usedRval_"]
-                    [::std::mem::offset_of!(IncludeUsedRval, usedRval_) - 0usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct NoUsedRval {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of NoUsedRval"][::std::mem::size_of::<NoUsedRval>() - 1usize];
-                ["Alignment of NoUsedRval"][::std::mem::align_of::<NoUsedRval>() - 1usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct CallArgsBase {
                 pub _address: u8,
@@ -6635,13 +4509,8 @@ pub mod root {
             pub struct NumberToBigIntConverter {
                 pub _address: u8,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: NumberToBigIntConverter_open0_bool__void_close0"] [:: std :: mem :: size_of :: < root :: JS :: detail :: NumberToBigIntConverter > () - 1usize] ;
-                ["Align of template specialization: NumberToBigIntConverter_open0_bool__void_close0"] [:: std :: mem :: align_of :: < root :: JS :: detail :: NumberToBigIntConverter > () - 1usize] ;
-            };
-            
-            pub unsafe extern "C" fn BigIntIsInt64(bi: *const root::JS::BigInt, result: *mut i64) -> bool { qjs_todo!("BigIntIsInt64") }
+                        
+                        pub unsafe extern "C" fn BigIntIsInt64(bi: *const root::JS::BigInt, result: *mut i64) -> bool { qjs_todo!("BigIntIsInt64") }
 
             
             pub unsafe extern "C" fn BigIntIsUint64(bi: *const root::JS::BigInt, result: *mut u64) -> bool { qjs_todo!("BigIntIsUint64") }
@@ -6712,22 +4581,7 @@ pub mod root {
                 pub inlineStorageLatin1: [root::JS::Latin1Char; 1usize],
                 pub inlineStorageTwoByte: [u16; 1usize],
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of String__bindgen_ty_1"]
-                    [::std::mem::size_of::<String__bindgen_ty_1>() - 8usize];
-                ["Alignment of String__bindgen_ty_1"]
-                    [::std::mem::align_of::<String__bindgen_ty_1>() - 8usize];
-                ["Offset of field: String__bindgen_ty_1::nonInlineCharsLatin1"]
-                    [::std::mem::offset_of!(String__bindgen_ty_1, nonInlineCharsLatin1) - 0usize];
-                ["Offset of field: String__bindgen_ty_1::nonInlineCharsTwoByte"]
-                    [::std::mem::offset_of!(String__bindgen_ty_1, nonInlineCharsTwoByte) - 0usize];
-                ["Offset of field: String__bindgen_ty_1::inlineStorageLatin1"]
-                    [::std::mem::offset_of!(String__bindgen_ty_1, inlineStorageLatin1) - 0usize];
-                ["Offset of field: String__bindgen_ty_1::inlineStorageTwoByte"]
-                    [::std::mem::offset_of!(String__bindgen_ty_1, inlineStorageTwoByte) - 0usize];
-            };
-            pub const String_ATOM_BIT: u32 = 8;
+                        pub const String_ATOM_BIT: u32 = 8;
             pub const String_LINEAR_BIT: u32 = 16;
             pub const String_INLINE_CHARS_BIT: u32 = 64;
             pub const String_LATIN1_CHARS_BIT: u32 = 1024;
@@ -6735,30 +4589,14 @@ pub mod root {
             pub const String_EXTERNAL_FLAGS: u32 = 272;
             pub const String_TYPE_FLAGS_MASK: u32 = 1016;
             pub const String_PERMANENT_ATOM_MASK: u32 = 264;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of String"][::std::mem::size_of::<String>() - 24usize];
-                ["Alignment of String"][::std::mem::align_of::<String>() - 8usize];
-                ["Offset of field: String::flags_"]
-                    [::std::mem::offset_of!(String, flags_) - 0usize];
-                ["Offset of field: String::externalCallbacks"]
-                    [::std::mem::offset_of!(String, externalCallbacks) - 16usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Symbol {
                 pub _1: *mut ::std::os::raw::c_void,
                 pub code_: u32,
             }
             pub const Symbol_WellKnownAPILimit: u32 = 2147483648;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of Symbol"][::std::mem::size_of::<Symbol>() - 16usize];
-                ["Alignment of Symbol"][::std::mem::align_of::<Symbol>() - 8usize];
-                ["Offset of field: Symbol::_1"][::std::mem::offset_of!(Symbol, _1) - 0usize];
-                ["Offset of field: Symbol::code_"][::std::mem::offset_of!(Symbol, code_) - 8usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Zone {
                 pub runtime_: *mut root::JSRuntime,
@@ -6789,48 +4627,18 @@ pub mod root {
                 AtomsZone = 1,
                 SystemZone = 2,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of Zone"][::std::mem::size_of::<Zone>() - 32usize];
-                ["Alignment of Zone"][::std::mem::align_of::<Zone>() - 8usize];
-                ["Offset of field: Zone::runtime_"]
-                    [::std::mem::offset_of!(Zone, runtime_) - 0usize];
-                ["Offset of field: Zone::barrierTracer_"]
-                    [::std::mem::offset_of!(Zone, barrierTracer_) - 8usize];
-                ["Offset of field: Zone::needsIncrementalBarrier_"]
-                    [::std::mem::offset_of!(Zone, needsIncrementalBarrier_) - 16usize];
-                ["Offset of field: Zone::gcState_"]
-                    [::std::mem::offset_of!(Zone, gcState_) - 20usize];
-                ["Offset of field: Zone::kind_"][::std::mem::offset_of!(Zone, kind_) - 24usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Realm {
                 pub compartment_: *mut root::JS::Compartment,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of Realm"][::std::mem::size_of::<Realm>() - 8usize];
-                ["Alignment of Realm"][::std::mem::align_of::<Realm>() - 8usize];
-                ["Offset of field: Realm::compartment_"]
-                    [::std::mem::offset_of!(Realm, compartment_) - 0usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct BaseShape {
                 pub clasp: *const root::JSClass,
                 pub realm: *mut root::JS::Realm,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of BaseShape"][::std::mem::size_of::<BaseShape>() - 16usize];
-                ["Alignment of BaseShape"][::std::mem::align_of::<BaseShape>() - 8usize];
-                ["Offset of field: BaseShape::clasp"]
-                    [::std::mem::offset_of!(BaseShape, clasp) - 0usize];
-                ["Offset of field: BaseShape::realm"]
-                    [::std::mem::offset_of!(BaseShape, realm) - 8usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Shape {
                 pub base: *mut root::JS::shadow::BaseShape,
@@ -6848,15 +4656,7 @@ pub mod root {
             pub const Shape_KIND_MASK: u32 = 3;
             pub const Shape_FIXED_SLOTS_SHIFT: u32 = 6;
             pub const Shape_FIXED_SLOTS_MASK: u32 = 1984;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of Shape"][::std::mem::size_of::<Shape>() - 16usize];
-                ["Alignment of Shape"][::std::mem::align_of::<Shape>() - 8usize];
-                ["Offset of field: Shape::base"][::std::mem::offset_of!(Shape, base) - 0usize];
-                ["Offset of field: Shape::immutableFlags"]
-                    [::std::mem::offset_of!(Shape, immutableFlags) - 8usize];
-            };
-            #[doc = " This layout is shared by all native objects. For non-native objects, the\n shape may always be accessed safely, and other members may be as well,\n depending on the object's specific layout."]
+                        #[doc = " This layout is shared by all native objects. For non-native objects, the\n shape may always be accessed safely, and other members may be as well,\n depending on the object's specific layout."]
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Object {
@@ -6865,15 +4665,7 @@ pub mod root {
                 pub _1: *mut ::std::os::raw::c_void,
             }
             pub const Object_MAX_FIXED_SLOTS: usize = 16;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of Object"][::std::mem::size_of::<Object>() - 24usize];
-                ["Alignment of Object"][::std::mem::align_of::<Object>() - 8usize];
-                ["Offset of field: Object::shape"][::std::mem::offset_of!(Object, shape) - 0usize];
-                ["Offset of field: Object::slots"][::std::mem::offset_of!(Object, slots) - 8usize];
-                ["Offset of field: Object::_1"][::std::mem::offset_of!(Object, _1) - 16usize];
-            };
-            #[repr(C)]
+                        #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Function {
                 pub _base: root::JS::shadow::Object,
@@ -6896,12 +4688,7 @@ pub mod root {
                 NativeJitInfoOrInterpretedScriptSlot = 2,
                 AtomSlot = 3,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of Function"][::std::mem::size_of::<Function>() - 24usize];
-                ["Alignment of Function"][::std::mem::align_of::<Function>() - 8usize];
-            };
-        }
+                    }
         #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum HeapState {
@@ -6928,14 +4715,8 @@ pub mod root {
         pub struct GCCellPtr {
             pub ptr: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of GCCellPtr"][::std::mem::size_of::<GCCellPtr>() - 8usize];
-            ["Alignment of GCCellPtr"][::std::mem::align_of::<GCCellPtr>() - 8usize];
-            ["Offset of field: GCCellPtr::ptr"][::std::mem::offset_of!(GCCellPtr, ptr) - 0usize];
-        };
-        
-        pub unsafe extern "C" fn GetTenuredGCThingZone(thing: root::JS::GCCellPtr) -> *mut root::JS::Zone { qjs_todo!("GetTenuredGCThingZone") }
+                
+                pub unsafe extern "C" fn GetTenuredGCThingZone(thing: root::JS::GCCellPtr) -> *mut root::JS::Zone { qjs_todo!("GetTenuredGCThingZone") }
 
         
         pub unsafe extern "C" fn GetNurseryCellZone(cell: *mut root::js::gc::Cell) -> *mut root::JS::Zone { qjs_todo!("GetNurseryCellZone") }
@@ -7004,16 +4785,7 @@ pub mod root {
             pub weakMapAction: root::JS::WeakMapTraceAction,
             pub weakEdgeAction: root::JS::WeakEdgeTraceAction,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TraceOptions"][::std::mem::size_of::<TraceOptions>() - 8usize];
-            ["Alignment of TraceOptions"][::std::mem::align_of::<TraceOptions>() - 4usize];
-            ["Offset of field: TraceOptions::weakMapAction"]
-                [::std::mem::offset_of!(TraceOptions, weakMapAction) - 0usize];
-            ["Offset of field: TraceOptions::weakEdgeAction"]
-                [::std::mem::offset_of!(TraceOptions, weakEdgeAction) - 4usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TracingContext {
             pub index_: usize,
@@ -7026,79 +4798,32 @@ pub mod root {
         pub struct TracingContext_Functor {
             pub vtable_: *const TracingContext_Functor__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TracingContext_Functor"]
-                [::std::mem::size_of::<TracingContext_Functor>() - 8usize];
-            ["Alignment of TracingContext_Functor"]
-                [::std::mem::align_of::<TracingContext_Functor>() - 8usize];
-        };
-        
-        pub static TracingContext_InvalidIndex: usize = unsafe { ::core::mem::zeroed() };
+                
+                pub static TracingContext_InvalidIndex: usize = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TracingContext"][::std::mem::size_of::<TracingContext>() - 16usize];
-            ["Alignment of TracingContext"][::std::mem::align_of::<TracingContext>() - 8usize];
-            ["Offset of field: TracingContext::index_"]
-                [::std::mem::offset_of!(TracingContext, index_) - 0usize];
-            ["Offset of field: TracingContext::functor_"]
-                [::std::mem::offset_of!(TracingContext, functor_) - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct CallbackTracer {
             pub _base: root::js::GenericTracerImpl,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CallbackTracer"][::std::mem::size_of::<CallbackTracer>() - 48usize];
-            ["Alignment of CallbackTracer"][::std::mem::align_of::<CallbackTracer>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoTracingIndex {
             pub trc_: *mut root::JSTracer,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoTracingIndex"][::std::mem::size_of::<AutoTracingIndex>() - 8usize];
-            ["Alignment of AutoTracingIndex"][::std::mem::align_of::<AutoTracingIndex>() - 8usize];
-            ["Offset of field: AutoTracingIndex::trc_"]
-                [::std::mem::offset_of!(AutoTracingIndex, trc_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoTracingDetails {
             pub trc_: *mut root::JSTracer,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoTracingDetails"][::std::mem::size_of::<AutoTracingDetails>() - 8usize];
-            ["Alignment of AutoTracingDetails"]
-                [::std::mem::align_of::<AutoTracingDetails>() - 8usize];
-            ["Offset of field: AutoTracingDetails::trc_"]
-                [::std::mem::offset_of!(AutoTracingDetails, trc_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoClearTracingContext {
             pub trc_: *mut root::JSTracer,
             pub prev_: root::JS::TracingContext,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoClearTracingContext"]
-                [::std::mem::size_of::<AutoClearTracingContext>() - 24usize];
-            ["Alignment of AutoClearTracingContext"]
-                [::std::mem::align_of::<AutoClearTracingContext>() - 8usize];
-            ["Offset of field: AutoClearTracingContext::trc_"]
-                [::std::mem::offset_of!(AutoClearTracingContext, trc_) - 0usize];
-            ["Offset of field: AutoClearTracingContext::prev_"]
-                [::std::mem::offset_of!(AutoClearTracingContext, prev_) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn TraceRoot(
+                
+                pub unsafe extern "C" fn TraceRoot(
                 trc: *mut root::JSTracer,
                 edgep: *mut *mut root::JS::BigInt,
                 name: *const ::std::os::raw::c_char,
@@ -7206,164 +4931,17 @@ pub mod root {
         pub struct IgnoreGCPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_unsigned_int_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_unsigned_int_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_unsigned_long_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_unsigned_long_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_bool__close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_bool__close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[repr(C)]
+                                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct GCPointerPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_BigInt_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_BigInt_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_BigInt_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_BigInt_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_Symbol_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_Symbol_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_Symbol_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_Symbol_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSAtom_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSAtom_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSAtom_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSAtom_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSFunction_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSFunction_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSFunction_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSFunction_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSLinearString_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSLinearString_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSLinearString_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSLinearString_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSObject_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSObject_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSObject_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSObject_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSScript_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSScript_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSScript_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSScript_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSString_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSString_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_JSString_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_JSString_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[repr(C)]
+                                                                                                                                        #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NonGCPointerPolicy {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_Nothing_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_Nothing_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_Ok_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_Ok_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        pub type NativeStackSize = usize;
+                        pub type NativeStackSize = usize;
         pub type NativeStackBase = usize;
         pub type NativeStackLimit = usize;
         impl root::JS::ProfilingCategoryPair {
@@ -7480,21 +5058,8 @@ pub mod root {
             pub mSubcategoryIndex: u32,
             pub mLabel: *const ::std::os::raw::c_char,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ProfilingCategoryPairInfo"]
-                [::std::mem::size_of::<ProfilingCategoryPairInfo>() - 16usize];
-            ["Alignment of ProfilingCategoryPairInfo"]
-                [::std::mem::align_of::<ProfilingCategoryPairInfo>() - 8usize];
-            ["Offset of field: ProfilingCategoryPairInfo::mCategory"]
-                [::std::mem::offset_of!(ProfilingCategoryPairInfo, mCategory) - 0usize];
-            ["Offset of field: ProfilingCategoryPairInfo::mSubcategoryIndex"]
-                [::std::mem::offset_of!(ProfilingCategoryPairInfo, mSubcategoryIndex) - 4usize];
-            ["Offset of field: ProfilingCategoryPairInfo::mLabel"]
-                [::std::mem::offset_of!(ProfilingCategoryPairInfo, mLabel) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn GetProfilingCategoryPairInfo(
+                
+                pub unsafe extern "C" fn GetProfilingCategoryPairInfo(
                 aCategoryPair: root::JS::ProfilingCategoryPair,
             ) -> *const root::JS::ProfilingCategoryPairInfo { qjs_todo!("GetProfilingCategoryPairInfo") }
 
@@ -7511,24 +5076,17 @@ pub mod root {
                 unregisterThread: root::JS::UnregisterThreadCallback,
             ) { qjs_todo!("SetProfilingThreadCallbacks") }
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_Realm_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_Realm_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        
-        pub unsafe extern "C" fn GetCurrentRealmOrNull(cx: *mut root::JSContext) -> *mut root::JS::Realm { qjs_todo!("GetCurrentRealmOrNull") }
+                
+                pub unsafe extern "C" fn GetCurrentRealmOrNull(cx: *mut root::JSContext) -> *mut root::JS::Realm { crate::engine::GetCurrentRealmOrNull(cx) }
 
         
-        pub unsafe extern "C" fn GetObjectRealmOrNull(obj: *mut root::JSObject) -> *mut root::JS::Realm { qjs_todo!("GetObjectRealmOrNull") }
+        pub unsafe extern "C" fn GetObjectRealmOrNull(obj: *mut root::JSObject) -> *mut root::JS::Realm { crate::engine::GetObjectRealmOrNull(obj) }
 
         
-        pub unsafe extern "C" fn GetRealmPrivate(realm: *mut root::JS::Realm) -> *mut ::std::os::raw::c_void { qjs_todo!("GetRealmPrivate") }
+        pub unsafe extern "C" fn GetRealmPrivate(realm: *mut root::JS::Realm) -> *mut ::std::os::raw::c_void { crate::engine::GetRealmPrivate(realm) }
 
         
-        pub unsafe extern "C" fn SetRealmPrivate(realm: *mut root::JS::Realm, data: *mut ::std::os::raw::c_void) { qjs_todo!("SetRealmPrivate") }
+        pub unsafe extern "C" fn SetRealmPrivate(realm: *mut root::JS::Realm, data: *mut ::std::os::raw::c_void) { crate::engine::SetRealmPrivate(realm, data) }
 
         pub type DestroyRealmCallback = ::std::option::Option<
             unsafe extern "C" fn(gcx: *mut root::JS::GCContext, realm: *mut root::JS::Realm),
@@ -7555,7 +5113,7 @@ pub mod root {
             ) { qjs_todo!("SetRealmNameCallback") }
 
         
-        pub unsafe extern "C" fn GetRealmGlobalOrNull(realm: *mut root::JS::Realm) -> *mut root::JSObject { qjs_todo!("GetRealmGlobalOrNull") }
+        pub unsafe extern "C" fn GetRealmGlobalOrNull(realm: *mut root::JS::Realm) -> *mut root::JSObject { crate::engine::GetRealmGlobalOrNull(realm) }
 
         
         pub unsafe extern "C" fn InitRealmStandardClasses(cx: *mut root::JSContext) -> bool { qjs_todo!("InitRealmStandardClasses") }
@@ -7608,10 +5166,10 @@ pub mod root {
         pub unsafe extern "C" fn EnterRealm(
                 cx: *mut root::JSContext,
                 target: *mut root::JSObject,
-            ) -> *mut root::JS::Realm { qjs_todo!("EnterRealm") }
+            ) -> *mut root::JS::Realm { crate::engine::EnterRealm(cx, target) }
 
         
-        pub unsafe extern "C" fn LeaveRealm(cx: *mut root::JSContext, oldRealm: *mut root::JS::Realm) { qjs_todo!("LeaveRealm") }
+        pub unsafe extern "C" fn LeaveRealm(cx: *mut root::JSContext, oldRealm: *mut root::JS::Realm) { crate::engine::LeaveRealm(cx, oldRealm) }
 
         #[doc = " Reset the seed for Math.random() within the current realm.\n\n Enables embedders to reset the seed at controlled points, e.g. after\n resuming execution from an instance snapshot of SpiderMonkey's VM."]
         pub unsafe extern "C" fn ResetRealmMathRandomSeed(cx: *mut root::JSContext) { qjs_todo!("ResetRealmMathRandomSeed") }
@@ -7723,26 +5281,7 @@ pub mod root {
             pub realm_: *mut root::JS::Realm,
             pub nativeStackLimit: [root::JS::NativeStackLimit; 3usize],
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RootingContext"][::std::mem::size_of::<RootingContext>() - 216usize];
-            ["Alignment of RootingContext"][::std::mem::align_of::<RootingContext>() - 8usize];
-            ["Offset of field: RootingContext::stackRoots_"]
-                [::std::mem::offset_of!(RootingContext, stackRoots_) - 0usize];
-            ["Offset of field: RootingContext::autoGCRooters_"]
-                [::std::mem::offset_of!(RootingContext, autoGCRooters_) - 128usize];
-            ["Offset of field: RootingContext::geckoProfiler_"]
-                [::std::mem::offset_of!(RootingContext, geckoProfiler_) - 152usize];
-            ["Offset of field: RootingContext::nursery_"]
-                [::std::mem::offset_of!(RootingContext, nursery_) - 168usize];
-            ["Offset of field: RootingContext::zone_"]
-                [::std::mem::offset_of!(RootingContext, zone_) - 176usize];
-            ["Offset of field: RootingContext::realm_"]
-                [::std::mem::offset_of!(RootingContext, realm_) - 184usize];
-            ["Offset of field: RootingContext::nativeStackLimit"]
-                [::std::mem::offset_of!(RootingContext, nativeStackLimit) - 192usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoGCRooter {
             pub down: *mut root::JS::AutoGCRooter,
@@ -7750,18 +5289,7 @@ pub mod root {
             pub kind_: root::JS::AutoGCRooter_Kind,
         }
         pub use self::super::super::root::JS::AutoGCRooterKind as AutoGCRooter_Kind;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoGCRooter"][::std::mem::size_of::<AutoGCRooter>() - 24usize];
-            ["Alignment of AutoGCRooter"][::std::mem::align_of::<AutoGCRooter>() - 8usize];
-            ["Offset of field: AutoGCRooter::down"]
-                [::std::mem::offset_of!(AutoGCRooter, down) - 0usize];
-            ["Offset of field: AutoGCRooter::stackTop"]
-                [::std::mem::offset_of!(AutoGCRooter, stackTop) - 8usize];
-            ["Offset of field: AutoGCRooter::kind_"]
-                [::std::mem::offset_of!(AutoGCRooter, kind_) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct CustomAutoRooter__bindgen_vtable(::std::os::raw::c_void);
         #[doc = " Custom rooting behavior for internal and external clients.\n\n Deprecated. Where possible, use Rooted<> instead."]
         #[repr(C)]
@@ -7770,12 +5298,7 @@ pub mod root {
             pub vtable_: *const CustomAutoRooter__bindgen_vtable,
             pub _base: root::JS::AutoGCRooter,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CustomAutoRooter"][::std::mem::size_of::<CustomAutoRooter>() - 32usize];
-            ["Alignment of CustomAutoRooter"][::std::mem::align_of::<CustomAutoRooter>() - 8usize];
-        };
-        pub type Rooted_ElementType<T> = T;
+                pub type Rooted_ElementType<T> = T;
         pub type RootedField_ElementType<T> = T;
         pub type RootedField_WrapperT = u8;
         
@@ -7819,16 +5342,11 @@ pub mod root {
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Value {
             pub asBits_: u64,
+            pub tag: i64,
         }
         pub type Value_PayloadType = u64;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Value"][::std::mem::size_of::<Value>() - 8usize];
-            ["Alignment of Value"][::std::mem::align_of::<Value>() - 8usize];
-            ["Offset of field: Value::asBits_"][::std::mem::offset_of!(Value, asBits_) - 0usize];
-        };
-        
-        pub unsafe extern "C" fn HeapValuePostWriteBarrier(
+                
+                pub unsafe extern "C" fn HeapValuePostWriteBarrier(
                 valuep: *mut root::JS::Value,
                 prev: *const root::JS::Value,
                 next: *const root::JS::Value,
@@ -7841,15 +5359,8 @@ pub mod root {
                 next: *const root::JS::Value,
             ) { qjs_todo!("HeapValueWriteBarriers") }
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_Value_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_Value_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        
-        pub static NullHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
+                
+                pub static NullHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
 
         
         pub static UndefinedHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
@@ -7860,14 +5371,7 @@ pub mod root {
         
         pub static FalseHandleValue: root::JS::HandleValue = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: Handle_open0_Maybe_open1_Value_close1_close0"]
-                [::std::mem::size_of::<u64>() - 8usize];
-            ["Align of template specialization: Handle_open0_Maybe_open1_Value_close1_close0"]
-                [::std::mem::align_of::<u64>() - 8usize];
-        };
-        pub type GCVector_ElementType<T> = T;
+                pub type GCVector_ElementType<T> = T;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct PersistentRootedVector {
@@ -7883,17 +5387,8 @@ pub mod root {
             pub length_: usize,
             pub elements_: *const root::JS::Value,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HandleValueArray"][::std::mem::size_of::<HandleValueArray>() - 16usize];
-            ["Alignment of HandleValueArray"][::std::mem::align_of::<HandleValueArray>() - 8usize];
-            ["Offset of field: HandleValueArray::length_"]
-                [::std::mem::offset_of!(HandleValueArray, length_) - 0usize];
-            ["Offset of field: HandleValueArray::elements_"]
-                [::std::mem::offset_of!(HandleValueArray, elements_) - 8usize];
-        };
-        #[doc = " Return true if the given object is callable. In ES6 terms, an object is\n callable if it has a [[Call]] internal method.\n\n Implements: ES6 7.2.3 IsCallable(argument).\n\n Functions are callable. A scripted proxy or wrapper is callable if its\n target is callable. Most other objects aren't callable."]
-        pub unsafe extern "C" fn IsCallable(obj: *mut root::JSObject) -> bool { qjs_todo!("IsCallable") }
+                #[doc = " Return true if the given object is callable. In ES6 terms, an object is\n callable if it has a [[Call]] internal method.\n\n Implements: ES6 7.2.3 IsCallable(argument).\n\n Functions are callable. A scripted proxy or wrapper is callable if its\n target is callable. Most other objects aren't callable."]
+                pub unsafe extern "C" fn IsCallable(obj: *mut root::JSObject) -> bool { qjs_todo!("IsCallable") }
 
         #[doc = " Return true if the given object is a constructor. In ES6 terms, an object is\n a constructor if it has a [[Construct]] internal method. The expression\n `new obj()` throws a TypeError if obj is not a constructor.\n\n Implements: ES6 7.2.4 IsConstructor(argument).\n\n JS functions and classes are constructors. Arrow functions and most builtin\n functions are not. A scripted proxy or wrapper is a constructor if its\n target is a constructor."]
         pub unsafe extern "C" fn IsConstructor(obj: *mut root::JSObject) -> bool { qjs_todo!("IsConstructor") }
@@ -7931,97 +5426,55 @@ pub mod root {
         }
         pub type Latin1Chars_Base = root::mozilla::Range<root::JS::Latin1Char>;
         pub type Latin1Chars_CharT = root::JS::Latin1Char;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Latin1Chars"][::std::mem::size_of::<Latin1Chars>() - 16usize];
-            ["Alignment of Latin1Chars"][::std::mem::align_of::<Latin1Chars>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ConstLatin1Chars {
             pub _base: root::mozilla::Range<root::JS::Latin1Char>,
         }
         pub type ConstLatin1Chars_Base = root::mozilla::Range<root::JS::Latin1Char>;
         pub type ConstLatin1Chars_CharT = root::JS::Latin1Char;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ConstLatin1Chars"][::std::mem::size_of::<ConstLatin1Chars>() - 16usize];
-            ["Alignment of ConstLatin1Chars"][::std::mem::align_of::<ConstLatin1Chars>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Latin1CharsZ {
             pub _base: root::mozilla::RangedPtr<root::JS::Latin1Char>,
         }
         pub type Latin1CharsZ_Base = root::mozilla::RangedPtr<root::JS::Latin1Char>;
         pub type Latin1CharsZ_CharT = root::JS::Latin1Char;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Latin1CharsZ"][::std::mem::size_of::<Latin1CharsZ>() - 8usize];
-            ["Alignment of Latin1CharsZ"][::std::mem::align_of::<Latin1CharsZ>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct UTF8Chars {
             pub _base: root::mozilla::Range<::std::os::raw::c_uchar>,
         }
         pub type UTF8Chars_Base = root::mozilla::Range<::std::os::raw::c_uchar>;
         pub type UTF8Chars_CharT = ::std::os::raw::c_uchar;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of UTF8Chars"][::std::mem::size_of::<UTF8Chars>() - 16usize];
-            ["Alignment of UTF8Chars"][::std::mem::align_of::<UTF8Chars>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct UTF8CharsZ {
             pub _base: root::mozilla::RangedPtr<::std::os::raw::c_uchar>,
         }
         pub type UTF8CharsZ_Base = root::mozilla::RangedPtr<::std::os::raw::c_uchar>;
         pub type UTF8CharsZ_CharT = ::std::os::raw::c_uchar;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of UTF8CharsZ"][::std::mem::size_of::<UTF8CharsZ>() - 8usize];
-            ["Alignment of UTF8CharsZ"][::std::mem::align_of::<UTF8CharsZ>() - 8usize];
-        };
-        #[repr(C, packed)]
+                #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ConstUTF8CharsZ {
             pub data_: *const ::std::os::raw::c_char,
         }
         pub type ConstUTF8CharsZ_CharT = ::std::os::raw::c_uchar;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ConstUTF8CharsZ"][::std::mem::size_of::<ConstUTF8CharsZ>() - 8usize];
-            ["Alignment of ConstUTF8CharsZ"][::std::mem::align_of::<ConstUTF8CharsZ>() - 1usize];
-            ["Offset of field: ConstUTF8CharsZ::data_"]
-                [::std::mem::offset_of!(ConstUTF8CharsZ, data_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TwoByteChars {
             pub _base: root::mozilla::Range<u16>,
         }
         pub type TwoByteChars_Base = root::mozilla::Range<u16>;
         pub type TwoByteChars_CharT = u16;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TwoByteChars"][::std::mem::size_of::<TwoByteChars>() - 16usize];
-            ["Alignment of TwoByteChars"][::std::mem::align_of::<TwoByteChars>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TwoByteCharsZ {
             pub _base: root::mozilla::RangedPtr<u16>,
         }
         pub type TwoByteCharsZ_Base = root::mozilla::RangedPtr<u16>;
         pub type TwoByteCharsZ_CharT = u16;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TwoByteCharsZ"][::std::mem::size_of::<TwoByteCharsZ>() - 8usize];
-            ["Alignment of TwoByteCharsZ"][::std::mem::align_of::<TwoByteCharsZ>() - 8usize];
-        };
-        pub type ConstCharPtr = root::mozilla::RangedPtr<u16>;
+                pub type ConstCharPtr = root::mozilla::RangedPtr<u16>;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ConstTwoByteChars {
@@ -8029,14 +5482,8 @@ pub mod root {
         }
         pub type ConstTwoByteChars_Base = root::mozilla::Range<u16>;
         pub type ConstTwoByteChars_CharT = u16;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ConstTwoByteChars"][::std::mem::size_of::<ConstTwoByteChars>() - 16usize];
-            ["Alignment of ConstTwoByteChars"]
-                [::std::mem::align_of::<ConstTwoByteChars>() - 8usize];
-        };
-        
-        pub unsafe extern "C" fn LossyTwoByteCharsToNewLatin1CharsZ(
+                
+                pub unsafe extern "C" fn LossyTwoByteCharsToNewLatin1CharsZ(
                 cx: *mut root::JSContext,
                 tbchars: *const root::mozilla::Range<u16>,
             ) -> root::JS::Latin1CharsZ { qjs_todo!("LossyTwoByteCharsToNewLatin1CharsZ") }
@@ -8134,22 +5581,8 @@ pub mod root {
         pub const PropertyKey_TypeMask: usize = 7;
         pub const PropertyKey_IntMin: u32 = 0;
         pub const PropertyKey_IntMax: u32 = 2147483647;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PropertyKey"][::std::mem::size_of::<PropertyKey>() - 8usize];
-            ["Alignment of PropertyKey"][::std::mem::align_of::<PropertyKey>() - 8usize];
-            ["Offset of field: PropertyKey::asBits_"]
-                [::std::mem::offset_of!(PropertyKey, asBits_) - 0usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_PropertyKey_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_PropertyKey_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-        #[doc = " Get one of the well-known symbols defined by ES6 as PropertyKey. This is\n equivalent to calling JS::GetWellKnownSymbol and then creating a PropertyKey.\n\n `which` must be in the range [0, WellKnownSymbolLimit)."]
-        pub unsafe extern "C" fn GetWellKnownSymbolKey(
+                        #[doc = " Get one of the well-known symbols defined by ES6 as PropertyKey. This is\n equivalent to calling JS::GetWellKnownSymbol and then creating a PropertyKey.\n\n `which` must be in the range [0, WellKnownSymbolLimit)."]
+                        pub unsafe extern "C" fn GetWellKnownSymbolKey(
                 cx: *mut root::JSContext,
                 which: root::JS::SymbolCode,
             ) -> root::JS::PropertyKey { qjs_todo!("GetWellKnownSymbolKey") }
@@ -8181,98 +5614,43 @@ pub mod root {
             OkCode = 0,
             Uninitialized = 18446744073709551615,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ObjectOpResult"][::std::mem::size_of::<ObjectOpResult>() - 8usize];
-            ["Alignment of ObjectOpResult"][::std::mem::align_of::<ObjectOpResult>() - 8usize];
-            ["Offset of field: ObjectOpResult::code_"]
-                [::std::mem::offset_of!(ObjectOpResult, code_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct WasmFunctionIndex {
             pub value_: u32,
         }
         pub const WasmFunctionIndex_Limit: u32 = 1073741823;
         pub const WasmFunctionIndex_DefaultBinarySourceColumnNumberOneOrigin: u32 = 1;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of WasmFunctionIndex"][::std::mem::size_of::<WasmFunctionIndex>() - 4usize];
-            ["Alignment of WasmFunctionIndex"]
-                [::std::mem::align_of::<WasmFunctionIndex>() - 4usize];
-            ["Offset of field: WasmFunctionIndex::value_"]
-                [::std::mem::offset_of!(WasmFunctionIndex, value_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ColumnNumberOffset {
             pub value_: i32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ColumnNumberOffset"][::std::mem::size_of::<ColumnNumberOffset>() - 4usize];
-            ["Alignment of ColumnNumberOffset"]
-                [::std::mem::align_of::<ColumnNumberOffset>() - 4usize];
-            ["Offset of field: ColumnNumberOffset::value_"]
-                [::std::mem::offset_of!(ColumnNumberOffset, value_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ColumnNumberUnsignedOffset {
             pub value_: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ColumnNumberUnsignedOffset"]
-                [::std::mem::size_of::<ColumnNumberUnsignedOffset>() - 4usize];
-            ["Alignment of ColumnNumberUnsignedOffset"]
-                [::std::mem::align_of::<ColumnNumberUnsignedOffset>() - 4usize];
-            ["Offset of field: ColumnNumberUnsignedOffset::value_"]
-                [::std::mem::offset_of!(ColumnNumberUnsignedOffset, value_) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct LimitedColumnNumberOneOrigin {
             pub _base: u32,
         }
         pub type LimitedColumnNumberOneOrigin_Base = u32;
         pub const LimitedColumnNumberOneOrigin_Limit: u32 = 1073741823;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of LimitedColumnNumberOneOrigin"]
-                [::std::mem::size_of::<LimitedColumnNumberOneOrigin>() - 4usize];
-            ["Alignment of LimitedColumnNumberOneOrigin"]
-                [::std::mem::align_of::<LimitedColumnNumberOneOrigin>() - 4usize];
-        };
-        #[repr(C, packed(4))]
+                #[repr(C, packed(4))]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ColumnNumberOneOrigin {
             pub _base: u32,
         }
         pub type ColumnNumberOneOrigin_Base = u32;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ColumnNumberOneOrigin"]
-                [::std::mem::size_of::<ColumnNumberOneOrigin>() - 4usize];
-            ["Alignment of ColumnNumberOneOrigin"]
-                [::std::mem::align_of::<ColumnNumberOneOrigin>() - 4usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TaggedColumnNumberOneOrigin {
             pub value_: u32,
         }
         pub const TaggedColumnNumberOneOrigin_WasmFunctionTag: u32 = 2147483648;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TaggedColumnNumberOneOrigin"]
-                [::std::mem::size_of::<TaggedColumnNumberOneOrigin>() - 4usize];
-            ["Alignment of TaggedColumnNumberOneOrigin"]
-                [::std::mem::align_of::<TaggedColumnNumberOneOrigin>() - 4usize];
-            ["Offset of field: TaggedColumnNumberOneOrigin::value_"]
-                [::std::mem::offset_of!(TaggedColumnNumberOneOrigin, value_) - 0usize];
-        };
-        pub type FrontendContext = root::js::FrontendContext;
+                pub type FrontendContext = root::js::FrontendContext;
         #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum AsmJSOption {
@@ -8298,16 +5676,7 @@ pub mod root {
             pub _bitfield_1: root::__BindgenBitfieldUnit<[u8; 1usize]>,
             pub asmJSOption_: root::JS::AsmJSOption,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PrefableCompileOptions"]
-                [::std::mem::size_of::<PrefableCompileOptions>() - 2usize];
-            ["Alignment of PrefableCompileOptions"]
-                [::std::mem::align_of::<PrefableCompileOptions>() - 1usize];
-            ["Offset of field: PrefableCompileOptions::asmJSOption_"]
-                [::std::mem::offset_of!(PrefableCompileOptions, asmJSOption_) - 1usize];
-        };
-        impl PrefableCompileOptions {
+                impl PrefableCompileOptions {
             #[inline]
             pub fn importAttributes_(&self) -> bool {
                 unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -8461,67 +5830,7 @@ pub mod root {
             pub introductionOffset: u32,
             pub hasIntroductionInfo: bool,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TransitiveCompileOptions"]
-                [::std::mem::size_of::<TransitiveCompileOptions>() - 58usize];
-            ["Alignment of TransitiveCompileOptions"]
-                [::std::mem::align_of::<TransitiveCompileOptions>() - 1usize];
-            ["Offset of field: TransitiveCompileOptions::filename_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, filename_) - 0usize];
-            ["Offset of field: TransitiveCompileOptions::introducerFilename_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introducerFilename_) - 8usize];
-            ["Offset of field: TransitiveCompileOptions::sourceMapURL_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, sourceMapURL_) - 16usize];
-            ["Offset of field: TransitiveCompileOptions::mutedErrors_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, mutedErrors_) - 24usize];
-            ["Offset of field: TransitiveCompileOptions::forceStrictMode_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, forceStrictMode_) - 25usize];
-            ["Offset of field: TransitiveCompileOptions::alwaysUseFdlibm_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, alwaysUseFdlibm_) - 26usize];
-            ["Offset of field: TransitiveCompileOptions::skipFilenameValidation_"][::std::mem::offset_of!(
-                TransitiveCompileOptions,
-                skipFilenameValidation_
-            ) - 27usize];
-            ["Offset of field: TransitiveCompileOptions::hideScriptFromDebugger_"][::std::mem::offset_of!(
-                TransitiveCompileOptions,
-                hideScriptFromDebugger_
-            ) - 28usize];
-            ["Offset of field: TransitiveCompileOptions::deferDebugMetadata_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, deferDebugMetadata_) - 29usize];
-            ["Offset of field: TransitiveCompileOptions::eagerDelazificationStrategy_"][::std::mem::offset_of!(
-                TransitiveCompileOptions,
-                eagerDelazificationStrategy_
-            )
-                - 30usize];
-            ["Offset of field: TransitiveCompileOptions::selfHostingMode"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, selfHostingMode) - 31usize];
-            ["Offset of field: TransitiveCompileOptions::discardSource"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, discardSource) - 32usize];
-            ["Offset of field: TransitiveCompileOptions::sourceIsLazy"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, sourceIsLazy) - 33usize];
-            ["Offset of field: TransitiveCompileOptions::allowHTMLComments"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, allowHTMLComments) - 34usize];
-            ["Offset of field: TransitiveCompileOptions::nonSyntacticScope"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, nonSyntacticScope) - 35usize];
-            ["Offset of field: TransitiveCompileOptions::topLevelAwait"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, topLevelAwait) - 36usize];
-            ["Offset of field: TransitiveCompileOptions::borrowBuffer"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, borrowBuffer) - 37usize];
-            ["Offset of field: TransitiveCompileOptions::usePinnedBytecode"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, usePinnedBytecode) - 38usize];
-            ["Offset of field: TransitiveCompileOptions::prefableOptions_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, prefableOptions_) - 39usize];
-            ["Offset of field: TransitiveCompileOptions::introductionType"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introductionType) - 41usize];
-            ["Offset of field: TransitiveCompileOptions::introductionLineno"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introductionLineno) - 49usize];
-            ["Offset of field: TransitiveCompileOptions::introductionOffset"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introductionOffset) - 53usize];
-            ["Offset of field: TransitiveCompileOptions::hasIntroductionInfo"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, hasIntroductionInfo) - 57usize];
-        };
-        #[doc = " The class representing a full set of compile options.\n\n Use this in code that only needs to access compilation options created\n elsewhere, like the compiler.  Don't instantiate this class (the constructor\n is protected anyway); instead, create instances only of the derived classes:\n CompileOptions and OwningCompileOptions."]
+                #[doc = " The class representing a full set of compile options.\n\n Use this in code that only needs to access compilation options created\n elsewhere, like the compiler.  Don't instantiate this class (the constructor\n is protected anyway); instead, create instances only of the derived classes:\n CompileOptions and OwningCompileOptions."]
         #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ReadOnlyCompileOptions {
@@ -8532,24 +5841,7 @@ pub mod root {
             pub isRunOnce: bool,
             pub noScriptRval: bool,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ReadOnlyCompileOptions"]
-                [::std::mem::size_of::<ReadOnlyCompileOptions>() - 72usize];
-            ["Alignment of ReadOnlyCompileOptions"]
-                [::std::mem::align_of::<ReadOnlyCompileOptions>() - 1usize];
-            ["Offset of field: ReadOnlyCompileOptions::lineno"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, lineno) - 58usize];
-            ["Offset of field: ReadOnlyCompileOptions::column"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, column) - 62usize];
-            ["Offset of field: ReadOnlyCompileOptions::scriptSourceOffset"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, scriptSourceOffset) - 66usize];
-            ["Offset of field: ReadOnlyCompileOptions::isRunOnce"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, isRunOnce) - 70usize];
-            ["Offset of field: ReadOnlyCompileOptions::noScriptRval"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, noScriptRval) - 71usize];
-        };
-        #[doc = " Compilation options, with dynamic lifetime. An instance of this type\n makes a copy of / holds / roots all dynamically allocated resources\n (principals; elements; strings) that it refers to. Its destructor frees\n / drops / unroots them. This is heavier than CompileOptions, below, but\n unlike CompileOptions, it can outlive any given stack frame.\n\n Note that this *roots* any JS values it refers to - they're live\n unconditionally. Thus, instances of this type can't be owned, directly\n or indirectly, by a JavaScript object: if any value that this roots ever\n comes to refer to the object that owns this, then the whole cycle, and\n anything else it entrains, will never be freed."]
+                #[doc = " Compilation options, with dynamic lifetime. An instance of this type\n makes a copy of / holds / roots all dynamically allocated resources\n (principals; elements; strings) that it refers to. Its destructor frees\n / drops / unroots them. This is heavier than CompileOptions, below, but\n unlike CompileOptions, it can outlive any given stack frame.\n\n Note that this *roots* any JS values it refers to - they're live\n unconditionally. Thus, instances of this type can't be owned, directly\n or indirectly, by a JavaScript object: if any value that this roots ever\n comes to refer to the object that owns this, then the whole cycle, and\n anything else it entrains, will never be freed."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct OwningCompileOptions {
@@ -8560,32 +5852,13 @@ pub mod root {
         pub struct OwningCompileOptions_ForFrontendContext {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of OwningCompileOptions_ForFrontendContext"]
-                [::std::mem::size_of::<OwningCompileOptions_ForFrontendContext>() - 1usize];
-            ["Alignment of OwningCompileOptions_ForFrontendContext"]
-                [::std::mem::align_of::<OwningCompileOptions_ForFrontendContext>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of OwningCompileOptions"]
-                [::std::mem::size_of::<OwningCompileOptions>() - 72usize];
-            ["Alignment of OwningCompileOptions"]
-                [::std::mem::align_of::<OwningCompileOptions>() - 1usize];
-        };
-        #[doc = " Compilation options stored on the stack. An instance of this type\n simply holds references to dynamically allocated resources (element;\n filename; source map URL) that are owned by something else. If you\n create an instance of this type, it's up to you to guarantee that\n everything you store in it will outlive it."]
+                        #[doc = " Compilation options stored on the stack. An instance of this type\n simply holds references to dynamically allocated resources (element;\n filename; source map URL) that are owned by something else. If you\n create an instance of this type, it's up to you to guarantee that\n everything you store in it will outlive it."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct CompileOptions {
             pub _base: root::JS::ReadOnlyCompileOptions,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CompileOptions"][::std::mem::size_of::<CompileOptions>() - 72usize];
-            ["Alignment of CompileOptions"][::std::mem::align_of::<CompileOptions>() - 1usize];
-        };
-        #[doc = " Subset of CompileOptions fields used while instantiating Stencils."]
+                #[doc = " Subset of CompileOptions fields used while instantiating Stencils."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct InstantiateOptions {
@@ -8594,21 +5867,7 @@ pub mod root {
             pub deferDebugMetadata: bool,
             pub eagerDelazificationStrategy_: root::JS::DelazificationOption,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of InstantiateOptions"][::std::mem::size_of::<InstantiateOptions>() - 4usize];
-            ["Alignment of InstantiateOptions"]
-                [::std::mem::align_of::<InstantiateOptions>() - 1usize];
-            ["Offset of field: InstantiateOptions::skipFilenameValidation"]
-                [::std::mem::offset_of!(InstantiateOptions, skipFilenameValidation) - 0usize];
-            ["Offset of field: InstantiateOptions::hideScriptFromDebugger"]
-                [::std::mem::offset_of!(InstantiateOptions, hideScriptFromDebugger) - 1usize];
-            ["Offset of field: InstantiateOptions::deferDebugMetadata"]
-                [::std::mem::offset_of!(InstantiateOptions, deferDebugMetadata) - 2usize];
-            ["Offset of field: InstantiateOptions::eagerDelazificationStrategy_"]
-                [::std::mem::offset_of!(InstantiateOptions, eagerDelazificationStrategy_) - 3usize];
-        };
-        #[doc = " Subset of CompileOptions fields used while decoding Stencils."]
+                #[doc = " Subset of CompileOptions fields used while decoding Stencils."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ReadOnlyDecodeOptions {
@@ -8619,48 +5878,18 @@ pub mod root {
             pub introductionLineno: u32,
             pub introductionOffset: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ReadOnlyDecodeOptions"]
-                [::std::mem::size_of::<ReadOnlyDecodeOptions>() - 32usize];
-            ["Alignment of ReadOnlyDecodeOptions"]
-                [::std::mem::align_of::<ReadOnlyDecodeOptions>() - 8usize];
-            ["Offset of field: ReadOnlyDecodeOptions::borrowBuffer"]
-                [::std::mem::offset_of!(ReadOnlyDecodeOptions, borrowBuffer) - 0usize];
-            ["Offset of field: ReadOnlyDecodeOptions::usePinnedBytecode"]
-                [::std::mem::offset_of!(ReadOnlyDecodeOptions, usePinnedBytecode) - 1usize];
-            ["Offset of field: ReadOnlyDecodeOptions::introducerFilename_"]
-                [::std::mem::offset_of!(ReadOnlyDecodeOptions, introducerFilename_) - 2usize];
-            ["Offset of field: ReadOnlyDecodeOptions::introductionType"]
-                [::std::mem::offset_of!(ReadOnlyDecodeOptions, introductionType) - 16usize];
-            ["Offset of field: ReadOnlyDecodeOptions::introductionLineno"]
-                [::std::mem::offset_of!(ReadOnlyDecodeOptions, introductionLineno) - 24usize];
-            ["Offset of field: ReadOnlyDecodeOptions::introductionOffset"]
-                [::std::mem::offset_of!(ReadOnlyDecodeOptions, introductionOffset) - 28usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct DecodeOptions {
             pub _base: root::JS::ReadOnlyDecodeOptions,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of DecodeOptions"][::std::mem::size_of::<DecodeOptions>() - 32usize];
-            ["Alignment of DecodeOptions"][::std::mem::align_of::<DecodeOptions>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct OwningDecodeOptions {
             pub _base: root::JS::ReadOnlyDecodeOptions,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of OwningDecodeOptions"][::std::mem::size_of::<OwningDecodeOptions>() - 32usize];
-            ["Alignment of OwningDecodeOptions"]
-                [::std::mem::align_of::<OwningDecodeOptions>() - 8usize];
-        };
-        #[doc = " Asserts (in debug and release builds) that `obj` belongs to the current\n thread's context."]
-        pub unsafe extern "C" fn AssertObjectBelongsToCurrentThread(obj: *mut root::JSObject) { qjs_todo!("AssertObjectBelongsToCurrentThread") }
+                #[doc = " Asserts (in debug and release builds) that `obj` belongs to the current\n thread's context."]
+                pub unsafe extern "C" fn AssertObjectBelongsToCurrentThread(obj: *mut root::JSObject) { qjs_todo!("AssertObjectBelongsToCurrentThread") }
 
         #[doc = " Install a process-wide callback to validate script filenames. The JS engine\n will invoke this callback for each JS script it parses or XDR decodes.\n\n If the callback returns |false|, an exception is thrown and parsing/decoding\n will be aborted.\n\n See also CompileOptions::setSkipFilenameValidation to opt-out of the callback\n for specific parse jobs."]
         pub type FilenameValidationCallback = ::std::option::Option<
@@ -8691,53 +5920,23 @@ pub mod root {
             pub wasBrittle: bool,
             pub cx: *mut root::JSContext,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoBrittleMode"][::std::mem::size_of::<AutoBrittleMode>() - 16usize];
-            ["Alignment of AutoBrittleMode"][::std::mem::align_of::<AutoBrittleMode>() - 8usize];
-            ["Offset of field: AutoBrittleMode::wasBrittle"]
-                [::std::mem::offset_of!(AutoBrittleMode, wasBrittle) - 0usize];
-            ["Offset of field: AutoBrittleMode::cx"]
-                [::std::mem::offset_of!(AutoBrittleMode, cx) - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TimeBudget {
             pub budget: root::mozilla::TimeDuration,
             pub deadline: root::mozilla::TimeStamp,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TimeBudget"][::std::mem::size_of::<TimeBudget>() - 16usize];
-            ["Alignment of TimeBudget"][::std::mem::align_of::<TimeBudget>() - 8usize];
-            ["Offset of field: TimeBudget::budget"]
-                [::std::mem::offset_of!(TimeBudget, budget) - 0usize];
-            ["Offset of field: TimeBudget::deadline"]
-                [::std::mem::offset_of!(TimeBudget, deadline) - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct WorkBudget {
             pub budget: i64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of WorkBudget"][::std::mem::size_of::<WorkBudget>() - 8usize];
-            ["Alignment of WorkBudget"][::std::mem::align_of::<WorkBudget>() - 8usize];
-            ["Offset of field: WorkBudget::budget"]
-                [::std::mem::offset_of!(WorkBudget, budget) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct UnlimitedBudget {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of UnlimitedBudget"][::std::mem::size_of::<UnlimitedBudget>() - 1usize];
-            ["Alignment of UnlimitedBudget"][::std::mem::align_of::<UnlimitedBudget>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct SliceBudget {
             pub counter: i64,
@@ -8750,24 +5949,7 @@ pub mod root {
         pub type SliceBudget_InterruptRequestFlag = u8;
         pub const SliceBudget_UnlimitedCounter: i64 = 9223372036854775807;
         pub const SliceBudget_StepsPerExpensiveCheck: i64 = 1000;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of SliceBudget"][::std::mem::size_of::<SliceBudget>() - 48usize];
-            ["Alignment of SliceBudget"][::std::mem::align_of::<SliceBudget>() - 8usize];
-            ["Offset of field: SliceBudget::counter"]
-                [::std::mem::offset_of!(SliceBudget, counter) - 0usize];
-            ["Offset of field: SliceBudget::interruptRequested"]
-                [::std::mem::offset_of!(SliceBudget, interruptRequested) - 8usize];
-            ["Offset of field: SliceBudget::budget"]
-                [::std::mem::offset_of!(SliceBudget, budget) - 16usize];
-            ["Offset of field: SliceBudget::interrupted"]
-                [::std::mem::offset_of!(SliceBudget, interrupted) - 40usize];
-            ["Offset of field: SliceBudget::idle"]
-                [::std::mem::offset_of!(SliceBudget, idle) - 41usize];
-            ["Offset of field: SliceBudget::extended"]
-                [::std::mem::offset_of!(SliceBudget, extended) - 42usize];
-        };
-        #[repr(u32)]
+                #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum GCOptions {
             Normal = 0,
@@ -8933,41 +6115,9 @@ pub mod root {
                 pub startTimestamp: root::mozilla::TimeStamp,
                 pub endTimestamp: root::mozilla::TimeStamp,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of GarbageCollectionEvent_Collection"]
-                    [::std::mem::size_of::<GarbageCollectionEvent_Collection>() - 16usize];
-                ["Alignment of GarbageCollectionEvent_Collection"]
-                    [::std::mem::align_of::<GarbageCollectionEvent_Collection>() - 8usize];
-                ["Offset of field: GarbageCollectionEvent_Collection::startTimestamp"][::std::mem::offset_of!(
-                    GarbageCollectionEvent_Collection,
-                    startTimestamp
-                ) - 0usize];
-                ["Offset of field: GarbageCollectionEvent_Collection::endTimestamp"][::std::mem::offset_of!(
-                    GarbageCollectionEvent_Collection,
-                    endTimestamp
-                ) - 8usize];
-            };
-            pub type GarbageCollectionEvent_Ptr = u8;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of GarbageCollectionEvent"]
-                    [::std::mem::size_of::<GarbageCollectionEvent>() - 48usize];
-                ["Alignment of GarbageCollectionEvent"]
-                    [::std::mem::align_of::<GarbageCollectionEvent>() - 8usize];
-                ["Offset of field: GarbageCollectionEvent::majorGCNumber_"]
-                    [::std::mem::offset_of!(GarbageCollectionEvent, majorGCNumber_) - 0usize];
-                ["Offset of field: GarbageCollectionEvent::reason"]
-                    [::std::mem::offset_of!(GarbageCollectionEvent, reason) - 8usize];
-                ["Offset of field: GarbageCollectionEvent::nonincrementalReason"][::std::mem::offset_of!(
-                    GarbageCollectionEvent,
-                    nonincrementalReason
-                ) - 16usize];
-                ["Offset of field: GarbageCollectionEvent::collections"]
-                    [::std::mem::offset_of!(GarbageCollectionEvent, collections) - 24usize];
-            };
-            
-            pub unsafe extern "C" fn SetDebuggerMallocSizeOf(
+                        pub type GarbageCollectionEvent_Ptr = u8;
+                        
+                        pub unsafe extern "C" fn SetDebuggerMallocSizeOf(
                     cx: *mut root::JSContext,
                     mallocSizeOf: root::mozilla::MallocSizeOf,
                 ) { qjs_todo!("SetDebuggerMallocSizeOf") }
@@ -9010,21 +6160,8 @@ pub mod root {
             pub options_: root::JS::GCOptions,
             pub reason_: root::JS::GCReason,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of GCDescription"][::std::mem::size_of::<GCDescription>() - 12usize];
-            ["Alignment of GCDescription"][::std::mem::align_of::<GCDescription>() - 4usize];
-            ["Offset of field: GCDescription::isZone_"]
-                [::std::mem::offset_of!(GCDescription, isZone_) - 0usize];
-            ["Offset of field: GCDescription::isComplete_"]
-                [::std::mem::offset_of!(GCDescription, isComplete_) - 1usize];
-            ["Offset of field: GCDescription::options_"]
-                [::std::mem::offset_of!(GCDescription, options_) - 4usize];
-            ["Offset of field: GCDescription::reason_"]
-                [::std::mem::offset_of!(GCDescription, reason_) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn MinorGcToJSON(cx: *mut root::JSContext) -> root::JS::UniqueChars { qjs_todo!("MinorGcToJSON") }
+                
+                pub unsafe extern "C" fn MinorGcToJSON(cx: *mut root::JSContext) -> root::JS::UniqueChars { qjs_todo!("MinorGcToJSON") }
 
         pub type GCSliceCallback = ::std::option::Option<
             unsafe extern "C" fn(
@@ -9106,17 +6243,8 @@ pub mod root {
         pub struct AutoDisableGenerationalGC {
             pub cx: *mut root::JSContext,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoDisableGenerationalGC"]
-                [::std::mem::size_of::<AutoDisableGenerationalGC>() - 8usize];
-            ["Alignment of AutoDisableGenerationalGC"]
-                [::std::mem::align_of::<AutoDisableGenerationalGC>() - 8usize];
-            ["Offset of field: AutoDisableGenerationalGC::cx"]
-                [::std::mem::offset_of!(AutoDisableGenerationalGC, cx) - 0usize];
-        };
-        #[doc = " Returns true if generational allocation and collection is currently enabled\n on the given runtime."]
-        pub unsafe extern "C" fn IsGenerationalGCEnabled(rt: *mut root::JSRuntime) -> bool { qjs_todo!("IsGenerationalGCEnabled") }
+                #[doc = " Returns true if generational allocation and collection is currently enabled\n on the given runtime."]
+                pub unsafe extern "C" fn IsGenerationalGCEnabled(rt: *mut root::JSRuntime) -> bool { qjs_todo!("IsGenerationalGCEnabled") }
 
         #[doc = " Pass a subclass of this \"abstract\" class to callees to require that they\n never GC. Subclasses can use assertions or the hazard analysis to ensure no\n GC happens."]
         #[repr(C)]
@@ -9124,60 +6252,30 @@ pub mod root {
         pub struct AutoRequireNoGC {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoRequireNoGC"][::std::mem::size_of::<AutoRequireNoGC>() - 1usize];
-            ["Alignment of AutoRequireNoGC"][::std::mem::align_of::<AutoRequireNoGC>() - 1usize];
-        };
-        #[doc = " Diagnostic assert (see MOZ_DIAGNOSTIC_ASSERT) that GC cannot occur while this\n class is live. This class does not disable the static rooting hazard\n analysis.\n\n This works by entering a GC unsafe region, which is checked on allocation and\n on GC."]
+                #[doc = " Diagnostic assert (see MOZ_DIAGNOSTIC_ASSERT) that GC cannot occur while this\n class is live. This class does not disable the static rooting hazard\n analysis.\n\n This works by entering a GC unsafe region, which is checked on allocation and\n on GC."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoAssertNoGC {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoAssertNoGC"][::std::mem::size_of::<AutoAssertNoGC>() - 1usize];
-            ["Alignment of AutoAssertNoGC"][::std::mem::align_of::<AutoAssertNoGC>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoSuppressGCAnalysis {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoSuppressGCAnalysis"]
-                [::std::mem::size_of::<AutoSuppressGCAnalysis>() - 1usize];
-            ["Alignment of AutoSuppressGCAnalysis"]
-                [::std::mem::align_of::<AutoSuppressGCAnalysis>() - 1usize];
-        };
-        #[doc = " Assert that code is only ever called from a GC callback, disable the static\n rooting hazard analysis and assert if any allocation that could potentially\n trigger a GC occurs while this guard object is live.\n\n This is useful to make the static analysis ignore code that runs in GC\n callbacks."]
+                #[doc = " Assert that code is only ever called from a GC callback, disable the static\n rooting hazard analysis and assert if any allocation that could potentially\n trigger a GC occurs while this guard object is live.\n\n This is useful to make the static analysis ignore code that runs in GC\n callbacks."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoAssertGCCallback {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoAssertGCCallback"]
-                [::std::mem::size_of::<AutoAssertGCCallback>() - 1usize];
-            ["Alignment of AutoAssertGCCallback"]
-                [::std::mem::align_of::<AutoAssertGCCallback>() - 1usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoCheckCannotGC {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoCheckCannotGC"][::std::mem::size_of::<AutoCheckCannotGC>() - 1usize];
-            ["Alignment of AutoCheckCannotGC"]
-                [::std::mem::align_of::<AutoCheckCannotGC>() - 1usize];
-        };
-        
-        pub unsafe extern "C" fn SetLowMemoryState(cx: *mut root::JSContext, newState: bool) { qjs_todo!("SetLowMemoryState") }
+                
+                pub unsafe extern "C" fn SetLowMemoryState(cx: *mut root::JSContext, newState: bool) { qjs_todo!("SetLowMemoryState") }
 
         
         pub unsafe extern "C" fn NotifyGCRootsRemoved(cx: *mut root::JSContext) { qjs_todo!("NotifyGCRootsRemoved") }
@@ -9229,26 +6327,8 @@ pub mod root {
             WithSideEffects = 0,
             NoSideEffects = 1,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ErrorReportBuilder"][::std::mem::size_of::<ErrorReportBuilder>() - 144usize];
-            ["Alignment of ErrorReportBuilder"]
-                [::std::mem::align_of::<ErrorReportBuilder>() - 8usize];
-            ["Offset of field: ErrorReportBuilder::reportp"]
-                [::std::mem::offset_of!(ErrorReportBuilder, reportp) - 0usize];
-            ["Offset of field: ErrorReportBuilder::ownedReport"]
-                [::std::mem::offset_of!(ErrorReportBuilder, ownedReport) - 8usize];
-            ["Offset of field: ErrorReportBuilder::exnObject"]
-                [::std::mem::offset_of!(ErrorReportBuilder, exnObject) - 96usize];
-            ["Offset of field: ErrorReportBuilder::filename"]
-                [::std::mem::offset_of!(ErrorReportBuilder, filename) - 120usize];
-            ["Offset of field: ErrorReportBuilder::toStringResult_"]
-                [::std::mem::offset_of!(ErrorReportBuilder, toStringResult_) - 128usize];
-            ["Offset of field: ErrorReportBuilder::toStringResultBytesStorage"]
-                [::std::mem::offset_of!(ErrorReportBuilder, toStringResultBytesStorage) - 136usize];
-        };
-        
-        pub unsafe extern "C" fn PrintError(
+                
+                pub unsafe extern "C" fn PrintError(
                 file: *mut root::FILE,
                 report: *mut root::JSErrorReport,
                 reportWarnings: bool,
@@ -9284,16 +6364,7 @@ pub mod root {
             pub exception_: root::JS::Rooted<root::JS::Value>,
             pub stack_: root::JS::Rooted<*mut root::JSObject>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ExceptionStack"][::std::mem::size_of::<ExceptionStack>() - 48usize];
-            ["Alignment of ExceptionStack"][::std::mem::align_of::<ExceptionStack>() - 8usize];
-            ["Offset of field: ExceptionStack::exception_"]
-                [::std::mem::offset_of!(ExceptionStack, exception_) - 0usize];
-            ["Offset of field: ExceptionStack::stack_"]
-                [::std::mem::offset_of!(ExceptionStack, stack_) - 24usize];
-        };
-        #[doc = " Save and later restore the current exception state of a given JSContext.\n This is useful for implementing behavior in C++ that's like try/catch\n or try/finally in JS.\n\n Typical usage:\n\n     bool ok = JS::Evaluate(cx, ...);\n     AutoSaveExceptionState savedExc(cx);\n     ... cleanup that might re-enter JS ...\n     return ok;"]
+                #[doc = " Save and later restore the current exception state of a given JSContext.\n This is useful for implementing behavior in C++ that's like try/catch\n or try/finally in JS.\n\n Typical usage:\n\n     bool ok = JS::Evaluate(cx, ...);\n     AutoSaveExceptionState savedExc(cx);\n     ... cleanup that might re-enter JS ...\n     return ok;"]
         #[repr(C)]
         pub struct AutoSaveExceptionState {
             pub context: *mut root::JSContext,
@@ -9301,23 +6372,8 @@ pub mod root {
             pub exceptionValue: root::JS::RootedValue,
             pub exceptionStack: root::JS::RootedObject,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoSaveExceptionState"]
-                [::std::mem::size_of::<AutoSaveExceptionState>() - 64usize];
-            ["Alignment of AutoSaveExceptionState"]
-                [::std::mem::align_of::<AutoSaveExceptionState>() - 8usize];
-            ["Offset of field: AutoSaveExceptionState::context"]
-                [::std::mem::offset_of!(AutoSaveExceptionState, context) - 0usize];
-            ["Offset of field: AutoSaveExceptionState::status"]
-                [::std::mem::offset_of!(AutoSaveExceptionState, status) - 8usize];
-            ["Offset of field: AutoSaveExceptionState::exceptionValue"]
-                [::std::mem::offset_of!(AutoSaveExceptionState, exceptionValue) - 16usize];
-            ["Offset of field: AutoSaveExceptionState::exceptionStack"]
-                [::std::mem::offset_of!(AutoSaveExceptionState, exceptionStack) - 40usize];
-        };
-        
-        pub unsafe extern "C" fn GetPendingExceptionStack(
+                
+                pub unsafe extern "C" fn GetPendingExceptionStack(
                 cx: *mut root::JSContext,
                 exceptionStack: *mut root::JS::ExceptionStack,
             ) -> bool { qjs_todo!("GetPendingExceptionStack") }
@@ -9338,13 +6394,13 @@ pub mod root {
         pub unsafe extern "C" fn ExceptionStackOrNull(obj: root::JS::HandleObject) -> *mut root::JSObject { qjs_todo!("ExceptionStackOrNull") }
 
         #[doc = " Get the current realm's global. Returns nullptr if no realm has been\n entered."]
-        pub unsafe extern "C" fn CurrentGlobalOrNull(cx: *mut root::JSContext) -> *mut root::JSObject { qjs_todo!("CurrentGlobalOrNull") }
+        pub unsafe extern "C" fn CurrentGlobalOrNull(cx: *mut root::JSContext) -> *mut root::JSObject { crate::engine::CurrentGlobalOrNull(cx) }
 
         #[doc = " Get the current realm's global. Returns nullptr if no realm has been\n entered."]
         pub unsafe extern "C" fn CurrentGlobal(cx: *mut root::JSContext) -> *const *mut root::JSObject { qjs_todo!("CurrentGlobal") }
 
         #[doc = " Get the global object associated with an object's realm. The object must not\n be a cross-compartment wrapper (because CCWs are shared by all realms in the\n compartment)."]
-        pub unsafe extern "C" fn GetNonCCWObjectGlobal(obj: *mut root::JSObject) -> *mut root::JSObject { qjs_todo!("GetNonCCWObjectGlobal") }
+        pub unsafe extern "C" fn GetNonCCWObjectGlobal(obj: *mut root::JSObject) -> *mut root::JSObject { crate::engine::GetNonCCWObjectGlobal(obj) }
 
         #[repr(u32)]
         #[doc = " During global creation, we fire notifications to callbacks registered\n via the Debugger API. These callbacks are arbitrary script, and can touch\n the global in arbitrary ways. When that happens, the global should not be\n in a half-baked state. But this creates a problem for consumers that need\n to set slots on the global to put it in a consistent state.\n\n This API provides a way for consumers to set slots atomically (immediately\n after the global is created), before any debugger hooks are fired. It's\n unfortunately on the clunky side, but that's the way the cookie crumbles.\n\n If callers have no additional state on the global to set up, they may pass\n |FireOnNewGlobalHook| to JS_NewGlobalObject, which causes that function to\n fire the hook as its final act before returning. Otherwise, callers should\n pass |DontFireOnNewGlobalHook|, which means that they are responsible for\n invoking JS_FireOnNewGlobalObject upon successfully creating the global. If\n an error occurs and the operation aborts, callers should skip firing the\n hook. But otherwise, callers must take care to fire the hook exactly once\n before compiling any script in the global's scope (we have assertions in\n place to enforce this). This lets us be sure that debugger clients never miss\n breakpoints."]
@@ -9555,17 +6611,7 @@ pub mod root {
             pub cx_: *mut root::JSContext,
             pub principals_: *mut root::JSPrincipals,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoHoldPrincipals"][::std::mem::size_of::<AutoHoldPrincipals>() - 16usize];
-            ["Alignment of AutoHoldPrincipals"]
-                [::std::mem::align_of::<AutoHoldPrincipals>() - 8usize];
-            ["Offset of field: AutoHoldPrincipals::cx_"]
-                [::std::mem::offset_of!(AutoHoldPrincipals, cx_) - 0usize];
-            ["Offset of field: AutoHoldPrincipals::principals_"]
-                [::std::mem::offset_of!(AutoHoldPrincipals, principals_) - 8usize];
-        };
-        pub type IdVector = u8;
+                pub type IdVector = u8;
         #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum PropertyAttribute {
@@ -9578,13 +6624,7 @@ pub mod root {
         pub struct PropertyAttributes {
             pub _base: root::mozilla::EnumSet<::std::os::raw::c_uchar>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PropertyAttributes"][::std::mem::size_of::<PropertyAttributes>() - 1usize];
-            ["Alignment of PropertyAttributes"]
-                [::std::mem::align_of::<PropertyAttributes>() - 1usize];
-        };
-        #[doc = " A structure that represents a property on an object, or the absence of a\n property.  Use {,Mutable}Handle<PropertyDescriptor> to interact with\n instances of this structure rather than interacting directly with member\n fields."]
+                #[doc = " A structure that represents a property on an object, or the absence of a\n property.  Use {,Mutable}Handle<PropertyDescriptor> to interact with\n instances of this structure rather than interacting directly with member\n fields."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct PropertyDescriptor {
@@ -9594,19 +6634,7 @@ pub mod root {
             pub setter_: *mut root::JSObject,
             pub value_: root::JS::Value,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PropertyDescriptor"][::std::mem::size_of::<PropertyDescriptor>() - 32usize];
-            ["Alignment of PropertyDescriptor"]
-                [::std::mem::align_of::<PropertyDescriptor>() - 8usize];
-            ["Offset of field: PropertyDescriptor::getter_"]
-                [::std::mem::offset_of!(PropertyDescriptor, getter_) - 8usize];
-            ["Offset of field: PropertyDescriptor::setter_"]
-                [::std::mem::offset_of!(PropertyDescriptor, setter_) - 16usize];
-            ["Offset of field: PropertyDescriptor::value_"]
-                [::std::mem::offset_of!(PropertyDescriptor, value_) - 24usize];
-        };
-        impl PropertyDescriptor {
+                impl PropertyDescriptor {
             #[inline]
             pub fn hasConfigurable_(&self) -> bool {
                 unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -10105,14 +7133,7 @@ pub mod root {
             pub _base: root::js::RefCounted,
             pub chars_: *const ::std::os::raw::c_char,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of LocaleString"][::std::mem::size_of::<LocaleString>() - 16usize];
-            ["Alignment of LocaleString"][::std::mem::align_of::<LocaleString>() - 8usize];
-            ["Offset of field: LocaleString::chars_"]
-                [::std::mem::offset_of!(LocaleString, chars_) - 8usize];
-        };
-        #[doc = " RealmCreationOptions specifies options relevant to creating a new realm, that\n are either immutable characteristics of that realm or that are discarded\n after the realm has been created.\n\n Access to these options on an existing realm is read-only: if you need\n particular selections, you must make them before you create the realm."]
+                #[doc = " RealmCreationOptions specifies options relevant to creating a new realm, that\n are either immutable characteristics of that realm or that are discarded\n after the realm has been created.\n\n Access to these options on an existing realm is read-only: if you need\n particular selections, you must make them before you create the realm."]
         #[repr(C)]
         pub struct RealmCreationOptions {
             pub traceGlobal_: root::JSTraceOp,
@@ -10137,69 +7158,12 @@ pub mod root {
             pub comp_: *mut root::JS::Compartment,
             pub zone_: *mut root::JS::Zone,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RealmCreationOptions__bindgen_ty_1"]
-                [::std::mem::size_of::<RealmCreationOptions__bindgen_ty_1>() - 8usize];
-            ["Alignment of RealmCreationOptions__bindgen_ty_1"]
-                [::std::mem::align_of::<RealmCreationOptions__bindgen_ty_1>() - 8usize];
-            ["Offset of field: RealmCreationOptions__bindgen_ty_1::comp_"]
-                [::std::mem::offset_of!(RealmCreationOptions__bindgen_ty_1, comp_) - 0usize];
-            ["Offset of field: RealmCreationOptions__bindgen_ty_1::zone_"]
-                [::std::mem::offset_of!(RealmCreationOptions__bindgen_ty_1, zone_) - 0usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RealmCreationOptions"]
-                [::std::mem::size_of::<RealmCreationOptions>() - 56usize];
-            ["Alignment of RealmCreationOptions"]
-                [::std::mem::align_of::<RealmCreationOptions>() - 8usize];
-            ["Offset of field: RealmCreationOptions::traceGlobal_"]
-                [::std::mem::offset_of!(RealmCreationOptions, traceGlobal_) - 0usize];
-            ["Offset of field: RealmCreationOptions::compSpec_"]
-                [::std::mem::offset_of!(RealmCreationOptions, compSpec_) - 8usize];
-            ["Offset of field: RealmCreationOptions::profilerRealmID_"]
-                [::std::mem::offset_of!(RealmCreationOptions, profilerRealmID_) - 24usize];
-            ["Offset of field: RealmCreationOptions::locale_"]
-                [::std::mem::offset_of!(RealmCreationOptions, locale_) - 32usize];
-            ["Offset of field: RealmCreationOptions::invisibleToDebugger_"]
-                [::std::mem::offset_of!(RealmCreationOptions, invisibleToDebugger_) - 40usize];
-            ["Offset of field: RealmCreationOptions::preserveJitCode_"]
-                [::std::mem::offset_of!(RealmCreationOptions, preserveJitCode_) - 41usize];
-            ["Offset of field: RealmCreationOptions::sharedMemoryAndAtomics_"]
-                [::std::mem::offset_of!(RealmCreationOptions, sharedMemoryAndAtomics_) - 42usize];
-            ["Offset of field: RealmCreationOptions::defineSharedArrayBufferConstructor_"][::std::mem::offset_of!(
-                RealmCreationOptions,
-                defineSharedArrayBufferConstructor_
-            )
-                - 43usize];
-            ["Offset of field: RealmCreationOptions::coopAndCoep_"]
-                [::std::mem::offset_of!(RealmCreationOptions, coopAndCoep_) - 44usize];
-            ["Offset of field: RealmCreationOptions::toSource_"]
-                [::std::mem::offset_of!(RealmCreationOptions, toSource_) - 45usize];
-            ["Offset of field: RealmCreationOptions::secureContext_"]
-                [::std::mem::offset_of!(RealmCreationOptions, secureContext_) - 46usize];
-            ["Offset of field: RealmCreationOptions::freezeBuiltins_"]
-                [::std::mem::offset_of!(RealmCreationOptions, freezeBuiltins_) - 47usize];
-            ["Offset of field: RealmCreationOptions::forceUTC_"]
-                [::std::mem::offset_of!(RealmCreationOptions, forceUTC_) - 48usize];
-            ["Offset of field: RealmCreationOptions::alwaysUseFdlibm_"]
-                [::std::mem::offset_of!(RealmCreationOptions, alwaysUseFdlibm_) - 49usize];
-        };
-        #[repr(C)]
+                        #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct RTPCallerTypeToken {
             pub value: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RTPCallerTypeToken"][::std::mem::size_of::<RTPCallerTypeToken>() - 1usize];
-            ["Alignment of RTPCallerTypeToken"]
-                [::std::mem::align_of::<RTPCallerTypeToken>() - 1usize];
-            ["Offset of field: RTPCallerTypeToken::value"]
-                [::std::mem::offset_of!(RTPCallerTypeToken, value) - 0usize];
-        };
-        #[doc = " RealmBehaviors specifies behaviors of a realm that can be changed after the\n realm's been created."]
+                #[doc = " RealmBehaviors specifies behaviors of a realm that can be changed after the\n realm's been created."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct RealmBehaviors {
@@ -10208,36 +7172,14 @@ pub mod root {
             pub clampAndJitterTime_: bool,
             pub isNonLive_: bool,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RealmBehaviors"][::std::mem::size_of::<RealmBehaviors>() - 5usize];
-            ["Alignment of RealmBehaviors"][::std::mem::align_of::<RealmBehaviors>() - 1usize];
-            ["Offset of field: RealmBehaviors::rtpCallerType"]
-                [::std::mem::offset_of!(RealmBehaviors, rtpCallerType) - 0usize];
-            ["Offset of field: RealmBehaviors::discardSource_"]
-                [::std::mem::offset_of!(RealmBehaviors, discardSource_) - 2usize];
-            ["Offset of field: RealmBehaviors::clampAndJitterTime_"]
-                [::std::mem::offset_of!(RealmBehaviors, clampAndJitterTime_) - 3usize];
-            ["Offset of field: RealmBehaviors::isNonLive_"]
-                [::std::mem::offset_of!(RealmBehaviors, isNonLive_) - 4usize];
-        };
-        #[doc = " RealmOptions specifies realm characteristics: both those that can't be\n changed on a realm once it's been created (RealmCreationOptions), and those\n that can be changed on an existing realm (RealmBehaviors)."]
+                #[doc = " RealmOptions specifies realm characteristics: both those that can't be\n changed on a realm once it's been created (RealmCreationOptions), and those\n that can be changed on an existing realm (RealmBehaviors)."]
         #[repr(C)]
         pub struct RealmOptions {
             pub creationOptions_: root::JS::RealmCreationOptions,
             pub behaviors_: root::JS::RealmBehaviors,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RealmOptions"][::std::mem::size_of::<RealmOptions>() - 64usize];
-            ["Alignment of RealmOptions"][::std::mem::align_of::<RealmOptions>() - 8usize];
-            ["Offset of field: RealmOptions::creationOptions_"]
-                [::std::mem::offset_of!(RealmOptions, creationOptions_) - 0usize];
-            ["Offset of field: RealmOptions::behaviors_"]
-                [::std::mem::offset_of!(RealmOptions, behaviors_) - 56usize];
-        };
-        
-        pub unsafe extern "C" fn RealmCreationOptionsRef(
+                
+                pub unsafe extern "C" fn RealmCreationOptionsRef(
                 realm: *mut root::JS::Realm,
             ) -> *const root::JS::RealmCreationOptions { qjs_todo!("RealmCreationOptionsRef") }
 
@@ -10282,25 +7224,13 @@ pub mod root {
         pub struct AllFrames {
             pub _address: u8,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AllFrames"][::std::mem::size_of::<AllFrames>() - 1usize];
-            ["Alignment of AllFrames"][::std::mem::align_of::<AllFrames>() - 1usize];
-        };
-        #[doc = " Capture at most this many frames."]
+                #[doc = " Capture at most this many frames."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MaxFrames {
             pub maxFrames: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MaxFrames"][::std::mem::size_of::<MaxFrames>() - 4usize];
-            ["Alignment of MaxFrames"][::std::mem::align_of::<MaxFrames>() - 4usize];
-            ["Offset of field: MaxFrames::maxFrames"]
-                [::std::mem::offset_of!(MaxFrames, maxFrames) - 0usize];
-        };
-        #[doc = " Capture the first frame with the given principals. By default, do not\n consider self-hosted frames with the given principals as satisfying the stack\n capture."]
+                #[doc = " Capture the first frame with the given principals. By default, do not\n consider self-hosted frames with the given principals as satisfying the stack\n capture."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct FirstSubsumedFrame {
@@ -10308,19 +7238,7 @@ pub mod root {
             pub principals: *mut root::JSPrincipals,
             pub ignoreSelfHosted: bool,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of FirstSubsumedFrame"][::std::mem::size_of::<FirstSubsumedFrame>() - 24usize];
-            ["Alignment of FirstSubsumedFrame"]
-                [::std::mem::align_of::<FirstSubsumedFrame>() - 8usize];
-            ["Offset of field: FirstSubsumedFrame::cx"]
-                [::std::mem::offset_of!(FirstSubsumedFrame, cx) - 0usize];
-            ["Offset of field: FirstSubsumedFrame::principals"]
-                [::std::mem::offset_of!(FirstSubsumedFrame, principals) - 8usize];
-            ["Offset of field: FirstSubsumedFrame::ignoreSelfHosted"]
-                [::std::mem::offset_of!(FirstSubsumedFrame, ignoreSelfHosted) - 16usize];
-        };
-        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
+                #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
         pub type StackCapture = root::__BindgenOpaqueArray<u64, 4usize>;
         #[doc = " Capture the current call stack as a chain of SavedFrame JSObjects, and set\n |stackp| to the SavedFrame for the youngest stack frame, or nullptr if there\n are no JS frames on the stack.\n\n The |capture| parameter describes the portion of the JS stack to capture:\n\n   * |JS::AllFrames|: Capture all frames on the stack.\n\n   * |JS::MaxFrames|: Capture no more than |JS::MaxFrames::maxFrames| from the\n      stack.\n\n   * |JS::FirstSubsumedFrame|: Capture the first frame whose principals are\n     subsumed by |JS::FirstSubsumedFrame::principals|. By default, do not\n     consider self-hosted frames; this can be controlled via the\n     |JS::FirstSubsumedFrame::ignoreSelfHosted| flag. Do not capture any async\n     stack."]
         pub unsafe extern "C" fn CaptureCurrentStack(
@@ -10351,26 +7269,14 @@ pub mod root {
         pub struct OptimizedEncodingListener {
             pub vtable_: *const OptimizedEncodingListener__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of OptimizedEncodingListener"]
-                [::std::mem::size_of::<OptimizedEncodingListener>() - 8usize];
-            ["Alignment of OptimizedEncodingListener"]
-                [::std::mem::align_of::<OptimizedEncodingListener>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct StreamConsumer__bindgen_vtable(::std::os::raw::c_void);
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct StreamConsumer {
             pub vtable_: *const StreamConsumer__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of StreamConsumer"][::std::mem::size_of::<StreamConsumer>() - 8usize];
-            ["Alignment of StreamConsumer"][::std::mem::align_of::<StreamConsumer>() - 8usize];
-        };
-        #[repr(i32)]
+                #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum MimeType {
             Wasm = 0,
@@ -10445,25 +7351,8 @@ pub mod root {
             pub protectTime: root::mozilla::TimeDuration,
             pub baselineCompileTime: root::mozilla::TimeDuration,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JSTimers"][::std::mem::size_of::<JSTimers>() - 48usize];
-            ["Alignment of JSTimers"][::std::mem::align_of::<JSTimers>() - 8usize];
-            ["Offset of field: JSTimers::executionTime"]
-                [::std::mem::offset_of!(JSTimers, executionTime) - 0usize];
-            ["Offset of field: JSTimers::delazificationTime"]
-                [::std::mem::offset_of!(JSTimers, delazificationTime) - 8usize];
-            ["Offset of field: JSTimers::xdrEncodingTime"]
-                [::std::mem::offset_of!(JSTimers, xdrEncodingTime) - 16usize];
-            ["Offset of field: JSTimers::gcTime"]
-                [::std::mem::offset_of!(JSTimers, gcTime) - 24usize];
-            ["Offset of field: JSTimers::protectTime"]
-                [::std::mem::offset_of!(JSTimers, protectTime) - 32usize];
-            ["Offset of field: JSTimers::baselineCompileTime"]
-                [::std::mem::offset_of!(JSTimers, baselineCompileTime) - 40usize];
-        };
-        
-        pub unsafe extern "C" fn GetJSTimers(cx: *mut root::JSContext) -> root::JS::JSTimers { qjs_todo!("GetJSTimers") }
+                
+                pub unsafe extern "C" fn GetJSTimers(cx: *mut root::JSContext) -> root::JS::JSTimers { qjs_todo!("GetJSTimers") }
 
         pub type Stencil = root::js::frontend::InitialStencilAndDelazifications;
         pub type TranscodeBuffer = u8;
@@ -10475,18 +7364,7 @@ pub mod root {
             pub filename: *const ::std::os::raw::c_char,
             pub lineno: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TranscodeSource"][::std::mem::size_of::<TranscodeSource>() - 32usize];
-            ["Alignment of TranscodeSource"][::std::mem::align_of::<TranscodeSource>() - 8usize];
-            ["Offset of field: TranscodeSource::range"]
-                [::std::mem::offset_of!(TranscodeSource, range) - 0usize];
-            ["Offset of field: TranscodeSource::filename"]
-                [::std::mem::offset_of!(TranscodeSource, filename) - 16usize];
-            ["Offset of field: TranscodeSource::lineno"]
-                [::std::mem::offset_of!(TranscodeSource, lineno) - 24usize];
-        };
-        #[repr(u8)]
+                #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum TranscodeResult {
             Ok = 0,
@@ -10644,25 +7522,8 @@ pub mod root {
             IMPLICIT = 0,
             EXPLICIT = 1,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoSetAsyncStackForNewCalls"]
-                [::std::mem::size_of::<AutoSetAsyncStackForNewCalls>() - 48usize];
-            ["Alignment of AutoSetAsyncStackForNewCalls"]
-                [::std::mem::align_of::<AutoSetAsyncStackForNewCalls>() - 8usize];
-            ["Offset of field: AutoSetAsyncStackForNewCalls::cx"]
-                [::std::mem::offset_of!(AutoSetAsyncStackForNewCalls, cx) - 0usize];
-            ["Offset of field: AutoSetAsyncStackForNewCalls::oldAsyncStack"]
-                [::std::mem::offset_of!(AutoSetAsyncStackForNewCalls, oldAsyncStack) - 8usize];
-            ["Offset of field: AutoSetAsyncStackForNewCalls::oldAsyncCause"]
-                [::std::mem::offset_of!(AutoSetAsyncStackForNewCalls, oldAsyncCause) - 32usize];
-            ["Offset of field: AutoSetAsyncStackForNewCalls::oldAsyncCallIsExplicit"][::std::mem::offset_of!(
-                AutoSetAsyncStackForNewCalls,
-                oldAsyncCallIsExplicit
-            ) - 40usize];
-        };
-        
-        pub unsafe extern "C" fn PropertySpecNameEqualsId(
+                
+                pub unsafe extern "C" fn PropertySpecNameEqualsId(
                 name: root::JSPropertySpec_Name,
                 id: root::JS::HandleId,
             ) -> bool { qjs_todo!("PropertySpecNameEqualsId") }
@@ -10683,17 +7544,8 @@ pub mod root {
             pub ss_: *mut root::js::ScriptSource,
             pub filename_: root::__BindgenOpaqueArray<u64, 2usize>,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoFilename"][::std::mem::size_of::<AutoFilename>() - 24usize];
-            ["Alignment of AutoFilename"][::std::mem::align_of::<AutoFilename>() - 8usize];
-            ["Offset of field: AutoFilename::ss_"]
-                [::std::mem::offset_of!(AutoFilename, ss_) - 0usize];
-            ["Offset of field: AutoFilename::filename_"]
-                [::std::mem::offset_of!(AutoFilename, filename_) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn GetScriptedCallerGlobal(cx: *mut root::JSContext) -> *mut root::JSObject { qjs_todo!("GetScriptedCallerGlobal") }
+                
+                pub unsafe extern "C" fn GetScriptedCallerGlobal(cx: *mut root::JSContext) -> *mut root::JSObject { qjs_todo!("GetScriptedCallerGlobal") }
 
         #[doc = " Informs the JS engine that the scripted caller should be hidden. This can be\n used by the embedding to maintain an override of the scripted caller in its\n calculations, by hiding the scripted caller in the JS engine and pushing data\n onto a separate stack, which it inspects when DescribeScriptedCaller returns\n null.\n\n We maintain a counter on each activation record. Add() increments the counter\n of the topmost activation, and Remove() decrements it. The count may never\n drop below zero, and must always be exactly zero when the activation is\n popped from the stack."]
         pub unsafe extern "C" fn HideScriptedCaller(cx: *mut root::JSContext) { qjs_todo!("HideScriptedCaller") }
@@ -10706,17 +7558,8 @@ pub mod root {
         pub struct AutoHideScriptedCaller {
             pub mContext: *mut root::JSContext,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoHideScriptedCaller"]
-                [::std::mem::size_of::<AutoHideScriptedCaller>() - 8usize];
-            ["Alignment of AutoHideScriptedCaller"]
-                [::std::mem::align_of::<AutoHideScriptedCaller>() - 8usize];
-            ["Offset of field: AutoHideScriptedCaller::mContext"]
-                [::std::mem::offset_of!(AutoHideScriptedCaller, mContext) - 0usize];
-        };
-        #[doc = " Attempt to disable Wasm's usage of reserving a large virtual memory\n allocation to avoid bounds checking overhead. This must be called before any\n Wasm module or memory is created in this process, or else this function will\n fail."]
-        pub unsafe extern "C" fn DisableWasmHugeMemory() -> bool { qjs_todo!("DisableWasmHugeMemory") }
+                #[doc = " Attempt to disable Wasm's usage of reserving a large virtual memory\n allocation to avoid bounds checking overhead. This must be called before any\n Wasm module or memory is created in this process, or else this function will\n fail."]
+                pub unsafe extern "C" fn DisableWasmHugeMemory() -> bool { qjs_todo!("DisableWasmHugeMemory") }
 
         #[doc = " Return true iff the given object is either a SavedFrame object or wrapper\n around a SavedFrame object, and it is not the SavedFrame.prototype object."]
         pub unsafe extern "C" fn IsMaybeWrappedSavedFrame(obj: *mut root::JSObject) -> bool { qjs_todo!("IsMaybeWrappedSavedFrame") }
@@ -10752,19 +7595,8 @@ pub mod root {
             pub freeFunc_: root::JS::BufferContentsFreeFunc,
             pub userData_: *mut ::std::os::raw::c_void,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of BufferContentsDeleter"]
-                [::std::mem::size_of::<BufferContentsDeleter>() - 16usize];
-            ["Alignment of BufferContentsDeleter"]
-                [::std::mem::align_of::<BufferContentsDeleter>() - 8usize];
-            ["Offset of field: BufferContentsDeleter::freeFunc_"]
-                [::std::mem::offset_of!(BufferContentsDeleter, freeFunc_) - 0usize];
-            ["Offset of field: BufferContentsDeleter::userData_"]
-                [::std::mem::offset_of!(BufferContentsDeleter, userData_) - 8usize];
-        };
-        #[doc = " Create a new ArrayBuffer with the given non-null |contents|.\n\n Ownership of |contents| remains with the caller: it isn't transferred to the\n returned ArrayBuffer.  Callers of this function *must* ensure that they\n perform these two steps, in this order, to properly relinquish ownership of\n |contents|:\n\n   1. Call |JS::DetachArrayBuffer| on the buffer returned by this function.\n      (|JS::DetachArrayBuffer| is generally fallible, but a call under these\n      circumstances is guaranteed to succeed.)\n   2. |contents| may be deallocated or discarded consistent with the manner\n      in which it was allocated.\n\n Do not simply allow the returned buffer to be garbage-collected before\n deallocating |contents|, because in general there is no way to know *when*\n an object is fully garbage-collected to the point where this would be safe."]
-        pub unsafe extern "C" fn NewArrayBufferWithUserOwnedContents(
+                #[doc = " Create a new ArrayBuffer with the given non-null |contents|.\n\n Ownership of |contents| remains with the caller: it isn't transferred to the\n returned ArrayBuffer.  Callers of this function *must* ensure that they\n perform these two steps, in this order, to properly relinquish ownership of\n |contents|:\n\n   1. Call |JS::DetachArrayBuffer| on the buffer returned by this function.\n      (|JS::DetachArrayBuffer| is generally fallible, but a call under these\n      circumstances is guaranteed to succeed.)\n   2. |contents| may be deallocated or discarded consistent with the manner\n      in which it was allocated.\n\n Do not simply allow the returned buffer to be garbage-collected before\n deallocating |contents|, because in general there is no way to know *when*\n an object is fully garbage-collected to the point where this would be safe."]
+                pub unsafe extern "C" fn NewArrayBufferWithUserOwnedContents(
                 cx: *mut root::JSContext,
                 nbytes: usize,
                 contents: *mut ::std::os::raw::c_void,
@@ -10976,7 +7808,7 @@ pub mod root {
                 options: *const root::JS::ReadOnlyCompileOptions,
                 srcBuf: *mut root::JS::SourceText<root::mozilla::Utf8Unit>,
                 rval: root::JS::MutableHandle<root::JS::Value>,
-            ) -> bool { qjs_todo!("Evaluate2") }
+            ) -> bool { crate::engine::Evaluate2(cx, options, srcBuf, rval) }
 
         #[doc = " Evaluate the UTF-8 contents of the file at the given path, and return the\n completion value in |rval|.  (The path itself is UTF-8 encoded, too.)  If\n the contents contain any malformed UTF-8, an error is reported."]
         pub unsafe extern "C" fn EvaluateUtf8Path(
@@ -10998,7 +7830,7 @@ pub mod root {
                 cx: *mut root::JSContext,
                 options: *const root::JS::ReadOnlyCompileOptions,
                 srcBuf: *mut root::JS::SourceText<root::mozilla::Utf8Unit>,
-            ) -> *mut root::JSScript { qjs_todo!("Compile1") }
+            ) -> *mut root::JSScript { crate::engine::Compile1(cx, options, srcBuf) }
 
         #[doc = " Compile the UTF-8 contents of the given file into a script.  It is an error\n if the file contains invalid UTF-8.  Return the script on success, or return\n null on failure (usually with an error reported)."]
         pub unsafe extern "C" fn CompileUtf8File(
@@ -11072,14 +7904,7 @@ pub mod root {
             pub _bitfield_1: root::__BindgenBitfieldUnit<[u8; 2usize]>,
             pub compileOptions_: root::JS::PrefableCompileOptions,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ContextOptions"][::std::mem::size_of::<ContextOptions>() - 4usize];
-            ["Alignment of ContextOptions"][::std::mem::align_of::<ContextOptions>() - 1usize];
-            ["Offset of field: ContextOptions::compileOptions_"]
-                [::std::mem::offset_of!(ContextOptions, compileOptions_) - 2usize];
-        };
-        impl ContextOptions {
+                impl ContextOptions {
             #[inline]
             pub fn wasm_(&self) -> bool {
                 unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -11572,14 +8397,8 @@ pub mod root {
         pub struct ClippedTime {
             pub t: f64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ClippedTime"][::std::mem::size_of::<ClippedTime>() - 8usize];
-            ["Alignment of ClippedTime"][::std::mem::align_of::<ClippedTime>() - 8usize];
-            ["Offset of field: ClippedTime::t"][::std::mem::offset_of!(ClippedTime, t) - 0usize];
-        };
-        
-        pub unsafe extern "C" fn NewDateObject(
+                
+                pub unsafe extern "C" fn NewDateObject(
                 cx: *mut root::JSContext,
                 time: root::JS::ClippedTime,
             ) -> *mut root::JSObject { qjs_todo!("NewDateObject") }
@@ -11670,13 +8489,8 @@ pub mod root {
         pub struct EnvironmentChain {
             pub _bindgen_opaque_blob: [u64; 16usize],
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of EnvironmentChain"][::std::mem::size_of::<EnvironmentChain>() - 128usize];
-            ["Alignment of EnvironmentChain"][::std::mem::align_of::<EnvironmentChain>() - 8usize];
-        };
-        #[doc = " Store |v1 === v2| to |*equal| -- strict equality, which performs no\n conversions on |v1| or |v2| before comparing.\n\n This operation can fail only if an internal error occurs (e.g. OOM while\n linearizing a string value)."]
-        pub unsafe extern "C" fn StrictlyEqual(
+                #[doc = " Store |v1 === v2| to |*equal| -- strict equality, which performs no\n conversions on |v1| or |v2| before comparing.\n\n This operation can fail only if an internal error occurs (e.g. OOM while\n linearizing a string value)."]
+                pub unsafe extern "C" fn StrictlyEqual(
                 cx: *mut root::JSContext,
                 v1: root::JS::Handle<root::JS::Value>,
                 v2: root::JS::Handle<root::JS::Value>,
@@ -11714,20 +8528,7 @@ pub mod root {
             AllowNonIterable = 1,
         }
         pub const ForOfIterator_NOT_ARRAY: u32 = 4294967295;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ForOfIterator"][::std::mem::size_of::<ForOfIterator>() - 64usize];
-            ["Alignment of ForOfIterator"][::std::mem::align_of::<ForOfIterator>() - 8usize];
-            ["Offset of field: ForOfIterator::cx_"]
-                [::std::mem::offset_of!(ForOfIterator, cx_) - 0usize];
-            ["Offset of field: ForOfIterator::iterator"]
-                [::std::mem::offset_of!(ForOfIterator, iterator) - 8usize];
-            ["Offset of field: ForOfIterator::nextMethod"]
-                [::std::mem::offset_of!(ForOfIterator, nextMethod) - 32usize];
-            ["Offset of field: ForOfIterator::index"]
-                [::std::mem::offset_of!(ForOfIterator, index) - 56usize];
-        };
-        #[doc = " Span - slices for C++\n\n Span implements Rust's slice concept for C++. It's called \"Span\" instead of\n \"Slice\" to follow the naming used in C++ Core Guidelines.\n\n A Span wraps a pointer and a length that identify a non-owning view to a\n contiguous block of memory of objects of the same type. Various types,\n including (pre-decay) C arrays, XPCOM strings, nsTArray, mozilla::Array,\n mozilla::Range and contiguous standard-library containers, auto-convert\n into Spans when attempting to pass them as arguments to methods that take\n Spans. (Span itself autoconverts into mozilla::Range.)\n\n Like Rust's slices, Span provides safety against out-of-bounds access by\n performing run-time bound checks. However, unlike Rust's slices, Span\n cannot provide safety against use-after-free.\n\n (Note: Span is like Rust's slice only conceptually. Due to the lack of\n ABI guarantees, you should still decompose spans/slices to raw pointer\n and length parts when crossing the FFI. The Elements() and data() methods\n are guaranteed to return a non-null pointer even for zero-length spans,\n so the pointer can be used as a raw part of a Rust slice without further\n checks.)\n\n In addition to having constructors (with the support of deduction guides)\n that take various well-known types, a Span for an arbitrary type can be\n constructed from a pointer and a length or a pointer and another pointer\n pointing just past the last element.\n\n A Span<const char> or Span<const char16_t> can be obtained for const char*\n or const char16_t pointing to a zero-terminated string using the\n MakeStringSpan() function (which treats a nullptr argument equivalently\n to the empty string). Corresponding implicit constructor does not exist\n in order to avoid accidental construction in cases where const char* or\n const char16_t* do not point to a zero-terminated string.\n\n Span has methods that follow the Mozilla naming style and methods that\n don't. The methods that follow the Mozilla naming style are meant to be\n used directly from Mozilla code. The methods that don't are meant for\n integration with C++11 range-based loops and with meta-programming that\n expects the same methods that are found on the standard-library\n containers. For example, to decompose a Span into its parts in Mozilla\n code, use Elements() and Length() (as with nsTArray) instead of data()\n and size() (as with std::vector).\n\n The pointer and length wrapped by a Span cannot be changed after a Span has\n been created. When new values are required, simply create a new Span. Span\n has a method called Subspan() that works analogously to the Substring()\n method of XPCOM strings taking a start index and an optional length. As a\n Mozilla extension (relative to Microsoft's gsl::span that mozilla::Span is\n based on), Span has methods From(start), To(end) and FromTo(start, end)\n that correspond to Rust's &slice[start..], &slice[..end] and\n &slice[start..end], respectively. (That is, the end index is the index of\n the first element not to be included in the new subspan.)\n\n When indicating a Span that's only read from, const goes inside the type\n parameter. Don't put const in front of Span. That is:\n size_t ReadsFromOneSpanAndWritesToAnother(Span<const uint8_t> aReadFrom,\n                                           Span<uint8_t> aWrittenTo);\n\n Any Span<const T> can be viewed as Span<const uint8_t> using the function\n AsBytes(). Any Span<T> can be viewed as Span<uint8_t> using the function\n AsWritableBytes().\n\n Note that iterators from different Span instances are uncomparable, even if\n they refer to the same memory. This also applies to any spans derived via\n Subspan etc."]
+                #[doc = " Span - slices for C++\n\n Span implements Rust's slice concept for C++. It's called \"Span\" instead of\n \"Slice\" to follow the naming used in C++ Core Guidelines.\n\n A Span wraps a pointer and a length that identify a non-owning view to a\n contiguous block of memory of objects of the same type. Various types,\n including (pre-decay) C arrays, XPCOM strings, nsTArray, mozilla::Array,\n mozilla::Range and contiguous standard-library containers, auto-convert\n into Spans when attempting to pass them as arguments to methods that take\n Spans. (Span itself autoconverts into mozilla::Range.)\n\n Like Rust's slices, Span provides safety against out-of-bounds access by\n performing run-time bound checks. However, unlike Rust's slices, Span\n cannot provide safety against use-after-free.\n\n (Note: Span is like Rust's slice only conceptually. Due to the lack of\n ABI guarantees, you should still decompose spans/slices to raw pointer\n and length parts when crossing the FFI. The Elements() and data() methods\n are guaranteed to return a non-null pointer even for zero-length spans,\n so the pointer can be used as a raw part of a Rust slice without further\n checks.)\n\n In addition to having constructors (with the support of deduction guides)\n that take various well-known types, a Span for an arbitrary type can be\n constructed from a pointer and a length or a pointer and another pointer\n pointing just past the last element.\n\n A Span<const char> or Span<const char16_t> can be obtained for const char*\n or const char16_t pointing to a zero-terminated string using the\n MakeStringSpan() function (which treats a nullptr argument equivalently\n to the empty string). Corresponding implicit constructor does not exist\n in order to avoid accidental construction in cases where const char* or\n const char16_t* do not point to a zero-terminated string.\n\n Span has methods that follow the Mozilla naming style and methods that\n don't. The methods that follow the Mozilla naming style are meant to be\n used directly from Mozilla code. The methods that don't are meant for\n integration with C++11 range-based loops and with meta-programming that\n expects the same methods that are found on the standard-library\n containers. For example, to decompose a Span into its parts in Mozilla\n code, use Elements() and Length() (as with nsTArray) instead of data()\n and size() (as with std::vector).\n\n The pointer and length wrapped by a Span cannot be changed after a Span has\n been created. When new values are required, simply create a new Span. Span\n has a method called Subspan() that works analogously to the Substring()\n method of XPCOM strings taking a start index and an optional length. As a\n Mozilla extension (relative to Microsoft's gsl::span that mozilla::Span is\n based on), Span has methods From(start), To(end) and FromTo(start, end)\n that correspond to Rust's &slice[start..], &slice[..end] and\n &slice[start..end], respectively. (That is, the end index is the index of\n the first element not to be included in the new subspan.)\n\n When indicating a Span that's only read from, const goes inside the type\n parameter. Don't put const in front of Span. That is:\n size_t ReadsFromOneSpanAndWritesToAnother(Span<const uint8_t> aReadFrom,\n                                           Span<uint8_t> aWrittenTo);\n\n Any Span<const T> can be viewed as Span<const uint8_t> using the function\n AsBytes(). Any Span<T> can be viewed as Span<uint8_t> using the function\n AsWritableBytes().\n\n Note that iterators from different Span instances are uncomparable, even if\n they refer to the same memory. This also applies to any spans derived via\n Subspan etc."]
         pub type SelfHostedCache = root::__BindgenOpaqueArray<u64, 2usize>;
         pub type SelfHostedWriter = ::std::option::Option<
             unsafe extern "C" fn(
@@ -11740,7 +8541,7 @@ pub mod root {
                 cx: *mut root::JSContext,
                 cache: root::JS::SelfHostedCache,
                 writer: root::JS::SelfHostedWriter,
-            ) -> bool { qjs_todo!("InitSelfHostedCode") }
+            ) -> bool { crate::engine::InitSelfHostedCode(cx, cache, writer) }
 
         
         pub unsafe extern "C" fn DisableJitBackend() { qjs_todo!("DisableJitBackend") }
@@ -11780,13 +8581,8 @@ pub mod root {
         pub struct JSONParseHandler {
             pub vtable_: *const JSONParseHandler__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JSONParseHandler"][::std::mem::size_of::<JSONParseHandler>() - 8usize];
-            ["Alignment of JSONParseHandler"][::std::mem::align_of::<JSONParseHandler>() - 8usize];
-        };
-        #[doc = " Performs the JSON.parse operation as specified by ECMAScript, and call\n callbacks defined by the handler."]
-        pub unsafe extern "C" fn ParseJSONWithHandler(
+                #[doc = " Performs the JSON.parse operation as specified by ECMAScript, and call\n callbacks defined by the handler."]
+                pub unsafe extern "C" fn ParseJSONWithHandler(
                 chars: *const root::JS::Latin1Char,
                 len: u32,
                 handler: *mut root::JS::JSONParseHandler,
@@ -11815,20 +8611,7 @@ pub mod root {
             Private = 2,
             Other = 3,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TabSizes"][::std::mem::size_of::<TabSizes>() - 32usize];
-            ["Alignment of TabSizes"][::std::mem::align_of::<TabSizes>() - 8usize];
-            ["Offset of field: TabSizes::objects_"]
-                [::std::mem::offset_of!(TabSizes, objects_) - 0usize];
-            ["Offset of field: TabSizes::strings_"]
-                [::std::mem::offset_of!(TabSizes, strings_) - 8usize];
-            ["Offset of field: TabSizes::private_"]
-                [::std::mem::offset_of!(TabSizes, private_) - 16usize];
-            ["Offset of field: TabSizes::other_"]
-                [::std::mem::offset_of!(TabSizes, other_) - 24usize];
-        };
-        #[doc = " These are the measurements used by Servo."]
+                #[doc = " These are the measurements used by Servo."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ServoSizes {
@@ -11850,24 +8633,7 @@ pub mod root {
             NonHeap = 5,
             Ignore = 6,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ServoSizes"][::std::mem::size_of::<ServoSizes>() - 48usize];
-            ["Alignment of ServoSizes"][::std::mem::align_of::<ServoSizes>() - 8usize];
-            ["Offset of field: ServoSizes::gcHeapUsed"]
-                [::std::mem::offset_of!(ServoSizes, gcHeapUsed) - 0usize];
-            ["Offset of field: ServoSizes::gcHeapUnused"]
-                [::std::mem::offset_of!(ServoSizes, gcHeapUnused) - 8usize];
-            ["Offset of field: ServoSizes::gcHeapAdmin"]
-                [::std::mem::offset_of!(ServoSizes, gcHeapAdmin) - 16usize];
-            ["Offset of field: ServoSizes::gcHeapDecommitted"]
-                [::std::mem::offset_of!(ServoSizes, gcHeapDecommitted) - 24usize];
-            ["Offset of field: ServoSizes::mallocHeap"]
-                [::std::mem::offset_of!(ServoSizes, mallocHeap) - 32usize];
-            ["Offset of field: ServoSizes::nonHeap"]
-                [::std::mem::offset_of!(ServoSizes, nonHeap) - 40usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ClassInfo {
             pub objectsGCHeap: usize,
@@ -11882,34 +8648,7 @@ pub mod root {
             pub objectsNonHeapElementsWasmShared: usize,
             pub objectsNonHeapCodeWasm: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ClassInfo"][::std::mem::size_of::<ClassInfo>() - 88usize];
-            ["Alignment of ClassInfo"][::std::mem::align_of::<ClassInfo>() - 8usize];
-            ["Offset of field: ClassInfo::objectsGCHeap"]
-                [::std::mem::offset_of!(ClassInfo, objectsGCHeap) - 0usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapSlots"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapSlots) - 8usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapElementsNormal"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapElementsNormal) - 16usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapElementsAsmJS"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapElementsAsmJS) - 24usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapGlobalData"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapGlobalData) - 32usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapMisc"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapMisc) - 40usize];
-            ["Offset of field: ClassInfo::objectsNonHeapElementsNormal"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsNormal) - 48usize];
-            ["Offset of field: ClassInfo::objectsNonHeapElementsShared"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsShared) - 56usize];
-            ["Offset of field: ClassInfo::objectsNonHeapElementsWasm"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsWasm) - 64usize];
-            ["Offset of field: ClassInfo::objectsNonHeapElementsWasmShared"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsWasmShared) - 72usize];
-            ["Offset of field: ClassInfo::objectsNonHeapCodeWasm"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapCodeWasm) - 80usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ShapeInfo {
             pub shapesGCHeapShared: usize,
@@ -11917,34 +8656,14 @@ pub mod root {
             pub shapesGCHeapBase: usize,
             pub shapesMallocHeapCache: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ShapeInfo"][::std::mem::size_of::<ShapeInfo>() - 32usize];
-            ["Alignment of ShapeInfo"][::std::mem::align_of::<ShapeInfo>() - 8usize];
-            ["Offset of field: ShapeInfo::shapesGCHeapShared"]
-                [::std::mem::offset_of!(ShapeInfo, shapesGCHeapShared) - 0usize];
-            ["Offset of field: ShapeInfo::shapesGCHeapDict"]
-                [::std::mem::offset_of!(ShapeInfo, shapesGCHeapDict) - 8usize];
-            ["Offset of field: ShapeInfo::shapesGCHeapBase"]
-                [::std::mem::offset_of!(ShapeInfo, shapesGCHeapBase) - 16usize];
-            ["Offset of field: ShapeInfo::shapesMallocHeapCache"]
-                [::std::mem::offset_of!(ShapeInfo, shapesMallocHeapCache) - 24usize];
-        };
-        #[doc = " Holds data about a notable class (one whose combined object and shape\n instances use more than a certain amount of memory) so we can report it\n individually.\n\n The only difference between this class and ClassInfo is that this class\n holds a copy of the filename."]
+                #[doc = " Holds data about a notable class (one whose combined object and shape\n instances use more than a certain amount of memory) so we can report it\n individually.\n\n The only difference between this class and ClassInfo is that this class\n holds a copy of the filename."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NotableClassInfo {
             pub _base: root::JS::ClassInfo,
             pub className_: root::JS::UniqueChars,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of NotableClassInfo"][::std::mem::size_of::<NotableClassInfo>() - 96usize];
-            ["Alignment of NotableClassInfo"][::std::mem::align_of::<NotableClassInfo>() - 8usize];
-            ["Offset of field: NotableClassInfo::className_"]
-                [::std::mem::offset_of!(NotableClassInfo, className_) - 88usize];
-        };
-        #[doc = " Data for tracking JIT-code memory usage."]
+                #[doc = " Data for tracking JIT-code memory usage."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct CodeSizes {
@@ -11954,21 +8673,7 @@ pub mod root {
             pub other: usize,
             pub unused: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CodeSizes"][::std::mem::size_of::<CodeSizes>() - 40usize];
-            ["Alignment of CodeSizes"][::std::mem::align_of::<CodeSizes>() - 8usize];
-            ["Offset of field: CodeSizes::ion"][::std::mem::offset_of!(CodeSizes, ion) - 0usize];
-            ["Offset of field: CodeSizes::baseline"]
-                [::std::mem::offset_of!(CodeSizes, baseline) - 8usize];
-            ["Offset of field: CodeSizes::regexp"]
-                [::std::mem::offset_of!(CodeSizes, regexp) - 16usize];
-            ["Offset of field: CodeSizes::other"]
-                [::std::mem::offset_of!(CodeSizes, other) - 24usize];
-            ["Offset of field: CodeSizes::unused"]
-                [::std::mem::offset_of!(CodeSizes, unused) - 32usize];
-        };
-        #[doc = " Data for tracking GC memory usage."]
+                #[doc = " Data for tracking GC memory usage."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct GCSizes {
@@ -11984,33 +8689,7 @@ pub mod root {
             pub storeBufferWholeCells: usize,
             pub storeBufferGenerics: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of GCSizes"][::std::mem::size_of::<GCSizes>() - 88usize];
-            ["Alignment of GCSizes"][::std::mem::align_of::<GCSizes>() - 8usize];
-            ["Offset of field: GCSizes::marker"][::std::mem::offset_of!(GCSizes, marker) - 0usize];
-            ["Offset of field: GCSizes::nurseryCommitted"]
-                [::std::mem::offset_of!(GCSizes, nurseryCommitted) - 8usize];
-            ["Offset of field: GCSizes::nurseryMallocedBuffers"]
-                [::std::mem::offset_of!(GCSizes, nurseryMallocedBuffers) - 16usize];
-            ["Offset of field: GCSizes::nurseryMallocedBlockCache"]
-                [::std::mem::offset_of!(GCSizes, nurseryMallocedBlockCache) - 24usize];
-            ["Offset of field: GCSizes::nurseryTrailerBlockSets"]
-                [::std::mem::offset_of!(GCSizes, nurseryTrailerBlockSets) - 32usize];
-            ["Offset of field: GCSizes::storeBufferVals"]
-                [::std::mem::offset_of!(GCSizes, storeBufferVals) - 40usize];
-            ["Offset of field: GCSizes::storeBufferCells"]
-                [::std::mem::offset_of!(GCSizes, storeBufferCells) - 48usize];
-            ["Offset of field: GCSizes::storeBufferSlots"]
-                [::std::mem::offset_of!(GCSizes, storeBufferSlots) - 56usize];
-            ["Offset of field: GCSizes::storeBufferWasmAnyRefs"]
-                [::std::mem::offset_of!(GCSizes, storeBufferWasmAnyRefs) - 64usize];
-            ["Offset of field: GCSizes::storeBufferWholeCells"]
-                [::std::mem::offset_of!(GCSizes, storeBufferWholeCells) - 72usize];
-            ["Offset of field: GCSizes::storeBufferGenerics"]
-                [::std::mem::offset_of!(GCSizes, storeBufferGenerics) - 80usize];
-        };
-        #[doc = " This class holds information about the memory taken up by identical copies of\n a particular string.  Multiple JSStrings may have their sizes aggregated\n together into one StringInfo object.  Note that two strings with identical\n chars will not be aggregated together if one is a short string and the other\n is not."]
+                #[doc = " This class holds information about the memory taken up by identical copies of\n a particular string.  Multiple JSStrings may have their sizes aggregated\n together into one StringInfo object.  Note that two strings with identical\n chars will not be aggregated together if one is a short string and the other\n is not."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct StringInfo {
@@ -12020,22 +8699,7 @@ pub mod root {
             pub mallocHeapTwoByte: usize,
             pub numCopies: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of StringInfo"][::std::mem::size_of::<StringInfo>() - 40usize];
-            ["Alignment of StringInfo"][::std::mem::align_of::<StringInfo>() - 8usize];
-            ["Offset of field: StringInfo::gcHeapLatin1"]
-                [::std::mem::offset_of!(StringInfo, gcHeapLatin1) - 0usize];
-            ["Offset of field: StringInfo::gcHeapTwoByte"]
-                [::std::mem::offset_of!(StringInfo, gcHeapTwoByte) - 8usize];
-            ["Offset of field: StringInfo::mallocHeapLatin1"]
-                [::std::mem::offset_of!(StringInfo, mallocHeapLatin1) - 16usize];
-            ["Offset of field: StringInfo::mallocHeapTwoByte"]
-                [::std::mem::offset_of!(StringInfo, mallocHeapTwoByte) - 24usize];
-            ["Offset of field: StringInfo::numCopies"]
-                [::std::mem::offset_of!(StringInfo, numCopies) - 32usize];
-        };
-        #[doc = " Holds data about a notable string (one which, counting all duplicates, uses\n more than a certain amount of memory) so we can report it individually.\n\n The only difference between this class and StringInfo is that\n NotableStringInfo holds a copy of some or all of the string's chars."]
+                #[doc = " Holds data about a notable string (one which, counting all duplicates, uses\n more than a certain amount of memory) so we can report it individually.\n\n The only difference between this class and StringInfo is that\n NotableStringInfo holds a copy of some or all of the string's chars."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NotableStringInfo {
@@ -12044,49 +8708,21 @@ pub mod root {
             pub length: usize,
         }
         pub const NotableStringInfo_MAX_SAVED_CHARS: usize = 1024;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of NotableStringInfo"][::std::mem::size_of::<NotableStringInfo>() - 56usize];
-            ["Alignment of NotableStringInfo"]
-                [::std::mem::align_of::<NotableStringInfo>() - 8usize];
-            ["Offset of field: NotableStringInfo::buffer"]
-                [::std::mem::offset_of!(NotableStringInfo, buffer) - 40usize];
-            ["Offset of field: NotableStringInfo::length"]
-                [::std::mem::offset_of!(NotableStringInfo, length) - 48usize];
-        };
-        #[doc = " This class holds information about the memory taken up by script sources\n from a particular file."]
+                #[doc = " This class holds information about the memory taken up by script sources\n from a particular file."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ScriptSourceInfo {
             pub misc: usize,
             pub numScripts: u32,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ScriptSourceInfo"][::std::mem::size_of::<ScriptSourceInfo>() - 16usize];
-            ["Alignment of ScriptSourceInfo"][::std::mem::align_of::<ScriptSourceInfo>() - 8usize];
-            ["Offset of field: ScriptSourceInfo::misc"]
-                [::std::mem::offset_of!(ScriptSourceInfo, misc) - 0usize];
-            ["Offset of field: ScriptSourceInfo::numScripts"]
-                [::std::mem::offset_of!(ScriptSourceInfo, numScripts) - 8usize];
-        };
-        #[doc = " Holds data about a notable script source file (one whose combined\n script sources use more than a certain amount of memory) so we can report it\n individually.\n\n The only difference between this class and ScriptSourceInfo is that this\n class holds a copy of the filename."]
+                #[doc = " Holds data about a notable script source file (one whose combined\n script sources use more than a certain amount of memory) so we can report it\n individually.\n\n The only difference between this class and ScriptSourceInfo is that this\n class holds a copy of the filename."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct NotableScriptSourceInfo {
             pub _base: root::JS::ScriptSourceInfo,
             pub filename_: root::JS::UniqueChars,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of NotableScriptSourceInfo"]
-                [::std::mem::size_of::<NotableScriptSourceInfo>() - 24usize];
-            ["Alignment of NotableScriptSourceInfo"]
-                [::std::mem::align_of::<NotableScriptSourceInfo>() - 8usize];
-            ["Offset of field: NotableScriptSourceInfo::filename_"]
-                [::std::mem::offset_of!(NotableScriptSourceInfo, filename_) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct HelperThreadStats {
             pub stateData: usize,
@@ -12096,41 +8732,14 @@ pub mod root {
             pub idleThreadCount: ::std::os::raw::c_uint,
             pub activeThreadCount: ::std::os::raw::c_uint,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HelperThreadStats"][::std::mem::size_of::<HelperThreadStats>() - 40usize];
-            ["Alignment of HelperThreadStats"]
-                [::std::mem::align_of::<HelperThreadStats>() - 8usize];
-            ["Offset of field: HelperThreadStats::stateData"]
-                [::std::mem::offset_of!(HelperThreadStats, stateData) - 0usize];
-            ["Offset of field: HelperThreadStats::ionCompileTask"]
-                [::std::mem::offset_of!(HelperThreadStats, ionCompileTask) - 8usize];
-            ["Offset of field: HelperThreadStats::wasmCompile"]
-                [::std::mem::offset_of!(HelperThreadStats, wasmCompile) - 16usize];
-            ["Offset of field: HelperThreadStats::contexts"]
-                [::std::mem::offset_of!(HelperThreadStats, contexts) - 24usize];
-            ["Offset of field: HelperThreadStats::idleThreadCount"]
-                [::std::mem::offset_of!(HelperThreadStats, idleThreadCount) - 32usize];
-            ["Offset of field: HelperThreadStats::activeThreadCount"]
-                [::std::mem::offset_of!(HelperThreadStats, activeThreadCount) - 36usize];
-        };
-        #[doc = " Measurements that not associated with any individual runtime."]
+                #[doc = " Measurements that not associated with any individual runtime."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct GlobalStats {
             pub helperThread: root::JS::HelperThreadStats,
             pub mallocSizeOf_: root::mozilla::MallocSizeOf,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of GlobalStats"][::std::mem::size_of::<GlobalStats>() - 48usize];
-            ["Alignment of GlobalStats"][::std::mem::align_of::<GlobalStats>() - 8usize];
-            ["Offset of field: GlobalStats::helperThread"]
-                [::std::mem::offset_of!(GlobalStats, helperThread) - 0usize];
-            ["Offset of field: GlobalStats::mallocSizeOf_"]
-                [::std::mem::offset_of!(GlobalStats, mallocSizeOf_) - 40usize];
-        };
-        #[doc = " These measurements relate directly to the JSRuntime, and not to zones,\n compartments, and realms within it."]
+                #[doc = " These measurements relate directly to the JSRuntime, and not to zones,\n compartments, and realms within it."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct RuntimeSizes {
@@ -12154,48 +8763,7 @@ pub mod root {
             pub notableScriptSources: root::__BindgenOpaqueArray<u64, 3usize>,
         }
         pub type RuntimeSizes_ScriptSourcesHashMap = root::__BindgenOpaqueArray<u64, 3usize>;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RuntimeSizes"][::std::mem::size_of::<RuntimeSizes>() - 272usize];
-            ["Alignment of RuntimeSizes"][::std::mem::align_of::<RuntimeSizes>() - 8usize];
-            ["Offset of field: RuntimeSizes::object"]
-                [::std::mem::offset_of!(RuntimeSizes, object) - 0usize];
-            ["Offset of field: RuntimeSizes::atomsTable"]
-                [::std::mem::offset_of!(RuntimeSizes, atomsTable) - 8usize];
-            ["Offset of field: RuntimeSizes::atomsMarkBitmaps"]
-                [::std::mem::offset_of!(RuntimeSizes, atomsMarkBitmaps) - 16usize];
-            ["Offset of field: RuntimeSizes::selfHostStencil"]
-                [::std::mem::offset_of!(RuntimeSizes, selfHostStencil) - 24usize];
-            ["Offset of field: RuntimeSizes::contexts"]
-                [::std::mem::offset_of!(RuntimeSizes, contexts) - 32usize];
-            ["Offset of field: RuntimeSizes::temporary"]
-                [::std::mem::offset_of!(RuntimeSizes, temporary) - 40usize];
-            ["Offset of field: RuntimeSizes::interpreterStack"]
-                [::std::mem::offset_of!(RuntimeSizes, interpreterStack) - 48usize];
-            ["Offset of field: RuntimeSizes::sharedImmutableStringsCache"]
-                [::std::mem::offset_of!(RuntimeSizes, sharedImmutableStringsCache) - 56usize];
-            ["Offset of field: RuntimeSizes::sharedIntlData"]
-                [::std::mem::offset_of!(RuntimeSizes, sharedIntlData) - 64usize];
-            ["Offset of field: RuntimeSizes::uncompressedSourceCache"]
-                [::std::mem::offset_of!(RuntimeSizes, uncompressedSourceCache) - 72usize];
-            ["Offset of field: RuntimeSizes::scriptData"]
-                [::std::mem::offset_of!(RuntimeSizes, scriptData) - 80usize];
-            ["Offset of field: RuntimeSizes::wasmRuntime"]
-                [::std::mem::offset_of!(RuntimeSizes, wasmRuntime) - 88usize];
-            ["Offset of field: RuntimeSizes::wasmGuardPages"]
-                [::std::mem::offset_of!(RuntimeSizes, wasmGuardPages) - 96usize];
-            ["Offset of field: RuntimeSizes::jitLazyLink"]
-                [::std::mem::offset_of!(RuntimeSizes, jitLazyLink) - 104usize];
-            ["Offset of field: RuntimeSizes::scriptSourceInfo"]
-                [::std::mem::offset_of!(RuntimeSizes, scriptSourceInfo) - 112usize];
-            ["Offset of field: RuntimeSizes::gc"]
-                [::std::mem::offset_of!(RuntimeSizes, gc) - 128usize];
-            ["Offset of field: RuntimeSizes::allScriptSources"]
-                [::std::mem::offset_of!(RuntimeSizes, allScriptSources) - 216usize];
-            ["Offset of field: RuntimeSizes::notableScriptSources"]
-                [::std::mem::offset_of!(RuntimeSizes, notableScriptSources) - 248usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct UnusedGCThingSizes {
             pub object: usize,
@@ -12212,57 +8780,14 @@ pub mod root {
             pub regExpShared: usize,
             pub smallBuffer: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of UnusedGCThingSizes"][::std::mem::size_of::<UnusedGCThingSizes>() - 104usize];
-            ["Alignment of UnusedGCThingSizes"]
-                [::std::mem::align_of::<UnusedGCThingSizes>() - 8usize];
-            ["Offset of field: UnusedGCThingSizes::object"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, object) - 0usize];
-            ["Offset of field: UnusedGCThingSizes::script"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, script) - 8usize];
-            ["Offset of field: UnusedGCThingSizes::shape"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, shape) - 16usize];
-            ["Offset of field: UnusedGCThingSizes::baseShape"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, baseShape) - 24usize];
-            ["Offset of field: UnusedGCThingSizes::getterSetter"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, getterSetter) - 32usize];
-            ["Offset of field: UnusedGCThingSizes::propMap"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, propMap) - 40usize];
-            ["Offset of field: UnusedGCThingSizes::string"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, string) - 48usize];
-            ["Offset of field: UnusedGCThingSizes::symbol"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, symbol) - 56usize];
-            ["Offset of field: UnusedGCThingSizes::bigInt"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, bigInt) - 64usize];
-            ["Offset of field: UnusedGCThingSizes::jitcode"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, jitcode) - 72usize];
-            ["Offset of field: UnusedGCThingSizes::scope"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, scope) - 80usize];
-            ["Offset of field: UnusedGCThingSizes::regExpShared"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, regExpShared) - 88usize];
-            ["Offset of field: UnusedGCThingSizes::smallBuffer"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, smallBuffer) - 96usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct GCBufferStats {
             pub usedBytes: usize,
             pub freeBytes: usize,
             pub adminBytes: usize,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of GCBufferStats"][::std::mem::size_of::<GCBufferStats>() - 24usize];
-            ["Alignment of GCBufferStats"][::std::mem::align_of::<GCBufferStats>() - 8usize];
-            ["Offset of field: GCBufferStats::usedBytes"]
-                [::std::mem::offset_of!(GCBufferStats, usedBytes) - 0usize];
-            ["Offset of field: GCBufferStats::freeBytes"]
-                [::std::mem::offset_of!(GCBufferStats, freeBytes) - 8usize];
-            ["Offset of field: GCBufferStats::adminBytes"]
-                [::std::mem::offset_of!(GCBufferStats, adminBytes) - 16usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ZoneStats {
             pub symbolsGCHeap: usize,
@@ -12303,84 +8828,7 @@ pub mod root {
             pub isTotals: bool,
         }
         pub type ZoneStats_StringsHashMap = root::__BindgenOpaqueArray<u64, 3usize>;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ZoneStats"][::std::mem::size_of::<ZoneStats>() - 528usize];
-            ["Alignment of ZoneStats"][::std::mem::align_of::<ZoneStats>() - 8usize];
-            ["Offset of field: ZoneStats::symbolsGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, symbolsGCHeap) - 0usize];
-            ["Offset of field: ZoneStats::bigIntsGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, bigIntsGCHeap) - 8usize];
-            ["Offset of field: ZoneStats::bigIntsMallocHeap"]
-                [::std::mem::offset_of!(ZoneStats, bigIntsMallocHeap) - 16usize];
-            ["Offset of field: ZoneStats::gcHeapArenaAdmin"]
-                [::std::mem::offset_of!(ZoneStats, gcHeapArenaAdmin) - 24usize];
-            ["Offset of field: ZoneStats::jitCodesGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, jitCodesGCHeap) - 32usize];
-            ["Offset of field: ZoneStats::getterSettersGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, getterSettersGCHeap) - 40usize];
-            ["Offset of field: ZoneStats::compactPropMapsGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, compactPropMapsGCHeap) - 48usize];
-            ["Offset of field: ZoneStats::normalPropMapsGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, normalPropMapsGCHeap) - 56usize];
-            ["Offset of field: ZoneStats::dictPropMapsGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, dictPropMapsGCHeap) - 64usize];
-            ["Offset of field: ZoneStats::propMapChildren"]
-                [::std::mem::offset_of!(ZoneStats, propMapChildren) - 72usize];
-            ["Offset of field: ZoneStats::propMapTables"]
-                [::std::mem::offset_of!(ZoneStats, propMapTables) - 80usize];
-            ["Offset of field: ZoneStats::scopesGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, scopesGCHeap) - 88usize];
-            ["Offset of field: ZoneStats::scopesMallocHeap"]
-                [::std::mem::offset_of!(ZoneStats, scopesMallocHeap) - 96usize];
-            ["Offset of field: ZoneStats::regExpSharedsGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, regExpSharedsGCHeap) - 104usize];
-            ["Offset of field: ZoneStats::regExpSharedsMallocHeap"]
-                [::std::mem::offset_of!(ZoneStats, regExpSharedsMallocHeap) - 112usize];
-            ["Offset of field: ZoneStats::smallBuffersGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, smallBuffersGCHeap) - 120usize];
-            ["Offset of field: ZoneStats::zoneObject"]
-                [::std::mem::offset_of!(ZoneStats, zoneObject) - 128usize];
-            ["Offset of field: ZoneStats::regexpZone"]
-                [::std::mem::offset_of!(ZoneStats, regexpZone) - 136usize];
-            ["Offset of field: ZoneStats::jitZone"]
-                [::std::mem::offset_of!(ZoneStats, jitZone) - 144usize];
-            ["Offset of field: ZoneStats::cacheIRStubs"]
-                [::std::mem::offset_of!(ZoneStats, cacheIRStubs) - 152usize];
-            ["Offset of field: ZoneStats::uniqueIdMap"]
-                [::std::mem::offset_of!(ZoneStats, uniqueIdMap) - 160usize];
-            ["Offset of field: ZoneStats::initialPropMapTable"]
-                [::std::mem::offset_of!(ZoneStats, initialPropMapTable) - 168usize];
-            ["Offset of field: ZoneStats::shapeTables"]
-                [::std::mem::offset_of!(ZoneStats, shapeTables) - 176usize];
-            ["Offset of field: ZoneStats::compartmentObjects"]
-                [::std::mem::offset_of!(ZoneStats, compartmentObjects) - 184usize];
-            ["Offset of field: ZoneStats::crossCompartmentWrappersTables"]
-                [::std::mem::offset_of!(ZoneStats, crossCompartmentWrappersTables) - 192usize];
-            ["Offset of field: ZoneStats::compartmentsPrivateData"]
-                [::std::mem::offset_of!(ZoneStats, compartmentsPrivateData) - 200usize];
-            ["Offset of field: ZoneStats::scriptCountsMap"]
-                [::std::mem::offset_of!(ZoneStats, scriptCountsMap) - 208usize];
-            ["Offset of field: ZoneStats::gcBuffers"]
-                [::std::mem::offset_of!(ZoneStats, gcBuffers) - 216usize];
-            ["Offset of field: ZoneStats::unusedGCThings"]
-                [::std::mem::offset_of!(ZoneStats, unusedGCThings) - 240usize];
-            ["Offset of field: ZoneStats::stringInfo"]
-                [::std::mem::offset_of!(ZoneStats, stringInfo) - 344usize];
-            ["Offset of field: ZoneStats::shapeInfo"]
-                [::std::mem::offset_of!(ZoneStats, shapeInfo) - 384usize];
-            ["Offset of field: ZoneStats::code"]
-                [::std::mem::offset_of!(ZoneStats, code) - 416usize];
-            ["Offset of field: ZoneStats::extra"]
-                [::std::mem::offset_of!(ZoneStats, extra) - 456usize];
-            ["Offset of field: ZoneStats::allStrings"]
-                [::std::mem::offset_of!(ZoneStats, allStrings) - 464usize];
-            ["Offset of field: ZoneStats::notableStrings"]
-                [::std::mem::offset_of!(ZoneStats, notableStrings) - 496usize];
-            ["Offset of field: ZoneStats::isTotals"]
-                [::std::mem::offset_of!(ZoneStats, isTotals) - 520usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct RealmStats {
             pub objectsPrivate: usize,
@@ -12403,48 +8851,7 @@ pub mod root {
             pub isTotals: bool,
         }
         pub type RealmStats_ClassesHashMap = root::__BindgenOpaqueArray<u64, 3usize>;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RealmStats"][::std::mem::size_of::<RealmStats>() - 264usize];
-            ["Alignment of RealmStats"][::std::mem::align_of::<RealmStats>() - 8usize];
-            ["Offset of field: RealmStats::objectsPrivate"]
-                [::std::mem::offset_of!(RealmStats, objectsPrivate) - 0usize];
-            ["Offset of field: RealmStats::scriptsGCHeap"]
-                [::std::mem::offset_of!(RealmStats, scriptsGCHeap) - 8usize];
-            ["Offset of field: RealmStats::scriptsMallocHeapData"]
-                [::std::mem::offset_of!(RealmStats, scriptsMallocHeapData) - 16usize];
-            ["Offset of field: RealmStats::baselineData"]
-                [::std::mem::offset_of!(RealmStats, baselineData) - 24usize];
-            ["Offset of field: RealmStats::allocSites"]
-                [::std::mem::offset_of!(RealmStats, allocSites) - 32usize];
-            ["Offset of field: RealmStats::ionData"]
-                [::std::mem::offset_of!(RealmStats, ionData) - 40usize];
-            ["Offset of field: RealmStats::jitScripts"]
-                [::std::mem::offset_of!(RealmStats, jitScripts) - 48usize];
-            ["Offset of field: RealmStats::realmObject"]
-                [::std::mem::offset_of!(RealmStats, realmObject) - 56usize];
-            ["Offset of field: RealmStats::realmTables"]
-                [::std::mem::offset_of!(RealmStats, realmTables) - 64usize];
-            ["Offset of field: RealmStats::innerViewsTable"]
-                [::std::mem::offset_of!(RealmStats, innerViewsTable) - 72usize];
-            ["Offset of field: RealmStats::objectMetadataTable"]
-                [::std::mem::offset_of!(RealmStats, objectMetadataTable) - 80usize];
-            ["Offset of field: RealmStats::savedStacksSet"]
-                [::std::mem::offset_of!(RealmStats, savedStacksSet) - 88usize];
-            ["Offset of field: RealmStats::nonSyntacticLexicalScopesTable"]
-                [::std::mem::offset_of!(RealmStats, nonSyntacticLexicalScopesTable) - 96usize];
-            ["Offset of field: RealmStats::classInfo"]
-                [::std::mem::offset_of!(RealmStats, classInfo) - 104usize];
-            ["Offset of field: RealmStats::extra"]
-                [::std::mem::offset_of!(RealmStats, extra) - 192usize];
-            ["Offset of field: RealmStats::allClasses"]
-                [::std::mem::offset_of!(RealmStats, allClasses) - 200usize];
-            ["Offset of field: RealmStats::notableClasses"]
-                [::std::mem::offset_of!(RealmStats, notableClasses) - 232usize];
-            ["Offset of field: RealmStats::isTotals"]
-                [::std::mem::offset_of!(RealmStats, isTotals) - 256usize];
-        };
-        pub type RealmStatsVector = root::__BindgenOpaqueArray<u64, 3usize>;
+                pub type RealmStatsVector = root::__BindgenOpaqueArray<u64, 3usize>;
         pub type ZoneStatsVector = root::__BindgenOpaqueArray<u64, 3usize>;
         #[repr(C)]
         pub struct RuntimeStats__bindgen_vtable(::std::os::raw::c_void);
@@ -12466,38 +8873,7 @@ pub mod root {
             pub currZoneStats: *mut root::JS::ZoneStats,
             pub mallocSizeOf_: root::mozilla::MallocSizeOf,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RuntimeStats"][::std::mem::size_of::<RuntimeStats>() - 1184usize];
-            ["Alignment of RuntimeStats"][::std::mem::align_of::<RuntimeStats>() - 8usize];
-            ["Offset of field: RuntimeStats::gcHeapChunkTotal"]
-                [::std::mem::offset_of!(RuntimeStats, gcHeapChunkTotal) - 8usize];
-            ["Offset of field: RuntimeStats::gcHeapDecommittedPages"]
-                [::std::mem::offset_of!(RuntimeStats, gcHeapDecommittedPages) - 16usize];
-            ["Offset of field: RuntimeStats::gcHeapUnusedChunks"]
-                [::std::mem::offset_of!(RuntimeStats, gcHeapUnusedChunks) - 24usize];
-            ["Offset of field: RuntimeStats::gcHeapUnusedArenas"]
-                [::std::mem::offset_of!(RuntimeStats, gcHeapUnusedArenas) - 32usize];
-            ["Offset of field: RuntimeStats::gcHeapChunkAdmin"]
-                [::std::mem::offset_of!(RuntimeStats, gcHeapChunkAdmin) - 40usize];
-            ["Offset of field: RuntimeStats::gcHeapGCThings"]
-                [::std::mem::offset_of!(RuntimeStats, gcHeapGCThings) - 48usize];
-            ["Offset of field: RuntimeStats::runtime"]
-                [::std::mem::offset_of!(RuntimeStats, runtime) - 56usize];
-            ["Offset of field: RuntimeStats::realmTotals"]
-                [::std::mem::offset_of!(RuntimeStats, realmTotals) - 328usize];
-            ["Offset of field: RuntimeStats::zTotals"]
-                [::std::mem::offset_of!(RuntimeStats, zTotals) - 592usize];
-            ["Offset of field: RuntimeStats::realmStatsVector"]
-                [::std::mem::offset_of!(RuntimeStats, realmStatsVector) - 1120usize];
-            ["Offset of field: RuntimeStats::zoneStatsVector"]
-                [::std::mem::offset_of!(RuntimeStats, zoneStatsVector) - 1144usize];
-            ["Offset of field: RuntimeStats::currZoneStats"]
-                [::std::mem::offset_of!(RuntimeStats, currZoneStats) - 1168usize];
-            ["Offset of field: RuntimeStats::mallocSizeOf_"]
-                [::std::mem::offset_of!(RuntimeStats, mallocSizeOf_) - 1176usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct ObjectPrivateVisitor__bindgen_vtable(::std::os::raw::c_void);
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -12511,17 +8887,8 @@ pub mod root {
                 iface: *mut *mut root::nsISupports,
             ) -> bool,
         >;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ObjectPrivateVisitor"]
-                [::std::mem::size_of::<ObjectPrivateVisitor>() - 16usize];
-            ["Alignment of ObjectPrivateVisitor"]
-                [::std::mem::align_of::<ObjectPrivateVisitor>() - 8usize];
-            ["Offset of field: ObjectPrivateVisitor::getISupports_"]
-                [::std::mem::offset_of!(ObjectPrivateVisitor, getISupports_) - 8usize];
-        };
-        
-        pub unsafe extern "C" fn CollectGlobalStats(gStats: *mut root::JS::GlobalStats) -> bool { qjs_todo!("CollectGlobalStats") }
+                
+                pub unsafe extern "C" fn CollectGlobalStats(gStats: *mut root::JS::GlobalStats) -> bool { qjs_todo!("CollectGlobalStats") }
 
         
         pub unsafe extern "C" fn CollectRuntimeStats(
@@ -12807,20 +9174,8 @@ pub mod root {
         pub struct JobQueue_SavedJobQueue {
             pub vtable_: *const JobQueue_SavedJobQueue__bindgen_vtable,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JobQueue_SavedJobQueue"]
-                [::std::mem::size_of::<JobQueue_SavedJobQueue>() - 8usize];
-            ["Alignment of JobQueue_SavedJobQueue"]
-                [::std::mem::align_of::<JobQueue_SavedJobQueue>() - 8usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of JobQueue"][::std::mem::size_of::<JobQueue>() - 8usize];
-            ["Alignment of JobQueue"][::std::mem::align_of::<JobQueue>() - 8usize];
-        };
-        #[doc = " Tell SpiderMonkey to use `queue` to schedule promise reactions.\n\n SpiderMonkey does not take ownership of the queue; it is the embedding's\n responsibility to clean it up after the runtime is destroyed."]
-        pub unsafe extern "C" fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS::JobQueue) { qjs_todo!("SetJobQueue") }
+                        #[doc = " Tell SpiderMonkey to use `queue` to schedule promise reactions.\n\n SpiderMonkey does not take ownership of the queue; it is the embedding's\n responsibility to clean it up after the runtime is destroyed."]
+                        pub unsafe extern "C" fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS::JobQueue) { qjs_todo!("SetJobQueue") }
 
         #[doc = " [SMDOC] Protecting the debuggee's job/microtask queue from debugger activity.\n\n When the JavaScript debugger interrupts the execution of some debuggee code\n (for a breakpoint, for example), the debuggee's execution must be paused\n while the developer takes time to look at it. During this interruption, other\n tabs should remain active and usable. If the debuggee shares a main thread\n with non-debuggee tabs, that means that the thread will have to process\n non-debuggee HTML tasks and microtasks as usual, even as the debuggee's are\n on hold until the debugger lets it continue execution. (Letting debuggee\n microtasks run during the interruption would mean that, from the debuggee's\n point of view, their side effects would take place wherever the breakpoint\n was set - in general, not a place other code should ever run, and a violation\n of the run-to-completion rule.)\n\n This means that, even though the timing and ordering of microtasks is\n carefully specified by the standard - and important to preserve for\n compatibility and predictability - debugger use may, correctly, have the\n effect of reordering microtasks. During the interruption, microtasks enqueued\n by non-debuggee tabs must run immediately alongside their HTML tasks as\n usual, whereas any debuggee microtasks that were in the queue when the\n interruption began must wait for the debuggee to be continued - and thus run\n after microtasks enqueued after they were.\n\n Fortunately, this reordering is visible only at the global level: when\n implemented correctly, it is not detectable by an individual debuggee. Note\n that a debuggee should generally be a complete unit of similar-origin related\n browsing contexts. Since non-debuggee activity falls outside that unit, it\n should never be visible to the debuggee (except via mechanisms that are\n already asynchronous, like events), so the debuggee should be unable to\n detect non-debuggee microtasks running when they normally would not. As long\n as behavior *visible to the debuggee* is unaffected by the interruption, we\n have respected the spirit of the rule.\n\n Of course, even as we accept the general principle that interrupting the\n debuggee should have as little detectable effect as possible, we still permit\n the developer to do things like evaluate expressions at the console that have\n arbitrary effects on the debuggee's state—effects that could never occur\n naturally at that point in the program. But since these are explicitly\n requested by the developer, who presumably knows what they're doing, we\n support this as best we can. If the developer evaluates an expression in the\n console that resolves a promise, it seems most natural for the promise's\n reaction microtasks to run immediately, within the interruption. This is an\n 'unnatural' time for the microtasks to run, but no more unnatural than the\n evaluation that triggered them.\n\n So the overall behavior we need is as follows:\n\n - When the debugger interrupts a debuggee, the debuggee's microtask queue\n   must be saved.\n\n - When debuggee execution resumes, the debuggee's microtask queue must be\n   restored exactly as it was when the interruption occurred.\n\n - Non-debuggee task and microtask execution must take place normally during\n   the interruption.\n\n Since each HTML task begins with an empty microtask queue, and it should not\n be possible for a task to mix debuggee and non-debuggee code, interrupting a\n debuggee should always find a microtask queue containing exclusively debuggee\n microtasks, if any. So saving and restoring the microtask queue should affect\n only the debuggee, not any non-debuggee content.\n\n AutoDebuggerJobQueueInterruption\n --------------------------------\n\n AutoDebuggerJobQueueInterruption is an RAII class, meant for use by the\n Debugger API implementation, that takes care of saving and restoring the\n queue.\n\n Constructing and initializing an instance of AutoDebuggerJobQueueInterruption\n sets aside the given JSContext's job queue, leaving the JSContext's queue\n empty. When the AutoDebuggerJobQueueInterruption instance is destroyed, it\n asserts that the JSContext's current job queue (holding jobs enqueued while\n the AutoDebuggerJobQueueInterruption was alive) is empty, and restores the\n saved queue to the JSContext.\n\n Since the Debugger API's behavior is up to us, we can specify that Debugger\n hooks begin execution with an empty job queue, and that we drain the queue\n after each hook function has run. This drain will be visible to debugger\n hooks, and makes hook calls resemble HTML tasks, with their own automatic\n microtask checkpoint. But, the drain will be invisible to the debuggee, as\n its queue is preserved across the hook invocation.\n\n To protect the debuggee's job queue, Debugger takes care to invoke callback\n functions only within the scope of an AutoDebuggerJobQueueInterruption\n instance.\n\n Why not let the hook functions themselves take care of this?\n ------------------------------------------------------------\n\n Certainly, we could leave responsibility for saving and restoring the job\n queue to the Debugger hook functions themselves.\n\n In fact, early versions of this change tried making the devtools server save\n and restore the queue explicitly, but because hooks are set and changed in\n numerous places, it was hard to be confident that every case had been\n covered, and it seemed that future changes could easily introduce new holes.\n\n Later versions of this change modified the accessor properties on the\n Debugger objects' prototypes to automatically protect the job queue when\n calling hooks, but the effect was essentially a monkeypatch applied to an API\n we defined and control, which doesn't make sense.\n\n In the end, since promises have become such a pervasive part of JavaScript\n programming, almost any imaginable use of Debugger would need to provide some\n kind of protection for the debuggee's job queue, so it makes sense to simply\n handle it once, carefully, in the implementation of Debugger itself."]
         #[repr(C)]
@@ -12829,18 +9184,7 @@ pub mod root {
             pub cx: *mut root::JSContext,
             pub saved: u64,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoDebuggerJobQueueInterruption"]
-                [::std::mem::size_of::<AutoDebuggerJobQueueInterruption>() - 16usize];
-            ["Alignment of AutoDebuggerJobQueueInterruption"]
-                [::std::mem::align_of::<AutoDebuggerJobQueueInterruption>() - 8usize];
-            ["Offset of field: AutoDebuggerJobQueueInterruption::cx"]
-                [::std::mem::offset_of!(AutoDebuggerJobQueueInterruption, cx) - 0usize];
-            ["Offset of field: AutoDebuggerJobQueueInterruption::saved"]
-                [::std::mem::offset_of!(AutoDebuggerJobQueueInterruption, saved) - 8usize];
-        };
-        #[repr(i32)]
+                #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum PromiseRejectionHandlingState {
             Unhandled = 0,
@@ -13007,12 +9351,7 @@ pub mod root {
             NotShuttingDown = 0,
             ShuttingDown = 1,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Dispatchable"][::std::mem::size_of::<Dispatchable>() - 8usize];
-            ["Alignment of Dispatchable"][::std::mem::align_of::<Dispatchable>() - 8usize];
-        };
-        #[doc = " Callbacks to dispatch a JS::Dispatchable to a JSContext's thread's event\n loop.\n\n The DispatchToEventLoopCallback set on a particular JSContext must accept\n JS::Dispatchable instances and arrange for their `run` methods to be called\n eventually on the JSContext's thread. This is used for cross-thread dispatch,\n so the callback itself must be safe to call from any thread. It cannot\n trigger a GC.\n\n The DelayedDispatchToEventLoopCallback in addition takes a delay, and it\n must accept JS::Dispatchable instances and arrange for their `run` methods\n to be called after the delay on the JSContext's thread.\n The embeddings must have its own timeout manager to handle the delay.\n If a timeout manager is not available for given context, it should return\n false, optionally with a warning message printed.\n\n If the callback returns `true`, it must eventually run the given\n Dispatchable; otherwise, SpiderMonkey may leak memory or hang.\n\n The callback may return `false` to indicate that the JSContext's thread is\n shutting down and is no longer accepting runnables. Shutting down is a\n one-way transition: once the callback has rejected a runnable, it must reject\n all subsequently submitted runnables as well.\n\n To establish a DispatchToEventLoopCallback, the embedding may either call\n InitDispatchsToEventLoop to provide its own, or call js::UseInternalJobQueues\n to select a default implementation built into SpiderMonkey. This latter\n depends on the embedding to call js::RunJobs on the JavaScript thread to\n process queued Dispatchables at appropriate times."]
+                #[doc = " Callbacks to dispatch a JS::Dispatchable to a JSContext's thread's event\n loop.\n\n The DispatchToEventLoopCallback set on a particular JSContext must accept\n JS::Dispatchable instances and arrange for their `run` methods to be called\n eventually on the JSContext's thread. This is used for cross-thread dispatch,\n so the callback itself must be safe to call from any thread. It cannot\n trigger a GC.\n\n The DelayedDispatchToEventLoopCallback in addition takes a delay, and it\n must accept JS::Dispatchable instances and arrange for their `run` methods\n to be called after the delay on the JSContext's thread.\n The embeddings must have its own timeout manager to handle the delay.\n If a timeout manager is not available for given context, it should return\n false, optionally with a warning message printed.\n\n If the callback returns `true`, it must eventually run the given\n Dispatchable; otherwise, SpiderMonkey may leak memory or hang.\n\n The callback may return `false` to indicate that the JSContext's thread is\n shutting down and is no longer accepting runnables. Shutting down is a\n one-way transition: once the callback has rejected a runnable, it must reject\n all subsequently submitted runnables as well.\n\n To establish a DispatchToEventLoopCallback, the embedding may either call\n InitDispatchsToEventLoop to provide its own, or call js::UseInternalJobQueues\n to select a default implementation built into SpiderMonkey. This latter\n depends on the embedding to call js::RunJobs on the JavaScript thread to\n process queued Dispatchables at appropriate times."]
         pub type DispatchToEventLoopCallback = ::std::option::Option<
             unsafe extern "C" fn(
                 closure: *mut ::std::os::raw::c_void,
@@ -13126,27 +9465,15 @@ pub mod root {
         pub const RegExpFlag_NoFlags: u8 = 0;
         #[doc = " All regular expression flags."]
         pub const RegExpFlag_AllFlags: u8 = 255;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RegExpFlag"][::std::mem::size_of::<RegExpFlag>() - 1usize];
-            ["Alignment of RegExpFlag"][::std::mem::align_of::<RegExpFlag>() - 1usize];
-        };
-        #[doc = " A collection of regular expression flags.  Individual flag values may be\n combined into a collection using bitwise operators."]
+                #[doc = " A collection of regular expression flags.  Individual flag values may be\n combined into a collection using bitwise operators."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct RegExpFlags {
             pub flags_: root::JS::RegExpFlags_Flag,
         }
         pub type RegExpFlags_Flag = u8;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of RegExpFlags"][::std::mem::size_of::<RegExpFlags>() - 1usize];
-            ["Alignment of RegExpFlags"][::std::mem::align_of::<RegExpFlags>() - 1usize];
-            ["Offset of field: RegExpFlags::flags_"]
-                [::std::mem::offset_of!(RegExpFlags, flags_) - 0usize];
-        };
-        #[doc = " Create a new RegExp for the given Latin-1-encoded bytes and flags."]
-        pub unsafe extern "C" fn NewRegExpObject(
+                #[doc = " Create a new RegExp for the given Latin-1-encoded bytes and flags."]
+                pub unsafe extern "C" fn NewRegExpObject(
                 cx: *mut root::JSContext,
                 bytes: *const ::std::os::raw::c_char,
                 length: usize,
@@ -13445,19 +9772,7 @@ pub mod root {
             pub allowIntraClusterClonableSharedObjects_: bool,
             pub allowSharedMemoryObjects_: bool,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CloneDataPolicy"][::std::mem::size_of::<CloneDataPolicy>() - 2usize];
-            ["Alignment of CloneDataPolicy"][::std::mem::align_of::<CloneDataPolicy>() - 1usize];
-            ["Offset of field: CloneDataPolicy::allowIntraClusterClonableSharedObjects_"][::std::mem::offset_of!(
-                CloneDataPolicy,
-                allowIntraClusterClonableSharedObjects_
-            )
-                - 0usize];
-            ["Offset of field: CloneDataPolicy::allowSharedMemoryObjects_"]
-                [::std::mem::offset_of!(CloneDataPolicy, allowSharedMemoryObjects_) - 1usize];
-        };
-        unsafe extern "C" {
+                unsafe extern "C" {
             #[doc = " Report a warning represented by the sprintf-like conversion of ASCII format\n filled from trailing ASCII arguments.\n\n Return true iff the warning was successfully reported without reporting an\n error (or being upgraded into one)."]
             #[link_name = "\u{1}_ZN2JS9WarnASCIIEP9JSContextPKcz"]
             pub fn WarnASCII(
@@ -13465,7 +9780,7 @@ pub mod root {
                 format: *const ::std::os::raw::c_char,
                 ...
             ) -> bool;
-        }
+                }
         unsafe extern "C" {
             #[doc = " Report a warning represented by the sprintf-like conversion of Latin-1 format\n filled from trailing Latin-1 arguments.\n\n Return true iff the warning was successfully reported without reporting an\n error (or being upgraded into one)."]
             #[link_name = "\u{1}_ZN2JS10WarnLatin1EP9JSContextPKcz"]
@@ -13494,7 +9809,7 @@ pub mod root {
         pub unsafe extern "C" fn SetWarningReporter(
                 cx: *mut root::JSContext,
                 reporter: root::JS::WarningReporter,
-            ) -> root::JS::WarningReporter { qjs_todo!("SetWarningReporter") }
+            ) -> root::JS::WarningReporter { crate::engine::SetWarningReporter(cx, reporter) }
 
         #[doc = " A simple RAII class that clears the registered warning reporter on\n construction and restores it on destruction.\n\n A fresh warning reporter *may* be set while an instance of this class is\n live, but it must be unset in LIFO fashion by the time that instance is\n destroyed."]
         #[repr(C)]
@@ -13503,18 +9818,7 @@ pub mod root {
             pub context_: *mut root::JSContext,
             pub prevReporter_: root::JS::WarningReporter,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoSuppressWarningReporter"]
-                [::std::mem::size_of::<AutoSuppressWarningReporter>() - 16usize];
-            ["Alignment of AutoSuppressWarningReporter"]
-                [::std::mem::align_of::<AutoSuppressWarningReporter>() - 8usize];
-            ["Offset of field: AutoSuppressWarningReporter::context_"]
-                [::std::mem::offset_of!(AutoSuppressWarningReporter, context_) - 0usize];
-            ["Offset of field: AutoSuppressWarningReporter::prevReporter_"]
-                [::std::mem::offset_of!(AutoSuppressWarningReporter, prevReporter_) - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         pub struct WasmModule__bindgen_vtable(::std::os::raw::c_void);
         #[doc = " The WasmModule interface allows the embedding to hold a reference to the\n underying C++ implementation of a JS WebAssembly.Module object for purposes\n of efficient postMessage() and (de)serialization from a random thread.\n\n In particular, this allows postMessage() of a WebAssembly.Module:\n GetWasmModule() is called when making a structured clone of a payload\n containing a WebAssembly.Module object. The structured clone buffer holds a\n refcount of the JS::WasmModule until createObject() is called in the target\n agent's JSContext. The new WebAssembly.Module object continues to hold the\n JS::WasmModule and thus the final reference of a JS::WasmModule may be\n dropped from any thread and so the virtual destructor (and all internal\n methods of the C++ module) must be thread-safe."]
         #[repr(C)]
@@ -13523,13 +9827,8 @@ pub mod root {
             pub vtable_: *const WasmModule__bindgen_vtable,
             pub _base: root::js::AtomicRefCounted,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of WasmModule"][::std::mem::size_of::<WasmModule>() - 16usize];
-            ["Alignment of WasmModule"][::std::mem::align_of::<WasmModule>() - 8usize];
-        };
-        
-        pub unsafe extern "C" fn IsWasmModuleObject(obj: root::JS::HandleObject) -> bool { qjs_todo!("IsWasmModuleObject") }
+                
+                pub unsafe extern "C" fn IsWasmModuleObject(obj: root::JS::HandleObject) -> bool { qjs_todo!("IsWasmModuleObject") }
 
         
         pub unsafe extern "C" fn GetWasmModule(obj: root::JS::HandleObject)
@@ -13540,17 +9839,8 @@ pub mod root {
         pub struct InstantiationStorage {
             pub gcOutput_: *mut root::js::frontend::PreallocatedCompilationGCOutput,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of InstantiationStorage"]
-                [::std::mem::size_of::<InstantiationStorage>() - 8usize];
-            ["Alignment of InstantiationStorage"]
-                [::std::mem::align_of::<InstantiationStorage>() - 8usize];
-            ["Offset of field: InstantiationStorage::gcOutput_"]
-                [::std::mem::offset_of!(InstantiationStorage, gcOutput_) - 0usize];
-        };
-        
-        pub unsafe extern "C" fn StencilAddRef(stencil: *mut root::JS::Stencil) { qjs_todo!("StencilAddRef") }
+                
+                pub unsafe extern "C" fn StencilAddRef(stencil: *mut root::JS::Stencil) { qjs_todo!("StencilAddRef") }
 
         
         pub unsafe extern "C" fn StencilRelease(stencil: *mut root::JS::Stencil) { qjs_todo!("StencilRelease") }
@@ -13691,15 +9981,7 @@ pub mod root {
             pub obj: *mut root::JSObject,
         }
         pub type ArrayBufferOrView_DataType = u8;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ArrayBufferOrView"][::std::mem::size_of::<ArrayBufferOrView>() - 8usize];
-            ["Alignment of ArrayBufferOrView"]
-                [::std::mem::align_of::<ArrayBufferOrView>() - 8usize];
-            ["Offset of field: ArrayBufferOrView::obj"]
-                [::std::mem::offset_of!(ArrayBufferOrView, obj) - 0usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ArrayBuffer {
             pub _base: root::JS::ArrayBufferOrView,
@@ -13716,22 +9998,12 @@ pub mod root {
         
         pub static mut ArrayBuffer_GrowableSharedClass: *const root::JSClass = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ArrayBuffer"][::std::mem::size_of::<ArrayBuffer>() - 8usize];
-            ["Alignment of ArrayBuffer"][::std::mem::align_of::<ArrayBuffer>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ArrayBufferView {
             pub _base: root::JS::ArrayBufferOrView,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ArrayBufferView"][::std::mem::size_of::<ArrayBufferView>() - 8usize];
-            ["Alignment of ArrayBufferView"][::std::mem::align_of::<ArrayBufferView>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct DataView {
             pub _base: root::JS::ArrayBufferView,
@@ -13742,12 +10014,7 @@ pub mod root {
         
         pub static mut DataView_ResizableClassPtr: *const root::JSClass = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of DataView"][::std::mem::size_of::<DataView>() - 8usize];
-            ["Alignment of DataView"][::std::mem::align_of::<DataView>() - 8usize];
-        };
-        #[repr(C)]
+                #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct TypedArray_base {
             pub _base: root::JS::ArrayBufferView,
@@ -13758,12 +10025,7 @@ pub mod root {
         
         pub static mut TypedArray_base_resizableClasses: *const root::JSClass = unsafe { ::core::mem::zeroed() };
 
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TypedArray_base"][::std::mem::size_of::<TypedArray_base>() - 8usize];
-            ["Alignment of TypedArray_base"][::std::mem::align_of::<TypedArray_base>() - 8usize];
-        };
-        pub type TypedArray_DataType = root::JS::detail::ExternalTypeOf_t;
+                pub type TypedArray_DataType = root::JS::detail::ExternalTypeOf_t;
         
         pub static TypedArray_Scalar: root::JS::Scalar::Type = unsafe { ::core::mem::zeroed() };
 
@@ -13837,14 +10099,7 @@ pub mod root {
             pub _bitfield_1: root::__BindgenBitfieldUnit<[u8; 1usize]>,
             pub __bindgen_padding_0: [u8; 3usize],
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CallArgs"][::std::mem::size_of::<CallArgs>() - 16usize];
-            ["Alignment of CallArgs"][::std::mem::align_of::<CallArgs>() - 8usize];
-            ["Offset of field: CallArgs::argv_"][::std::mem::offset_of!(CallArgs, argv_) - 0usize];
-            ["Offset of field: CallArgs::argc_"][::std::mem::offset_of!(CallArgs, argc_) - 8usize];
-        };
-        impl CallArgs {
+                impl CallArgs {
             #[inline]
             pub fn constructing_(&self) -> bool {
                 unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -13936,52 +10191,19 @@ pub mod root {
         pub struct MutableHandleIdVector {
             pub ptr: *mut ::std::os::raw::c_void,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MutableHandleIdVector"]
-                [::std::mem::size_of::<MutableHandleIdVector>() - 8usize];
-            ["Alignment of MutableHandleIdVector"]
-                [::std::mem::align_of::<MutableHandleIdVector>() - 8usize];
-            ["Offset of field: MutableHandleIdVector::ptr"]
-                [::std::mem::offset_of!(MutableHandleIdVector, ptr) - 0usize];
-        };
-        #[doc = " <div rustbindgen replaces=\"JS::HandleObjectVector\"></div>"]
+                #[doc = " <div rustbindgen replaces=\"JS::HandleObjectVector\"></div>"]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct HandleObjectVector {
             pub ptr: *mut ::std::os::raw::c_void,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HandleObjectVector"][::std::mem::size_of::<HandleObjectVector>() - 8usize];
-            ["Alignment of HandleObjectVector"]
-                [::std::mem::align_of::<HandleObjectVector>() - 8usize];
-            ["Offset of field: HandleObjectVector::ptr"]
-                [::std::mem::offset_of!(HandleObjectVector, ptr) - 0usize];
-        };
-        #[doc = " <div rustbindgen replaces=\"JS::MutableHandleObjectVector\"></div>"]
+                #[doc = " <div rustbindgen replaces=\"JS::MutableHandleObjectVector\"></div>"]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct MutableHandleObjectVector {
             pub ptr: *mut ::std::os::raw::c_void,
         }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MutableHandleObjectVector"]
-                [::std::mem::size_of::<MutableHandleObjectVector>() - 8usize];
-            ["Alignment of MutableHandleObjectVector"]
-                [::std::mem::align_of::<MutableHandleObjectVector>() - 8usize];
-            ["Offset of field: MutableHandleObjectVector::ptr"]
-                [::std::mem::offset_of!(MutableHandleObjectVector, ptr) - 0usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of template specialization: GCPolicy_open0_ptr_Realm_close0"]
-                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
-            ["Align of template specialization: GCPolicy_open0_ptr_Realm_close0"]
-                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
-        };
-    }
+                    }
     pub type jsbytecode = u8;
     #[repr(C)]
     #[derive(Debug, Copy, Clone)]
@@ -14173,19 +10395,7 @@ pub mod root {
         pub options_: root::JS::TraceOptions,
         pub context_: root::JS::TracingContext,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSTracer"][::std::mem::size_of::<JSTracer>() - 48usize];
-        ["Alignment of JSTracer"][::std::mem::align_of::<JSTracer>() - 8usize];
-        ["Offset of field: JSTracer::runtime_"]
-            [::std::mem::offset_of!(JSTracer, runtime_) - 8usize];
-        ["Offset of field: JSTracer::kind_"][::std::mem::offset_of!(JSTracer, kind_) - 16usize];
-        ["Offset of field: JSTracer::options_"]
-            [::std::mem::offset_of!(JSTracer, options_) - 20usize];
-        ["Offset of field: JSTracer::context_"]
-            [::std::mem::offset_of!(JSTracer, context_) - 32usize];
-    };
-    #[doc = " MozRefCountType is Mozilla's reference count type.\n\n We use the same type to represent the refcount of RefCounted objects\n as well, in order to be able to use the leak detection facilities\n that are implemented by XPCOM.\n\n Note that this type is not in the mozilla namespace so that it is\n usable for both C and C++ code."]
+        #[doc = " MozRefCountType is Mozilla's reference count type.\n\n We use the same type to represent the refcount of RefCounted objects\n as well, in order to be able to use the leak detection facilities\n that are implemented by XPCOM.\n\n Note that this type is not in the mozilla namespace so that it is\n usable for both C and C++ code."]
     pub type MozRefCountType = usize;
     pub type MozExternalRefCountType = u32;
     #[repr(C)]
@@ -14193,71 +10403,26 @@ pub mod root {
     pub struct Flow {
         pub mFlowId: u64,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of Flow"][::std::mem::size_of::<Flow>() - 8usize];
-        ["Alignment of Flow"][::std::mem::align_of::<Flow>() - 8usize];
-        ["Offset of field: Flow::mFlowId"][::std::mem::offset_of!(Flow, mFlowId) - 0usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_Flow_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-        ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_Flow_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: ProfileBufferEntryReader_Deserializer_open0_Flow_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-        ["Align of template specialization: ProfileBufferEntryReader_Deserializer_open0_Flow_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-    };
-    #[repr(C)]
+                #[repr(C)]
     #[derive(Debug, PartialEq)]
     pub struct ProfilingStack {
         pub capacity: u32,
         pub frames: u64,
         pub stackPointer: u32,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of ProfilingStack"][::std::mem::size_of::<ProfilingStack>() - 24usize];
-        ["Alignment of ProfilingStack"][::std::mem::align_of::<ProfilingStack>() - 8usize];
-        ["Offset of field: ProfilingStack::capacity"]
-            [::std::mem::offset_of!(ProfilingStack, capacity) - 0usize];
-        ["Offset of field: ProfilingStack::frames"]
-            [::std::mem::offset_of!(ProfilingStack, frames) - 8usize];
-        ["Offset of field: ProfilingStack::stackPointer"]
-            [::std::mem::offset_of!(ProfilingStack, stackPointer) - 16usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Debug, PartialEq)]
     pub struct JSAutoRealm {
         pub cx_: *mut root::JSContext,
         pub oldRealm_: *mut root::JS::Realm,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSAutoRealm"][::std::mem::size_of::<JSAutoRealm>() - 16usize];
-        ["Alignment of JSAutoRealm"][::std::mem::align_of::<JSAutoRealm>() - 8usize];
-        ["Offset of field: JSAutoRealm::cx_"][::std::mem::offset_of!(JSAutoRealm, cx_) - 0usize];
-        ["Offset of field: JSAutoRealm::oldRealm_"]
-            [::std::mem::offset_of!(JSAutoRealm, oldRealm_) - 8usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Debug, PartialEq)]
     pub struct JSAutoNullableRealm {
         pub cx_: *mut root::JSContext,
         pub oldRealm_: *mut root::JS::Realm,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSAutoNullableRealm"][::std::mem::size_of::<JSAutoNullableRealm>() - 16usize];
-        ["Alignment of JSAutoNullableRealm"]
-            [::std::mem::align_of::<JSAutoNullableRealm>() - 8usize];
-        ["Offset of field: JSAutoNullableRealm::cx_"]
-            [::std::mem::offset_of!(JSAutoNullableRealm, cx_) - 0usize];
-        ["Offset of field: JSAutoNullableRealm::oldRealm_"]
-            [::std::mem::offset_of!(JSAutoNullableRealm, oldRealm_) - 8usize];
-    };
-    #[repr(u8)]
+        #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
     pub enum JSValueType {
         JSVAL_TYPE_DOUBLE = 0,
@@ -14511,31 +10676,8 @@ pub mod root {
         pub construct: root::JSNative,
         pub trace: root::JSTraceOp,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSClassOps"][::std::mem::size_of::<JSClassOps>() - 80usize];
-        ["Alignment of JSClassOps"][::std::mem::align_of::<JSClassOps>() - 8usize];
-        ["Offset of field: JSClassOps::addProperty"]
-            [::std::mem::offset_of!(JSClassOps, addProperty) - 0usize];
-        ["Offset of field: JSClassOps::delProperty"]
-            [::std::mem::offset_of!(JSClassOps, delProperty) - 8usize];
-        ["Offset of field: JSClassOps::enumerate"]
-            [::std::mem::offset_of!(JSClassOps, enumerate) - 16usize];
-        ["Offset of field: JSClassOps::newEnumerate"]
-            [::std::mem::offset_of!(JSClassOps, newEnumerate) - 24usize];
-        ["Offset of field: JSClassOps::resolve"]
-            [::std::mem::offset_of!(JSClassOps, resolve) - 32usize];
-        ["Offset of field: JSClassOps::mayResolve"]
-            [::std::mem::offset_of!(JSClassOps, mayResolve) - 40usize];
-        ["Offset of field: JSClassOps::finalize"]
-            [::std::mem::offset_of!(JSClassOps, finalize) - 48usize];
-        ["Offset of field: JSClassOps::call"][::std::mem::offset_of!(JSClassOps, call) - 56usize];
-        ["Offset of field: JSClassOps::construct"]
-            [::std::mem::offset_of!(JSClassOps, construct) - 64usize];
-        ["Offset of field: JSClassOps::trace"][::std::mem::offset_of!(JSClassOps, trace) - 72usize];
-    };
-    
-    pub static mut JS_NULL_CLASS_OPS: *const root::JSClassOps = unsafe { ::core::mem::zeroed() };
+        
+        pub static mut JS_NULL_CLASS_OPS: *const root::JSClassOps = unsafe { ::core::mem::zeroed() };
 
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
@@ -14548,25 +10690,14 @@ pub mod root {
         pub oOps: *const root::js::ObjectOps,
     }
     pub const JSClass_NON_NATIVE: u32 = 262144;
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSClass"][::std::mem::size_of::<JSClass>() - 48usize];
-        ["Alignment of JSClass"][::std::mem::align_of::<JSClass>() - 8usize];
-        ["Offset of field: JSClass::name"][::std::mem::offset_of!(JSClass, name) - 0usize];
-        ["Offset of field: JSClass::flags"][::std::mem::offset_of!(JSClass, flags) - 8usize];
-        ["Offset of field: JSClass::cOps"][::std::mem::offset_of!(JSClass, cOps) - 16usize];
-        ["Offset of field: JSClass::spec"][::std::mem::offset_of!(JSClass, spec) - 24usize];
-        ["Offset of field: JSClass::ext"][::std::mem::offset_of!(JSClass, ext) - 32usize];
-        ["Offset of field: JSClass::oOps"][::std::mem::offset_of!(JSClass, oOps) - 40usize];
-    };
-    
-    pub unsafe extern "C" fn JS_NewContext(
+        
+        pub unsafe extern "C" fn JS_NewContext(
             maxbytes: u32,
             parentRuntime: *mut root::JSRuntime,
-        ) -> *mut root::JSContext { qjs_todo!("JS_NewContext") }
+        ) -> *mut root::JSContext { crate::engine::JS_NewContext(maxbytes, parentRuntime) }
 
     
-    pub unsafe extern "C" fn JS_DestroyContext(cx: *mut root::JSContext) { qjs_todo!("JS_DestroyContext") }
+    pub unsafe extern "C" fn JS_DestroyContext(cx: *mut root::JSContext) { crate::engine::JS_DestroyContext(cx) }
 
     
     pub unsafe extern "C" fn JS_GetContextPrivate(cx: *mut root::JSContext) -> *mut ::std::os::raw::c_void { qjs_todo!("JS_GetContextPrivate") }
@@ -14578,7 +10709,7 @@ pub mod root {
     pub unsafe extern "C" fn JS_GetParentRuntime(cx: *mut root::JSContext) -> *mut root::JSRuntime { qjs_todo!("JS_GetParentRuntime") }
 
     
-    pub unsafe extern "C" fn JS_GetRuntime(cx: *mut root::JSContext) -> *mut root::JSRuntime { qjs_todo!("JS_GetRuntime") }
+    pub unsafe extern "C" fn JS_GetRuntime(cx: *mut root::JSContext) -> *mut root::JSRuntime { crate::engine::JS_GetRuntime(cx) }
 
     
     pub unsafe extern "C" fn JS_SetFutexCanWait(cx: *mut root::JSContext) { qjs_todo!("JS_SetFutexCanWait") }
@@ -14748,14 +10879,7 @@ pub mod root {
     pub struct JSExternalStringCallbacks {
         pub vtable_: *const JSExternalStringCallbacks__bindgen_vtable,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSExternalStringCallbacks"]
-            [::std::mem::size_of::<JSExternalStringCallbacks>() - 8usize];
-        ["Alignment of JSExternalStringCallbacks"]
-            [::std::mem::align_of::<JSExternalStringCallbacks>() - 8usize];
-    };
-    pub type JSGCCallback = ::std::option::Option<
+        pub type JSGCCallback = ::std::option::Option<
         unsafe extern "C" fn(
             cx: *mut root::JSContext,
             status: root::JSGCStatus,
@@ -14768,7 +10892,7 @@ pub mod root {
             cx: *mut root::JSContext,
             traceOp: root::JSTraceDataOp,
             data: *mut ::std::os::raw::c_void,
-        ) -> bool { qjs_todo!("JS_AddExtraGCRootsTracer") }
+        ) -> bool { crate::engine::JS_AddExtraGCRootsTracer(cx, traceOp, data) }
 
     #[doc = " Undo a call to JS_AddExtraGCRootsTracer."]
     pub unsafe extern "C" fn JS_RemoveExtraGCRootsTracer(
@@ -14778,7 +10902,7 @@ pub mod root {
         ) { qjs_todo!("JS_RemoveExtraGCRootsTracer") }
 
     
-    pub unsafe extern "C" fn JS_GC(cx: *mut root::JSContext, reason: root::JS::GCReason) { qjs_todo!("JS_GC") }
+    pub unsafe extern "C" fn JS_GC(cx: *mut root::JSContext, reason: root::JS::GCReason) { crate::engine::JS_GC(cx, reason) }
 
     
     pub unsafe extern "C" fn JS_MaybeGC(cx: *mut root::JSContext) { qjs_todo!("JS_MaybeGC") }
@@ -14846,7 +10970,7 @@ pub mod root {
         ) -> bool { qjs_todo!("JS_UpdateWeakPointerAfterGCUnbarriered") }
 
     
-    pub unsafe extern "C" fn JS_SetGCParameter(cx: *mut root::JSContext, key: root::JSGCParamKey, value: u32) { qjs_todo!("JS_SetGCParameter") }
+    pub unsafe extern "C" fn JS_SetGCParameter(cx: *mut root::JSContext, key: root::JSGCParamKey, value: u32) { crate::engine::JS_SetGCParameter(cx, key, value) }
 
     
     pub unsafe extern "C" fn JS_ResetGCParameter(cx: *mut root::JSContext, key: root::JSGCParamKey) { qjs_todo!("JS_ResetGCParameter") }
@@ -14939,13 +11063,8 @@ pub mod root {
     pub struct JSErrorInterceptor {
         pub vtable_: *const JSErrorInterceptor__bindgen_vtable,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorInterceptor"][::std::mem::size_of::<JSErrorInterceptor>() - 8usize];
-        ["Alignment of JSErrorInterceptor"][::std::mem::align_of::<JSErrorInterceptor>() - 8usize];
-    };
-    
-    pub unsafe extern "C" fn JS_SetErrorInterceptorCallback(
+        
+        pub unsafe extern "C" fn JS_SetErrorInterceptorCallback(
             arg1: *mut root::JSRuntime,
             callback: *mut root::JSErrorInterceptor,
         ) { qjs_todo!("JS_SetErrorInterceptorCallback") }
@@ -14995,21 +11114,7 @@ pub mod root {
         #[doc = " One of the JSExnType constants above."]
         pub exnType: i16,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorFormatString"][::std::mem::size_of::<JSErrorFormatString>() - 24usize];
-        ["Alignment of JSErrorFormatString"]
-            [::std::mem::align_of::<JSErrorFormatString>() - 8usize];
-        ["Offset of field: JSErrorFormatString::name"]
-            [::std::mem::offset_of!(JSErrorFormatString, name) - 0usize];
-        ["Offset of field: JSErrorFormatString::format"]
-            [::std::mem::offset_of!(JSErrorFormatString, format) - 8usize];
-        ["Offset of field: JSErrorFormatString::argCount"]
-            [::std::mem::offset_of!(JSErrorFormatString, argCount) - 16usize];
-        ["Offset of field: JSErrorFormatString::exnType"]
-            [::std::mem::offset_of!(JSErrorFormatString, exnType) - 18usize];
-    };
-    pub type JSErrorCallback = ::std::option::Option<
+        pub type JSErrorCallback = ::std::option::Option<
         unsafe extern "C" fn(
             userRef: *mut ::std::os::raw::c_void,
             errorNumber: ::std::os::raw::c_uint,
@@ -15030,26 +11135,7 @@ pub mod root {
         pub _bitfield_1: root::__BindgenBitfieldUnit<[u8; 1usize]>,
         pub __bindgen_padding_0: [u8; 7usize],
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorBase"][::std::mem::size_of::<JSErrorBase>() - 48usize];
-        ["Alignment of JSErrorBase"][::std::mem::align_of::<JSErrorBase>() - 8usize];
-        ["Offset of field: JSErrorBase::message_"]
-            [::std::mem::offset_of!(JSErrorBase, message_) - 0usize];
-        ["Offset of field: JSErrorBase::filename"]
-            [::std::mem::offset_of!(JSErrorBase, filename) - 8usize];
-        ["Offset of field: JSErrorBase::sourceId"]
-            [::std::mem::offset_of!(JSErrorBase, sourceId) - 16usize];
-        ["Offset of field: JSErrorBase::lineno"]
-            [::std::mem::offset_of!(JSErrorBase, lineno) - 20usize];
-        ["Offset of field: JSErrorBase::column"]
-            [::std::mem::offset_of!(JSErrorBase, column) - 24usize];
-        ["Offset of field: JSErrorBase::errorNumber"]
-            [::std::mem::offset_of!(JSErrorBase, errorNumber) - 28usize];
-        ["Offset of field: JSErrorBase::errorMessageName"]
-            [::std::mem::offset_of!(JSErrorBase, errorMessageName) - 32usize];
-    };
-    impl JSErrorBase {
+        impl JSErrorBase {
         #[inline]
         pub fn ownsMessage_(&self) -> bool {
             unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -15105,12 +11191,7 @@ pub mod root {
     pub struct JSErrorNotes_Note {
         pub _base: root::JSErrorBase,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorNotes_Note"][::std::mem::size_of::<JSErrorNotes_Note>() - 48usize];
-        ["Alignment of JSErrorNotes_Note"][::std::mem::align_of::<JSErrorNotes_Note>() - 8usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct JSErrorNotes_iterator {
         pub note_: *mut u64,
@@ -15121,22 +11202,7 @@ pub mod root {
     pub type JSErrorNotes_iterator_difference_type = isize;
     pub type JSErrorNotes_iterator_pointer = *mut root::JSErrorNotes_iterator_value_type;
     pub type JSErrorNotes_iterator_reference = *mut root::JSErrorNotes_iterator_value_type;
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorNotes_iterator"][::std::mem::size_of::<JSErrorNotes_iterator>() - 8usize];
-        ["Alignment of JSErrorNotes_iterator"]
-            [::std::mem::align_of::<JSErrorNotes_iterator>() - 8usize];
-        ["Offset of field: JSErrorNotes_iterator::note_"]
-            [::std::mem::offset_of!(JSErrorNotes_iterator, note_) - 0usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorNotes"][::std::mem::size_of::<JSErrorNotes>() - 32usize];
-        ["Alignment of JSErrorNotes"][::std::mem::align_of::<JSErrorNotes>() - 8usize];
-        ["Offset of field: JSErrorNotes::notes_"]
-            [::std::mem::offset_of!(JSErrorNotes, notes_) - 0usize];
-    };
-    #[doc = " Describes a single error or warning that occurs in the execution of script."]
+            #[doc = " Describes a single error or warning that occurs in the execution of script."]
     #[repr(C)]
     #[derive(Debug, PartialEq)]
     pub struct JSErrorReport {
@@ -15150,22 +11216,7 @@ pub mod root {
         pub _bitfield_1: root::__BindgenBitfieldUnit<[u8; 1usize]>,
         pub __bindgen_padding_0: [u8; 5usize],
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSErrorReport"][::std::mem::size_of::<JSErrorReport>() - 88usize];
-        ["Alignment of JSErrorReport"][::std::mem::align_of::<JSErrorReport>() - 8usize];
-        ["Offset of field: JSErrorReport::linebuf_"]
-            [::std::mem::offset_of!(JSErrorReport, linebuf_) - 48usize];
-        ["Offset of field: JSErrorReport::linebufLength_"]
-            [::std::mem::offset_of!(JSErrorReport, linebufLength_) - 56usize];
-        ["Offset of field: JSErrorReport::tokenOffset_"]
-            [::std::mem::offset_of!(JSErrorReport, tokenOffset_) - 64usize];
-        ["Offset of field: JSErrorReport::notes"]
-            [::std::mem::offset_of!(JSErrorReport, notes) - 72usize];
-        ["Offset of field: JSErrorReport::exnType"]
-            [::std::mem::offset_of!(JSErrorReport, exnType) - 80usize];
-    };
-    impl JSErrorReport {
+        impl JSErrorReport {
         #[inline]
         pub fn isMuted(&self) -> bool {
             unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -15412,7 +11463,7 @@ pub mod root {
     pub unsafe extern "C" fn JS_ReportAllocationOverflow(cx: *mut root::JSContext) { qjs_todo!("JS_ReportAllocationOverflow") }
 
     
-    pub unsafe extern "C" fn JS_IsExceptionPending(cx: *mut root::JSContext) -> bool { qjs_todo!("JS_IsExceptionPending") }
+    pub unsafe extern "C" fn JS_IsExceptionPending(cx: *mut root::JSContext) -> bool { crate::engine::JS_IsExceptionPending(cx) }
 
     
     pub unsafe extern "C" fn JS_IsThrowingOutOfMemory(cx: *mut root::JSContext) -> bool { qjs_todo!("JS_IsThrowingOutOfMemory") }
@@ -15421,17 +11472,17 @@ pub mod root {
     pub unsafe extern "C" fn JS_GetPendingException(
             cx: *mut root::JSContext,
             vp: root::JS::MutableHandleValue,
-        ) -> bool { qjs_todo!("JS_GetPendingException") }
+        ) -> bool { crate::engine::JS_GetPendingException(cx, vp) }
 
     
     pub unsafe extern "C" fn JS_SetPendingException(
             cx: *mut root::JSContext,
             v: root::JS::HandleValue,
             behavior: root::JS::ExceptionStackBehavior,
-        ) { qjs_todo!("JS_SetPendingException") }
+        ) { crate::engine::JS_SetPendingException(cx, v, behavior) }
 
     
-    pub unsafe extern "C" fn JS_ClearPendingException(cx: *mut root::JSContext) { qjs_todo!("JS_ClearPendingException") }
+    pub unsafe extern "C" fn JS_ClearPendingException(cx: *mut root::JSContext) { crate::engine::JS_ClearPendingException(cx) }
 
     #[doc = " If the given object is an exception object, the exception will have (or be\n able to lazily create) an error report struct, and this function will return\n the address of that struct.  Otherwise, it returns nullptr. The lifetime\n of the error report struct that might be returned is the same as the\n lifetime of the exception object."]
     pub unsafe extern "C" fn JS_ErrorFromException(
@@ -15449,13 +11500,13 @@ pub mod root {
             principals: *mut root::JSPrincipals,
             hookOption: root::JS::OnNewGlobalHookOption,
             options: *const root::JS::RealmOptions,
-        ) -> *mut root::JSObject { qjs_todo!("JS_NewGlobalObject") }
+        ) -> *mut root::JSObject { crate::engine::JS_NewGlobalObject(cx, clasp, principals, hookOption, options) }
 
     #[doc = " Spidermonkey does not have a good way of keeping track of what compartments\n should be marked on their own. We can mark the roots unconditionally, but\n marking GC things only relevant in live compartments is hard. To mitigate\n this, we create a static trace hook, installed on each global object, from\n which we can be sure the compartment is relevant, and mark it.\n\n It is still possible to specify custom trace hooks for global object classes.\n They can be provided via the RealmOptions passed to JS_NewGlobalObject."]
-    pub unsafe extern "C" fn JS_GlobalObjectTraceHook(trc: *mut root::JSTracer, global: *mut root::JSObject) { qjs_todo!("JS_GlobalObjectTraceHook") }
+    pub unsafe extern "C" fn JS_GlobalObjectTraceHook(trc: *mut root::JSTracer, global: *mut root::JSObject) { crate::engine::JS_GlobalObjectTraceHook(trc, global) }
 
     
-    pub unsafe extern "C" fn JS_FireOnNewGlobalObject(cx: *mut root::JSContext, global: root::JS::HandleObject) { qjs_todo!("JS_FireOnNewGlobalObject") }
+    pub unsafe extern "C" fn JS_FireOnNewGlobalObject(cx: *mut root::JSContext, global: root::JS::HandleObject) { crate::engine::JS_FireOnNewGlobalObject(cx, global) }
 
     pub type JSInterruptCallback =
         ::std::option::Option<unsafe extern "C" fn(arg1: *mut root::JSContext) -> bool>;
@@ -15524,23 +11575,8 @@ pub mod root {
     pub struct JSPrincipals_RefCount {
         pub value: i32,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPrincipals_RefCount"][::std::mem::size_of::<JSPrincipals_RefCount>() - 4usize];
-        ["Alignment of JSPrincipals_RefCount"]
-            [::std::mem::align_of::<JSPrincipals_RefCount>() - 4usize];
-        ["Offset of field: JSPrincipals_RefCount::value"]
-            [::std::mem::offset_of!(JSPrincipals_RefCount, value) - 0usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPrincipals"][::std::mem::size_of::<JSPrincipals>() - 16usize];
-        ["Alignment of JSPrincipals"][::std::mem::align_of::<JSPrincipals>() - 8usize];
-        ["Offset of field: JSPrincipals::refcount"]
-            [::std::mem::offset_of!(JSPrincipals, refcount) - 8usize];
-    };
-    
-    pub unsafe extern "C" fn JS_HoldPrincipals(principals: *mut root::JSPrincipals) { qjs_todo!("JS_HoldPrincipals") }
+            
+            pub unsafe extern "C" fn JS_HoldPrincipals(principals: *mut root::JSPrincipals) { qjs_todo!("JS_HoldPrincipals") }
 
     
     pub unsafe extern "C" fn JS_DropPrincipals(cx: *mut root::JSContext, principals: *mut root::JSPrincipals) { qjs_todo!("JS_DropPrincipals") }
@@ -15582,20 +11618,8 @@ pub mod root {
         pub codeForEvalGets: root::JSCodeForEvalOp,
         pub subsumes: root::JSSubsumesOp,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSSecurityCallbacks"][::std::mem::size_of::<JSSecurityCallbacks>() - 24usize];
-        ["Alignment of JSSecurityCallbacks"]
-            [::std::mem::align_of::<JSSecurityCallbacks>() - 8usize];
-        ["Offset of field: JSSecurityCallbacks::contentSecurityPolicyAllows"]
-            [::std::mem::offset_of!(JSSecurityCallbacks, contentSecurityPolicyAllows) - 0usize];
-        ["Offset of field: JSSecurityCallbacks::codeForEvalGets"]
-            [::std::mem::offset_of!(JSSecurityCallbacks, codeForEvalGets) - 8usize];
-        ["Offset of field: JSSecurityCallbacks::subsumes"]
-            [::std::mem::offset_of!(JSSecurityCallbacks, subsumes) - 16usize];
-    };
-    
-    pub unsafe extern "C" fn JS_SetSecurityCallbacks(
+        
+        pub unsafe extern "C" fn JS_SetSecurityCallbacks(
             cx: *mut root::JSContext,
             callbacks: *const root::JSSecurityCallbacks,
         ) { qjs_todo!("JS_SetSecurityCallbacks") }
@@ -16295,16 +12319,7 @@ pub mod root {
         pub op: root::JSNative,
         pub info: *const root::JSJitInfo,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSNativeWrapper"][::std::mem::size_of::<JSNativeWrapper>() - 16usize];
-        ["Alignment of JSNativeWrapper"][::std::mem::align_of::<JSNativeWrapper>() - 8usize];
-        ["Offset of field: JSNativeWrapper::op"]
-            [::std::mem::offset_of!(JSNativeWrapper, op) - 0usize];
-        ["Offset of field: JSNativeWrapper::info"]
-            [::std::mem::offset_of!(JSNativeWrapper, info) - 8usize];
-    };
-    #[doc = " Description of a property. JS_DefineProperties and JS_InitClass take arrays\n of these and define many properties at once. JS_PSG, JS_PSGS and JS_PS_END\n are helper macros for defining such arrays."]
+        #[doc = " Description of a property. JS_DefineProperties and JS_InitClass take arrays\n of these and define many properties at once. JS_PSG, JS_PSGS and JS_PS_END\n are helper macros for defining such arrays."]
     #[repr(C)]
     #[derive(Copy, Clone)]
     pub struct JSPropertySpec {
@@ -16319,18 +12334,7 @@ pub mod root {
         pub unused: root::JSNative,
         pub funname: *const ::std::os::raw::c_char,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_SelfHostedWrapper"]
-            [::std::mem::size_of::<JSPropertySpec_SelfHostedWrapper>() - 16usize];
-        ["Alignment of JSPropertySpec_SelfHostedWrapper"]
-            [::std::mem::align_of::<JSPropertySpec_SelfHostedWrapper>() - 8usize];
-        ["Offset of field: JSPropertySpec_SelfHostedWrapper::unused"]
-            [::std::mem::offset_of!(JSPropertySpec_SelfHostedWrapper, unused) - 0usize];
-        ["Offset of field: JSPropertySpec_SelfHostedWrapper::funname"]
-            [::std::mem::offset_of!(JSPropertySpec_SelfHostedWrapper, funname) - 8usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Copy, Clone)]
     pub struct JSPropertySpec_ValueWrapper {
         pub type_: root::JSPropertySpec_ValueWrapper_Type,
@@ -16350,46 +12354,13 @@ pub mod root {
         pub int32: i32,
         pub double_: f64,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_ValueWrapper__bindgen_ty_1"]
-            [::std::mem::size_of::<JSPropertySpec_ValueWrapper__bindgen_ty_1>() - 8usize];
-        ["Alignment of JSPropertySpec_ValueWrapper__bindgen_ty_1"]
-            [::std::mem::align_of::<JSPropertySpec_ValueWrapper__bindgen_ty_1>() - 8usize];
-        ["Offset of field: JSPropertySpec_ValueWrapper__bindgen_ty_1::string"]
-            [::std::mem::offset_of!(JSPropertySpec_ValueWrapper__bindgen_ty_1, string) - 0usize];
-        ["Offset of field: JSPropertySpec_ValueWrapper__bindgen_ty_1::int32"]
-            [::std::mem::offset_of!(JSPropertySpec_ValueWrapper__bindgen_ty_1, int32) - 0usize];
-        ["Offset of field: JSPropertySpec_ValueWrapper__bindgen_ty_1::double_"]
-            [::std::mem::offset_of!(JSPropertySpec_ValueWrapper__bindgen_ty_1, double_) - 0usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_ValueWrapper"]
-            [::std::mem::size_of::<JSPropertySpec_ValueWrapper>() - 16usize];
-        ["Alignment of JSPropertySpec_ValueWrapper"]
-            [::std::mem::align_of::<JSPropertySpec_ValueWrapper>() - 8usize];
-        ["Offset of field: JSPropertySpec_ValueWrapper::type_"]
-            [::std::mem::offset_of!(JSPropertySpec_ValueWrapper, type_) - 0usize];
-    };
-    #[repr(C)]
+            #[repr(C)]
     #[derive(Copy, Clone)]
     pub union JSPropertySpec_Accessor {
         pub native: root::JSNativeWrapper,
         pub selfHosted: root::JSPropertySpec_SelfHostedWrapper,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_Accessor"]
-            [::std::mem::size_of::<JSPropertySpec_Accessor>() - 16usize];
-        ["Alignment of JSPropertySpec_Accessor"]
-            [::std::mem::align_of::<JSPropertySpec_Accessor>() - 8usize];
-        ["Offset of field: JSPropertySpec_Accessor::native"]
-            [::std::mem::offset_of!(JSPropertySpec_Accessor, native) - 0usize];
-        ["Offset of field: JSPropertySpec_Accessor::selfHosted"]
-            [::std::mem::offset_of!(JSPropertySpec_Accessor, selfHosted) - 0usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Copy, Clone)]
     pub union JSPropertySpec_AccessorsOrValue {
         pub accessors: root::JSPropertySpec_AccessorsOrValue_Accessors,
@@ -16401,64 +12372,20 @@ pub mod root {
         pub getter: root::JSPropertySpec_Accessor,
         pub setter: root::JSPropertySpec_Accessor,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_AccessorsOrValue_Accessors"]
-            [::std::mem::size_of::<JSPropertySpec_AccessorsOrValue_Accessors>() - 32usize];
-        ["Alignment of JSPropertySpec_AccessorsOrValue_Accessors"]
-            [::std::mem::align_of::<JSPropertySpec_AccessorsOrValue_Accessors>() - 8usize];
-        ["Offset of field: JSPropertySpec_AccessorsOrValue_Accessors::getter"]
-            [::std::mem::offset_of!(JSPropertySpec_AccessorsOrValue_Accessors, getter) - 0usize];
-        ["Offset of field: JSPropertySpec_AccessorsOrValue_Accessors::setter"]
-            [::std::mem::offset_of!(JSPropertySpec_AccessorsOrValue_Accessors, setter) - 16usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_AccessorsOrValue"]
-            [::std::mem::size_of::<JSPropertySpec_AccessorsOrValue>() - 32usize];
-        ["Alignment of JSPropertySpec_AccessorsOrValue"]
-            [::std::mem::align_of::<JSPropertySpec_AccessorsOrValue>() - 8usize];
-        ["Offset of field: JSPropertySpec_AccessorsOrValue::accessors"]
-            [::std::mem::offset_of!(JSPropertySpec_AccessorsOrValue, accessors) - 0usize];
-        ["Offset of field: JSPropertySpec_AccessorsOrValue::value"]
-            [::std::mem::offset_of!(JSPropertySpec_AccessorsOrValue, value) - 0usize];
-    };
-    #[repr(C)]
+            #[repr(C)]
     #[derive(Copy, Clone)]
     pub union JSPropertySpec_Name {
         pub string_: *const ::std::os::raw::c_char,
         pub symbol_: usize,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec_Name"][::std::mem::size_of::<JSPropertySpec_Name>() - 8usize];
-        ["Alignment of JSPropertySpec_Name"]
-            [::std::mem::align_of::<JSPropertySpec_Name>() - 8usize];
-        ["Offset of field: JSPropertySpec_Name::string_"]
-            [::std::mem::offset_of!(JSPropertySpec_Name, string_) - 0usize];
-        ["Offset of field: JSPropertySpec_Name::symbol_"]
-            [::std::mem::offset_of!(JSPropertySpec_Name, symbol_) - 0usize];
-    };
-    #[repr(u8)]
+        #[repr(u8)]
     #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
     pub enum JSPropertySpec_Kind {
         Value = 0,
         SelfHostedAccessor = 1,
         NativeAccessor = 2,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPropertySpec"][::std::mem::size_of::<JSPropertySpec>() - 48usize];
-        ["Alignment of JSPropertySpec"][::std::mem::align_of::<JSPropertySpec>() - 8usize];
-        ["Offset of field: JSPropertySpec::name"]
-            [::std::mem::offset_of!(JSPropertySpec, name) - 0usize];
-        ["Offset of field: JSPropertySpec::attributes_"]
-            [::std::mem::offset_of!(JSPropertySpec, attributes_) - 8usize];
-        ["Offset of field: JSPropertySpec::kind_"]
-            [::std::mem::offset_of!(JSPropertySpec, kind_) - 9usize];
-        ["Offset of field: JSPropertySpec::u"][::std::mem::offset_of!(JSPropertySpec, u) - 16usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Copy, Clone)]
     pub struct JSFunctionSpec {
         pub name: root::JSFunctionSpec_Name,
@@ -16468,22 +12395,7 @@ pub mod root {
         pub selfHostedName: *const ::std::os::raw::c_char,
     }
     pub type JSFunctionSpec_Name = root::JSPropertySpec_Name;
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSFunctionSpec"][::std::mem::size_of::<JSFunctionSpec>() - 40usize];
-        ["Alignment of JSFunctionSpec"][::std::mem::align_of::<JSFunctionSpec>() - 8usize];
-        ["Offset of field: JSFunctionSpec::name"]
-            [::std::mem::offset_of!(JSFunctionSpec, name) - 0usize];
-        ["Offset of field: JSFunctionSpec::call"]
-            [::std::mem::offset_of!(JSFunctionSpec, call) - 8usize];
-        ["Offset of field: JSFunctionSpec::nargs"]
-            [::std::mem::offset_of!(JSFunctionSpec, nargs) - 24usize];
-        ["Offset of field: JSFunctionSpec::flags"]
-            [::std::mem::offset_of!(JSFunctionSpec, flags) - 26usize];
-        ["Offset of field: JSFunctionSpec::selfHostedName"]
-            [::std::mem::offset_of!(JSFunctionSpec, selfHostedName) - 32usize];
-    };
-    pub type JSIterateCompartmentCallback = ::std::option::Option<
+        pub type JSIterateCompartmentCallback = ::std::option::Option<
         unsafe extern "C" fn(
             arg1: *mut root::JSContext,
             arg2: *mut ::std::os::raw::c_void,
@@ -16511,7 +12423,7 @@ pub mod root {
             systemCodeStackSize: root::JS::NativeStackSize,
             trustedScriptStackSize: root::JS::NativeStackSize,
             untrustedScriptStackSize: root::JS::NativeStackSize,
-        ) { qjs_todo!("JS_SetNativeStackQuota") }
+        ) { crate::engine::JS_SetNativeStackQuota(cx, systemCodeStackSize, trustedScriptStackSize, untrustedScriptStackSize) }
 
     
     pub unsafe extern "C" fn JS_GetEmptyString(cx: *mut root::JSContext) -> *mut root::JSString { qjs_todo!("JS_GetEmptyString") }
@@ -16760,17 +12672,7 @@ pub mod root {
         pub wrap: root::JSWrapObjectCallback,
         pub preWrap: root::JSPreWrapCallback,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSWrapObjectCallbacks"][::std::mem::size_of::<JSWrapObjectCallbacks>() - 16usize];
-        ["Alignment of JSWrapObjectCallbacks"]
-            [::std::mem::align_of::<JSWrapObjectCallbacks>() - 8usize];
-        ["Offset of field: JSWrapObjectCallbacks::wrap"]
-            [::std::mem::offset_of!(JSWrapObjectCallbacks, wrap) - 0usize];
-        ["Offset of field: JSWrapObjectCallbacks::preWrap"]
-            [::std::mem::offset_of!(JSWrapObjectCallbacks, preWrap) - 8usize];
-    };
-    pub type JSDestroyZoneCallback = ::std::option::Option<
+        pub type JSDestroyZoneCallback = ::std::option::Option<
         unsafe extern "C" fn(arg1: *mut root::JS::GCContext, arg2: *mut root::JS::Zone),
     >;
     pub type JSDestroyCompartmentCallback = ::std::option::Option<
@@ -17334,7 +13236,7 @@ pub mod root {
             cx: *mut root::JSContext,
             script: root::JS::Handle<*mut root::JSScript>,
             rval: root::JS::MutableHandle<root::JS::Value>,
-        ) -> bool { qjs_todo!("JS_ExecuteScript") }
+        ) -> bool { crate::engine::JS_ExecuteScript(cx, script, rval) }
 
     
     pub unsafe extern "C" fn JS_ExecuteScript1(
@@ -17381,7 +13283,7 @@ pub mod root {
         ) -> bool { qjs_todo!("JS_SetICUMemoryFunctions") }
 
     #[doc = " Destroy free-standing resources allocated by SpiderMonkey, not associated\n with any runtime, context, or other structure.\n\n This method should be called after all other JSAPI data has been properly\n cleaned up: every new runtime must have been destroyed, every new context\n must have been destroyed, and so on.  Calling this method before all other\n resources have been destroyed has undefined behavior.\n\n Failure to call this method, at present, has no adverse effects other than\n leaking memory.  This may not always be the case; it's recommended that all\n embedders call this method when all other JSAPI operations have completed.\n\n It is currently not possible to initialize SpiderMonkey multiple times (that\n is, calling JS_Init/JSAPI methods/JS_ShutDown in that order, then doing so\n again).  This restriction may eventually be lifted."]
-    pub unsafe extern "C" fn JS_ShutDown() { qjs_todo!("JS_ShutDown") }
+    pub unsafe extern "C" fn JS_ShutDown() { crate::engine::JS_ShutDown() }
 
     #[doc = " A variant of JS_ShutDown for process which used JS_FrontendOnlyInit instead\n of JS_Init."]
     pub unsafe extern "C" fn JS_FrontendOnlyShutDown() { qjs_todo!("JS_FrontendOnlyShutDown") }
@@ -17544,30 +13446,7 @@ pub mod root {
         pub canTransfer: root::CanTransferStructuredCloneOp,
         pub sabCloned: root::SharedArrayBufferClonedOp,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSStructuredCloneCallbacks"]
-            [::std::mem::size_of::<JSStructuredCloneCallbacks>() - 64usize];
-        ["Alignment of JSStructuredCloneCallbacks"]
-            [::std::mem::align_of::<JSStructuredCloneCallbacks>() - 8usize];
-        ["Offset of field: JSStructuredCloneCallbacks::read"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, read) - 0usize];
-        ["Offset of field: JSStructuredCloneCallbacks::write"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, write) - 8usize];
-        ["Offset of field: JSStructuredCloneCallbacks::reportError"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, reportError) - 16usize];
-        ["Offset of field: JSStructuredCloneCallbacks::readTransfer"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, readTransfer) - 24usize];
-        ["Offset of field: JSStructuredCloneCallbacks::writeTransfer"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, writeTransfer) - 32usize];
-        ["Offset of field: JSStructuredCloneCallbacks::freeTransfer"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, freeTransfer) - 40usize];
-        ["Offset of field: JSStructuredCloneCallbacks::canTransfer"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, canTransfer) - 48usize];
-        ["Offset of field: JSStructuredCloneCallbacks::sabCloned"]
-            [::std::mem::offset_of!(JSStructuredCloneCallbacks, sabCloned) - 56usize];
-    };
-    #[repr(u32)]
+        #[repr(u32)]
     #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
     pub enum OwnTransferablePolicy {
         #[doc = " The buffer owns any Transferables that it might contain, and should\n properly release them upon destruction."]
@@ -17593,29 +13472,8 @@ pub mod root {
     pub type JSStructuredCloneData_Iterator = root::IterImpl;
     pub type JSStructuredCloneData_StringBuffers = root::__BindgenOpaqueArray<u64, 7usize>;
     pub const JSStructuredCloneData_kStandardCapacity: usize = 4096;
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSStructuredCloneData"]
-            [::std::mem::size_of::<JSStructuredCloneData>() - 184usize];
-        ["Alignment of JSStructuredCloneData"]
-            [::std::mem::align_of::<JSStructuredCloneData>() - 8usize];
-        ["Offset of field: JSStructuredCloneData::bufList_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, bufList_) - 0usize];
-        ["Offset of field: JSStructuredCloneData::scope_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, scope_) - 72usize];
-        ["Offset of field: JSStructuredCloneData::callbacks_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, callbacks_) - 80usize];
-        ["Offset of field: JSStructuredCloneData::closure_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, closure_) - 88usize];
-        ["Offset of field: JSStructuredCloneData::ownTransferables_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, ownTransferables_) - 96usize];
-        ["Offset of field: JSStructuredCloneData::refsHeld_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, refsHeld_) - 104usize];
-        ["Offset of field: JSStructuredCloneData::stringBufferRefsHeld_"]
-            [::std::mem::offset_of!(JSStructuredCloneData, stringBufferRefsHeld_) - 128usize];
-    };
-    #[doc = " Implements StructuredDeserialize and StructuredDeserializeWithTransfer.\n\n Note: If `data` contains transferable objects, it can be read only once."]
-    pub unsafe extern "C" fn JS_ReadStructuredClone(
+        #[doc = " Implements StructuredDeserialize and StructuredDeserializeWithTransfer.\n\n Note: If `data` contains transferable objects, it can be read only once."]
+        pub unsafe extern "C" fn JS_ReadStructuredClone(
             cx: *mut root::JSContext,
             data: *const root::JSStructuredCloneData,
             version: u32,
@@ -17660,19 +13518,8 @@ pub mod root {
         pub data_: root::JSStructuredCloneData,
         pub version_: u32,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSAutoStructuredCloneBuffer"]
-            [::std::mem::size_of::<JSAutoStructuredCloneBuffer>() - 192usize];
-        ["Alignment of JSAutoStructuredCloneBuffer"]
-            [::std::mem::align_of::<JSAutoStructuredCloneBuffer>() - 8usize];
-        ["Offset of field: JSAutoStructuredCloneBuffer::data_"]
-            [::std::mem::offset_of!(JSAutoStructuredCloneBuffer, data_) - 0usize];
-        ["Offset of field: JSAutoStructuredCloneBuffer::version_"]
-            [::std::mem::offset_of!(JSAutoStructuredCloneBuffer, version_) - 184usize];
-    };
-    
-    pub unsafe extern "C" fn JS_ReadUint32Pair(
+        
+        pub unsafe extern "C" fn JS_ReadUint32Pair(
             r: *mut root::JSStructuredCloneReader,
             p1: *mut u32,
             p2: *mut u32,
@@ -17746,25 +13593,13 @@ pub mod root {
     pub struct JSJitGetterCallArgs {
         pub _base: root::JS::MutableHandle<root::JS::Value>,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitGetterCallArgs"][::std::mem::size_of::<JSJitGetterCallArgs>() - 8usize];
-        ["Alignment of JSJitGetterCallArgs"]
-            [::std::mem::align_of::<JSJitGetterCallArgs>() - 8usize];
-    };
-    #[doc = " A class, expected to be passed by value, which represents the CallArgs for a\n JSJitSetterOp."]
+        #[doc = " A class, expected to be passed by value, which represents the CallArgs for a\n JSJitSetterOp."]
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct JSJitSetterCallArgs {
         pub _base: root::JS::MutableHandle<root::JS::Value>,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitSetterCallArgs"][::std::mem::size_of::<JSJitSetterCallArgs>() - 8usize];
-        ["Alignment of JSJitSetterCallArgs"]
-            [::std::mem::align_of::<JSJitSetterCallArgs>() - 8usize];
-    };
-    pub type JSJitMethodCallArgs_Base = root::__BindgenOpaqueArray<u64, 2usize>;
+        pub type JSJitMethodCallArgs_Base = root::__BindgenOpaqueArray<u64, 2usize>;
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct JSJitMethodCallArgsTraits {
@@ -17772,14 +13607,7 @@ pub mod root {
     }
     pub const JSJitMethodCallArgsTraits_offsetOfArgv: usize = 0;
     pub const JSJitMethodCallArgsTraits_offsetOfArgc: usize = 8;
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitMethodCallArgsTraits"]
-            [::std::mem::size_of::<JSJitMethodCallArgsTraits>() - 1usize];
-        ["Alignment of JSJitMethodCallArgsTraits"]
-            [::std::mem::align_of::<JSJitMethodCallArgsTraits>() - 1usize];
-    };
-    pub type JSJitGetterOp = ::std::option::Option<
+        pub type JSJitGetterOp = ::std::option::Option<
         unsafe extern "C" fn(
             arg1: *mut root::JSContext,
             arg2: root::JS::Handle<*mut root::JSObject>,
@@ -17863,71 +13691,25 @@ pub mod root {
         pub staticMethod: root::JSNative,
         pub ignoresReturnValueMethod: root::JSNative,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitInfo__bindgen_ty_1"]
-            [::std::mem::size_of::<JSJitInfo__bindgen_ty_1>() - 8usize];
-        ["Alignment of JSJitInfo__bindgen_ty_1"]
-            [::std::mem::align_of::<JSJitInfo__bindgen_ty_1>() - 8usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_1::getter"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_1, getter) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_1::setter"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_1, setter) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_1::method"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_1, method) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_1::staticMethod"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_1, staticMethod) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_1::ignoresReturnValueMethod"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_1, ignoresReturnValueMethod) - 0usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Copy, Clone)]
     pub union JSJitInfo__bindgen_ty_2 {
         pub protoID: u16,
         pub inlinableNative: root::js::jit::InlinableNative,
         pub trampolineNative: root::js::jit::TrampolineNative,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitInfo__bindgen_ty_2"]
-            [::std::mem::size_of::<JSJitInfo__bindgen_ty_2>() - 2usize];
-        ["Alignment of JSJitInfo__bindgen_ty_2"]
-            [::std::mem::align_of::<JSJitInfo__bindgen_ty_2>() - 2usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_2::protoID"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_2, protoID) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_2::inlinableNative"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_2, inlinableNative) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_2::trampolineNative"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_2, trampolineNative) - 0usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Copy, Clone)]
     pub union JSJitInfo__bindgen_ty_3 {
         pub depth: u16,
         pub nativeOp: u16,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitInfo__bindgen_ty_3"]
-            [::std::mem::size_of::<JSJitInfo__bindgen_ty_3>() - 2usize];
-        ["Alignment of JSJitInfo__bindgen_ty_3"]
-            [::std::mem::align_of::<JSJitInfo__bindgen_ty_3>() - 2usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_3::depth"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_3, depth) - 0usize];
-        ["Offset of field: JSJitInfo__bindgen_ty_3::nativeOp"]
-            [::std::mem::offset_of!(JSJitInfo__bindgen_ty_3, nativeOp) - 0usize];
-    };
-    pub const JSJitInfo_OpTypeBits: usize = 4;
+        pub const JSJitInfo_OpTypeBits: usize = 4;
     pub const JSJitInfo_AliasSetBits: usize = 4;
     pub const JSJitInfo_ReturnTypeBits: usize = 8;
     pub const JSJitInfo_SlotIndexBits: usize = 10;
     pub const JSJitInfo_maxSlotIndex: usize = 1023;
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitInfo"][::std::mem::size_of::<JSJitInfo>() - 16usize];
-        ["Alignment of JSJitInfo"][::std::mem::align_of::<JSJitInfo>() - 8usize];
-    };
-    impl JSJitInfo {
+        impl JSJitInfo {
         #[inline]
         pub fn type_(&self) -> u32 {
             unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 4u8) as u32) }
@@ -18323,18 +14105,8 @@ pub mod root {
         pub base: root::JSJitInfo,
         pub argTypes: *const root::JSJitInfo_ArgType,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSTypedMethodJitInfo"][::std::mem::size_of::<JSTypedMethodJitInfo>() - 24usize];
-        ["Alignment of JSTypedMethodJitInfo"]
-            [::std::mem::align_of::<JSTypedMethodJitInfo>() - 8usize];
-        ["Offset of field: JSTypedMethodJitInfo::base"]
-            [::std::mem::offset_of!(JSTypedMethodJitInfo, base) - 0usize];
-        ["Offset of field: JSTypedMethodJitInfo::argTypes"]
-            [::std::mem::offset_of!(JSTypedMethodJitInfo, argTypes) - 16usize];
-    };
-    
-    pub unsafe extern "C" fn JS_NewInt8Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject { qjs_todo!("JS_NewInt8Array") }
+        
+        pub unsafe extern "C" fn JS_NewInt8Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject { qjs_todo!("JS_NewInt8Array") }
 
     
     pub unsafe extern "C" fn JS_NewInt8ArrayFromArray(
@@ -19725,29 +15497,8 @@ pub mod root {
         pub usage: *const ::std::os::raw::c_char,
         pub help: *const ::std::os::raw::c_char,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSFunctionSpecWithHelp"]
-            [::std::mem::size_of::<JSFunctionSpecWithHelp>() - 48usize];
-        ["Alignment of JSFunctionSpecWithHelp"]
-            [::std::mem::align_of::<JSFunctionSpecWithHelp>() - 8usize];
-        ["Offset of field: JSFunctionSpecWithHelp::name"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, name) - 0usize];
-        ["Offset of field: JSFunctionSpecWithHelp::call"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, call) - 8usize];
-        ["Offset of field: JSFunctionSpecWithHelp::nargs"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, nargs) - 16usize];
-        ["Offset of field: JSFunctionSpecWithHelp::flags"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, flags) - 18usize];
-        ["Offset of field: JSFunctionSpecWithHelp::jitInfo"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, jitInfo) - 24usize];
-        ["Offset of field: JSFunctionSpecWithHelp::usage"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, usage) - 32usize];
-        ["Offset of field: JSFunctionSpecWithHelp::help"]
-            [::std::mem::offset_of!(JSFunctionSpecWithHelp, help) - 40usize];
-    };
-    
-    pub unsafe extern "C" fn JS_DefineFunctionsWithHelp(
+        
+        pub unsafe extern "C" fn JS_DefineFunctionsWithHelp(
             cx: *mut root::JSContext,
             obj: root::JS::HandleObject,
             fs: *const root::JSFunctionSpecWithHelp,
@@ -19757,13 +15508,13 @@ pub mod root {
         #[allow(unused_imports)]
         use self::super::super::root;
         
-        pub unsafe extern "C" fn JS_Init() -> bool { qjs_todo!("JS_Init") }
+        pub unsafe extern "C" fn JS_Init() -> bool { crate::engine::JS_Init() }
 
         
-        pub unsafe extern "C" fn JS_NewRealmOptions() -> *mut root::JS::RealmOptions { qjs_todo!("JS_NewRealmOptions") }
+        pub unsafe extern "C" fn JS_NewRealmOptions() -> *mut root::JS::RealmOptions { crate::engine::JS_NewRealmOptions() }
 
         
-        pub unsafe extern "C" fn DeleteRealmOptions(options: *mut root::JS::RealmOptions) { qjs_todo!("DeleteRealmOptions") }
+        pub unsafe extern "C" fn DeleteRealmOptions(options: *mut root::JS::RealmOptions) { crate::engine::DeleteRealmOptions(options) }
 
         
         pub unsafe extern "C" fn JS_NewOwningCompileOptions(
@@ -20004,17 +15755,7 @@ pub mod root {
         pub _bitfield_1: root::__BindgenBitfieldUnit<[u8; 1usize]>,
         pub __bindgen_padding_0: [u8; 3usize],
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSJitMethodCallArgs"][::std::mem::size_of::<JSJitMethodCallArgs>() - 16usize];
-        ["Alignment of JSJitMethodCallArgs"]
-            [::std::mem::align_of::<JSJitMethodCallArgs>() - 8usize];
-        ["Offset of field: JSJitMethodCallArgs::argv_"]
-            [::std::mem::offset_of!(JSJitMethodCallArgs, argv_) - 0usize];
-        ["Offset of field: JSJitMethodCallArgs::argc_"]
-            [::std::mem::offset_of!(JSJitMethodCallArgs, argc_) - 8usize];
-    };
-    impl JSJitMethodCallArgs {
+        impl JSJitMethodCallArgs {
         #[inline]
         pub fn constructing_(&self) -> bool {
             unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
@@ -20108,3025 +15849,12 @@ pub mod root {
         pub overflow_arg_area: *mut ::std::os::raw::c_void,
         pub reg_save_area: *mut ::std::os::raw::c_void,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of __va_list_tag"][::std::mem::size_of::<__va_list_tag>() - 24usize];
-        ["Alignment of __va_list_tag"][::std::mem::align_of::<__va_list_tag>() - 8usize];
-        ["Offset of field: __va_list_tag::gp_offset"]
-            [::std::mem::offset_of!(__va_list_tag, gp_offset) - 0usize];
-        ["Offset of field: __va_list_tag::fp_offset"]
-            [::std::mem::offset_of!(__va_list_tag, fp_offset) - 4usize];
-        ["Offset of field: __va_list_tag::overflow_arg_area"]
-            [::std::mem::offset_of!(__va_list_tag, overflow_arg_area) - 8usize];
-        ["Offset of field: __va_list_tag::reg_save_area"]
-            [::std::mem::offset_of!(__va_list_tag, reg_save_area) - 16usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: BaseTimeDuration_open0_TimeDurationValueCalculator_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: BaseTimeDuration > () - 8usize] ;
-        ["Align of template specialization: BaseTimeDuration_open0_TimeDurationValueCalculator_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: BaseTimeDuration > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_StackGCVector_open1_PropertyKey_TempAllocPolicy_close1_close0"] [:: std :: mem :: size_of :: < root :: JS :: MutableHandle < root :: JS :: StackGCVector < root :: JS :: PropertyKey , root :: js :: TempAllocPolicy > > > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_StackGCVector_open1_PropertyKey_TempAllocPolicy_close1_close0"] [:: std :: mem :: align_of :: < root :: JS :: MutableHandle < root :: JS :: StackGCVector < root :: JS :: PropertyKey , root :: js :: TempAllocPolicy > > > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Opaque_open0_uint64_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Opaque<u64>>() - 8usize];
-        ["Align of template specialization: Opaque_open0_uint64_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Opaque<u64>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: GenericTracerImpl_open0_CallbackTracer_close0"]
-            [::std::mem::size_of::<root::js::GenericTracerImpl>() - 48usize];
-        ["Align of template specialization: GenericTracerImpl_open0_CallbackTracer_close0"]
-            [::std::mem::align_of::<root::js::GenericTracerImpl>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-        ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-        ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-        ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-        ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-        ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-        ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultHasher_open0_unsigned_int_void_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultHasher>() - 1usize];
-        ["Align of template specialization: DefaultHasher_open0_unsigned_int_void_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultHasher>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_ProfileChunkedBuffer_RequestedChunkRefCountedHolder_close0"] [:: std :: mem :: size_of :: < root :: RefPtr < root :: mozilla :: ProfileChunkedBuffer_RequestedChunkRefCountedHolder > > () - 8usize] ;
-        ["Align of template specialization: RefPtr_open0_ProfileChunkedBuffer_RequestedChunkRefCountedHolder_close0"] [:: std :: mem :: align_of :: < root :: RefPtr < root :: mozilla :: ProfileChunkedBuffer_RequestedChunkRefCountedHolder > > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: TenuredHeap_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::TenuredHeap>() - 8usize];
-        ["Align of template specialization: TenuredHeap_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::TenuredHeap>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: LinkedListElement_open0_PersistentRootedBase_close0"]
-            [::std::mem::size_of::<root::mozilla::LinkedListElement>() - 24usize];
-        ["Align of template specialization: LinkedListElement_open0_PersistentRootedBase_close0"]
-            [::std::mem::align_of::<root::mozilla::LinkedListElement>() - 8usize];
-    };
-    #[repr(C)]
+                                                                                                                                                                                                                                                                            #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct _bindgen_ty_74 {
         pub _address: u8,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 16usize];
-        ["Align of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 16usize];
-        ["Align of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 16usize];
-        ["Align of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 16usize];
-        ["Align of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<root::JS::Latin1Char>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<root::JS::Latin1Char>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_unsigned_char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<::std::os::raw::c_uchar>>() - 16usize];
-        ["Align of template specialization: Range_open0_unsigned_char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<::std::os::raw::c_uchar>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_unsigned_char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<::std::os::raw::c_uchar>>() - 16usize];
-        ["Align of template specialization: Range_open0_unsigned_char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<::std::os::raw::c_uchar>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_unsigned_char_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<::std::os::raw::c_uchar>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_unsigned_char_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<::std::os::raw::c_uchar>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_unsigned_char_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<::std::os::raw::c_uchar>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_unsigned_char_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<::std::os::raw::c_uchar>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<u16>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<u16>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RangedPtr_open0_const_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::RangedPtr<u16>>() - 8usize];
-        ["Align of template specialization: RangedPtr_open0_const_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::RangedPtr<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JSErrorNotes_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JSErrorNotes_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JSErrorNotes_Note_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JSErrorNotes_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JSErrorNotes_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Maybe_open1_Value_close1_close0"]
-            [::std::mem::size_of::<u64>() - 8usize];
-        ["Align of template specialization: Handle_open0_Maybe_open1_Value_close1_close0"]
-            [::std::mem::align_of::<u64>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: EnumSet_open0_PropertyAttribute_unsigned_char_close0"]
-            [::std::mem::size_of::<root::mozilla::EnumSet<::std::os::raw::c_uchar>>() - 1usize];
-        ["Align of template specialization: EnumSet_open0_PropertyAttribute_unsigned_char_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: EnumSet < :: std :: os :: raw :: c_uchar > > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::jsid>>() - 8usize];
-        ["Align of template specialization: Handle_open0_jsid_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::jsid>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: Handle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefCounted_open0_LocaleString_close0"]
-            [::std::mem::size_of::<root::js::RefCounted>() - 8usize];
-        ["Align of template specialization: RefCounted_open0_LocaleString_close0"]
-            [::std::mem::align_of::<root::js::RefCounted>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_LocaleString_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_LocaleString_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_LocaleString_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_LocaleString_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: CheckedInt_open0_uint32_t_close0"]
-            [::std::mem::size_of::<root::mozilla::CheckedInt<u32>>() - 8usize];
-        ["Align of template specialization: CheckedInt_open0_uint32_t_close0"]
-            [::std::mem::align_of::<root::mozilla::CheckedInt<u32>>() - 4usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::already_AddRefed<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::already_AddRefed<root::mozilla::StringBuffer>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::already_AddRefed<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::already_AddRefed<root::mozilla::StringBuffer>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::already_AddRefed<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::already_AddRefed<root::mozilla::StringBuffer>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::already_AddRefed<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::already_AddRefed<root::mozilla::StringBuffer>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::already_AddRefed<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: already_AddRefed_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::already_AddRefed<root::mozilla::StringBuffer>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_uint8_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u8>>() - 16usize];
-        ["Align of template specialization: Range_open0_uint8_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u8>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSFunction_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSFunction>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 16usize];
-        ["Align of template specialization: Range_open0_Latin1Char_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<root::JS::Latin1Char>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::size_of::<root::mozilla::Range<u16>>() - 16usize];
-        ["Align of template specialization: Range_open0_const_char16_t_close0"]
-            [::std::mem::align_of::<root::mozilla::Range<u16>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[repr(C)]
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct IterImpl {
         pub mSegment: usize,
@@ -23134,475 +15862,4 @@ pub mod root {
         pub mDataEnd: *mut ::std::os::raw::c_char,
         pub mAbsoluteOffset: usize,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of IterImpl"][::std::mem::size_of::<IterImpl>() - 32usize];
-        ["Alignment of IterImpl"][::std::mem::align_of::<IterImpl>() - 8usize];
-        ["Offset of field: IterImpl::mSegment"]
-            [::std::mem::offset_of!(IterImpl, mSegment) - 0usize];
-        ["Offset of field: IterImpl::mData"][::std::mem::offset_of!(IterImpl, mData) - 8usize];
-        ["Offset of field: IterImpl::mDataEnd"]
-            [::std::mem::offset_of!(IterImpl, mDataEnd) - 16usize];
-        ["Offset of field: IterImpl::mAbsoluteOffset"]
-            [::std::mem::offset_of!(IterImpl, mAbsoluteOffset) - 24usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_StringBuffer_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::mozilla::StringBuffer>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: AtomicRefCounted_open0_WasmModule_close0"]
-            [::std::mem::size_of::<root::js::AtomicRefCounted>() - 8usize];
-        ["Align of template specialization: AtomicRefCounted_open0_WasmModule_close0"]
-            [::std::mem::align_of::<root::js::AtomicRefCounted>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyKey_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyKey>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: MutableHandle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: size_of :: < u64 > () - 8usize] ;
-        ["Align of template specialization: Handle_open0_Maybe_open1_PropertyDescriptor_close1_close0"] [:: std :: mem :: align_of :: < u64 > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-        ["Align of template specialization: MutableHandle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::PropertyDescriptor>>()
-                - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-        ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
-    };
-}
+                                                                                                                                                                                                                                                                        }

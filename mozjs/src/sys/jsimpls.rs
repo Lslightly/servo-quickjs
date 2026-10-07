@@ -196,23 +196,12 @@ impl JS::AutoGCRooter {
         }
     }
 
+    // QuickJS: no rooter lists; values reachable from Rust are kept alive by the shim's pool.
     pub unsafe fn add_to_root_stack(&mut self, cx: *mut JSContext) {
-        #[allow(non_snake_case)]
-        let autoGCRooters: *mut _ = {
-            let rooting_cx = cx as *mut JS::RootingContext;
-            &raw mut (*rooting_cx).autoGCRooters_.0[self.kind_ as usize]
-        };
-        self.stackTop = autoGCRooters as *mut *mut _;
-        self.down = *autoGCRooters as *mut _;
-
-        assert!(*self.stackTop != self);
-        *autoGCRooters = self as *mut _ as _;
+        let _ = cx;
     }
 
-    pub unsafe fn remove_from_root_stack(&mut self) {
-        assert!(*self.stackTop == self);
-        *self.stackTop = self.down;
-    }
+    pub unsafe fn remove_from_root_stack(&mut self) {}
 }
 
 impl JSJitMethodCallArgs {
@@ -404,28 +393,13 @@ impl JSNativeWrapper {
 }
 
 impl RootedBase {
+    // QuickJS: there is no root stack. A rooted value is retained by the shim's pool instead (see
+    // `JS::Rooted::add_to_root_stack`), which keeps it alive until the end of the task.
     unsafe fn add_to_root_stack(this: *mut Self, cx: *mut JSContext, kind: JS::RootKind) {
-        let stack = Self::get_root_stack(cx, kind);
-        (*this).stack = stack;
-        (*this).prev = *stack;
-
-        *stack = this as usize as _;
+        let _ = (this, cx, kind);
     }
 
-    unsafe fn remove_from_root_stack(&mut self) {
-        assert!(*self.stack == self as *mut _ as usize as _);
-        *self.stack = self.prev;
-    }
-
-    unsafe fn get_root_stack(cx: *mut JSContext, kind: JS::RootKind) -> *mut *mut RootedBase {
-        let kind = kind as usize;
-        let rooting_cx = Self::get_rooting_context(cx);
-        &raw mut (*rooting_cx).stackRoots_.0[kind] as *mut _ as *mut _
-    }
-
-    unsafe fn get_rooting_context(cx: *mut JSContext) -> *mut JS::RootingContext {
-        cx as *mut JS::RootingContext
-    }
+    unsafe fn remove_from_root_stack(&mut self) {}
 }
 
 impl<T: RootKind> JS::Rooted<T> {
@@ -442,7 +416,8 @@ impl<T: RootKind> JS::Rooted<T> {
 
     pub unsafe fn add_to_root_stack(this: *mut Self, cx: *mut JSContext) {
         let base = unsafe { &raw mut (*this).base };
-        RootedBase::add_to_root_stack(base, cx, T::KIND)
+        RootedBase::add_to_root_stack(base, cx, T::KIND);
+        crate::engine::retain_rooted(cx, T::KIND, &raw const (*this).data as *const std::ffi::c_void);
     }
 
     pub unsafe fn remove_from_root_stack(&mut self) {

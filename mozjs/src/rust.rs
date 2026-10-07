@@ -1358,7 +1358,7 @@ where
     let mut iterator = jsapi::ForOfIterator {
         cx_: raw_cx,
         iterator: RootedObject::new_unrooted(ptr::null_mut()),
-        nextMethod: RootedValue::new_unrooted(JSVal { asBits_: 0 }),
+        nextMethod: RootedValue::new_unrooted(UndefinedValue()),
         index: ::std::u32::MAX, // NOT_ARRAY
         ..zero
     };

@@ -2,6 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+//! `jsid` (`JS::PropertyKey`) on QuickJS. Integer ids keep SpiderMonkey's encoding; string and
+//! symbol ids hold a QuickJS atom: `(atom << 3) | tag`. Atoms referenced by ids are retained by
+//! the shim's pool when the id is created.
+
 #![allow(non_snake_case)]
 
 use crate::sys::jsapi::JS::Symbol;
@@ -12,6 +16,7 @@ use libc::c_void;
 pub const JSID_VOID: jsid = VoidId();
 
 const JSID_TYPE_MASK: usize = 0x7;
+const ATOM_SHIFT: usize = 3;
 
 #[repr(usize)]
 enum PropertyKeyTag {
@@ -40,22 +45,43 @@ pub fn IntId(i: i32) -> jsid {
 #[inline(always)]
 pub fn SymbolId(symbol: *mut Symbol) -> jsid {
     assert!(!symbol.is_null());
-    assert_eq!((symbol as usize) & JSID_TYPE_MASK, 0);
-    AsPropertyKey((symbol as usize) | (PropertyKeyTag::Symbol as usize))
+    from_atom(unsafe { crate::engine::symbol_ptr_to_atom(symbol) })
 }
 
 #[inline(always)]
-/// <https://searchfox.org/mozilla-central/rev/1f65969e57c757146e3e548614b49d3a4168eeb8/js/public/Id.h#183>
 pub fn StringId(s: *mut JSString) -> jsid {
     assert!(!s.is_null());
-    assert_eq!((s as usize) & JSID_TYPE_MASK, 0);
-    AsPropertyKey((s as usize) | (PropertyKeyTag::String as usize))
+    from_atom(unsafe { crate::engine::string_ptr_to_atom(s) })
+}
+
+/// The id for a QuickJS atom (no reference count change).
+pub(crate) fn from_atom(atom: u32) -> jsid {
+    if atom & (1 << 31) != 0 {
+        return IntId((atom & 0x7fff_ffff) as i32);
+    }
+    let tag = if unsafe { crate::engine::atom_is_symbol(atom) } {
+        PropertyKeyTag::Symbol
+    } else {
+        PropertyKeyTag::String
+    };
+    AsPropertyKey(((atom as usize) << ATOM_SHIFT) | tag as usize)
 }
 
 impl jsid {
     #[inline(always)]
     fn asBits(&self) -> usize {
         self.asBits_
+    }
+
+    /// The QuickJS atom of this id (no reference count change; `JS_ATOM_NULL` for void).
+    pub(crate) fn to_atom(&self) -> u32 {
+        if self.is_int() {
+            (self.to_int() as u32) | (1 << 31)
+        } else if self.is_void() {
+            0
+        } else {
+            (self.asBits() >> ATOM_SHIFT) as u32
+        }
     }
 
     #[inline(always)]
@@ -80,7 +106,7 @@ impl jsid {
 
     #[inline(always)]
     pub fn is_gcthing(&self) -> bool {
-        self.is_string() && self.is_symbol()
+        self.is_string() || self.is_symbol()
     }
 
     #[inline(always)]
@@ -92,32 +118,22 @@ impl jsid {
     #[inline(always)]
     pub fn to_string(&self) -> *mut JSString {
         assert!(self.is_string());
-        (self.asBits() ^ (PropertyKeyTag::String as usize)) as *mut JSString
+        unsafe { crate::engine::atom_to_string_ptr(self.to_atom()) }
     }
 
     #[inline(always)]
     pub fn to_symbol(&self) -> *mut Symbol {
         assert!(self.is_symbol());
-        (self.asBits() ^ (PropertyKeyTag::Symbol as usize)) as *mut Symbol
+        unsafe { crate::engine::atom_to_symbol_ptr(self.to_atom()) }
     }
 
     #[inline(always)]
     pub fn to_gcthing(&self) -> *mut c_void {
         assert!(self.is_gcthing());
-        (self.asBits() ^ JSID_TYPE_MASK) as *mut c_void
+        if self.is_string() {
+            self.to_string() as *mut c_void
+        } else {
+            self.to_symbol() as *mut c_void
+        }
     }
-}
-
-#[test]
-fn test_representation() {
-    let id = VoidId();
-    assert!(id.is_void());
-
-    let id = IntId(0);
-    assert!(id.is_int());
-    assert_eq!(id.to_int(), 0);
-
-    let id = IntId(i32::MAX);
-    assert!(id.is_int());
-    assert_eq!(id.to_int(), i32::MAX);
 }

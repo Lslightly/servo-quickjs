@@ -38,6 +38,8 @@ macro_rules! qjs_todo {
 
 pub mod sys;
 
+mod engine;
+
 pub use quickjs_sys as qjs;
 
 pub mod jsapi {

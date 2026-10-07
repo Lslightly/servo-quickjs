@@ -7,7 +7,7 @@
 #![deny(missing_docs)]
 
 use crate::context::{JSContext, RawJSContext};
-use crate::jsapi::{JSErrorFormatString, JSExnType, JS_ReportErrorNumberUTF8};
+use crate::jsapi::{JSErrorFormatString, JSExnType};
 use libc;
 use std::ffi::CStr;
 use std::{mem, os, ptr};
@@ -53,13 +53,9 @@ unsafe extern "C" fn get_error_message(
 /// passed back to the get_error_message callback.
 /// c_uint is u32, so this cast is safe, as is casting to/from i32 from there.
 unsafe fn throw_js_error(cx: *mut RawJSContext, error: &CStr, error_number: u32) {
-    JS_ReportErrorNumberUTF8(
-        cx,
-        Some(get_error_message),
-        ptr::null_mut(),
-        error_number,
-        error.as_ptr(),
-    );
+    // QuickJS: SpiderMonkey's variadic error-number API is replaced by a direct throw.
+    let _ = (get_error_message, ptr::null_mut::<os::raw::c_void>());
+    crate::engine::throw_error(cx, mem::transmute::<u32, JSExnType>(error_number), error);
 }
 
 /// Throw a `TypeError` with the given message.

@@ -236,26 +236,7 @@ pub mod root {
             unsafe extern "C" fn(aInterruptQueues: *mut ::std::os::raw::c_void),
         >,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JobQueueTraps"][::std::mem::size_of::<JobQueueTraps>() - 56usize];
-        ["Alignment of JobQueueTraps"][::std::mem::align_of::<JobQueueTraps>() - 8usize];
-        ["Offset of field: JobQueueTraps::getHostDefinedData"]
-            [::std::mem::offset_of!(JobQueueTraps, getHostDefinedData) - 0usize];
-        ["Offset of field: JobQueueTraps::enqueuePromiseJob"]
-            [::std::mem::offset_of!(JobQueueTraps, enqueuePromiseJob) - 8usize];
-        ["Offset of field: JobQueueTraps::runJobs"]
-            [::std::mem::offset_of!(JobQueueTraps, runJobs) - 16usize];
-        ["Offset of field: JobQueueTraps::empty"]
-            [::std::mem::offset_of!(JobQueueTraps, empty) - 24usize];
-        ["Offset of field: JobQueueTraps::pushNewInterruptQueue"]
-            [::std::mem::offset_of!(JobQueueTraps, pushNewInterruptQueue) - 32usize];
-        ["Offset of field: JobQueueTraps::popInterruptQueue"]
-            [::std::mem::offset_of!(JobQueueTraps, popInterruptQueue) - 40usize];
-        ["Offset of field: JobQueueTraps::dropInterruptQueues"]
-            [::std::mem::offset_of!(JobQueueTraps, dropInterruptQueues) - 48usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     pub struct RustJobQueue__bindgen_vtable(::std::os::raw::c_void);
     #[repr(C)]
     pub struct RustJobQueue {
@@ -275,35 +256,7 @@ pub mod root {
         pub mNewQueue: *const ::std::os::raw::c_void,
         pub mSavedQueue: *const ::std::os::raw::c_void,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of RustJobQueue_SavedQueue"]
-            [::std::mem::size_of::<RustJobQueue_SavedQueue>() - 96usize];
-        ["Alignment of RustJobQueue_SavedQueue"]
-            [::std::mem::align_of::<RustJobQueue_SavedQueue>() - 8usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mTraps"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mTraps) - 8usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mInterruptQueues"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mInterruptQueues) - 64usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mCurrentQueue"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mCurrentQueue) - 72usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mNewQueue"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mNewQueue) - 80usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mSavedQueue"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mSavedQueue) - 88usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of RustJobQueue"][::std::mem::size_of::<RustJobQueue>() - 80usize];
-        ["Alignment of RustJobQueue"][::std::mem::align_of::<RustJobQueue>() - 8usize];
-        ["Offset of field: RustJobQueue::mTraps"]
-            [::std::mem::offset_of!(RustJobQueue, mTraps) - 8usize];
-        ["Offset of field: RustJobQueue::mQueue"]
-            [::std::mem::offset_of!(RustJobQueue, mQueue) - 64usize];
-        ["Offset of field: RustJobQueue::mInterruptQueues"]
-            [::std::mem::offset_of!(RustJobQueue, mInterruptQueues) - 72usize];
-    };
-    #[repr(C)]
+            #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct JSExternalStringCallbacksTraps {
         pub latin1Finalize: ::std::option::Option<
@@ -330,22 +283,7 @@ pub mod root {
             ) -> usize,
         >,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSExternalStringCallbacksTraps"]
-            [::std::mem::size_of::<JSExternalStringCallbacksTraps>() - 32usize];
-        ["Alignment of JSExternalStringCallbacksTraps"]
-            [::std::mem::align_of::<JSExternalStringCallbacksTraps>() - 8usize];
-        ["Offset of field: JSExternalStringCallbacksTraps::latin1Finalize"]
-            [::std::mem::offset_of!(JSExternalStringCallbacksTraps, latin1Finalize) - 0usize];
-        ["Offset of field: JSExternalStringCallbacksTraps::utf16Finalize"]
-            [::std::mem::offset_of!(JSExternalStringCallbacksTraps, utf16Finalize) - 8usize];
-        ["Offset of field: JSExternalStringCallbacksTraps::latin1SizeOfBuffer"]
-            [::std::mem::offset_of!(JSExternalStringCallbacksTraps, latin1SizeOfBuffer) - 16usize];
-        ["Offset of field: JSExternalStringCallbacksTraps::utf16SizeOfBuffer"]
-            [::std::mem::offset_of!(JSExternalStringCallbacksTraps, utf16SizeOfBuffer) - 24usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     pub struct RustJSExternalStringCallbacks__bindgen_vtable(::std::os::raw::c_void);
     #[repr(C)]
     pub struct RustJSExternalStringCallbacks {
@@ -353,18 +291,7 @@ pub mod root {
         pub mTraps: root::JSExternalStringCallbacksTraps,
         pub privateData: *mut ::std::os::raw::c_void,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of RustJSExternalStringCallbacks"]
-            [::std::mem::size_of::<RustJSExternalStringCallbacks>() - 48usize];
-        ["Alignment of RustJSExternalStringCallbacks"]
-            [::std::mem::align_of::<RustJSExternalStringCallbacks>() - 8usize];
-        ["Offset of field: RustJSExternalStringCallbacks::mTraps"]
-            [::std::mem::offset_of!(RustJSExternalStringCallbacks, mTraps) - 8usize];
-        ["Offset of field: RustJSExternalStringCallbacks::privateData"]
-            [::std::mem::offset_of!(RustJSExternalStringCallbacks, privateData) - 40usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct ProxyTraps {
         pub enter: ::std::option::Option<
@@ -573,67 +500,7 @@ pub mod root {
         pub isConstructor:
             ::std::option::Option<unsafe extern "C" fn(obj: *mut root::JSObject) -> bool>,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of ProxyTraps"][::std::mem::size_of::<ProxyTraps>() - 240usize];
-        ["Alignment of ProxyTraps"][::std::mem::align_of::<ProxyTraps>() - 8usize];
-        ["Offset of field: ProxyTraps::enter"][::std::mem::offset_of!(ProxyTraps, enter) - 0usize];
-        ["Offset of field: ProxyTraps::getOwnPropertyDescriptor"]
-            [::std::mem::offset_of!(ProxyTraps, getOwnPropertyDescriptor) - 8usize];
-        ["Offset of field: ProxyTraps::defineProperty"]
-            [::std::mem::offset_of!(ProxyTraps, defineProperty) - 16usize];
-        ["Offset of field: ProxyTraps::ownPropertyKeys"]
-            [::std::mem::offset_of!(ProxyTraps, ownPropertyKeys) - 24usize];
-        ["Offset of field: ProxyTraps::delete_"]
-            [::std::mem::offset_of!(ProxyTraps, delete_) - 32usize];
-        ["Offset of field: ProxyTraps::enumerate"]
-            [::std::mem::offset_of!(ProxyTraps, enumerate) - 40usize];
-        ["Offset of field: ProxyTraps::getPrototypeIfOrdinary"]
-            [::std::mem::offset_of!(ProxyTraps, getPrototypeIfOrdinary) - 48usize];
-        ["Offset of field: ProxyTraps::getPrototype"]
-            [::std::mem::offset_of!(ProxyTraps, getPrototype) - 56usize];
-        ["Offset of field: ProxyTraps::setPrototype"]
-            [::std::mem::offset_of!(ProxyTraps, setPrototype) - 64usize];
-        ["Offset of field: ProxyTraps::setImmutablePrototype"]
-            [::std::mem::offset_of!(ProxyTraps, setImmutablePrototype) - 72usize];
-        ["Offset of field: ProxyTraps::preventExtensions"]
-            [::std::mem::offset_of!(ProxyTraps, preventExtensions) - 80usize];
-        ["Offset of field: ProxyTraps::isExtensible"]
-            [::std::mem::offset_of!(ProxyTraps, isExtensible) - 88usize];
-        ["Offset of field: ProxyTraps::has"][::std::mem::offset_of!(ProxyTraps, has) - 96usize];
-        ["Offset of field: ProxyTraps::get"][::std::mem::offset_of!(ProxyTraps, get) - 104usize];
-        ["Offset of field: ProxyTraps::set"][::std::mem::offset_of!(ProxyTraps, set) - 112usize];
-        ["Offset of field: ProxyTraps::call"][::std::mem::offset_of!(ProxyTraps, call) - 120usize];
-        ["Offset of field: ProxyTraps::construct"]
-            [::std::mem::offset_of!(ProxyTraps, construct) - 128usize];
-        ["Offset of field: ProxyTraps::hasOwn"]
-            [::std::mem::offset_of!(ProxyTraps, hasOwn) - 136usize];
-        ["Offset of field: ProxyTraps::getOwnEnumerablePropertyKeys"]
-            [::std::mem::offset_of!(ProxyTraps, getOwnEnumerablePropertyKeys) - 144usize];
-        ["Offset of field: ProxyTraps::nativeCall"]
-            [::std::mem::offset_of!(ProxyTraps, nativeCall) - 152usize];
-        ["Offset of field: ProxyTraps::objectClassIs"]
-            [::std::mem::offset_of!(ProxyTraps, objectClassIs) - 160usize];
-        ["Offset of field: ProxyTraps::className"]
-            [::std::mem::offset_of!(ProxyTraps, className) - 168usize];
-        ["Offset of field: ProxyTraps::fun_toString"]
-            [::std::mem::offset_of!(ProxyTraps, fun_toString) - 176usize];
-        ["Offset of field: ProxyTraps::boxedValue_unbox"]
-            [::std::mem::offset_of!(ProxyTraps, boxedValue_unbox) - 184usize];
-        ["Offset of field: ProxyTraps::defaultValue"]
-            [::std::mem::offset_of!(ProxyTraps, defaultValue) - 192usize];
-        ["Offset of field: ProxyTraps::trace"]
-            [::std::mem::offset_of!(ProxyTraps, trace) - 200usize];
-        ["Offset of field: ProxyTraps::finalize"]
-            [::std::mem::offset_of!(ProxyTraps, finalize) - 208usize];
-        ["Offset of field: ProxyTraps::objectMoved"]
-            [::std::mem::offset_of!(ProxyTraps, objectMoved) - 216usize];
-        ["Offset of field: ProxyTraps::isCallable"]
-            [::std::mem::offset_of!(ProxyTraps, isCallable) - 224usize];
-        ["Offset of field: ProxyTraps::isConstructor"]
-            [::std::mem::offset_of!(ProxyTraps, isConstructor) - 232usize];
-    };
-    pub type InvokeScriptPreparerHook = ::std::option::Option<
+        pub type InvokeScriptPreparerHook = ::std::option::Option<
         unsafe extern "C" fn(
             global: root::JS::HandleObject,
             closure: *mut root::js::ScriptEnvironmentPreparer_Closure,
@@ -646,17 +513,8 @@ pub mod root {
         pub vtable_: *const RustEnvironmentPreparer__bindgen_vtable,
         pub invokeScriptPreparerHook: root::InvokeScriptPreparerHook,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of RustEnvironmentPreparer"]
-            [::std::mem::size_of::<RustEnvironmentPreparer>() - 16usize];
-        ["Alignment of RustEnvironmentPreparer"]
-            [::std::mem::align_of::<RustEnvironmentPreparer>() - 8usize];
-        ["Offset of field: RustEnvironmentPreparer::invokeScriptPreparerHook"]
-            [::std::mem::offset_of!(RustEnvironmentPreparer, invokeScriptPreparerHook) - 8usize];
-    };
-    
-    pub unsafe extern "C" fn RegisterScriptEnvironmentPreparer(
+        
+        pub unsafe extern "C" fn RegisterScriptEnvironmentPreparer(
             cx: *mut root::JSContext,
             hook: root::InvokeScriptPreparerHook,
         ) { qjs_todo!("RegisterScriptEnvironmentPreparer") }
@@ -678,15 +536,7 @@ pub mod root {
         pub __bindgen_padding_0: [u64; 2usize],
         pub mTraps: root::ProxyTraps,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of WrapperProxyHandler"][::std::mem::size_of::<WrapperProxyHandler>() - 264usize];
-        ["Alignment of WrapperProxyHandler"]
-            [::std::mem::align_of::<WrapperProxyHandler>() - 8usize];
-        ["Offset of field: WrapperProxyHandler::mTraps"]
-            [::std::mem::offset_of!(WrapperProxyHandler, mTraps) - 24usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     pub struct ForwardingProxyHandler__bindgen_vtable(::std::os::raw::c_void);
     #[repr(C)]
     pub struct ForwardingProxyHandler {
@@ -695,18 +545,7 @@ pub mod root {
         pub mTraps: root::ProxyTraps,
         pub mExtra: *const ::std::os::raw::c_void,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of ForwardingProxyHandler"]
-            [::std::mem::size_of::<ForwardingProxyHandler>() - 272usize];
-        ["Alignment of ForwardingProxyHandler"]
-            [::std::mem::align_of::<ForwardingProxyHandler>() - 8usize];
-        ["Offset of field: ForwardingProxyHandler::mTraps"]
-            [::std::mem::offset_of!(ForwardingProxyHandler, mTraps) - 24usize];
-        ["Offset of field: ForwardingProxyHandler::mExtra"]
-            [::std::mem::offset_of!(ForwardingProxyHandler, mExtra) - 264usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     pub struct ServoDOMVisitor__bindgen_vtable(::std::os::raw::c_void);
     #[repr(C)]
     pub struct ServoDOMVisitor {
@@ -714,14 +553,7 @@ pub mod root {
         pub __bindgen_padding_0: u64,
         pub get_size: root::GetSize,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of ServoDOMVisitor"][::std::mem::size_of::<ServoDOMVisitor>() - 24usize];
-        ["Alignment of ServoDOMVisitor"][::std::mem::align_of::<ServoDOMVisitor>() - 8usize];
-        ["Offset of field: ServoDOMVisitor::get_size"]
-            [::std::mem::offset_of!(ServoDOMVisitor, get_size) - 16usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct JSPrincipalsCallbacks {
         pub write: ::std::option::Option<
@@ -734,17 +566,7 @@ pub mod root {
         pub isSystemOrAddonPrincipal:
             ::std::option::Option<unsafe extern "C" fn(arg1: *mut root::JSPrincipals) -> bool>,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of JSPrincipalsCallbacks"][::std::mem::size_of::<JSPrincipalsCallbacks>() - 16usize];
-        ["Alignment of JSPrincipalsCallbacks"]
-            [::std::mem::align_of::<JSPrincipalsCallbacks>() - 8usize];
-        ["Offset of field: JSPrincipalsCallbacks::write"]
-            [::std::mem::offset_of!(JSPrincipalsCallbacks, write) - 0usize];
-        ["Offset of field: JSPrincipalsCallbacks::isSystemOrAddonPrincipal"]
-            [::std::mem::offset_of!(JSPrincipalsCallbacks, isSystemOrAddonPrincipal) - 8usize];
-    };
-    #[repr(C)]
+        #[repr(C)]
     pub struct RustJSPrincipals__bindgen_vtable(::std::os::raw::c_void);
     #[repr(C)]
     pub struct RustJSPrincipals {
@@ -753,17 +575,8 @@ pub mod root {
         pub callbacks: root::JSPrincipalsCallbacks,
         pub privateData: *mut ::std::os::raw::c_void,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of RustJSPrincipals"][::std::mem::size_of::<RustJSPrincipals>() - 40usize];
-        ["Alignment of RustJSPrincipals"][::std::mem::align_of::<RustJSPrincipals>() - 8usize];
-        ["Offset of field: RustJSPrincipals::callbacks"]
-            [::std::mem::offset_of!(RustJSPrincipals, callbacks) - 16usize];
-        ["Offset of field: RustJSPrincipals::privateData"]
-            [::std::mem::offset_of!(RustJSPrincipals, privateData) - 32usize];
-    };
-    
-    pub unsafe extern "C" fn ShouldMeasureObject(
+        
+        pub unsafe extern "C" fn ShouldMeasureObject(
             obj: *mut root::JSObject,
             iface: *mut *mut root::nsISupports,
         ) -> bool { qjs_todo!("ShouldMeasureObject") }
@@ -855,14 +668,14 @@ pub mod root {
     pub unsafe extern "C" fn GetSecurityWrapper() -> *const ::std::os::raw::c_void { qjs_todo!("GetSecurityWrapper") }
 
     
-    pub unsafe extern "C" fn DeleteCompileOptions(aOpts: *mut root::JS::ReadOnlyCompileOptions) { qjs_todo!("DeleteCompileOptions") }
+    pub unsafe extern "C" fn DeleteCompileOptions(aOpts: *mut root::JS::ReadOnlyCompileOptions) { crate::engine::DeleteCompileOptions(aOpts) }
 
     
     pub unsafe extern "C" fn NewCompileOptions(
             aCx: *mut root::JSContext,
             aFile: *const ::std::os::raw::c_char,
             aLine: ::std::os::raw::c_uint,
-        ) -> *mut root::JS::ReadOnlyCompileOptions { qjs_todo!("NewCompileOptions") }
+        ) -> *mut root::JS::ReadOnlyCompileOptions { crate::engine::NewCompileOptions(aCx, aFile, aLine) }
 
     
     pub unsafe extern "C" fn NewProxyObject(
@@ -1305,15 +1118,7 @@ pub mod root {
     pub struct DispatchablePointer {
         pub ptr: u64,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of DispatchablePointer"][::std::mem::size_of::<DispatchablePointer>() - 8usize];
-        ["Alignment of DispatchablePointer"]
-            [::std::mem::align_of::<DispatchablePointer>() - 8usize];
-        ["Offset of field: DispatchablePointer::ptr"]
-            [::std::mem::offset_of!(DispatchablePointer, ptr) - 0usize];
-    };
-    pub type RustDispatchToEventLoopCallback = ::std::option::Option<
+        pub type RustDispatchToEventLoopCallback = ::std::option::Option<
         unsafe extern "C" fn(
             closure: *mut ::std::os::raw::c_void,
             ptr: *mut root::DispatchablePointer,
@@ -1325,18 +1130,8 @@ pub mod root {
         pub dispatchCallback: root::RustDispatchToEventLoopCallback,
         pub closure: *mut ::std::os::raw::c_void,
     }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of EventLoopCallbackData"][::std::mem::size_of::<EventLoopCallbackData>() - 16usize];
-        ["Alignment of EventLoopCallbackData"]
-            [::std::mem::align_of::<EventLoopCallbackData>() - 8usize];
-        ["Offset of field: EventLoopCallbackData::dispatchCallback"]
-            [::std::mem::offset_of!(EventLoopCallbackData, dispatchCallback) - 0usize];
-        ["Offset of field: EventLoopCallbackData::closure"]
-            [::std::mem::offset_of!(EventLoopCallbackData, closure) - 8usize];
-    };
-    
-    pub unsafe extern "C" fn DispatchToEventLoop(
+        
+        pub unsafe extern "C" fn DispatchToEventLoop(
             closure: *mut ::std::os::raw::c_void,
             dispatchable: *mut u64,
         ) -> bool { qjs_todo!("DispatchToEventLoop") }
