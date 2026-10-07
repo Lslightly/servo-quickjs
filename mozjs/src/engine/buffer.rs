@@ -565,6 +565,11 @@ pub(crate) unsafe fn IsResizableArrayBufferView(obj: *mut root::JSObject) -> boo
     view(obj).is_some_and(|b| b.resizable())
 }
 
+pub(crate) unsafe fn JS_MaxMovableTypedArraySize() -> usize {
+    // No typed array data moves.
+    0
+}
+
 pub(crate) unsafe fn JS_GetTypedArrayLength(obj: *mut root::JSObject) -> usize {
     typed_array(obj).map_or(0, |b| b.length())
 }

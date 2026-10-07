@@ -11,7 +11,8 @@ use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 use mozjs::context::JSContext;
 use mozjs::jsapi::{
     ArrayBufferHasData, GetArrayBufferByteLength, GetArrayBufferData, GetArrayBufferLengthAndData,
-    GetArrayBufferViewLengthAndData, IsArrayBufferObject, IsDetachedArrayBufferObject, JSObject,
+    GetArrayBufferViewLengthAndData, IsArrayBufferObject, IsDetachedArrayBufferObject,
+    IsResizableArrayBufferView, JSObject,
     JS_GetArrayBufferViewByteLength, JS_GetArrayBufferViewByteOffset, JS_GetArrayBufferViewType,
     JS_GetBigInt64ArrayData, JS_GetFloat16ArrayData, JS_GetObjectAsFloat64Array,
     JS_GetTypedArrayByteLength, JS_GetTypedArrayLength, JS_GetTypedArraySharedness,
@@ -292,6 +293,24 @@ fn views_with_offsets(cx: &mut JSContext, global: HandleObject) {
     rooted!(&in(cx) let bad = unsafe { JS_NewDataView(cx, buf.handle(), 14, 4) });
     assert!(bad.get().is_null());
     take_exception(cx);
+
+    // Views of resizable buffers track the length, and have no data when out of bounds.
+    rooted!(&in(cx) let rv = eval_obj(cx, global, "var r = new ArrayBuffer(8, { maxByteLength: 16 }); var rdv = new DataView(r, 2); var rv = new Uint16Array(r, 2); r.resize(12); rv"));
+    rooted!(&in(cx) let rdv = eval_obj(cx, global, "rdv"));
+    unsafe {
+        assert!(IsResizableArrayBufferView(rv.get()));
+        assert!(!IsResizableArrayBufferView(v.get()));
+        assert_eq!(JS_GetTypedArrayLength(rv.get()), 5);
+        assert_eq!(JS_GetArrayBufferViewByteLength(rdv.get()), 10);
+    }
+    eval(cx, global, "r.resize(1)");
+    unsafe {
+        assert_eq!(JS_GetTypedArrayLength(rv.get()), 0);
+        assert_eq!(JS_GetArrayBufferViewByteLength(rdv.get()), 0);
+        let (mut len, mut data) = (1, ptr::null_mut());
+        GetArrayBufferViewLengthAndData(rv.get(), &mut len, &mut shared, &mut data);
+        assert_eq!((len, data), (0, ptr::null_mut()));
+    }
 }
 
 fn detach(cx: &mut JSContext, global: HandleObject) {
