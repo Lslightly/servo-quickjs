@@ -35,6 +35,7 @@ mod proxy;
 mod realm;
 mod runtime;
 mod string;
+pub(crate) mod verify;
 
 pub(crate) use atom::*;
 pub(crate) use buffer::*;
@@ -129,6 +130,7 @@ impl Cx {
             qv
         };
         self.pool.push(qv);
+        verify::pooled(qv, 1);
         JSVal::from_qjs(qv)
     }
 
@@ -141,6 +143,7 @@ impl Cx {
     pub fn drain_pool(&mut self, mark: (usize, usize)) {
         while self.pool.len() > mark.0 {
             let v = self.pool.pop().unwrap();
+            verify::pooled(v, -1);
             unsafe { q::JS_FreeValueRT(self.rt, v) };
         }
         while self.atom_pool.len() > mark.1 {
@@ -222,11 +225,13 @@ pub(crate) unsafe fn retain_rooted(cx: *mut root::JSContext, kind: root::JS::Roo
 /// See `crate::quickjs::retain_object`.
 pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
     q::JS_DupValueRT(current().rt, obj_val(obj));
+    verify::count(obj_val(obj), 1);
 }
 
 /// See `crate::quickjs::release_object`.
 pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
     if let Some(cx) = try_current() {
+        verify::count(obj_val(obj), -1);
         q::JS_FreeValueRT(cx.rt, obj_val(obj));
     }
 }

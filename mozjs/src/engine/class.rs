@@ -205,6 +205,7 @@ impl Tracer {
     unsafe fn mark(trc: *mut root::JSTracer, v: q::JSValue) {
         let trc = &*(trc as *mut Tracer);
         if v.has_ref_count() {
+            super::verify::mark(v, trc.mark);
             q::JS_MarkValue(trc.rt, v, trc.mark);
         }
     }
@@ -504,8 +505,10 @@ unsafe fn barrier(prev: q::JSValue, next: q::JSValue) {
     };
     if next.has_ref_count() {
         q::JS_DupValueRT(cx.rt, next);
+        super::verify::count(next, 1);
     }
     if prev.has_ref_count() {
+        super::verify::count(prev, -1);
         q::JS_FreeValueRT(cx.rt, prev);
     }
 }

@@ -23,6 +23,7 @@ pub(crate) unsafe fn JS_NewContext(maxbytes: u32, parentRuntime: *mut root::JSRu
     if rt.is_null() {
         return ptr::null_mut();
     }
+    super::verify::install(rt);
     let base_ctx = q::JS_NewContext(rt);
     let cx = Box::into_raw(Box::new(Cx {
         rt,
@@ -51,6 +52,7 @@ pub(crate) unsafe fn JS_DestroyContext(cx: *mut root::JSContext) {
     q::JS_FreeContext(cx.base_ctx);
     q::JS_FreeRuntime(cx.rt);
     set_current(ptr::null_mut());
+    super::verify::reset();
 }
 
 pub(crate) unsafe fn JS_GetRuntime(cx: *mut root::JSContext) -> *mut root::JSRuntime {
