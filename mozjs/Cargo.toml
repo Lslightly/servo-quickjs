@@ -1,0 +1,27 @@
+[package]
+name = "mozjs"
+# Must match the `mozjs` version Servo pins, so `[patch]` can replace it.
+version = "0.23.1"
+edition = "2021"
+license = "MPL-2.0"
+description = "The mozjs (SpiderMonkey) API implemented on QuickJS, for Servo"
+publish = false
+
+[features]
+default = ["jit", "libz-sys", "intl"]
+# Accepted for compatibility with Servo's feature forwarding; no effect on QuickJS.
+crown = []
+debugmozjs = []
+intl = []
+jit = []
+jitspew = []
+libz-rs = []
+libz-sys = []
+profilemozjs = []
+
+[dependencies]
+encoding_rs = "0.8.35"
+libc = "0.2"
+log = "0.4"
+num-traits = "0.2"
+quickjs-sys = { path = "../quickjs-sys" }

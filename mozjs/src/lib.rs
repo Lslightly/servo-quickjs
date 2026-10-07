@@ -1,0 +1,78 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#![crate_name = "mozjs"]
+#![crate_type = "rlib"]
+#![allow(
+    non_upper_case_globals,
+    non_camel_case_types,
+    non_snake_case,
+    improper_ctypes
+)]
+#![cfg_attr(feature = "crown", feature(register_tool))]
+#![cfg_attr(feature = "crown", register_tool(crown))]
+
+
+//!
+//! This crate contains Rust bindings to the [SpiderMonkey Javascript engine][1]
+//! developed by Mozilla.
+//!
+//! These bindings are designed to be a fairly straightforward translation to the C++ API, while
+//! taking advantage of Rust's memory safety. For more about the Spidermonkey API, see the
+//! [embedding examples][2] on GitHub.
+//!
+//! The code from User Guide sections [A minimal example](https://github.com/servo/mozjs/blob/main/mozjs/examples/minimal.rs) and
+//! [Running scripts](https://github.com/servo/mozjs/blob/main/mozjs/examples/eval.rs) are also included.
+//!
+//! [1]: https://firefox-source-docs.mozilla.org/js/index.html
+//! [2]: https://github.com/mozilla-spidermonkey/spidermonkey-embedding-examples/
+//!
+
+/// Placeholder body for SpiderMonkey APIs that have no QuickJS implementation yet.
+macro_rules! qjs_todo {
+    ($name:expr) => {
+        panic!("mozjs-on-quickjs: `{}` is not implemented", $name)
+    };
+}
+
+pub mod sys;
+
+pub use quickjs_sys as qjs;
+
+pub mod jsapi {
+    // Resolve ambiguous imports
+    pub use crate::sys::jsapi::js::detail;
+    pub use crate::sys::jsapi::JS::{FrontendContext, MemoryUse};
+
+    pub use crate::sys::jsapi::glue::*;
+    pub use crate::sys::jsapi::js::detail::*;
+    pub use crate::sys::jsapi::js::*;
+    pub use crate::sys::jsapi::mozilla::MallocSizeOf;
+    pub use crate::sys::jsapi::JS::detail::*;
+    pub use crate::sys::jsapi::JS::shadow::Object;
+    pub use crate::sys::jsapi::JS::Scalar::Type;
+    pub use crate::sys::jsapi::JS::*;
+    pub use crate::sys::jsapi::*;
+}
+
+#[macro_use]
+pub mod rust;
+
+pub mod cell;
+mod consts;
+pub mod context;
+pub mod conversions;
+pub mod error;
+pub mod gc;
+pub mod panic;
+pub mod realm;
+pub mod typedarray;
+
+pub use crate::consts::*;
+pub use crate::sys::glue;
+pub use crate::sys::jsid;
+pub use crate::sys::jsval;
+
+pub use crate::jsval::JS_ARGV;
+pub use crate::jsval::JS_CALLEE;
