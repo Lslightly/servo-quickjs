@@ -180,10 +180,11 @@ pub(crate) unsafe fn UnhideScriptedCaller(cx: *mut root::JSContext) {
 }
 
 pub(crate) unsafe fn JS_GetScriptedCallerPrivate(cx: *mut root::JSContext, dest: root::JS::MutableHandleValue) {
-    // TODO(qjs): script privates are not associated with QuickJS functions yet; callers fall back
-    // to the global's defaults.
-    let _ = cx;
-    *dest.ptr = JSVal::from_qjs(q::JS_UNDEFINED);
+    let cx = Cx::from_raw(cx);
+    *dest.ptr = match scripted_caller(cx) {
+        Some(caller) => super::module::script_or_module_private(cx, caller.realm, caller.filename),
+        None => JSVal::from_qjs(q::JS_UNDEFINED),
+    };
 }
 
 pub(crate) unsafe fn DumpJSStack(cx: *mut root::JSContext, showArgs: bool, showLocals: bool, showThisProps: bool) {

@@ -1,0 +1,598 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+//! QuickJS shim: ES modules loaded the way Servo does it (script_module.rs, module_loading.rs).
+//! The host compiles each module, lists its requests, "fetches" them from an in-memory map,
+//! links through the resolve hook and evaluates.
+
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::ffi::{c_void, CString};
+use std::marker::PhantomData;
+use std::ptr;
+use std::sync::OnceLock;
+
+use mozjs::context::JSContext;
+use mozjs::jsapi::{
+    self, GCReason, Heap, JSContext as RawJSContext, JSObject, JSScript, JSString,
+    ModuleErrorBehaviour, ModuleType, OnNewGlobalHookOption, Value,
+};
+use mozjs::jsval::{Int32Value, JSVal, PrivateValue, UndefinedValue};
+use mozjs::qjs;
+use mozjs::rooted;
+use mozjs::rust::wrappers2::{
+    CompileJsonModule1, CompileModule1, GetModuleNamespace, GetRequestedModuleSpecifier,
+    GetRequestedModuleType, GetRequestedModulesCount, JS_GetPendingException,
+    JS_NewGlobalObject, ModuleEvaluate, ModuleLink, ThrowOnModuleEvaluationFailure,
+};
+use mozjs::rust::{
+    transform_str_to_source_text, CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS,
+};
+
+const BASE: &str = "https://test/";
+
+/// Servo's module map plus the "network".
+#[derive(Default)]
+struct Loader {
+    sources: HashMap<String, String>,
+    /// Module records by URL (counted, like Servo's `ModuleObject`).
+    modules: HashMap<String, Box<Heap<*mut JSObject>>>,
+    /// URLs by private id - 1 (a module's private value is `PrivateValue(id)`).
+    urls: Vec<String>,
+    /// import() calls seen by the dynamic import hook: (referencing private id, specifier, type).
+    dynamic_imports: Vec<(usize, String, ModuleType)>,
+    /// The promises of those calls, for the host to settle.
+    import_promises: Vec<Box<Heap<*mut JSObject>>>,
+    /// Rejection tracker calls: (promise, handled).
+    rejections: Vec<(*mut c_void, bool)>,
+}
+
+thread_local!(static LOADER: RefCell<Loader> = RefCell::new(Loader::default()));
+
+/// Drops the module map before the runtime (its `Heap`s release references).
+struct LoaderGuard;
+
+impl Drop for LoaderGuard {
+    fn drop(&mut self) {
+        let loader = LOADER.with(|l| std::mem::take(&mut *l.borrow_mut()));
+        drop(loader);
+    }
+}
+
+fn h<T>(ptr: &T) -> jsapi::Handle<T> {
+    jsapi::Handle { _phantom_0: PhantomData, ptr }
+}
+
+fn mh<T>(ptr: &mut T) -> jsapi::MutableHandle<T> {
+    jsapi::MutableHandle { _phantom_0: PhantomData, ptr }
+}
+
+fn url(specifier: &str) -> String {
+    format!("{BASE}{}", specifier.trim_start_matches("./"))
+}
+
+unsafe fn string(s: *mut JSString) -> String {
+    let v = qjs::JSValue::mkptr(qjs::JS_TAG_STRING, s as *mut c_void);
+    let mut data = ptr::null();
+    let mut wide = 0;
+    let len = qjs::JS_GetStringData(v, &mut data, &mut wide);
+    if wide != 0 {
+        String::from_utf16(std::slice::from_raw_parts(data as *const u16, len)).unwrap()
+    } else {
+        std::slice::from_raw_parts(data as *const u8, len).iter().map(|&b| b as char).collect()
+    }
+}
+
+fn private_id(private: &Value) -> usize {
+    if private.is_undefined() { 0 } else { private.to_private() as usize }
+}
+
+unsafe fn compile(cx: &mut JSContext, url: &str, source: &str, module_type: ModuleType) -> *mut JSObject {
+    let options = CompileOptionsWrapper::new(cx, CString::new(url).unwrap(), 1);
+    let mut text = transform_str_to_source_text(source);
+    let record = match module_type {
+        ModuleType::JSON => CompileJsonModule1(cx, options.ptr, &mut text),
+        _ => CompileModule1(cx, options.ptr, &mut text),
+    };
+    if record.is_null() {
+        return record;
+    }
+    LOADER.with(|l| {
+        let mut l = l.borrow_mut();
+        if module_type != ModuleType::JSON {
+            l.urls.push(url.to_owned());
+            let private = PrivateValue(l.urls.len() as *const c_void);
+            jsapi::SetModulePrivate(record, &private);
+        }
+        l.modules.insert(url.to_owned(), Heap::boxed(record));
+    });
+    record
+}
+
+fn record(url: &str) -> *mut JSObject {
+    LOADER.with(|l| l.borrow().modules.get(url).map(|m| m.get()).unwrap_or(ptr::null_mut()))
+}
+
+/// The specifiers and types of a module's requests.
+unsafe fn requests(cx: &mut JSContext, record: *mut JSObject) -> Vec<(String, ModuleType)> {
+    rooted!(&in(cx) let record = record);
+    let count = GetRequestedModulesCount(cx, record.handle());
+    (0..count)
+        .map(|i| {
+            let specifier = GetRequestedModuleSpecifier(cx, record.handle(), i);
+            assert!(!specifier.is_null());
+            (string(specifier), GetRequestedModuleType(cx, record.handle(), i))
+        })
+        .collect()
+}
+
+/// Servo's LoadRequestedModules: compiles the whole graph below `root_url`.
+unsafe fn load_graph(cx: &mut JSContext, root_url: &str) -> *mut JSObject {
+    let source = LOADER.with(|l| l.borrow().sources[root_url].clone());
+    let root = compile(cx, root_url, &source, ModuleType::JavaScript);
+    assert!(!root.is_null(), "{root_url} failed to compile");
+    let mut pending = vec![root];
+    while let Some(module) = pending.pop() {
+        if !jsapi::IsCyclicModule(module) {
+            continue;
+        }
+        for (specifier, module_type) in requests(cx, module) {
+            let url = url(&specifier);
+            if !record(&url).is_null() {
+                continue;
+            }
+            let source = LOADER.with(|l| l.borrow().sources[&url].clone());
+            let fetched = compile(cx, &url, &source, module_type);
+            assert!(!fetched.is_null(), "{url} failed to compile");
+            pending.push(fetched);
+        }
+    }
+    root
+}
+
+/// Servo's HostResolveImportedModule: the module map entry of the request.
+unsafe extern "C" fn resolve_hook(cx: *mut RawJSContext, private: jsapi::HandleValue, request: jsapi::Handle<*mut JSObject>) -> *mut JSObject {
+    let referrer = LOADER.with(|l| l.borrow().urls[private_id(&*private.ptr) - 1].clone());
+    assert!(referrer.starts_with(BASE));
+    let specifier = string(jsapi::GetModuleRequestSpecifier(cx, request));
+    let module_type = jsapi::GetModuleRequestType(cx, request);
+    let found = record(&url(&specifier));
+    assert!(!found.is_null(), "{specifier} not in the module map");
+    assert_eq!(jsapi::IsCyclicModule(found), module_type == ModuleType::JavaScript);
+    found
+}
+
+/// Servo's HostPopulateImportMeta: `import.meta.url`, and `import.meta.id`, the module's
+/// private id.
+unsafe extern "C" fn metadata_hook(cx: *mut RawJSContext, private: jsapi::HandleValue, meta: jsapi::Handle<*mut JSObject>) -> bool {
+    let id = private_id(&*private.ptr);
+    let url = LOADER.with(|l| l.borrow().urls[id - 1].clone());
+    let url = jsapi::JS_NewStringCopyN(cx, url.as_ptr() as *const _, url.len());
+    let id = Int32Value(id as i32);
+    jsapi::JS_DefineProperty4(cx, meta, c"url".as_ptr(), h(&url), jsapi::JSPROP_ENUMERATE as u32) &&
+        jsapi::JS_DefineProperty(cx, meta, c"id".as_ptr(), h(&id), jsapi::JSPROP_ENUMERATE as u32)
+}
+
+/// Returns the private id of the innermost script or module.
+unsafe extern "C" fn caller_id(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
+    let args = jsapi::CallArgs::from_vp(vp, argc);
+    let mut private = UndefinedValue();
+    mozjs::glue::JS_GetScriptedCallerPrivate(cx, mh(&mut private));
+    args.rval().set(Int32Value(private_id(&private) as i32));
+    true
+}
+
+/// Records the call; throws for specifiers starting with "throw".
+unsafe extern "C" fn dynamic_import_hook(cx: *mut RawJSContext, private: jsapi::HandleValue, request: jsapi::Handle<*mut JSObject>, promise: jsapi::Handle<*mut JSObject>) -> bool {
+    assert!(!(*promise.ptr).is_null());
+    let specifier = string(jsapi::GetModuleRequestSpecifier(cx, request));
+    let module_type = jsapi::GetModuleRequestType(cx, request);
+    let id = private_id(&*private.ptr);
+    LOADER.with(|l| {
+        let mut l = l.borrow_mut();
+        l.dynamic_imports.push((id, specifier.clone(), module_type));
+        l.import_promises.push(Heap::boxed(*promise.ptr));
+    });
+    if specifier.starts_with("throw") {
+        let error = Int32Value(42);
+        jsapi::JS_SetPendingException(cx, h(&error), jsapi::ExceptionStackBehavior::Capture);
+        return false;
+    }
+    true
+}
+
+unsafe extern "C" fn rejection_tracker(_ctx: *mut qjs::JSContext, promise: qjs::JSValue, _reason: qjs::JSValue, is_handled: std::ffi::c_int, _opaque: *mut c_void) {
+    LOADER.with(|l| l.borrow_mut().rejections.push((promise.ptr(), is_handled != 0)));
+}
+
+unsafe fn install_hooks(cx: &mut JSContext) {
+    let rt = jsapi::JS_GetRuntime(cx.raw_cx());
+    jsapi::SetModuleResolveHook(rt, Some(resolve_hook));
+    jsapi::SetModuleMetadataHook(rt, Some(metadata_hook));
+    jsapi::SetModuleDynamicImportHook(rt, Some(dynamic_import_hook));
+    assert!(jsapi::GetModuleResolveHook(rt).is_some());
+    let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
+    assert!(!jsapi::JS_DefineFunction(cx.raw_cx(), h(&global), c"callerId".as_ptr(), Some(caller_id), 0, 0).is_null());
+    qjs::JS_SetHostPromiseRejectionTracker(rt as *mut qjs::JSRuntime, Some(rejection_tracker), ptr::null_mut());
+}
+
+fn add_sources(sources: &[(&str, &str)]) {
+    LOADER.with(|l| {
+        let mut l = l.borrow_mut();
+        for (name, source) in sources {
+            l.sources.insert(url(name), source.to_string());
+        }
+    });
+}
+
+unsafe fn get(cx: &mut JSContext, obj: *mut JSObject, name: &std::ffi::CStr) -> JSVal {
+    let mut v = UndefinedValue();
+    assert!(jsapi::JS_GetProperty(cx.raw_cx(), h(&obj), name.as_ptr(), mh(&mut v)));
+    v
+}
+
+unsafe fn namespace(cx: &mut JSContext, url: &str) -> *mut JSObject {
+    rooted!(&in(cx) let record = record(url));
+    let ns = GetModuleNamespace(cx, record.handle());
+    assert!(!ns.is_null());
+    ns
+}
+
+fn promise_state(promise: *mut JSObject) -> qjs::JSPromiseStateEnum {
+    // QuickJS reads the state without the context.
+    unsafe { qjs::JS_PromiseState(ptr::null_mut(), qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, promise as *mut c_void)) }
+}
+
+/// Runs QuickJS's own job queue (Servo's job queue hook is not installed here).
+unsafe fn run_jobs(cx: &mut JSContext) {
+    let rt = jsapi::JS_GetRuntime(cx.raw_cx()) as *mut qjs::JSRuntime;
+    let mut ctx = ptr::null_mut();
+    while qjs::JS_ExecutePendingJob(rt, &mut ctx) > 0 {}
+}
+
+unsafe fn pending_exception(cx: &mut JSContext) -> JSVal {
+    rooted!(&in(cx) let mut exception = UndefinedValue());
+    assert!(JS_GetPendingException(cx, exception.handle_mut()));
+    jsapi::JS_ClearPendingException(cx.raw_cx());
+    exception.get()
+}
+
+unsafe fn message(cx: &mut JSContext, error: JSVal) -> String {
+    string(get(cx, error.to_object(), c"message").to_string())
+}
+
+/// The engine can be initialized once per process; the tests share it and never shut it down.
+fn engine() -> JSEngineHandle {
+    static ENGINE: OnceLock<JSEngineHandle> = OnceLock::new();
+    ENGINE
+        .get_or_init(|| {
+            let engine = JSEngine::init().unwrap();
+            let handle = engine.handle();
+            std::mem::forget(engine);
+            handle
+        })
+        .clone()
+}
+
+/// Runs `f` in a new global's realm (and runtime) with the module hooks installed.
+fn with_realm(f: impl FnOnce(&mut JSContext)) {
+    let mut runtime = Runtime::new(engine());
+    let _loader = LoaderGuard;
+    let cx = runtime.cx();
+    let options = RealmOptions::default();
+    unsafe {
+        rooted!(&in(cx) let global = JS_NewGlobalObject(
+            cx,
+            &SIMPLE_GLOBAL_CLASS,
+            ptr::null_mut(),
+            OnNewGlobalHookOption::FireOnNewGlobalHook,
+            &*options,
+        ));
+        let mut realm = mozjs::realm::AutoRealm::new_from_handle(cx, global.handle());
+        let cx = &mut *realm;
+        install_hooks(cx);
+        f(cx);
+    }
+}
+
+#[test]
+fn module_graph() {
+    add_sources(&[
+        ("root.js", "import { a, c } from './a.js';\nimport { b } from './b.js';\nexport const sum = a + b + c;\nexport const id = import.meta.id;\nexport const sameMeta = import.meta === import.meta;"),
+        ("a.js", "export { c } from './c.js';\nexport const a = 1;"),
+        ("b.js", "export const b = 2;"),
+        ("c.js", "export const c = 4;\nexport const metaId = import.meta.id;\nexport const metaUrl = import.meta.url;\nexport const keys = Object.keys(import.meta).join();\nexport const caller = callerId();"),
+    ]);
+    with_realm(|cx| unsafe {
+        let root_url = url("root.js");
+        {
+            let root = load_graph(cx, &root_url);
+            assert_eq!(
+                requests(cx, root),
+                vec![("./a.js".to_owned(), ModuleType::JavaScript), ("./b.js".to_owned(), ModuleType::JavaScript)]
+            );
+            assert_eq!(requests(cx, record(&url("a.js"))).len(), 1);
+            assert!(requests(cx, record(&url("b.js"))).is_empty());
+
+            rooted!(&in(cx) let root = root);
+            assert!(ModuleLink(cx, root.handle()));
+            rooted!(&in(cx) let mut promise = UndefinedValue());
+            assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+            assert!(promise.get().is_object());
+            assert_eq!(promise_state(promise.get().to_object()), qjs::JS_PROMISE_FULFILLED);
+            rooted!(&in(cx) let promise = promise.get().to_object());
+            assert!(ThrowOnModuleEvaluationFailure(cx, promise.handle(), ModuleErrorBehaviour::ThrowModuleErrorsSync));
+        }
+
+        // Only the module map keeps the records alive now.
+        mozjs::quickjs::drain_autorelease_pool();
+        jsapi::JS_GC(cx.raw_cx(), GCReason::API);
+
+        let ns = namespace(cx, &root_url);
+        assert_eq!(get(cx, ns, c"sum").to_int32(), 7);
+        assert_eq!(get(cx, ns, c"id").to_int32(), 1);
+        assert!(get(cx, ns, c"sameMeta").to_boolean());
+        let c_id = LOADER.with(|l| l.borrow().urls.iter().position(|u| *u == url("c.js")).unwrap() + 1);
+        let ns = namespace(cx, &url("c.js"));
+        assert_eq!(get(cx, ns, c"metaId").to_int32(), c_id as i32);
+        assert_eq!(string(get(cx, ns, c"keys").to_string()), "url,id");
+        assert_eq!(string(get(cx, ns, c"metaUrl").to_string()), url("c.js"));
+        assert_eq!(get(cx, ns, c"caller").to_int32(), c_id as i32);
+
+        let mut private = UndefinedValue();
+        mozjs::glue::JS_GetModulePrivate(record(&root_url), mh(&mut private));
+        assert_eq!(private_id(&private), 1);
+    });
+}
+
+#[test]
+fn cyclic_imports() {
+    add_sources(&[
+        ("main.js", "import { getB } from './a.js';\nexport const result = getB();"),
+        ("a.js", "import { b } from './b.js';\nexport const a = 1;\nexport function getB() { return b; }"),
+        ("b.js", "import { a } from './a.js';\nexport const b = 2;\nexport function getA() { return a; }"),
+    ]);
+    with_realm(|cx| unsafe {
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert!(jsapi::IsCyclicModule(root.get()));
+        assert!(ModuleLink(cx, root.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        assert_eq!(promise_state(promise.get().to_object()), qjs::JS_PROMISE_FULFILLED);
+        let ns = namespace(cx, &url("main.js"));
+        assert_eq!(get(cx, ns, c"result").to_int32(), 2);
+        let ns_b = namespace(cx, &url("b.js"));
+        rooted!(&in(cx) let get_a = get(cx, ns_b, c"getA"));
+        rooted!(&in(cx) let mut rval = UndefinedValue());
+        rooted!(&in(cx) let this = UndefinedValue());
+        let args = jsapi::HandleValueArray { length_: 0, elements_: ptr::null() };
+        assert!(mozjs::rust::wrappers2::Call(cx, this.handle(), get_a.handle(), &args, rval.handle_mut()));
+        assert_eq!(rval.get().to_int32(), 1);
+    });
+}
+
+#[test]
+fn evaluation_error() {
+    add_sources(&[
+        ("main.js", "import './bad.js';\nexport const unreachable = 1;"),
+        ("bad.js", "throw new Error('boom');"),
+    ]);
+    with_realm(|cx| unsafe {
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert!(ModuleLink(cx, root.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        let promise_obj = promise.get().to_object();
+        assert_eq!(promise_state(promise_obj), qjs::JS_PROMISE_REJECTED);
+        rooted!(&in(cx) let promise = promise_obj);
+        assert!(!ThrowOnModuleEvaluationFailure(cx, promise.handle(), ModuleErrorBehaviour::ThrowModuleErrorsSync));
+        let error = pending_exception(cx);
+        assert_eq!(message(cx, error), "boom");
+
+        // The rejection was reported as unhandled, then as handled; so were those of QuickJS's
+        // internal promises.
+        let rejections = LOADER.with(|l| l.borrow().rejections.clone());
+        let ours: Vec<bool> = rejections.iter().filter(|r| r.0 == promise_obj as *mut c_void).map(|r| r.1).collect();
+        assert_eq!(ours, vec![false, true]);
+        assert_eq!(rejections.iter().filter(|r| r.1).count(), rejections.iter().filter(|r| !r.1).count());
+
+        // Evaluating again gives the same rejection.
+        rooted!(&in(cx) let mut again = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), again.handle_mut()));
+        rooted!(&in(cx) let again = again.get().to_object());
+        assert!(!ThrowOnModuleEvaluationFailure(cx, again.handle(), ModuleErrorBehaviour::ThrowModuleErrorsSync));
+        let error = pending_exception(cx);
+        assert_eq!(message(cx, error), "boom");
+    });
+}
+
+#[test]
+fn top_level_await() {
+    add_sources(&[
+        ("main.js", "import { later } from './tla.js';\nexport const seen = later;"),
+        ("tla.js", "export let later = 1;\nawait null;\nlater = 2;"),
+    ]);
+    with_realm(|cx| unsafe {
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert!(ModuleLink(cx, root.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        let promise_obj = promise.get().to_object();
+        assert_eq!(promise_state(promise_obj), qjs::JS_PROMISE_PENDING);
+        rooted!(&in(cx) let promise = promise_obj);
+        assert!(ThrowOnModuleEvaluationFailure(cx, promise.handle(), ModuleErrorBehaviour::ThrowModuleErrorsSync));
+        assert!(!jsapi::JS_IsExceptionPending(cx.raw_cx()));
+
+        run_jobs(cx);
+        assert_eq!(promise_state(promise_obj), qjs::JS_PROMISE_FULFILLED);
+        let ns = namespace(cx, &url("main.js"));
+        assert_eq!(get(cx, ns, c"seen").to_int32(), 2);
+    });
+}
+
+#[test]
+fn json_modules() {
+    add_sources(&[
+        ("main.js", "import data from './data.json' with { type: 'json' };\nexport const second = data.list[1];\nexport { default as raw } from './data.json' with { type: 'json' };"),
+        ("data.json", "{ \"list\": [10, 20, 30] }"),
+    ]);
+    with_realm(|cx| unsafe {
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert_eq!(
+            requests(cx, root.get()),
+            vec![("./data.json".to_owned(), ModuleType::JSON), ("./data.json".to_owned(), ModuleType::JSON)]
+        );
+        let json = record(&url("data.json"));
+        assert!(!jsapi::IsCyclicModule(json));
+        rooted!(&in(cx) let json = json);
+        assert_eq!(GetRequestedModulesCount(cx, json.handle()), 0);
+
+        assert!(ModuleLink(cx, root.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        assert_eq!(promise_state(promise.get().to_object()), qjs::JS_PROMISE_FULFILLED);
+        let ns = namespace(cx, &url("main.js"));
+        assert_eq!(get(cx, ns, c"second").to_int32(), 20);
+        assert!(get(cx, ns, c"raw").is_object());
+        let json_ns = namespace(cx, &url("data.json"));
+        assert_eq!(get(cx, json_ns, c"default").to_object(), get(cx, ns, c"raw").to_object());
+
+        // A JSON module evaluated on its own (as by a dynamic import).
+        let options = CompileOptionsWrapper::new(cx, c"https://test/solo.json".to_owned(), 1);
+        rooted!(&in(cx) let solo = CompileJsonModule1(cx, options.ptr, &mut transform_str_to_source_text("[1, 2]")));
+        assert!(!solo.get().is_null());
+        let private = PrivateValue(99 as *const c_void);
+        jsapi::SetModulePrivate(solo.get(), &private);
+        let mut read = UndefinedValue();
+        mozjs::glue::JS_GetModulePrivate(solo.get(), mh(&mut read));
+        assert_eq!(private_id(&read), 99);
+        assert!(ModuleLink(cx, solo.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, solo.handle(), promise.handle_mut()));
+        let ns = GetModuleNamespace(cx, solo.handle());
+        let list = get(cx, ns, c"default").to_object();
+        assert_eq!(get(cx, list, c"length").to_int32(), 2);
+
+        // Parse errors are reported at compile time.
+        let options = CompileOptionsWrapper::new(cx, c"https://test/bad.json".to_owned(), 1);
+        let bad = CompileJsonModule1(cx, options.ptr, &mut transform_str_to_source_text("{ nope"));
+        assert!(bad.is_null());
+        let error = pending_exception(cx);
+        assert!(error.is_object());
+    });
+}
+
+#[test]
+fn compile_and_link_errors() {
+    add_sources(&[
+        ("main.js", "import { missing } from './dep.js';\nexport { missing };"),
+        ("dep.js", "export const present = 1;"),
+    ]);
+    with_realm(|cx| unsafe {
+        // Syntax error.
+        let options = CompileOptionsWrapper::new(cx, c"https://test/syntax.js".to_owned(), 1);
+        let bad = CompileModule1(cx, options.ptr, &mut transform_str_to_source_text("export let = ;"));
+        assert!(bad.is_null());
+        assert!(pending_exception(cx).is_object());
+
+        // Missing export.
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert!(!ModuleLink(cx, root.handle()));
+        let error = pending_exception(cx);
+        assert!(message(cx, error).contains("missing"), "{}", message(cx, error));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(!ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        pending_exception(cx);
+    });
+}
+
+#[test]
+fn import_attributes() {
+    add_sources(&[(
+        "main.js",
+        "import a from './a.js' with { type: 'css' };\nimport b from './b.js' with { foo: 'bar' };\nimport c from './c.js' with { type: 'json' };",
+    )]);
+    with_realm(|cx| unsafe {
+        let options = CompileOptionsWrapper::new(cx, c"https://test/main.js".to_owned(), 1);
+        let source = LOADER.with(|l| l.borrow().sources[&url("main.js")].clone());
+        rooted!(&in(cx) let root = CompileModule1(cx, options.ptr, &mut transform_str_to_source_text(&source)));
+        assert!(!root.get().is_null());
+        assert_eq!(GetRequestedModulesCount(cx, root.handle()), 3);
+        assert_eq!(GetRequestedModuleType(cx, root.handle(), 0), ModuleType::Unknown);
+        assert_eq!(GetRequestedModuleType(cx, root.handle(), 2), ModuleType::JSON);
+        let a = GetRequestedModuleSpecifier(cx, root.handle(), 0);
+        assert_eq!(string(a), "./a.js");
+        assert!(GetRequestedModuleSpecifier(cx, root.handle(), 1).is_null());
+        let error = pending_exception(cx);
+        assert!(message(cx, error).contains("foo"));
+
+        // Module requests round-trip.
+        rooted!(&in(cx) let specifier = a);
+        let request = jsapi::CreateModuleRequest(cx.raw_cx(), specifier.handle().into(), ModuleType::JSON);
+        assert!(!request.is_null());
+        assert_eq!(string(jsapi::GetModuleRequestSpecifier(cx.raw_cx(), h(&request))), "./a.js");
+        assert_eq!(jsapi::GetModuleRequestType(cx.raw_cx(), h(&request)), ModuleType::JSON);
+    });
+}
+
+#[test]
+fn dynamic_import() {
+    add_sources(&[
+        (
+            "main.js",
+            "export const ok = import('./dyn.js').then(ns => ns.value * 2);\nexport const failed = import('throw.js');\nexport const unsupported = import('./x.js', { with: { foo: 'bar' } });\nexport const json = import('./x.json', { with: { type: 'json' } });",
+        ),
+        ("dyn.js", "export const value = 21;"),
+    ]);
+    with_realm(|cx| unsafe {
+        rooted!(&in(cx) let root = load_graph(cx, &url("main.js")));
+        assert!(ModuleLink(cx, root.handle()));
+        rooted!(&in(cx) let mut promise = UndefinedValue());
+        assert!(ModuleEvaluate(cx, root.handle(), promise.handle_mut()));
+        assert_eq!(promise_state(promise.get().to_object()), qjs::JS_PROMISE_FULFILLED);
+
+        let ns = namespace(cx, &url("main.js"));
+        assert_eq!(promise_state(get(cx, ns, c"failed").to_object()), qjs::JS_PROMISE_REJECTED);
+        assert_eq!(promise_state(get(cx, ns, c"unsupported").to_object()), qjs::JS_PROMISE_REJECTED);
+        let calls = LOADER.with(|l| l.borrow().dynamic_imports.clone());
+        assert_eq!(
+            calls,
+            vec![
+                (1, "./dyn.js".to_owned(), ModuleType::JavaScript),
+                (1, "throw.js".to_owned(), ModuleType::JavaScript),
+                (1, "./x.json".to_owned(), ModuleType::JSON),
+            ]
+        );
+
+        // Servo's ContinueDynamicImport: load, link and evaluate, then resolve with the namespace.
+        rooted!(&in(cx) let dyn_root = load_graph(cx, &url("dyn.js")));
+        assert!(ModuleLink(cx, dyn_root.handle()));
+        rooted!(&in(cx) let mut evaluated = UndefinedValue());
+        assert!(ModuleEvaluate(cx, dyn_root.handle(), evaluated.handle_mut()));
+        rooted!(&in(cx) let dyn_ns = mozjs::jsval::ObjectValue(GetModuleNamespace(cx, dyn_root.handle())));
+        rooted!(&in(cx) let import_promise = LOADER.with(|l| l.borrow().import_promises[0].get()));
+        assert!(mozjs::rust::wrappers2::ResolvePromise(cx, import_promise.handle(), dyn_ns.handle()));
+        run_jobs(cx);
+        rooted!(&in(cx) let ok = get(cx, ns, c"ok").to_object());
+        assert_eq!(promise_state(ok.get()), qjs::JS_PROMISE_FULFILLED);
+        rooted!(&in(cx) let mut result = UndefinedValue());
+        mozjs::glue::JS_GetPromiseResult(ok.handle().into(), result.handle_mut().into());
+        assert_eq!(result.get().to_int32(), 42);
+
+        // From a classic script, with its script private.
+        let options = CompileOptionsWrapper::new(cx, c"https://test/classic.js".to_owned(), 1);
+        let script = mozjs::rust::wrappers2::Compile1(cx, options.ptr, &mut transform_str_to_source_text("globalThis.p = import('./from-classic.js');\nglobalThis.classicCaller = callerId();"));
+        assert!(!script.is_null());
+        let private = PrivateValue(77 as *const c_void);
+        jsapi::SetScriptPrivate(script, &private);
+        rooted!(&in(cx) let script: *mut JSScript = script);
+        rooted!(&in(cx) let mut rval = UndefinedValue());
+        assert!(mozjs::rust::wrappers2::JS_ExecuteScript(cx, script.handle(), rval.handle_mut()));
+        let calls = LOADER.with(|l| l.borrow().dynamic_imports.clone());
+        assert_eq!(calls.last().unwrap(), &(77, "./from-classic.js".to_owned(), ModuleType::JavaScript));
+        let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
+        assert_eq!(get(cx, global, c"classicCaller").to_int32(), 77);
+    });
+}

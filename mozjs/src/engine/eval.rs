@@ -18,12 +18,12 @@ use std::collections::HashMap;
 /// Backs a `JS::ReadOnlyCompileOptions*`: mozjs writes the SpiderMonkey fields directly, so the
 /// real struct comes first.
 #[repr(C)]
-struct CompileOptions {
-    base: root::JS::ReadOnlyCompileOptions,
-    filename: CString,
+pub(crate) struct CompileOptions {
+    pub base: root::JS::ReadOnlyCompileOptions,
+    pub filename: CString,
 }
 
-unsafe fn options<'a>(options: *const root::JS::ReadOnlyCompileOptions) -> &'a CompileOptions {
+pub(crate) unsafe fn options<'a>(options: *const root::JS::ReadOnlyCompileOptions) -> &'a CompileOptions {
     &*(options as *const CompileOptions)
 }
 
@@ -44,7 +44,7 @@ pub(crate) unsafe fn DeleteCompileOptions(aOpts: *mut root::JS::ReadOnlyCompileO
 
 /// NUL-terminated source (QuickJS requires it), padded with newlines so that QuickJS's line
 /// numbers match the starting line SpiderMonkey would have used.
-unsafe fn source_buffer(lineno: u32, units: *const u8, len: usize) -> Vec<u8> {
+pub(crate) unsafe fn source_buffer(lineno: u32, units: *const u8, len: usize) -> Vec<u8> {
     let pad = lineno.saturating_sub(1) as usize;
     let mut buf = Vec::with_capacity(pad + len + 1);
     buf.resize(pad, b'\n');
@@ -102,7 +102,7 @@ pub(crate) unsafe fn JS_ExecuteScript(cx: *mut root::JSContext, script: root::JS
 }
 
 
-unsafe fn utf16_source(srcBuf: *mut root::JS::SourceText<u16>) -> String {
+pub(crate) unsafe fn utf16_source(srcBuf: *mut root::JS::SourceText<u16>) -> String {
     let len = (*srcBuf).length_ as usize;
     if len == 0 {
         return String::new();
@@ -111,7 +111,7 @@ unsafe fn utf16_source(srcBuf: *mut root::JS::SourceText<u16>) -> String {
 }
 
 /// UTF-8 source as a NUL-terminated buffer padded to start at `lineno`.
-fn padded(lineno: u32, src: &str) -> Vec<u8> {
+pub(crate) fn padded(lineno: u32, src: &str) -> Vec<u8> {
     source_buffer_from(lineno, src.as_bytes())
 }
 
@@ -225,6 +225,7 @@ thread_local! {
 pub(crate) unsafe fn SetScriptPrivate(script: *mut root::JSScript, value: *const root::JS::Value) {
     let rt = super::current().rt;
     let v = q::JS_DupValueRT(rt, (*value).to_qjs());
+    super::module::record_script_private(script, v);
     if let Some(old) = SCRIPT_PRIVATES.with(|p| p.borrow_mut().insert(script as usize, v)) {
         q::JS_FreeValueRT(rt, old);
     }

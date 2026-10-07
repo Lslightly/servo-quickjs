@@ -345,6 +345,9 @@ static inline JSValue __JS_NewShortBigInt(JSContext *ctx, int64_t d)
 /* allow top-level await in normal script. JS_Eval() returns a
    promise. Only allowed with JS_EVAL_TYPE_GLOBAL */
 #define JS_EVAL_FLAG_ASYNC (1 << 7)
+/* Servo: with JS_EVAL_TYPE_MODULE and JS_EVAL_FLAG_COMPILE_ONLY, do not load the
+   requested modules; JS_LinkModule() resolves them later */
+#define JS_EVAL_FLAG_NO_RESOLVE (1 << 8)
 
 typedef JSValue JSCFunction(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv);
 typedef JSValue JSCFunctionMagic(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv, int magic);
@@ -1076,6 +1079,43 @@ void JS_SetModuleLoaderFunc2(JSRuntime *rt,
 JSValue JS_GetImportMeta(JSContext *ctx, JSModuleDef *m);
 JSAtom JS_GetModuleName(JSContext *ctx, JSModuleDef *m);
 JSValue JS_GetModuleNamespace(JSContext *ctx, JSModuleDef *m);
+/* Servo: host-driven module loading. The requests of a module (in source order,
+   not deduplicated) are its specifiers and their import attributes (JS_UNDEFINED
+   or an object). JS_LinkModule() calls 'resolve' for each request of the module
+   graph that has no module yet, then links the graph like the Link() method of
+   module records. 'resolve' returns NULL with an exception on failure; the
+   returned module must stay alive for as long as 'm' (e.g. in the same context). */
+int JS_GetModuleRequestCount(JSModuleDef *m);
+JSAtom JS_GetModuleRequestSpecifier(JSContext *ctx, JSModuleDef *m, int idx);
+JSValue JS_GetModuleRequestAttributes(JSContext *ctx, JSModuleDef *m, int idx);
+typedef JSModuleDef *JSModuleResolveFunc(JSContext *ctx, JSModuleDef *m, int idx,
+                                         void *opaque);
+int JS_LinkModule(JSContext *ctx, JSModuleDef *m, JSModuleResolveFunc *resolve,
+                  void *opaque);
+JS_BOOL JS_IsModuleLinked(JSModuleDef *m);
+/* Servo: whether 'm' was created with JS_NewCModule() */
+JS_BOOL JS_IsCModule(JSModuleDef *m);
+/* Servo: the first module of 'ctx' named 'name' (the file name of its code), like
+   import.meta and import() find the calling module, or NULL */
+JSModuleDef *JS_FindLoadedModule(JSContext *ctx, JSAtom name);
+/* Servo: the file name of a compiled script (JS_TAG_FUNCTION_BYTECODE), or
+   JS_ATOM_NULL */
+JSAtom JS_GetScriptFileName(JSContext *ctx, JSValueConst script);
+/* Servo: host hooks. The import.meta hook populates the new import.meta object of
+   'm'. The dynamic import hook replaces the module loader for import():
+   'basename' is the file name of the calling script or module (JS_NULL if
+   unknown), 'm' the loaded module of that name in 'ctx' if any, and the host
+   settles 'promise', the result of import(). Both return < 0 on exception. */
+typedef int JSImportMetaHook(JSContext *ctx, JSModuleDef *m, JSValueConst meta,
+                             void *opaque);
+typedef int JSDynamicImportHook(JSContext *ctx, JSValueConst basename, JSModuleDef *m,
+                                JSValueConst specifier, JSValueConst attributes,
+                                JSValueConst promise, void *opaque);
+void JS_SetImportMetaHook(JSRuntime *rt, JSImportMetaHook *hook, void *opaque);
+void JS_SetDynamicImportHook(JSRuntime *rt, JSDynamicImportHook *hook, void *opaque);
+/* Servo: marks a settled promise as handled (SetSettledPromiseIsHandled), telling
+   the rejection tracker as adding a reaction would */
+void JS_MarkPromiseHandled(JSContext *ctx, JSValueConst promise);
 
 /* JS Job support */
 

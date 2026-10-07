@@ -172,6 +172,7 @@ pub const JS_EVAL_FLAG_STRICT: u32 = 8;
 pub const JS_EVAL_FLAG_COMPILE_ONLY: u32 = 32;
 pub const JS_EVAL_FLAG_BACKTRACE_BARRIER: u32 = 64;
 pub const JS_EVAL_FLAG_ASYNC: u32 = 128;
+pub const JS_EVAL_FLAG_NO_RESOLVE: u32 = 256;
 pub const JS_ATOM_NULL: u32 = 0;
 pub const JS_CALL_FLAG_CONSTRUCTOR: u32 = 1;
 pub const JS_INVALID_CLASS_ID: u32 = 0;
@@ -1778,6 +1779,87 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_GetModuleNamespace(ctx: *mut JSContext, m: *mut JSModuleDef) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetModuleRequestCount(m: *mut JSModuleDef) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_GetModuleRequestSpecifier(
+        ctx: *mut JSContext,
+        m: *mut JSModuleDef,
+        idx: ::std::os::raw::c_int,
+    ) -> JSAtom;
+}
+unsafe extern "C" {
+    pub fn JS_GetModuleRequestAttributes(
+        ctx: *mut JSContext,
+        m: *mut JSModuleDef,
+        idx: ::std::os::raw::c_int,
+    ) -> JSValue;
+}
+pub type JSModuleResolveFunc = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        m: *mut JSModuleDef,
+        idx: ::std::os::raw::c_int,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> *mut JSModuleDef,
+>;
+unsafe extern "C" {
+    pub fn JS_LinkModule(
+        ctx: *mut JSContext,
+        m: *mut JSModuleDef,
+        resolve: JSModuleResolveFunc,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_IsModuleLinked(m: *mut JSModuleDef) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_IsCModule(m: *mut JSModuleDef) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_FindLoadedModule(ctx: *mut JSContext, name: JSAtom) -> *mut JSModuleDef;
+}
+unsafe extern "C" {
+    pub fn JS_GetScriptFileName(ctx: *mut JSContext, script: JSValue) -> JSAtom;
+}
+pub type JSImportMetaHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        m: *mut JSModuleDef,
+        meta: JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
+pub type JSDynamicImportHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        basename: JSValue,
+        m: *mut JSModuleDef,
+        specifier: JSValue,
+        attributes: JSValue,
+        promise: JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_SetImportMetaHook(
+        rt: *mut JSRuntime,
+        hook: JSImportMetaHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+unsafe extern "C" {
+    pub fn JS_SetDynamicImportHook(
+        rt: *mut JSRuntime,
+        hook: JSDynamicImportHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+unsafe extern "C" {
+    pub fn JS_MarkPromiseHandled(ctx: *mut JSContext, promise: JSValue);
 }
 pub type JSJobFunc = ::std::option::Option<
     unsafe extern "C" fn(
