@@ -13,14 +13,14 @@
 //! current realm's intrinsic prototypes.
 
 use std::collections::HashSet;
-use std::ffi::c_int;
+use std::ffi::{c_int, CStr};
 use std::ptr;
 
 use quickjs_sys as q;
 
-use super::class::{adopt_object, object_data, QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT};
+use super::class::{adopt_object, function_data, object_data, QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT};
 use super::property::{data_flags, Atom};
-use super::{obj_val, Cx};
+use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
@@ -610,4 +610,166 @@ pub(crate) unsafe fn JS_EnumerateStandardClasses(cx: *mut root::JSContext, obj: 
 pub(crate) unsafe fn JS_NewEnumerateStandardClasses(cx: *mut root::JSContext, obj: root::JS::HandleObject, properties: root::JS::MutableHandleIdVector, enumerableOnly: bool) -> bool {
     let _ = (cx, obj, properties, enumerableOnly);
     true
+}
+
+// Functions.
+
+pub(crate) unsafe fn IsCallable(obj: *mut root::JSObject) -> bool {
+    q::JS_IsFunction(super::current().base_ctx, obj_val(obj)) != 0
+}
+
+pub(crate) unsafe fn IsConstructor(obj: *mut root::JSObject) -> bool {
+    q::JS_IsConstructor(super::current().base_ctx, obj_val(obj)) != 0
+}
+
+pub(crate) unsafe fn JS_ValueToFunction(cx: *mut root::JSContext, v: root::JS::HandleValue) -> *mut root::JSFunction {
+    let cx = Cx::from_raw(cx);
+    let v = (*v.ptr).to_qjs();
+    if v.tag() == q::JS_TAG_OBJECT && q::JS_IsFunction(cx.qctx(), v) != 0 {
+        return val_obj(v) as *mut root::JSFunction;
+    }
+    q::JS_ThrowTypeError(cx.qctx(), c"value is not a function".as_ptr());
+    ptr::null_mut()
+}
+
+/// The value of the own data property `name` of `obj` (a new reference), `JS_UNDEFINED` if there
+/// is none, or `JS_EXCEPTION`.
+unsafe fn own_data_property(cx: &mut Cx, obj: *mut root::JSObject, name: &CStr) -> q::JSValue {
+    let atom = Atom::from_cstr(cx, name.as_ptr());
+    let mut qd: q::JSPropertyDescriptor = std::mem::zeroed();
+    let r = q::JS_GetOwnProperty(cx.qctx(), &mut qd, obj_val(obj), atom.atom);
+    if r < 0 {
+        return q::JS_EXCEPTION;
+    }
+    if r == 0 {
+        return q::JS_UNDEFINED;
+    }
+    q::JS_FreeValueRT(cx.rt, qd.getter);
+    q::JS_FreeValueRT(cx.rt, qd.setter);
+    qd.value
+}
+
+/// The length of a `JS_TAG_STRING` value (not a rope).
+unsafe fn flat_string_len(s: q::JSValue) -> usize {
+    let mut data = ptr::null();
+    let mut wide = 0;
+    q::JS_GetStringData(s, &mut data, &mut wide)
+}
+
+/// The function's `name` (null when anonymous). QuickJS keeps no separate explicit or display
+/// name, so both ids read the own `name` property.
+unsafe fn function_name(cx: *mut root::JSContext, fun: root::JS::Handle<*mut root::JSFunction>, name: root::JS::MutableHandle<*mut root::JSString>) -> bool {
+    let cx = Cx::from_raw(cx);
+    let v = own_data_property(cx, *fun.ptr as *mut root::JSObject, c"name");
+    if is_exception(v) {
+        return false;
+    }
+    let v = cx.adopt(v);
+    *name.ptr = if v.is_string() && flat_string_len(v.to_qjs()) > 0 {
+        v.to_string()
+    } else {
+        ptr::null_mut()
+    };
+    true
+}
+
+pub(crate) unsafe fn JS_GetFunctionId(cx: *mut root::JSContext, fun: root::JS::Handle<*mut root::JSFunction>, name: root::JS::MutableHandle<*mut root::JSString>) -> bool {
+    function_name(cx, fun, name)
+}
+
+pub(crate) unsafe fn JS_GetFunctionDisplayId(cx: *mut root::JSContext, fun: root::JS::Handle<*mut root::JSFunction>, name: root::JS::MutableHandle<*mut root::JSString>) -> bool {
+    function_name(cx, fun, name)
+}
+
+pub(crate) unsafe fn JS_GetFunctionArity(fun: *mut root::JSFunction) -> u16 {
+    let cx = super::current();
+    let v = own_data_property(cx, fun as *mut root::JSObject, c"length");
+    if is_exception(v) {
+        q::JS_FreeValueRT(cx.rt, q::JS_GetException(cx.qctx()));
+        return 0;
+    }
+    let mut n = 0u32;
+    q::JS_ToUint32(cx.qctx(), &mut n, v);
+    q::JS_FreeValueRT(cx.rt, v);
+    n.min(u16::MAX as u32) as u16
+}
+
+pub(crate) unsafe fn GetFunctionRealm(cx: *mut root::JSContext, objArg: root::JS::HandleObject) -> *mut root::JS::Realm {
+    let cx = Cx::from_raw(cx);
+    let obj = *objArg.ptr;
+    if let Some(data) = function_data(obj) {
+        if !data.realm.is_null() {
+            return data.realm as *mut root::JS::Realm;
+        }
+    }
+    if let Some(data) = object_data(obj) {
+        if !data.realm.is_null() {
+            return data.realm as *mut root::JS::Realm;
+        }
+    }
+    let qrealm = q::JS_GetFunctionRealm(cx.qctx(), obj_val(obj));
+    if qrealm.is_null() {
+        return ptr::null_mut();
+    }
+    let realm = q::JS_GetContextOpaque(qrealm) as *mut RealmData;
+    if realm.is_null() { cx.current_realm() as *mut root::JS::Realm } else { realm as *mut root::JS::Realm }
+}
+
+pub(crate) unsafe fn NewFunctionWithReserved(cx: *mut root::JSContext, call: root::JSNative, nargs: ::std::os::raw::c_uint, flags: ::std::os::raw::c_uint, name: *const ::std::os::raw::c_char) -> *mut root::JSFunction {
+    // Every native function has the two extended slots.
+    super::JS_NewFunction(cx, call, nargs, flags, name)
+}
+
+pub(crate) unsafe fn DefineFunctionWithReserved(cx: *mut root::JSContext, obj: *mut root::JSObject, name: *const ::std::os::raw::c_char, call: root::JSNative, nargs: ::std::os::raw::c_uint, attrs: ::std::os::raw::c_uint) -> *mut root::JSFunction {
+    super::JS_DefineFunction(cx, root::JS::Handle::from_marked_location(&obj), name, call, nargs, attrs)
+}
+
+pub(crate) unsafe fn GetFunctionNativeReserved(fun: *mut root::JSObject, which: usize) -> *const root::JS::Value {
+    let data = function_data(fun).expect("GetFunctionNativeReserved on a non-native function");
+    &data.slots[which] as *const q::JSValue as *const root::JS::Value
+}
+
+pub(crate) unsafe fn SetFunctionNativeReserved(fun: *mut root::JSObject, which: usize, val: *const root::JS::Value) {
+    let cx = super::current();
+    let data = function_data(fun).expect("SetFunctionNativeReserved on a non-native function");
+    let new = q::JS_DupValueRT(cx.rt, (*val).to_qjs());
+    let old = std::mem::replace(&mut data.slots[which], new);
+    q::JS_FreeValueRT(cx.rt, old);
+}
+
+pub(crate) unsafe fn RUST_FUNCTION_VALUE_TO_JITINFO(v: root::JS::Value) -> *const root::JSJitInfo {
+    if !v.is_object() {
+        return ptr::null();
+    }
+    function_data(v.to_object()).map_or(ptr::null(), |data| data.info)
+}
+
+pub(crate) unsafe fn CallJitGetterOp(info: *const root::JSJitInfo, cx: *mut root::JSContext, thisObj: root::JS::HandleObject, specializedThis: *mut ::std::os::raw::c_void, argc: ::std::os::raw::c_uint, vp: *mut root::JS::Value) -> bool {
+    let _ = argc;
+    let getter = (*info).__bindgen_anon_1.getter.expect("JSJitInfo without a getter");
+    let args = root::JSJitGetterCallArgs { _base: root::JS::MutableHandle::from_marked_location(vp) };
+    getter(cx, thisObj, specializedThis, args)
+}
+
+pub(crate) unsafe fn CallJitSetterOp(info: *const root::JSJitInfo, cx: *mut root::JSContext, thisObj: root::JS::HandleObject, specializedThis: *mut ::std::os::raw::c_void, argc: ::std::os::raw::c_uint, vp: *mut root::JS::Value) -> bool {
+    let setter = (*info).__bindgen_anon_1.setter.expect("JSJitInfo without a setter");
+    // `vp` has no argument slot when the setter is called without arguments.
+    let mut undefined = JSVal::from_qjs(q::JS_UNDEFINED);
+    let arg = if argc > 0 { vp.add(2) } else { &mut undefined as *mut JSVal };
+    let args = root::JSJitSetterCallArgs { _base: root::JS::MutableHandle::from_marked_location(arg) };
+    setter(cx, thisObj, specializedThis, args)
+}
+
+pub(crate) unsafe fn CallJitMethodOp(info: *const root::JSJitInfo, cx: *mut root::JSContext, thisObj: root::JS::HandleObject, specializedThis: *mut ::std::os::raw::c_void, argc: u32, vp: *mut root::JS::Value) -> bool {
+    let method = (*info).__bindgen_anon_1.method.expect("JSJitInfo without a method");
+    let mut args: root::JSJitMethodCallArgs = std::mem::zeroed();
+    args.argv_ = vp.add(2);
+    args.argc_ = argc;
+    args.set_constructing_((*vp.add(1)).is_magic());
+    method(cx, thisObj, specializedThis, &args)
+}
+
+pub(crate) unsafe fn Construct1(cx: *mut root::JSContext, fun: root::JS::Handle<root::JS::Value>, args: *const root::JS::HandleValueArray, objp: root::JS::MutableHandle<*mut root::JSObject>) -> bool {
+    let no_new_target: *mut root::JSObject = ptr::null_mut();
+    super::Construct(cx, fun, root::JS::Handle::from_marked_location(&no_new_target), args, objp)
 }
