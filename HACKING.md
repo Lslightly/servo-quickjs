@@ -42,12 +42,12 @@ Design: `docs/design.md`. Read it first.
 
 ## Testing
 
-- `CARGO_TARGET_DIR=<your target dir> just test`.
+- `just test` (`QJS_TARGET_DIR` sets the target dir), and `just test-verify` with the tracing verifier.
 - The mozjs 0.23.1 tests are in `mozjs/tests/` (see `mozjs/upstream-tests/README.md` for the local changes).
 - Add focused tests for your area as `mozjs/tests/qjs_<area>.rs`.
 
 ## Commits
 
-- Author `Jonathan Schwender <schwenderjonathan@gmail.com>`, with `-s`.
+- Sign off every commit (`git commit -s`, [Developer Certificate of Origin](https://developercertificate.org/)).
 - Short subject (`mozjs: …` or `quickjs: …`) and a short body.
-- No Co-Authored-By or AI trailers.
+- Commits written with an AI agent carry an `AI-assisted:` trailer before the sign-off, e.g. `AI-assisted: Yes (agent session; written and tested by the agent)`.
