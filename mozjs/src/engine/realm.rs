@@ -177,6 +177,11 @@ pub(crate) unsafe fn DeleteRealmOptions(options: *mut root::JS::RealmOptions) {
     drop(Box::from_raw(options));
 }
 
+/// The number of live realms of this thread.
+pub(crate) fn realm_count() -> usize {
+    GLOBALS.with(|g| g.borrow().len())
+}
+
 pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const root::JSClass, principals: *mut root::JSPrincipals, hookOption: root::JS::OnNewGlobalHookOption, options: *const root::JS::RealmOptions) -> *mut root::JSObject {
     let _ = hookOption;
     let cx = Cx::from_raw(cx);

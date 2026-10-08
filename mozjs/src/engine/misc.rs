@@ -65,6 +65,7 @@ pub(crate) unsafe fn AddRawValueRoot(cx: *mut root::JSContext, vp: *mut root::JS
     let _ = name;
     let cx = Cx::from_raw(cx);
     let v = q::JS_DupValueRT(cx.rt, (*vp).to_qjs());
+    super::runtime::note_root_origin(v);
     let old = MISC.with(|m| m.borrow_mut().raw_roots.insert(vp as usize, v));
     if let Some(old) = old {
         q::JS_FreeValueRT(cx.rt, old);
@@ -75,6 +76,7 @@ pub(crate) unsafe fn AddRawValueRoot(cx: *mut root::JSContext, vp: *mut root::JS
 pub(crate) unsafe fn RemoveRawValueRoot(cx: *mut root::JSContext, vp: *mut root::JS::Value) {
     let cx = Cx::from_raw(cx);
     if let Some(v) = MISC.with(|m| m.borrow_mut().raw_roots.remove(&(vp as usize))) {
+        super::runtime::forget_root_origin(v);
         q::JS_FreeValueRT(cx.rt, v);
     }
 }
