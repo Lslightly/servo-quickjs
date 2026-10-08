@@ -12,7 +12,7 @@
 use std::collections::HashMap;
 use std::ffi::{c_int, c_void};
 use std::ptr;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 use std::sync::Mutex;
 
 use servo_quickjs as q;
@@ -63,8 +63,11 @@ unsafe fn reserved_slot_count(clasp: *const root::JSClass) -> usize {
 struct Registry {
     by_clasp: HashMap<usize, q::JSClassID>,
     by_id: HashMap<q::JSClassID, usize>,
-    function_class: q::JSClassID,
 }
+
+/// The QuickJS class of native functions, readable without the lock: every DOM call looks its
+/// jit info up.
+static FUNCTION_CLASS_ID: AtomicU32 = AtomicU32::new(0);
 
 static REGISTRY: Mutex<Option<Registry>> = Mutex::new(None);
 
@@ -300,28 +303,37 @@ pub(crate) unsafe fn call_native(
     // rooted values die with the native's frame; otherwise a loop calling natives would grow the
     // pool until the end of the task.
     let pool_mark = cx.pool_mark();
-    let mut vp: Vec<JSVal> = Vec::with_capacity(argc as usize + 3);
-    vp.push(JSVal::from_qjs(func_obj));
-    vp.push(if constructing {
+    // callee, this, the arguments and new.target; on the stack for most calls.
+    let len = argc as usize + 2 + constructing as usize;
+    let mut on_stack = [JSVal::default(); 8];
+    let mut on_heap = Vec::new();
+    let vp: &mut [JSVal] = if len <= on_stack.len() {
+        &mut on_stack[..len]
+    } else {
+        on_heap.resize(len, JSVal::default());
+        &mut on_heap
+    };
+    vp[0] = JSVal::from_qjs(func_obj);
+    vp[1] = if constructing {
         JSVal {
             asBits_: root::JSWhyMagic::JS_IS_CONSTRUCTING as u64,
             tag: TAG_MAGIC,
         }
     } else {
         JSVal::from_qjs(this_val)
-    });
+    };
     for i in 0..argc as usize {
         let arg = *argv.add(i);
         // Ropes are flattened (and the flat copy retained) so Rust never sees them.
-        vp.push(if arg.tag() == q::JS_TAG_STRING_ROPE {
+        vp[2 + i] = if arg.tag() == q::JS_TAG_STRING_ROPE {
             cx.retain(JSVal::from_qjs(arg))
         } else {
             JSVal::from_qjs(arg)
-        });
+        };
     }
     if constructing {
         // new.target
-        vp.push(JSVal::from_qjs(this_val));
+        vp[2 + argc as usize] = JSVal::from_qjs(this_val);
     }
     let entered = !realm.is_null();
     if entered {
@@ -355,12 +367,17 @@ pub(crate) struct FunctionData {
 }
 
 unsafe fn function_class(rt: *mut q::JSRuntime) -> q::JSClassID {
-    let id = with_registry(|r| {
-        if r.function_class == 0 {
-            q::JS_NewClassID(&mut r.function_class);
-        }
-        r.function_class
-    });
+    let mut id = FUNCTION_CLASS_ID.load(Ordering::Acquire);
+    if id == 0 {
+        id = with_registry(|_| {
+            let mut id = FUNCTION_CLASS_ID.load(Ordering::Acquire);
+            if id == 0 {
+                q::JS_NewClassID(&mut id);
+                FUNCTION_CLASS_ID.store(id, Ordering::Release);
+            }
+            id
+        });
+    }
     if q::JS_IsRegisteredClass(rt, id) == 0 {
         let def = q::JSClassDef {
             class_name: c"Function".as_ptr(),
@@ -377,7 +394,7 @@ unsafe fn function_class(rt: *mut q::JSRuntime) -> q::JSClassID {
 pub(crate) unsafe fn function_data<'a>(obj: *mut root::JSObject) -> Option<&'a mut FunctionData> {
     let v = obj_val(obj);
     let id = q::JS_GetClassID(v);
-    let fid = with_registry(|r| r.function_class);
+    let fid = FUNCTION_CLASS_ID.load(Ordering::Relaxed);
     if fid == 0 || id != fid {
         return None;
     }
