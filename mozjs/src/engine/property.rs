@@ -348,7 +348,7 @@ pub(crate) unsafe fn JS_SetElement(
 }
 
 unsafe fn has(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, foundp: *mut bool) -> bool {
-    let r = q::JS_HasProperty(cx.qctx(), obj_val(obj), atom);
+    let r = q::JS_HasPropertyCached(cx.qctx(), obj_val(obj), atom, 0);
     if r < 0 {
         return false;
     }

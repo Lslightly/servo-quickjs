@@ -377,6 +377,11 @@ struct JSRuntime {
     void *can_compile_strings_opaque;
     /* Servo: debug hook called when an object is freed */
     JSFreeObjectHook *free_object_hook;
+    /* Servo: JS_HasPropertyCached() results, valid while proto_epoch is unchanged. It
+       changes whenever an object the cached lookups met changes its properties or
+       prototype, or is freed. */
+    struct JSProtoCacheEntry *proto_cache;
+    uint32_t proto_epoch;
     /* Servo: called when a context is freed */
     JSContextFinalizer *context_finalizer;
 
@@ -1034,6 +1039,15 @@ struct JSShape {
     /* followed by JSShapeProperty prop[prop_size]; */
 };
 
+/* Servo: see JS_HasPropertyCached() */
+#define JS_PROTO_CACHE_BITS 8
+
+typedef struct JSProtoCacheEntry {
+    uintptr_t obj_found; /* the object, 1 if the property was found, 2 if it is an index */
+    JSAtom atom;
+    uint32_t epoch;
+} JSProtoCacheEntry;
+
 struct JSObject {
     JSGCObjectHeader header;
     /* TRUE if the array prototype is "normal":
@@ -1053,6 +1067,8 @@ struct JSObject {
     uint8_t tmp_mark : 1; /* used in JS_WriteObjectRec() */
     uint8_t is_HTMLDDA : 1; /* specific annex B IsHtmlDDA behavior */
     uint8_t is_global_object : 1; /* Servo: u.global_object is used, whatever the class */
+    uint8_t is_prototype : 1; /* Servo: the prototype of some shape */
+    uint8_t in_proto_cache : 1; /* Servo: met by a JS_HasPropertyCached() lookup (see proto_epoch) */
     uint16_t class_id; /* see JS_CLASS_x */
     /* count the number of weak references to this object. The object
        structure is freed only if header.ref_count = 0 and
@@ -1123,6 +1139,13 @@ struct JSObject {
         JSGlobalObject global_object;
     } u;
 };
+
+/* Servo: an object JS_HasPropertyCached() met changed */
+static inline void js_prototypes_changed(JSRuntime *rt)
+{
+    if (unlikely(++rt->proto_epoch == 0) && rt->proto_cache)
+        memset(rt->proto_cache, 0, sizeof(JSProtoCacheEntry) << JS_PROTO_CACHE_BITS);
+}
 
 typedef struct JSMapRecord {
     int ref_count; /* used during enumeration to avoid freeing the record */
@@ -2470,6 +2493,9 @@ void JS_FreeRuntime(JSRuntime *rt)
 {
     struct list_head *el, *el1;
     int i;
+
+    js_free_rt(rt, rt->proto_cache);
+    rt->proto_cache = NULL;
 
     JS_FreeValueRT(rt, rt->current_exception);
     JS_FreeAtomRT(rt, rt->current_exception_filename);
@@ -5322,8 +5348,10 @@ static inline JSShape *js_new_shape_nohash(JSContext *ctx, JSObject *proto,
         return NULL;
     js_rc(sh)->ref_count = 1;
     add_gc_object(rt, &sh->header, JS_GC_OBJ_TYPE_SHAPE);
-    if (proto)
+    if (proto) {
         JS_DupValue(ctx, JS_MKPTR(JS_TAG_OBJECT, proto));
+        proto->is_prototype = TRUE;
+    }
     sh->proto = proto;
     memset(sh->hash_table, 0, sizeof(sh->hash_table[0]) * hash_size);
     sh->prop_hash_mask = hash_size - 1;
@@ -5731,6 +5759,8 @@ static JSValue JS_NewObjectFromShape(JSContext *ctx, JSShape *sh, JSClassID clas
     p->tmp_mark = 0;
     p->is_HTMLDDA = 0;
     p->is_global_object = 0;
+    p->is_prototype = 0;
+    p->in_proto_cache = 0;
     p->weakref_count = 0;
     p->u.opaque = NULL;
     p->shape = sh;
@@ -6450,6 +6480,8 @@ static void free_object(JSRuntime *rt, JSObject *p)
                          freeing cycles */
     if (unlikely(rt->free_object_hook)) /* Servo */
         rt->free_object_hook(rt, JS_MKPTR(JS_TAG_OBJECT, p));
+    if (unlikely(p->in_proto_cache))
+        js_prototypes_changed(rt);
     /* free all the fields */
     sh = p->shape;
     pr = get_shape_prop(sh);
@@ -8123,6 +8155,10 @@ static int JS_SetPrototypeInternal(JSContext *ctx, JSValueConst obj,
     if (sh->proto)
         JS_FreeValue(ctx, JS_MKPTR(JS_TAG_OBJECT, sh->proto));
     sh->proto = proto;
+    if (proto)
+        proto->is_prototype = TRUE;
+    if (p->in_proto_cache)
+        js_prototypes_changed(ctx->rt);
     p->is_std_array_prototype = FALSE; 
     return TRUE;
 }
@@ -9350,6 +9386,8 @@ static JSProperty *add_property(JSContext *ctx,
 {
     JSShape *sh, *new_sh;
 
+    if (unlikely(p->in_proto_cache))
+        js_prototypes_changed(ctx->rt);
     if (unlikely(__JS_AtomIsTaggedInt(prop))) {
         /* update is_std_array_prototype */
         if (unlikely(p->is_std_array_prototype)) {
@@ -9512,6 +9550,8 @@ static int delete_property(JSContext *ctx, JSObject *p, JSAtom atom)
                 sh->hash_table[h1] = pr->hash_next;
             }
             sh->deleted_prop_count++;
+            if (unlikely(p->in_proto_cache))
+                js_prototypes_changed(ctx->rt);
             /* free the entry */
             pr1 = &p->prop[h - 1];
             if (unlikely(p->is_global_object /* Servo */)) {
@@ -62485,6 +62525,60 @@ void JS_VisitGCChildren(JSRuntime *rt, void *ptr, JSGCChildVisitor *visit, void 
     rt->gc_child_opaque = opaque;
     mark_children(rt, ptr, js_visit_gc_child);
     rt->gc_child_visitor = NULL;
+}
+
+int JS_HasPropertyCached(JSContext *ctx, JSValueConst obj, JSAtom prop, int flags)
+{
+    JSRuntime *rt = ctx->rt;
+    JSObject *p, *p1;
+    JSShapeProperty *prs;
+    JSProtoCacheEntry *e;
+    uintptr_t found;
+    uint32_t idx;
+
+    if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT || __JS_AtomIsTaggedInt(prop))
+        goto uncached;
+    p = JS_VALUE_GET_OBJ(obj);
+    if (!p->is_prototype)
+        goto uncached;
+    if (unlikely(!rt->proto_cache)) {
+        rt->proto_cache = js_mallocz_rt(rt, sizeof(JSProtoCacheEntry) << JS_PROTO_CACHE_BITS);
+        if (!rt->proto_cache)
+            goto uncached;
+    }
+    e = &rt->proto_cache[(((uint32_t)((uintptr_t)p >> 4) ^ prop) * 0x9E3779B1u) >>
+                         (32 - JS_PROTO_CACHE_BITS)];
+    if ((e->obj_found & ~(uintptr_t)3) == (uintptr_t)p && e->atom == prop &&
+        e->epoch == rt->proto_epoch) {
+        found = e->obj_found & 3;
+        goto done;
+    }
+    /* Only ordinary objects, whose properties are those of their shape: once met here, any
+       change to them changes proto_epoch. */
+    found = 0;
+    for (p1 = p; p1; p1 = p1->shape->proto) {
+        if (p1->is_exotic)
+            goto uncached;
+        p1->in_proto_cache = TRUE;
+        prs = find_own_property1(p1, prop);
+        if (prs) {
+            if ((prs->flags & JS_PROP_TMASK) == JS_PROP_VARREF)
+                goto uncached;
+            found = 1;
+            break;
+        }
+    }
+    if (found && JS_AtomIsArrayIndex(ctx, &idx, prop))
+        found |= 2;
+    e->obj_found = (uintptr_t)p | found;
+    e->atom = prop;
+    e->epoch = rt->proto_epoch;
+ done:
+    if ((found & 2) && (flags & JS_HAS_CACHED_NO_INDEX))
+        return -2;
+    return found & 1;
+ uncached:
+    return (flags & JS_HAS_CACHED_ORDINARY_ONLY) ? -2 : JS_HasProperty(ctx, obj, prop);
 }
 
 void *JS_GetObjectShapeProto(void *obj)

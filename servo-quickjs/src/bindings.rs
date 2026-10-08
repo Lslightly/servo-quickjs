@@ -185,6 +185,8 @@ pub const JS_GPN_SET_ENUM: u32 = 32;
 pub const JS_PARSE_JSON_EXT: u32 = 1;
 pub const JS_STRIP_SOURCE: u32 = 1;
 pub const JS_STRIP_DEBUG: u32 = 2;
+pub const JS_HAS_CACHED_ORDINARY_ONLY: u32 = 1;
+pub const JS_HAS_CACHED_NO_INDEX: u32 = 2;
 pub const JS_WRITE_OBJ_BYTECODE: u32 = 1;
 pub const JS_WRITE_OBJ_BSWAP: u32 = 2;
 pub const JS_WRITE_OBJ_SAB: u32 = 4;
@@ -1855,6 +1857,14 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_GetObjectShapeProto(obj: *mut ::std::os::raw::c_void) -> *mut ::std::os::raw::c_void;
+}
+unsafe extern "C" {
+    pub fn JS_HasPropertyCached(
+        ctx: *mut JSContext,
+        obj: JSValue,
+        prop: JSAtom,
+        flags: ::std::os::raw::c_int,
+    ) -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
     pub fn JS_GetClassNameRT(

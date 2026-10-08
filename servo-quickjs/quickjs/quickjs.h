@@ -1135,8 +1135,15 @@ void JS_SetGCRootsHook(JSRuntime *rt, JSGCRootsHook *hook, void *opaque);
    Only valid in a JSGCRootsHook. */
 typedef void JSGCChildVisitor(JSRuntime *rt, int gc_obj_type, void *ptr, void *opaque);
 void JS_VisitGCChildren(JSRuntime *rt, void *ptr, JSGCChildVisitor *visit, void *opaque);
-/* Servo (debugging): the prototype in an object's shape, without a reference, or NULL. */
+/* Servo: the prototype in an object's shape, without a reference, or NULL. */
 void *JS_GetObjectShapeProto(void *obj);
+/* Servo: JS_HasProperty() with a cache for lookups that start at a prototype and only
+   meet ordinary objects (no exotic behavior). With JS_HAS_CACHED_ORDINARY_ONLY, other
+   lookups return -2 without looking anything up; with JS_HAS_CACHED_NO_INDEX, so do array
+   indices found on the chain. */
+#define JS_HAS_CACHED_ORDINARY_ONLY (1 << 0)
+#define JS_HAS_CACHED_NO_INDEX      (1 << 1)
+int JS_HasPropertyCached(JSContext *ctx, JSValueConst obj, JSAtom prop, int flags);
 /* Servo (debugging): a class's name, formatted into 'buf' if needed. */
 const char *JS_GetClassNameRT(JSRuntime *rt, JSClassID class_id, char *buf, int buf_size);
 /* Servo: the host-defined value of a compiled script (JS_TAG_FUNCTION_BYTECODE),
