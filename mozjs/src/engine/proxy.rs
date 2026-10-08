@@ -25,7 +25,7 @@
 use std::cell::{Cell, RefCell};
 use std::ffi::{c_int, c_uint, c_void, CString};
 use std::ptr;
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::OnceLock;
 
 use servo_quickjs as q;
@@ -868,12 +868,72 @@ unsafe extern "C" fn proxy_has_property(
     found as c_int
 }
 
+/// Set by `SetDOMProxyInformation`: DOM proxies follow SpiderMonkey's DOM proxy rules.
+static DOM_PROXIES: AtomicBool = AtomicBool::new(false);
+
+enum Unshadowed {
+    /// The traps must decide.
+    No,
+    /// The name resolves on this prototype (borrowed).
+    Proto(q::JSValue),
+    Exception,
+}
+
+/// Whether `atom` resolves on the prototype chain of the DOM proxy `obj` without its traps, as
+/// SpiderMonkey's JIT inline caches assume (`SetDOMProxyInformation`): a DOM proxy shadows a name
+/// that isn't an index only through its expando object, and its named properties come after its
+/// prototype's.
+unsafe fn unshadowed(ctx: *mut q::JSContext, obj: q::JSValue, atom: q::JSAtom) -> Unshadowed {
+    // Integer indices are tagged atoms.
+    if !DOM_PROXIES.load(Ordering::Relaxed) || atom & (1 << 31) != 0 {
+        return Unshadowed::No;
+    }
+    let Some(&[static_proto_class, _]) = PROXY_CLASS_IDS.get() else {
+        return Unshadowed::No;
+    };
+    if q::JS_GetClassID(obj) != static_proto_class {
+        return Unshadowed::No;
+    }
+    let data = &*(q::JS_GetOpaque(obj, static_proto_class) as *const ProxyData);
+    let handler = &*data.handler;
+    // Generated DOM proxies have their DOM class as extra; the window's named properties object
+    // has none and different rules.
+    if handler.kind != Kind::Forwarding || handler.extra.is_null() {
+        return Unshadowed::No;
+    }
+    let proto = q::JS_GetObjectShapeProto(obj.ptr());
+    if proto.is_null() {
+        return Unshadowed::No;
+    }
+    let proto = q::JSValue::mkptr(q::JS_TAG_OBJECT, proto);
+    // Chains with exotic objects (e.g. a JS Proxy) keep the traps' order of lookups.
+    let flags = (q::JS_HAS_CACHED_ORDINARY_ONLY | q::JS_HAS_CACHED_NO_INDEX) as i32;
+    if q::JS_HasPropertyCached(ctx, proto, atom, flags) != 1 {
+        return Unshadowed::No;
+    }
+    if data.private.tag() == q::JS_TAG_OBJECT {
+        match q::JS_GetOwnProperty(ctx, ptr::null_mut(), data.private, atom) {
+            0 => {}
+            1 => return Unshadowed::No,
+            _ => return Unshadowed::Exception,
+        }
+    }
+    Unshadowed::Proto(proto)
+}
+
 unsafe extern "C" fn proxy_get_property(
     ctx: *mut q::JSContext,
     obj: q::JSValue,
     atom: q::JSAtom,
     receiver: q::JSValue,
 ) -> q::JSValue {
+    match unshadowed(ctx, obj, atom) {
+        Unshadowed::Proto(proto) => {
+            return q::JS_GetPropertyInternal(ctx, proto, atom, receiver, 0)
+        }
+        Unshadowed::Exception => return q::JS_EXCEPTION,
+        Unshadowed::No => {}
+    }
     let t = Trap::new(ctx, obj);
     let mut vp = UndefinedValue();
     if !t
@@ -894,6 +954,14 @@ unsafe extern "C" fn proxy_set_property(
     receiver: q::JSValue,
     flags: c_int,
 ) -> c_int {
+    match unshadowed(ctx, obj, atom) {
+        Unshadowed::Proto(proto) => {
+            let value = q::JS_DupValue(ctx, value);
+            return q::JS_SetPropertyInternal(ctx, proto, atom, value, receiver, flags);
+        }
+        Unshadowed::Exception => return -1,
+        Unshadowed::No => {}
+    }
     let t = Trap::new(ctx, obj);
     let mut result = new_op_result();
     if !t.proxy.set(
@@ -1112,12 +1180,11 @@ pub(crate) unsafe fn SetDOMProxyInformation(
     domProxyShadowsCheck: root::JS::DOMProxyShadowsCheck,
     domRemoteProxyHandlerFamily: *const ::std::os::raw::c_void,
 ) {
-    // Only used by SpiderMonkey's JIT inline caches.
-    let _ = (
-        domProxyHandlerFamily,
-        domProxyShadowsCheck,
-        domRemoteProxyHandlerFamily,
-    );
+    // The shadows check is Servo's expando lookup, which `unshadowed` does natively.
+    let _ = (domProxyShadowsCheck, domRemoteProxyHandlerFamily);
+    if domProxyHandlerFamily == GetProxyHandlerFamily() {
+        DOM_PROXIES.store(true, Ordering::Relaxed);
+    }
 }
 
 pub(crate) unsafe fn InvokeGetOwnPropertyDescriptor(
