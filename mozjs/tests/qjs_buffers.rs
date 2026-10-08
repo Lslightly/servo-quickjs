@@ -12,15 +12,15 @@ use mozjs::context::JSContext;
 use mozjs::jsapi::{
     ArrayBufferHasData, GetArrayBufferByteLength, GetArrayBufferData, GetArrayBufferLengthAndData,
     GetArrayBufferViewLengthAndData, IsArrayBufferObject, IsDetachedArrayBufferObject,
-    IsResizableArrayBufferView, JSObject,
-    JS_GetArrayBufferViewByteLength, JS_GetArrayBufferViewByteOffset, JS_GetArrayBufferViewType,
-    JS_GetBigInt64ArrayData, JS_GetFloat16ArrayData, JS_GetObjectAsFloat64Array,
-    JS_GetTypedArrayByteLength, JS_GetTypedArrayLength, JS_GetTypedArraySharedness,
-    JS_GetUint8ArrayData, JS_IsArrayBufferViewObject, JS_IsTypedArrayObject,
-    OnNewGlobalHookOption, Type, UnwrapArrayBuffer, UnwrapArrayBufferView, UnwrapBigInt64Array,
-    UnwrapBigUint64Array, UnwrapFloat16Array, UnwrapFloat32Array, UnwrapFloat64Array,
-    UnwrapInt16Array, UnwrapInt32Array, UnwrapInt8Array, UnwrapUint16Array, UnwrapUint32Array,
-    UnwrapUint8Array, UnwrapUint8ClampedArray,
+    IsResizableArrayBufferView, JSObject, JS_GetArrayBufferViewByteLength,
+    JS_GetArrayBufferViewByteOffset, JS_GetArrayBufferViewType, JS_GetBigInt64ArrayData,
+    JS_GetFloat16ArrayData, JS_GetObjectAsFloat64Array, JS_GetTypedArrayByteLength,
+    JS_GetTypedArrayLength, JS_GetTypedArraySharedness, JS_GetUint8ArrayData,
+    JS_IsArrayBufferViewObject, JS_IsTypedArrayObject, OnNewGlobalHookOption, Type,
+    UnwrapArrayBuffer, UnwrapArrayBufferView, UnwrapBigInt64Array, UnwrapBigUint64Array,
+    UnwrapFloat16Array, UnwrapFloat32Array, UnwrapFloat64Array, UnwrapInt16Array, UnwrapInt32Array,
+    UnwrapInt8Array, UnwrapUint16Array, UnwrapUint32Array, UnwrapUint8Array,
+    UnwrapUint8ClampedArray,
 };
 use mozjs::jsval::{JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -71,7 +71,10 @@ fn with_global(engine: &JSEngine, f: impl FnOnce(&mut JSContext, HandleObject)) 
 fn eval(cx: &mut JSContext, global: HandleObject, src: &str) -> JSVal {
     rooted!(&in(cx) let mut rval = UndefinedValue());
     let options = CompileOptionsWrapper::new(cx, c"qjs_buffers".to_owned(), 1);
-    assert!(evaluate_script(cx, global, src, rval.handle_mut(), options).is_ok(), "{src}");
+    assert!(
+        evaluate_script(cx, global, src, rval.handle_mut(), options).is_ok(),
+        "{src}"
+    );
     rval.get()
 }
 
@@ -141,18 +144,150 @@ macro_rules! check_type {
 }
 
 fn each_type(cx: &mut JSContext, global: HandleObject) {
-    check_type!(cx, global, JS_NewInt8Array, JS_NewInt8ArrayFromArray, JS_NewInt8ArrayWithBuffer, UnwrapInt8Array, Type::Int8, "Int8Array", 1, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewUint8Array, JS_NewUint8ArrayFromArray, JS_NewUint8ArrayWithBuffer, UnwrapUint8Array, Type::Uint8, "Uint8Array", 1, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewUint8ClampedArray, JS_NewUint8ClampedArrayFromArray, JS_NewUint8ClampedArrayWithBuffer, UnwrapUint8ClampedArray, Type::Uint8Clamped, "Uint8ClampedArray", 1, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewInt16Array, JS_NewInt16ArrayFromArray, JS_NewInt16ArrayWithBuffer, UnwrapInt16Array, Type::Int16, "Int16Array", 2, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewUint16Array, JS_NewUint16ArrayFromArray, JS_NewUint16ArrayWithBuffer, UnwrapUint16Array, Type::Uint16, "Uint16Array", 2, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewInt32Array, JS_NewInt32ArrayFromArray, JS_NewInt32ArrayWithBuffer, UnwrapInt32Array, Type::Int32, "Int32Array", 4, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewUint32Array, JS_NewUint32ArrayFromArray, JS_NewUint32ArrayWithBuffer, UnwrapUint32Array, Type::Uint32, "Uint32Array", 4, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewFloat16Array, JS_NewFloat16ArrayFromArray, JS_NewFloat16ArrayWithBuffer, UnwrapFloat16Array, Type::Float16, "Float16Array", 2, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewFloat32Array, JS_NewFloat32ArrayFromArray, JS_NewFloat32ArrayWithBuffer, UnwrapFloat32Array, Type::Float32, "Float32Array", 4, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewFloat64Array, JS_NewFloat64ArrayFromArray, JS_NewFloat64ArrayWithBuffer, UnwrapFloat64Array, Type::Float64, "Float64Array", 8, "[1, 2, 3]");
-    check_type!(cx, global, JS_NewBigInt64Array, JS_NewBigInt64ArrayFromArray, JS_NewBigInt64ArrayWithBuffer, UnwrapBigInt64Array, Type::BigInt64, "BigInt64Array", 8, "[1n, 2n, 3n]");
-    check_type!(cx, global, JS_NewBigUint64Array, JS_NewBigUint64ArrayFromArray, JS_NewBigUint64ArrayWithBuffer, UnwrapBigUint64Array, Type::BigUint64, "BigUint64Array", 8, "[1n, 2n, 3n]");
+    check_type!(
+        cx,
+        global,
+        JS_NewInt8Array,
+        JS_NewInt8ArrayFromArray,
+        JS_NewInt8ArrayWithBuffer,
+        UnwrapInt8Array,
+        Type::Int8,
+        "Int8Array",
+        1,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewUint8Array,
+        JS_NewUint8ArrayFromArray,
+        JS_NewUint8ArrayWithBuffer,
+        UnwrapUint8Array,
+        Type::Uint8,
+        "Uint8Array",
+        1,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewUint8ClampedArray,
+        JS_NewUint8ClampedArrayFromArray,
+        JS_NewUint8ClampedArrayWithBuffer,
+        UnwrapUint8ClampedArray,
+        Type::Uint8Clamped,
+        "Uint8ClampedArray",
+        1,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewInt16Array,
+        JS_NewInt16ArrayFromArray,
+        JS_NewInt16ArrayWithBuffer,
+        UnwrapInt16Array,
+        Type::Int16,
+        "Int16Array",
+        2,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewUint16Array,
+        JS_NewUint16ArrayFromArray,
+        JS_NewUint16ArrayWithBuffer,
+        UnwrapUint16Array,
+        Type::Uint16,
+        "Uint16Array",
+        2,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewInt32Array,
+        JS_NewInt32ArrayFromArray,
+        JS_NewInt32ArrayWithBuffer,
+        UnwrapInt32Array,
+        Type::Int32,
+        "Int32Array",
+        4,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewUint32Array,
+        JS_NewUint32ArrayFromArray,
+        JS_NewUint32ArrayWithBuffer,
+        UnwrapUint32Array,
+        Type::Uint32,
+        "Uint32Array",
+        4,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewFloat16Array,
+        JS_NewFloat16ArrayFromArray,
+        JS_NewFloat16ArrayWithBuffer,
+        UnwrapFloat16Array,
+        Type::Float16,
+        "Float16Array",
+        2,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewFloat32Array,
+        JS_NewFloat32ArrayFromArray,
+        JS_NewFloat32ArrayWithBuffer,
+        UnwrapFloat32Array,
+        Type::Float32,
+        "Float32Array",
+        4,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewFloat64Array,
+        JS_NewFloat64ArrayFromArray,
+        JS_NewFloat64ArrayWithBuffer,
+        UnwrapFloat64Array,
+        Type::Float64,
+        "Float64Array",
+        8,
+        "[1, 2, 3]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewBigInt64Array,
+        JS_NewBigInt64ArrayFromArray,
+        JS_NewBigInt64ArrayWithBuffer,
+        UnwrapBigInt64Array,
+        Type::BigInt64,
+        "BigInt64Array",
+        8,
+        "[1n, 2n, 3n]"
+    );
+    check_type!(
+        cx,
+        global,
+        JS_NewBigUint64Array,
+        JS_NewBigUint64ArrayFromArray,
+        JS_NewBigUint64ArrayWithBuffer,
+        UnwrapBigUint64Array,
+        Type::BigUint64,
+        "BigUint64Array",
+        8,
+        "[1n, 2n, 3n]"
+    );
 
     // From another typed array, and from an iterable.
     rooted!(&in(cx) let src = eval_obj(cx, global, "new Uint8Array([7, 8])"));
@@ -173,7 +308,10 @@ fn each_type(cx: &mut JSContext, global: HandleObject) {
         assert!(UnwrapArrayBufferView(buf.get()).is_null());
         assert!(UnwrapArrayBuffer(o.get()).is_null());
         assert_eq!(UnwrapArrayBuffer(buf.get()), buf.get());
-        assert_eq!(JS_GetArrayBufferViewType(o.get()), Type::MaxTypedArrayViewType);
+        assert_eq!(
+            JS_GetArrayBufferViewType(o.get()),
+            Type::MaxTypedArrayViewType
+        );
     }
 
     // Creating a view over something that is not a buffer, or out of bounds, throws.
@@ -207,7 +345,10 @@ fn data_pointers(cx: &mut JSContext, global: HandleObject) {
     let obj = unsafe { JS_GetObjectAsFloat64Array(f.get(), &mut len, &mut shared, &mut data) };
     assert_eq!(obj, f.get());
     assert_eq!(len, 2);
-    assert_eq!(unsafe { std::slice::from_raw_parts(data, len) }, &[1.5, -2.0]);
+    assert_eq!(
+        unsafe { std::slice::from_raw_parts(data, len) },
+        &[1.5, -2.0]
+    );
     unsafe { *data.add(1) = 8.25 };
     assert_js(cx, global, "f[1] === 8.25");
 
@@ -233,7 +374,11 @@ fn data_pointers(cx: &mut JSContext, global: HandleObject) {
     assert!(!data.is_null() && !shared);
     unsafe { *data.add(7) = 9 };
     set_global(cx, global, c"buf", buf.get());
-    assert_js(cx, global, "buf.byteLength === 8 && new Uint8Array(buf)[7] === 9");
+    assert_js(
+        cx,
+        global,
+        "buf.byteLength === 8 && new Uint8Array(buf)[7] === 9",
+    );
     let (mut len, mut data2) = (0, ptr::null_mut());
     unsafe { GetArrayBufferLengthAndData(buf.get(), &mut len, &mut shared, &mut data2) };
     assert_eq!((len, data2), (8, data));
@@ -274,7 +419,10 @@ fn views_with_offsets(cx: &mut JSContext, global: HandleObject) {
     unsafe {
         assert!(JS_IsArrayBufferViewObject(dv.get()));
         assert!(!JS_IsTypedArrayObject(dv.get()));
-        assert_eq!(JS_GetArrayBufferViewType(dv.get()), Type::MaxTypedArrayViewType);
+        assert_eq!(
+            JS_GetArrayBufferViewType(dv.get()),
+            Type::MaxTypedArrayViewType
+        );
         assert_eq!(JS_GetArrayBufferViewByteOffset(dv.get()), 2);
         assert_eq!(JS_GetArrayBufferViewByteLength(dv.get()), 4);
         let (mut len, mut data) = (0, ptr::null_mut());
@@ -334,7 +482,11 @@ fn detach(cx: &mut JSContext, global: HandleObject) {
         GetArrayBufferViewLengthAndData(view.get(), &mut len, &mut shared, &mut data);
         assert_eq!((len, data), (0, ptr::null_mut()));
     }
-    assert_js(cx, global, "d.byteLength === 0 && d.detached && dv.length === 0");
+    assert_js(
+        cx,
+        global,
+        "d.byteLength === 0 && d.detached && dv.length === 0",
+    );
     assert_eq!(Uint8Array::from(view.get()).unwrap().to_vec(), None);
 
     // Detaching again is a no-op; detaching a view throws.
@@ -363,7 +515,10 @@ fn steal_contents(cx: &mut JSContext, global: HandleObject) {
     // The contents move into a new buffer without a copy.
     rooted!(&in(cx) let n = unsafe { NewArrayBufferWithContents(cx, 3, data as *mut c_void) });
     let mut shared = false;
-    assert_eq!(unsafe { GetArrayBufferData(n.get(), &mut shared, ptr::null()) }, data);
+    assert_eq!(
+        unsafe { GetArrayBufferData(n.get(), &mut shared, ptr::null()) },
+        data
+    );
     set_global(cx, global, c"n", n.get());
     assert_js(cx, global, "new Uint8Array(n).join() === '1,2,3'");
 
@@ -384,7 +539,11 @@ fn clone_and_copy(cx: &mut JSContext, global: HandleObject) {
     rooted!(&in(cx) let buf = eval_obj(cx, global, "var c = new Uint8Array([0, 1, 2, 3, 4, 5]); c.buffer"));
     rooted!(&in(cx) let clone = unsafe { ArrayBufferClone(cx, buf.handle(), 1, 3) });
     set_global(cx, global, c"cl", clone.get());
-    assert_js(cx, global, "cl !== c.buffer && new Uint8Array(cl).join() === '1,2,3'");
+    assert_js(
+        cx,
+        global,
+        "cl !== c.buffer && new Uint8Array(cl).join() === '1,2,3'",
+    );
     rooted!(&in(cx) let bad = unsafe { ArrayBufferClone(cx, buf.handle(), 4, 3) });
     assert!(bad.get().is_null());
     take_exception(cx);
@@ -399,7 +558,11 @@ fn clone_and_copy(cx: &mut JSContext, global: HandleObject) {
 
     rooted!(&in(cx) let copy = unsafe { CopyArrayBuffer(cx, buf.handle()) });
     set_global(cx, global, c"cp", copy.get());
-    assert_js(cx, global, "cp !== c.buffer && new Uint8Array(cp).join() === c.join()");
+    assert_js(
+        cx,
+        global,
+        "cp !== c.buffer && new Uint8Array(cp).join() === c.join()",
+    );
     assert!(unsafe { DetachArrayBuffer(cx, buf.handle()) });
     rooted!(&in(cx) let bad = unsafe { CopyArrayBuffer(cx, buf.handle()) });
     assert!(bad.get().is_null());
@@ -417,7 +580,10 @@ struct Freed {
 
 impl Freed {
     fn new() -> Freed {
-        Freed { calls: AtomicUsize::new(0), contents: AtomicPtr::new(ptr::null_mut()) }
+        Freed {
+            calls: AtomicUsize::new(0),
+            contents: AtomicPtr::new(ptr::null_mut()),
+        }
     }
 
     fn calls(&self) -> usize {
@@ -453,7 +619,10 @@ fn external_buffers(engine: &JSEngine) {
     with_global(engine, |cx, global| {
         rooted!(&in(cx) let ext = new_external(cx, &mut data, &freed));
         let mut shared = true;
-        assert_eq!(unsafe { GetArrayBufferData(ext.get(), &mut shared, ptr::null()) }, contents as *mut u8);
+        assert_eq!(
+            unsafe { GetArrayBufferData(ext.get(), &mut shared, ptr::null()) },
+            contents as *mut u8
+        );
         assert!(!shared);
         set_global(cx, global, c"ext", ext.get());
         assert_js(cx, global, "new Uint8Array(ext)[7] === 8");
@@ -482,7 +651,11 @@ fn external_buffers(engine: &JSEngine) {
         assert_eq!(freed.calls(), 1);
         rooted!(&in(cx) let n = unsafe { NewArrayBufferWithContents(cx, 8, stolen) });
         set_global(cx, global, c"n", n.get());
-        assert_js(cx, global, "new Uint8Array(n).join() === '42,2,3,4,5,6,7,8'");
+        assert_js(
+            cx,
+            global,
+            "new Uint8Array(n).join() === '42,2,3,4,5,6,7,8'",
+        );
     });
     assert_eq!(freed.calls(), 1);
 
@@ -493,7 +666,10 @@ fn external_buffers(engine: &JSEngine) {
         set_global(cx, global, c"ext", ext.get());
         rooted!(&in(cx) let moved = eval_obj(cx, global, "var moved = ext.transfer(); moved"));
         let mut shared = false;
-        assert_eq!(unsafe { GetArrayBufferData(moved.get(), &mut shared, ptr::null()) }, contents as *mut u8);
+        assert_eq!(
+            unsafe { GetArrayBufferData(moved.get(), &mut shared, ptr::null()) },
+            contents as *mut u8
+        );
         assert_eq!(freed.calls(), 0);
         eval(cx, global, "moved.transfer(4)");
         assert_eq!(freed.calls(), 1);

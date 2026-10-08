@@ -13,7 +13,6 @@
 #![cfg_attr(feature = "crown", feature(register_tool))]
 #![cfg_attr(feature = "crown", register_tool(crown))]
 
-
 //!
 //! This crate contains Rust bindings to the [SpiderMonkey Javascript engine][1]
 //! developed by Mozilla.

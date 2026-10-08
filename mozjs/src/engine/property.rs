@@ -49,7 +49,10 @@ impl Drop for Atom {
 
 impl Atom {
     pub unsafe fn from_cstr(cx: &Cx, name: *const c_char) -> Atom {
-        Atom { atom: q::JS_NewAtom(cx.qctx(), name), rt: cx.rt }
+        Atom {
+            atom: q::JS_NewAtom(cx.qctx(), name),
+            rt: cx.rt,
+        }
     }
 
     pub unsafe fn from_utf16(cx: &Cx, name: *const u16, len: usize) -> Atom {
@@ -63,7 +66,10 @@ impl Atom {
         let raw = name.symbol_;
         if raw != 0 && raw <= root::JS::SymbolCode::Limit as usize {
             let atom = well_known_symbol_atom(cx, raw - 1);
-            return Atom { atom: q::JS_DupAtom(cx.base_ctx, atom), rt: cx.rt };
+            return Atom {
+                atom: q::JS_DupAtom(cx.base_ctx, atom),
+                rt: cx.rt,
+            };
         }
         Atom::from_cstr(cx, name.string_)
     }
@@ -120,7 +126,10 @@ unsafe fn lookup_well_known_symbol_atom(cx: &mut Cx, code: usize) -> q::JSAtom {
     atom
 }
 
-pub(crate) unsafe fn GetWellKnownSymbol(cx: *mut root::JSContext, which: root::JS::SymbolCode) -> *mut root::JS::Symbol {
+pub(crate) unsafe fn GetWellKnownSymbol(
+    cx: *mut root::JSContext,
+    which: root::JS::SymbolCode,
+) -> *mut root::JS::Symbol {
     let cx = Cx::from_raw(cx);
     let atom = well_known_symbol_atom(cx, which as usize);
     super::atom_to_symbol_ptr(atom)
@@ -131,7 +140,12 @@ fn ok(status: c_int) -> bool {
     status >= 0
 }
 
-unsafe fn get(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, vp: root::JS::MutableHandleValue) -> bool {
+unsafe fn get(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let v = q::JS_GetProperty(cx.qctx(), obj_val(obj), atom);
     if v.tag() == q::JS_TAG_EXCEPTION {
         return false;
@@ -145,14 +159,40 @@ unsafe fn set(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, v: JSVal) 
     ok(q::JS_SetProperty(cx.qctx(), obj_val(obj), atom, v))
 }
 
-unsafe fn define_value(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, v: q::JSValue, attrs: c_uint) -> bool {
+unsafe fn define_value(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    v: q::JSValue,
+    attrs: c_uint,
+) -> bool {
     // JS_DefinePropertyValue consumes `v`.
-    ok(q::JS_DefinePropertyValue(cx.qctx(), obj_val(obj), atom, v, data_flags(attrs)))
+    ok(q::JS_DefinePropertyValue(
+        cx.qctx(),
+        obj_val(obj),
+        atom,
+        v,
+        data_flags(attrs),
+    ))
 }
 
-unsafe fn define_accessor(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, getter: q::JSValue, setter: q::JSValue, attrs: c_uint) -> bool {
+unsafe fn define_accessor(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    getter: q::JSValue,
+    setter: q::JSValue,
+    attrs: c_uint,
+) -> bool {
     // JS_DefinePropertyGetSet consumes `getter` and `setter`.
-    ok(q::JS_DefinePropertyGetSet(cx.qctx(), obj_val(obj), atom, getter, setter, accessor_flags(attrs)))
+    ok(q::JS_DefinePropertyGetSet(
+        cx.qctx(),
+        obj_val(obj),
+        atom,
+        getter,
+        setter,
+        accessor_flags(attrs),
+    ))
 }
 
 /// SetFunctionName with a prefix: `"get name"`, or `"get [description]"` for a symbol key. The
@@ -160,7 +200,11 @@ unsafe fn define_accessor(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom
 unsafe fn accessor_name(cx: &mut Cx, prefix: &str, name: q::JSAtom) -> q::JSAtom {
     let qctx = cx.qctx();
     let is_symbol = crate::sys::jsid::from_atom(name).is_symbol();
-    let key = if is_symbol { q::JS_AtomToValue(qctx, name) } else { q::JS_AtomToString(qctx, name) };
+    let key = if is_symbol {
+        q::JS_AtomToValue(qctx, name)
+    } else {
+        q::JS_AtomToString(qctx, name)
+    };
     let text = if is_symbol {
         let desc = q::JS_GetPropertyStr(qctx, key, c"description".as_ptr());
         let text = string_lossy(qctx, desc);
@@ -184,7 +228,13 @@ unsafe fn string_lossy(qctx: *mut q::JSContext, v: q::JSValue) -> String {
     text
 }
 
-unsafe fn native_fn(cx: &mut Cx, native: root::JSNative, info: *const root::JSJitInfo, nargs: u32, name: q::JSAtom) -> q::JSValue {
+unsafe fn native_fn(
+    cx: &mut Cx,
+    native: root::JSNative,
+    info: *const root::JSJitInfo,
+    nargs: u32,
+    name: q::JSAtom,
+) -> q::JSValue {
     if native.is_none() {
         return q::JS_UNDEFINED;
     }
@@ -193,27 +243,52 @@ unsafe fn native_fn(cx: &mut Cx, native: root::JSNative, info: *const root::JSJi
 
 unsafe fn handle_obj_val(cx: &Cx, h: root::JS::Handle<*mut root::JSObject>) -> q::JSValue {
     let o = *h.ptr;
-    if o.is_null() { q::JS_UNDEFINED } else { q::JS_DupValueRT(cx.rt, obj_val(o)) }
+    if o.is_null() {
+        q::JS_UNDEFINED
+    } else {
+        q::JS_DupValueRT(cx.rt, obj_val(o))
+    }
 }
 
-pub(crate) unsafe fn JS_GetProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, vp: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn JS_GetProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     get(cx, *obj.ptr, atom.atom, vp)
 }
 
-pub(crate) unsafe fn JS_GetPropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, vp: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn JS_GetPropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let cx = Cx::from_raw(cx);
     get(cx, *obj.ptr, (*id.ptr).to_atom(), vp)
 }
 
-pub(crate) unsafe fn JS_GetUCProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const u16, namelen: usize, vp: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn JS_GetUCProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const u16,
+    namelen: usize,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_utf16(cx, name, namelen);
     get(cx, *obj.ptr, atom.atom, vp)
 }
 
-pub(crate) unsafe fn JS_GetElement(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, index: u32, vp: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn JS_GetElement(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    index: u32,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = q::JS_GetPropertyUint32(cx.qctx(), obj_val(*obj.ptr), index);
     if v.tag() == q::JS_TAG_EXCEPTION {
@@ -223,27 +298,53 @@ pub(crate) unsafe fn JS_GetElement(cx: *mut root::JSContext, obj: root::JS::Hand
     true
 }
 
-pub(crate) unsafe fn JS_SetProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, v: root::JS::Handle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_SetProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    v: root::JS::Handle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     set(cx, *obj.ptr, atom.atom, *v.ptr)
 }
 
-pub(crate) unsafe fn JS_SetPropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, v: root::JS::Handle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_SetPropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    v: root::JS::Handle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     set(cx, *obj.ptr, (*id.ptr).to_atom(), *v.ptr)
 }
 
-pub(crate) unsafe fn JS_SetUCProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const u16, namelen: usize, v: root::JS::Handle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_SetUCProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const u16,
+    namelen: usize,
+    v: root::JS::Handle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_utf16(cx, name, namelen);
     set(cx, *obj.ptr, atom.atom, *v.ptr)
 }
 
-pub(crate) unsafe fn JS_SetElement(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, index: u32, v: root::JS::Handle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_SetElement(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    index: u32,
+    v: root::JS::Handle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = q::JS_DupValueRT(cx.rt, (*v.ptr).to_qjs());
-    ok(q::JS_SetPropertyUint32(cx.qctx(), obj_val(*obj.ptr), index, v))
+    ok(q::JS_SetPropertyUint32(
+        cx.qctx(),
+        obj_val(*obj.ptr),
+        index,
+        v,
+    ))
 }
 
 unsafe fn has(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, foundp: *mut bool) -> bool {
@@ -255,7 +356,12 @@ unsafe fn has(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, foundp: *m
     true
 }
 
-unsafe fn has_own(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, foundp: *mut bool) -> bool {
+unsafe fn has_own(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    foundp: *mut bool,
+) -> bool {
     let r = q::JS_GetOwnProperty(cx.qctx(), ptr::null_mut(), obj_val(obj), atom);
     if r < 0 {
         return false;
@@ -264,33 +370,63 @@ unsafe fn has_own(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, foundp
     true
 }
 
-pub(crate) unsafe fn JS_HasProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, foundp: *mut bool) -> bool {
+pub(crate) unsafe fn JS_HasProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    foundp: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     has(cx, *obj.ptr, atom.atom, foundp)
 }
 
-pub(crate) unsafe fn JS_HasPropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, foundp: *mut bool) -> bool {
+pub(crate) unsafe fn JS_HasPropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    foundp: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     has(cx, *obj.ptr, (*id.ptr).to_atom(), foundp)
 }
 
-pub(crate) unsafe fn JS_HasOwnProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, foundp: *mut bool) -> bool {
+pub(crate) unsafe fn JS_HasOwnProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    foundp: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     has_own(cx, *obj.ptr, atom.atom, foundp)
 }
 
-pub(crate) unsafe fn JS_HasOwnPropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, foundp: *mut bool) -> bool {
+pub(crate) unsafe fn JS_HasOwnPropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    foundp: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     has_own(cx, *obj.ptr, (*id.ptr).to_atom(), foundp)
 }
 
-pub(crate) unsafe fn JS_AlreadyHasOwnPropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, foundp: *mut bool) -> bool {
+pub(crate) unsafe fn JS_AlreadyHasOwnPropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    foundp: *mut bool,
+) -> bool {
     JS_HasOwnPropertyById(cx, obj, id, foundp)
 }
 
-unsafe fn delete(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, result: *mut root::JS::ObjectOpResult) -> bool {
+unsafe fn delete(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    result: *mut root::JS::ObjectOpResult,
+) -> bool {
     let r = q::JS_DeleteProperty(cx.qctx(), obj_val(obj), atom, 0);
     if r < 0 {
         return false;
@@ -303,27 +439,50 @@ unsafe fn delete(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, result:
     true
 }
 
-pub(crate) unsafe fn JS_DeleteProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, result: *mut root::JS::ObjectOpResult) -> bool {
+pub(crate) unsafe fn JS_DeleteProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    result: *mut root::JS::ObjectOpResult,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     delete(cx, *obj.ptr, atom.atom, result)
 }
 
-pub(crate) unsafe fn JS_DeletePropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, result: *mut root::JS::ObjectOpResult) -> bool {
+pub(crate) unsafe fn JS_DeletePropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    result: *mut root::JS::ObjectOpResult,
+) -> bool {
     let cx = Cx::from_raw(cx);
     delete(cx, *obj.ptr, (*id.ptr).to_atom(), result)
 }
 
 // Definitions by name.
 
-pub(crate) unsafe fn JS_DefineProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, value: root::JS::Handle<root::JS::Value>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    value: root::JS::Handle<root::JS::Value>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     let v = q::JS_DupValueRT(cx.rt, (*value.ptr).to_qjs());
     define_value(cx, *obj.ptr, atom.atom, v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineProperty1(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, getter: root::JSNative, setter: root::JSNative, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty1(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    getter: root::JSNative,
+    setter: root::JSNative,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     let g = native_fn(cx, getter, ptr::null(), 0, atom.atom);
@@ -331,7 +490,14 @@ pub(crate) unsafe fn JS_DefineProperty1(cx: *mut root::JSContext, obj: root::JS:
     define_accessor(cx, *obj.ptr, atom.atom, g, s, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineProperty2(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, getter: root::JS::Handle<*mut root::JSObject>, setter: root::JS::Handle<*mut root::JSObject>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty2(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    getter: root::JS::Handle<*mut root::JSObject>,
+    setter: root::JS::Handle<*mut root::JSObject>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     let g = handle_obj_val(cx, getter);
@@ -339,47 +505,111 @@ pub(crate) unsafe fn JS_DefineProperty2(cx: *mut root::JSContext, obj: root::JS:
     define_accessor(cx, *obj.ptr, atom.atom, g, s, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineProperty3(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, value: root::JS::Handle<*mut root::JSObject>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty3(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    value: root::JS::Handle<*mut root::JSObject>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     let v = handle_obj_val(cx, value);
     define_value(cx, *obj.ptr, atom.atom, v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineProperty4(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, value: root::JS::Handle<*mut root::JSString>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty4(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    value: root::JS::Handle<*mut root::JSString>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
-    let v = q::JS_DupValueRT(cx.rt, q::JSValue::mkptr(q::JS_TAG_STRING, *value.ptr as *mut _));
+    let v = q::JS_DupValueRT(
+        cx.rt,
+        q::JSValue::mkptr(q::JS_TAG_STRING, *value.ptr as *mut _),
+    );
     define_value(cx, *obj.ptr, atom.atom, v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineProperty5(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, value: i32, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty5(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    value: i32,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
-    define_value(cx, *obj.ptr, atom.atom, q::JS_NewInt32(cx.qctx(), value), attrs)
+    define_value(
+        cx,
+        *obj.ptr,
+        atom.atom,
+        q::JS_NewInt32(cx.qctx(), value),
+        attrs,
+    )
 }
 
-pub(crate) unsafe fn JS_DefineProperty6(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, value: u32, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty6(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    value: u32,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
-    define_value(cx, *obj.ptr, atom.atom, q::JS_NewUint32(cx.qctx(), value), attrs)
+    define_value(
+        cx,
+        *obj.ptr,
+        atom.atom,
+        q::JS_NewUint32(cx.qctx(), value),
+        attrs,
+    )
 }
 
-pub(crate) unsafe fn JS_DefineProperty7(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, value: f64, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineProperty7(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    value: f64,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
-    define_value(cx, *obj.ptr, atom.atom, q::JS_NewFloat64(cx.qctx(), value), attrs)
+    define_value(
+        cx,
+        *obj.ptr,
+        atom.atom,
+        q::JS_NewFloat64(cx.qctx(), value),
+        attrs,
+    )
 }
 
 // Definitions by id.
 
-pub(crate) unsafe fn JS_DefinePropertyById2(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, value: root::JS::Handle<root::JS::Value>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById2(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    value: root::JS::Handle<root::JS::Value>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = q::JS_DupValueRT(cx.rt, (*value.ptr).to_qjs());
     define_value(cx, *obj.ptr, (*id.ptr).to_atom(), v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById3(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, getter: root::JSNative, setter: root::JSNative, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById3(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    getter: root::JSNative,
+    setter: root::JSNative,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = (*id.ptr).to_atom();
     let g = native_fn(cx, getter, ptr::null(), 0, atom);
@@ -387,47 +617,99 @@ pub(crate) unsafe fn JS_DefinePropertyById3(cx: *mut root::JSContext, obj: root:
     define_accessor(cx, *obj.ptr, atom, g, s, attrs)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById4(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, getter: root::JS::Handle<*mut root::JSObject>, setter: root::JS::Handle<*mut root::JSObject>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById4(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    getter: root::JS::Handle<*mut root::JSObject>,
+    setter: root::JS::Handle<*mut root::JSObject>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let g = handle_obj_val(cx, getter);
     let s = handle_obj_val(cx, setter);
     define_accessor(cx, *obj.ptr, (*id.ptr).to_atom(), g, s, attrs)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById5(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, value: root::JS::Handle<*mut root::JSObject>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById5(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    value: root::JS::Handle<*mut root::JSObject>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = handle_obj_val(cx, value);
     define_value(cx, *obj.ptr, (*id.ptr).to_atom(), v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById6(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, value: root::JS::Handle<*mut root::JSString>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById6(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    value: root::JS::Handle<*mut root::JSString>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
-    let v = q::JS_DupValueRT(cx.rt, q::JSValue::mkptr(q::JS_TAG_STRING, *value.ptr as *mut _));
+    let v = q::JS_DupValueRT(
+        cx.rt,
+        q::JSValue::mkptr(q::JS_TAG_STRING, *value.ptr as *mut _),
+    );
     define_value(cx, *obj.ptr, (*id.ptr).to_atom(), v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById7(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, value: i32, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById7(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    value: i32,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = q::JS_NewInt32(cx.qctx(), value);
     define_value(cx, *obj.ptr, (*id.ptr).to_atom(), v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById8(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, value: u32, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById8(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    value: u32,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = q::JS_NewUint32(cx.qctx(), value);
     define_value(cx, *obj.ptr, (*id.ptr).to_atom(), v, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineElement(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, index: u32, value: root::JS::Handle<root::JS::Value>, attrs: ::std::os::raw::c_uint) -> bool {
+pub(crate) unsafe fn JS_DefineElement(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    index: u32,
+    value: root::JS::Handle<root::JS::Value>,
+    attrs: ::std::os::raw::c_uint,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let v = q::JS_DupValueRT(cx.rt, (*value.ptr).to_qjs());
-    ok(q::JS_DefinePropertyValueUint32(cx.qctx(), obj_val(*obj.ptr), index, v, data_flags(attrs)))
+    ok(q::JS_DefinePropertyValueUint32(
+        cx.qctx(),
+        obj_val(*obj.ptr),
+        index,
+        v,
+        data_flags(attrs),
+    ))
 }
 
 // Property descriptors.
 
 /// Defines a property from a SpiderMonkey descriptor (`[[DefineOwnProperty]]`).
-unsafe fn define_desc(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, desc: &root::JS::PropertyDescriptor, result: *mut root::JS::ObjectOpResult) -> bool {
+unsafe fn define_desc(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    desc: &root::JS::PropertyDescriptor,
+    result: *mut root::JS::ObjectOpResult,
+) -> bool {
     let mut flags = 0;
     if desc.hasConfigurable_() {
         flags |= q::JS_PROP_HAS_CONFIGURABLE;
@@ -467,7 +749,15 @@ unsafe fn define_desc(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, de
         }
     }
     // Without JS_PROP_THROW a rejected definition returns 0, which maps to ObjectOpResult.
-    let r = q::JS_DefineProperty(cx.qctx(), obj_val(obj), atom, value, getter, setter, flags as c_int);
+    let r = q::JS_DefineProperty(
+        cx.qctx(),
+        obj_val(obj),
+        atom,
+        value,
+        getter,
+        setter,
+        flags as c_int,
+    );
     if r < 0 {
         return false;
     }
@@ -479,12 +769,23 @@ unsafe fn define_desc(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, de
     true
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, desc: root::JS::Handle<root::JS::PropertyDescriptor>, result: *mut root::JS::ObjectOpResult) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    desc: root::JS::Handle<root::JS::PropertyDescriptor>,
+    result: *mut root::JS::ObjectOpResult,
+) -> bool {
     let cx = Cx::from_raw(cx);
     define_desc(cx, *obj.ptr, (*id.ptr).to_atom(), &*desc.ptr, result)
 }
 
-pub(crate) unsafe fn JS_DefinePropertyById1(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, desc: root::JS::Handle<root::JS::PropertyDescriptor>) -> bool {
+pub(crate) unsafe fn JS_DefinePropertyById1(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    desc: root::JS::Handle<root::JS::PropertyDescriptor>,
+) -> bool {
     let mut result = root::JS::ObjectOpResult { code_: 0 };
     let cx = Cx::from_raw(cx);
     if !define_desc(cx, *obj.ptr, (*id.ptr).to_atom(), &*desc.ptr, &mut result) {
@@ -497,14 +798,25 @@ pub(crate) unsafe fn JS_DefinePropertyById1(cx: *mut root::JSContext, obj: root:
     true
 }
 
-pub(crate) unsafe fn JS_DefineUCProperty(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const u16, namelen: usize, desc: root::JS::Handle<root::JS::PropertyDescriptor>, result: *mut root::JS::ObjectOpResult) -> bool {
+pub(crate) unsafe fn JS_DefineUCProperty(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const u16,
+    namelen: usize,
+    desc: root::JS::Handle<root::JS::PropertyDescriptor>,
+    result: *mut root::JS::ObjectOpResult,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_utf16(cx, name, namelen);
     define_desc(cx, *obj.ptr, atom.atom, &*desc.ptr, result)
 }
 
 /// Fills a SpiderMonkey descriptor from a QuickJS one (taking over its references via the pool).
-unsafe fn to_sm_desc(cx: &mut Cx, qd: &q::JSPropertyDescriptor, out: &mut root::JS::PropertyDescriptor) {
+unsafe fn to_sm_desc(
+    cx: &mut Cx,
+    qd: &q::JSPropertyDescriptor,
+    out: &mut root::JS::PropertyDescriptor,
+) {
     *out = std::mem::zeroed();
     let flags = qd.flags as u32;
     out.set_hasConfigurable_(true);
@@ -516,8 +828,16 @@ unsafe fn to_sm_desc(cx: &mut Cx, qd: &q::JSPropertyDescriptor, out: &mut root::
         out.set_hasSetter_(true);
         let g = cx.adopt(qd.getter);
         let s = cx.adopt(qd.setter);
-        out.getter_ = if g.is_object() { g.to_object() } else { ptr::null_mut() };
-        out.setter_ = if s.is_object() { s.to_object() } else { ptr::null_mut() };
+        out.getter_ = if g.is_object() {
+            g.to_object()
+        } else {
+            ptr::null_mut()
+        };
+        out.setter_ = if s.is_object() {
+            s.to_object()
+        } else {
+            ptr::null_mut()
+        };
         q::JS_FreeValueRT(cx.rt, qd.value);
     } else {
         out.set_hasWritable_(true);
@@ -529,7 +849,13 @@ unsafe fn to_sm_desc(cx: &mut Cx, qd: &q::JSPropertyDescriptor, out: &mut root::
     }
 }
 
-unsafe fn own_desc(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, isNone: *mut bool) -> bool {
+unsafe fn own_desc(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    isNone: *mut bool,
+) -> bool {
     let mut qd: q::JSPropertyDescriptor = std::mem::zeroed();
     let r = q::JS_GetOwnProperty(cx.qctx(), &mut qd, obj_val(obj), atom);
     if r < 0 {
@@ -542,7 +868,14 @@ unsafe fn own_desc(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, desc:
     true
 }
 
-unsafe fn desc_on_chain(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, holder: root::JS::MutableHandle<*mut root::JSObject>, isNone: *mut bool) -> bool {
+unsafe fn desc_on_chain(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    holder: root::JS::MutableHandle<*mut root::JSObject>,
+    isNone: *mut bool,
+) -> bool {
     let mut current = obj;
     loop {
         if !own_desc(cx, current, atom, desc, isNone) {
@@ -565,23 +898,49 @@ unsafe fn desc_on_chain(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, 
     }
 }
 
-pub(crate) unsafe fn JS_GetOwnPropertyDescriptorById(cx: *mut root::JSContext, obj: root::JS::HandleObject, id: root::JS::HandleId, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, isNone: *mut bool) -> bool {
+pub(crate) unsafe fn JS_GetOwnPropertyDescriptorById(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+    id: root::JS::HandleId,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    isNone: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     own_desc(cx, *obj.ptr, (*id.ptr).to_atom(), desc, isNone)
 }
 
-pub(crate) unsafe fn JS_GetOwnPropertyDescriptor(cx: *mut root::JSContext, obj: root::JS::HandleObject, name: *const ::std::os::raw::c_char, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, isNone: *mut bool) -> bool {
+pub(crate) unsafe fn JS_GetOwnPropertyDescriptor(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+    name: *const ::std::os::raw::c_char,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    isNone: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     own_desc(cx, *obj.ptr, atom.atom, desc, isNone)
 }
 
-pub(crate) unsafe fn JS_GetPropertyDescriptorById(cx: *mut root::JSContext, obj: root::JS::HandleObject, id: root::JS::HandleId, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, holder: root::JS::MutableHandleObject, isNone: *mut bool) -> bool {
+pub(crate) unsafe fn JS_GetPropertyDescriptorById(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+    id: root::JS::HandleId,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    holder: root::JS::MutableHandleObject,
+    isNone: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     desc_on_chain(cx, *obj.ptr, (*id.ptr).to_atom(), desc, holder, isNone)
 }
 
-pub(crate) unsafe fn JS_GetPropertyDescriptor(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, holder: root::JS::MutableHandle<*mut root::JSObject>, isNone: *mut bool) -> bool {
+pub(crate) unsafe fn JS_GetPropertyDescriptor(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    holder: root::JS::MutableHandle<*mut root::JSObject>,
+    isNone: *mut bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     desc_on_chain(cx, *obj.ptr, atom.atom, desc, holder, isNone)
@@ -589,38 +948,91 @@ pub(crate) unsafe fn JS_GetPropertyDescriptor(cx: *mut root::JSContext, obj: roo
 
 // Prototypes.
 
-pub(crate) unsafe fn JS_GetPrototype(cx: *mut root::JSContext, obj: root::JS::HandleObject, result: root::JS::MutableHandleObject) -> bool {
+pub(crate) unsafe fn JS_GetPrototype(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+    result: root::JS::MutableHandleObject,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let proto = q::JS_GetPrototype(cx.qctx(), obj_val(*obj.ptr));
     if proto.tag() == q::JS_TAG_EXCEPTION {
         return false;
     }
     let proto = cx.adopt(proto);
-    *result.ptr = if proto.is_object() { proto.to_object() } else { ptr::null_mut() };
+    *result.ptr = if proto.is_object() {
+        proto.to_object()
+    } else {
+        ptr::null_mut()
+    };
     true
 }
 
-pub(crate) unsafe fn JS_SetPrototype(cx: *mut root::JSContext, obj: root::JS::HandleObject, proto: root::JS::HandleObject) -> bool {
+pub(crate) unsafe fn JS_SetPrototype(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+    proto: root::JS::HandleObject,
+) -> bool {
     let cx = Cx::from_raw(cx);
-    let p = if (*proto.ptr).is_null() { q::JS_NULL } else { obj_val(*proto.ptr) };
+    let p = if (*proto.ptr).is_null() {
+        q::JS_NULL
+    } else {
+        obj_val(*proto.ptr)
+    };
     ok(q::JS_SetPrototype(cx.qctx(), obj_val(*obj.ptr), p))
 }
 
 // Functions and specs.
 
-pub(crate) unsafe fn JS_DefineFunction(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, call: root::JSNative, nargs: ::std::os::raw::c_uint, attrs: ::std::os::raw::c_uint) -> *mut root::JSFunction {
+pub(crate) unsafe fn JS_DefineFunction(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    call: root::JSNative,
+    nargs: ::std::os::raw::c_uint,
+    attrs: ::std::os::raw::c_uint,
+) -> *mut root::JSFunction {
     let cx = Cx::from_raw(cx);
     let atom = Atom::from_cstr(cx, name);
     define_function(cx, *obj.ptr, atom.atom, call, ptr::null(), nargs, attrs)
 }
 
-pub(crate) unsafe fn JS_DefineFunctionById(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, id: root::JS::Handle<root::jsid>, call: root::JSNative, nargs: ::std::os::raw::c_uint, attrs: ::std::os::raw::c_uint) -> *mut root::JSFunction {
+pub(crate) unsafe fn JS_DefineFunctionById(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    id: root::JS::Handle<root::jsid>,
+    call: root::JSNative,
+    nargs: ::std::os::raw::c_uint,
+    attrs: ::std::os::raw::c_uint,
+) -> *mut root::JSFunction {
     let cx = Cx::from_raw(cx);
-    define_function(cx, *obj.ptr, (*id.ptr).to_atom(), call, ptr::null(), nargs, attrs)
+    define_function(
+        cx,
+        *obj.ptr,
+        (*id.ptr).to_atom(),
+        call,
+        ptr::null(),
+        nargs,
+        attrs,
+    )
 }
 
-unsafe fn define_function(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, call: root::JSNative, info: *const root::JSJitInfo, nargs: c_uint, attrs: c_uint) -> *mut root::JSFunction {
-    let f = new_function(cx, call, info, nargs, attrs & root::JSFUN_CONSTRUCTOR != 0, atom);
+unsafe fn define_function(
+    cx: &mut Cx,
+    obj: *mut root::JSObject,
+    atom: q::JSAtom,
+    call: root::JSNative,
+    info: *const root::JSJitInfo,
+    nargs: c_uint,
+    attrs: c_uint,
+) -> *mut root::JSFunction {
+    let f = new_function(
+        cx,
+        call,
+        info,
+        nargs,
+        attrs & root::JSFUN_CONSTRUCTOR != 0,
+        atom,
+    );
     if f.tag() == q::JS_TAG_EXCEPTION {
         return ptr::null_mut();
     }
@@ -650,7 +1062,11 @@ unsafe fn self_hosted(cx: &mut Cx, name: *const c_char) -> q::JSValue {
     f
 }
 
-pub(crate) unsafe fn JS_DefineFunctions(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, fs: *const root::JSFunctionSpec) -> bool {
+pub(crate) unsafe fn JS_DefineFunctions(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    fs: *const root::JSFunctionSpec,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let mut spec = fs;
     while !(*spec).name.string_.is_null() {
@@ -662,7 +1078,17 @@ pub(crate) unsafe fn JS_DefineFunctions(cx: *mut root::JSContext, obj: root::JS:
             if !define_value(cx, *obj.ptr, atom.atom, f, attrs) {
                 return false;
             }
-        } else if define_function(cx, *obj.ptr, atom.atom, s.call.op, s.call.info, s.nargs as c_uint, attrs).is_null() {
+        } else if define_function(
+            cx,
+            *obj.ptr,
+            atom.atom,
+            s.call.op,
+            s.call.info,
+            s.nargs as c_uint,
+            attrs,
+        )
+        .is_null()
+        {
             return false;
         }
         spec = spec.add(1);
@@ -670,7 +1096,11 @@ pub(crate) unsafe fn JS_DefineFunctions(cx: *mut root::JSContext, obj: root::JS:
     true
 }
 
-pub(crate) unsafe fn JS_DefineProperties(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, ps: *const root::JSPropertySpec) -> bool {
+pub(crate) unsafe fn JS_DefineProperties(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    ps: *const root::JSPropertySpec,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let mut spec = ps;
     while !(*spec).name.string_.is_null() {
@@ -688,17 +1118,25 @@ pub(crate) unsafe fn JS_DefineProperties(cx: *mut root::JSContext, obj: root::JS
                 q::JS_FreeAtomRT(cx.rt, get_name);
                 q::JS_FreeAtomRT(cx.rt, set_name);
                 define_accessor(cx, *obj.ptr, atom.atom, g, st, attrs)
-            },
+            }
             root::JSPropertySpec_Kind::Value => {
                 let w = &s.u.value;
                 let v = match w.type_ {
-                    root::JSPropertySpec_ValueWrapper_Type::String => q::JS_NewString(cx.qctx(), w.__bindgen_anon_1.string),
-                    root::JSPropertySpec_ValueWrapper_Type::Int32 => q::JS_NewInt32(cx.qctx(), w.__bindgen_anon_1.int32),
-                    root::JSPropertySpec_ValueWrapper_Type::Double => q::JS_NewFloat64(cx.qctx(), w.__bindgen_anon_1.double_),
+                    root::JSPropertySpec_ValueWrapper_Type::String => {
+                        q::JS_NewString(cx.qctx(), w.__bindgen_anon_1.string)
+                    }
+                    root::JSPropertySpec_ValueWrapper_Type::Int32 => {
+                        q::JS_NewInt32(cx.qctx(), w.__bindgen_anon_1.int32)
+                    }
+                    root::JSPropertySpec_ValueWrapper_Type::Double => {
+                        q::JS_NewFloat64(cx.qctx(), w.__bindgen_anon_1.double_)
+                    }
                 };
                 define_value(cx, *obj.ptr, atom.atom, v, attrs)
-            },
-            root::JSPropertySpec_Kind::SelfHostedAccessor => panic!("self-hosted accessors are not supported"),
+            }
+            root::JSPropertySpec_Kind::SelfHostedAccessor => {
+                panic!("self-hosted accessors are not supported")
+            }
         };
         if !ok {
             return false;
@@ -718,7 +1156,13 @@ unsafe fn args_vec(args: *const root::JS::HandleValueArray) -> Vec<q::JSValue> {
     elems.iter().map(|v| v.to_qjs()).collect()
 }
 
-unsafe fn call(cx: &mut Cx, fun: q::JSValue, this: q::JSValue, args: *const root::JS::HandleValueArray, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+unsafe fn call(
+    cx: &mut Cx,
+    fun: q::JSValue,
+    this: q::JSValue,
+    args: *const root::JS::HandleValueArray,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let mut argv = args_vec(args);
     let r = q::JS_Call(cx.qctx(), fun, this, argv.len() as c_int, argv.as_mut_ptr());
     if r.tag() == q::JS_TAG_EXCEPTION {
@@ -728,18 +1172,40 @@ unsafe fn call(cx: &mut Cx, fun: q::JSValue, this: q::JSValue, args: *const root
     true
 }
 
-pub(crate) unsafe fn Call(cx: *mut root::JSContext, thisv: root::JS::Handle<root::JS::Value>, fun: root::JS::Handle<root::JS::Value>, args: *const root::JS::HandleValueArray, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn Call(
+    cx: *mut root::JSContext,
+    thisv: root::JS::Handle<root::JS::Value>,
+    fun: root::JS::Handle<root::JS::Value>,
+    args: *const root::JS::HandleValueArray,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     call(cx, (*fun.ptr).to_qjs(), (*thisv.ptr).to_qjs(), args, rval)
 }
 
-pub(crate) unsafe fn JS_CallFunctionValue(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, fval: root::JS::Handle<root::JS::Value>, args: *const root::JS::HandleValueArray, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_CallFunctionValue(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    fval: root::JS::Handle<root::JS::Value>,
+    args: *const root::JS::HandleValueArray,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
-    let this = if (*obj.ptr).is_null() { q::JS_UNDEFINED } else { obj_val(*obj.ptr) };
+    let this = if (*obj.ptr).is_null() {
+        q::JS_UNDEFINED
+    } else {
+        obj_val(*obj.ptr)
+    };
     call(cx, (*fval.ptr).to_qjs(), this, args, rval)
 }
 
-pub(crate) unsafe fn JS_CallFunctionName(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, name: *const ::std::os::raw::c_char, args: *const root::JS::HandleValueArray, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_CallFunctionName(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+    args: *const root::JS::HandleValueArray,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let this = obj_val(*obj.ptr);
     let f = q::JS_GetPropertyStr(cx.qctx(), this, name);
@@ -750,11 +1216,27 @@ pub(crate) unsafe fn JS_CallFunctionName(cx: *mut root::JSContext, obj: root::JS
     call(cx, f.to_qjs(), this, args, rval)
 }
 
-pub(crate) unsafe fn Construct(cx: *mut root::JSContext, fun: root::JS::Handle<root::JS::Value>, newTarget: root::JS::Handle<*mut root::JSObject>, args: *const root::JS::HandleValueArray, objp: root::JS::MutableHandle<*mut root::JSObject>) -> bool {
+pub(crate) unsafe fn Construct(
+    cx: *mut root::JSContext,
+    fun: root::JS::Handle<root::JS::Value>,
+    newTarget: root::JS::Handle<*mut root::JSObject>,
+    args: *const root::JS::HandleValueArray,
+    objp: root::JS::MutableHandle<*mut root::JSObject>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let mut argv = args_vec(args);
-    let target = if (*newTarget.ptr).is_null() { (*fun.ptr).to_qjs() } else { obj_val(*newTarget.ptr) };
-    let r = q::JS_CallConstructor2(cx.qctx(), (*fun.ptr).to_qjs(), target, argv.len() as c_int, argv.as_mut_ptr());
+    let target = if (*newTarget.ptr).is_null() {
+        (*fun.ptr).to_qjs()
+    } else {
+        obj_val(*newTarget.ptr)
+    };
+    let r = q::JS_CallConstructor2(
+        cx.qctx(),
+        (*fun.ptr).to_qjs(),
+        target,
+        argv.len() as c_int,
+        argv.as_mut_ptr(),
+    );
     if r.tag() == q::JS_TAG_EXCEPTION {
         return false;
     }
@@ -762,7 +1244,11 @@ pub(crate) unsafe fn Construct(cx: *mut root::JSContext, fun: root::JS::Handle<r
     true
 }
 
-pub(crate) unsafe fn JS_ValueToObject(cx: *mut root::JSContext, v: root::JS::HandleValue, objp: root::JS::MutableHandleObject) -> bool {
+pub(crate) unsafe fn JS_ValueToObject(
+    cx: *mut root::JSContext,
+    v: root::JS::HandleValue,
+    objp: root::JS::MutableHandleObject,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let qctx = cx.qctx();
     let global = q::JS_GetGlobalObject(qctx);
@@ -784,7 +1270,11 @@ pub(crate) unsafe fn JS_ValueToObject(cx: *mut root::JSContext, v: root::JS::Han
     true
 }
 
-pub(crate) unsafe fn GetArrayLength(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, lengthp: *mut u32) -> bool {
+pub(crate) unsafe fn GetArrayLength(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    lengthp: *mut u32,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let len = q::JS_GetPropertyStr(cx.qctx(), obj_val(*obj.ptr), c"length".as_ptr());
     if len.tag() == q::JS_TAG_EXCEPTION {

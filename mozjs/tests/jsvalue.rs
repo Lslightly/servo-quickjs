@@ -5,6 +5,7 @@
 use std::ptr;
 
 use mozjs::jsapi::OnNewGlobalHookOption;
+use mozjs::jsval::JSVal;
 use mozjs::jsval::{BooleanValue, DoubleValue, Int32Value, NullValue, UndefinedValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
@@ -12,7 +13,6 @@ use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
 use mozjs::rust::{
     HandleObject, JSEngine, RealmOptions, RootedGuard, Runtime, SIMPLE_GLOBAL_CLASS,
 };
-use mozjs::jsval::JSVal;
 
 unsafe fn tester<F: Fn(RootedGuard<JSVal>)>(
     rt: &mut Runtime,

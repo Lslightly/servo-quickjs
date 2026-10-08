@@ -17,8 +17,8 @@
 //! References to realms (QuickJS contexts) held by the shim's objects are checked the same way.
 
 use std::cell::RefCell;
-use std::sync::atomic::{AtomicU8, Ordering};
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU8, Ordering};
 
 use servo_quickjs as q;
 
@@ -47,7 +47,7 @@ fn enabled() -> bool {
             let enabled = std::env::var_os("QJS_VERIFY_TRACING").is_some_and(|v| v != "0");
             ENABLED.store(if enabled { 2 } else { 1 }, Ordering::Relaxed);
             enabled
-        },
+        }
         state => state == 2,
     }
 }

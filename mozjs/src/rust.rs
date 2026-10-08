@@ -67,10 +67,10 @@ use crate::jsapi::{SetWarningReporter, SourceText, ToBooleanSlow};
 use crate::jsval::{JSVal, ObjectValue, UndefinedValue};
 use crate::panic::maybe_resume_unwind;
 use crate::realm::AutoRealm;
-use log::{debug, warn};
 use crate::sys::jsapi::JS::SavedFrameResult;
 pub use crate::sys::jsgc::{GCMethods, IntoHandle, IntoMutableHandle};
 pub use crate::sys::trace::Traceable as Trace;
+use log::{debug, warn};
 
 use crate::rooted;
 

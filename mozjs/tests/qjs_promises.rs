@@ -309,8 +309,14 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
             0
         ));
         for (source, realm) in [
-            ("Promise.resolve(1).then(other.Function('return 1'))", other.get()),
-            ("Promise.resolve({ then: other.Function('resolve', 'resolve(1)') })", other.get()),
+            (
+                "Promise.resolve(1).then(other.Function('return 1'))",
+                other.get(),
+            ),
+            (
+                "Promise.resolve({ then: other.Function('resolve', 'resolve(1)') })",
+                other.get(),
+            ),
             ("Promise.resolve(1).then(() => 1)", global.get()),
         ] {
             eval(cx, global, source).unwrap();
@@ -412,7 +418,14 @@ fn rejection_tracker(cx: &mut JSContext, global: SafeHandleObject) {
         rooted!(&in(cx) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(cx, c"cross-origin.js".to_owned(), 1);
         (*options.ptr)._base.mutedErrors_ = true;
-        evaluate_script(cx, global, "Promise.reject(4); eval('Promise.reject(5)')", rval.handle_mut(), options).unwrap();
+        evaluate_script(
+            cx,
+            global,
+            "Promise.reject(4); eval('Promise.reject(5)')",
+            rval.handle_mut(),
+            options,
+        )
+        .unwrap();
         eval(cx, global, "Promise.reject(6)").unwrap();
         assert_eq!(MUTED.with(|m| m.borrow().clone()), [true, true, false]);
 
@@ -425,11 +438,20 @@ fn rejection_tracker(cx: &mut JSContext, global: SafeHandleObject) {
             &*RealmOptions::default(),
         ));
         let other_val = ObjectValue(other.get());
-        assert!(jsapi::JS_DefineProperty(cx.raw_cx(), handle(&global.get()), c"other".as_ptr(), handle(&other_val), 0));
+        assert!(jsapi::JS_DefineProperty(
+            cx.raw_cx(),
+            handle(&global.get()),
+            c"other".as_ptr(),
+            handle(&other_val),
+            0
+        ));
         TRACKER_GLOBALS.with(|g| g.borrow_mut().clear());
         eval(cx, global, "new other.Promise((_, reject) => reject(7))").unwrap();
         eval(cx, global, "Promise.reject(8)").unwrap();
-        assert_eq!(TRACKER_GLOBALS.with(|g| g.borrow().clone()), [other.get(), global.get()]);
+        assert_eq!(
+            TRACKER_GLOBALS.with(|g| g.borrow().clone()),
+            [other.get(), global.get()]
+        );
         jsapi::SetPromiseRejectionTrackerCallback(cx.raw_cx(), None, ptr::null_mut());
     }
 }

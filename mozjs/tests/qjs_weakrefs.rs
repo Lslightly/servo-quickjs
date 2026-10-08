@@ -10,11 +10,13 @@ use std::ptr;
 use std::sync::atomic::{AtomicPtr, Ordering};
 
 use mozjs::glue::CallValueTracer;
-use mozjs::jsapi::{GCReason, Heap, JSClass, JSClassOps, JSObject, JSTracer, OnNewGlobalHookOption};
+use mozjs::jsapi::{
+    GCReason, Heap, JSClass, JSClassOps, JSObject, JSTracer, OnNewGlobalHookOption,
+};
 use mozjs::jsval::{JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_GC, JS_NewGlobalObject, JS_NewObject, JS_SetProperty};
+use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewObject, JS_SetProperty, JS_GC};
 use mozjs::rust::{
     evaluate_script, CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
 };
@@ -82,7 +84,12 @@ fn freed_target_is_not_live() {
             // target.holder = holder, and the holder's Rust field counts and traces the target.
             rooted!(&in(cx) let target = eval(cx, "(() => { const target = {}; globalThis.ref = new WeakRef(target); return target; })()").to_object());
             rooted!(&in(cx) let holder = ObjectValue(JS_NewObject(cx, &HOLDER_CLASS)));
-            assert!(JS_SetProperty(cx, target.handle(), c"holder".as_ptr(), holder.handle()));
+            assert!(JS_SetProperty(
+                cx,
+                target.handle(),
+                c"holder".as_ptr(),
+                holder.handle()
+            ));
             FIELD.with(|field| *field.borrow_mut() = Some(Heap::boxed(ObjectValue(target.get()))));
         }
         mozjs::quickjs::drain_autorelease_pool();
@@ -95,7 +102,10 @@ fn freed_target_is_not_live() {
         mozjs::quickjs::drain_autorelease_pool();
         JS_GC(cx, GCReason::API);
         FIELD.with(|field| {
-            LEFT_OVER.store(Box::into_raw(field.borrow_mut().take().unwrap()), Ordering::Relaxed)
+            LEFT_OVER.store(
+                Box::into_raw(field.borrow_mut().take().unwrap()),
+                Ordering::Relaxed,
+            )
         });
     }
 }

@@ -25,14 +25,19 @@ const COLLATOR: usize = 0;
 const NUMBER_FORMAT: usize = 1;
 const DATE_TIME_FORMAT: usize = 2;
 const NAMES: [&CStr; 3] = [c"Collator", c"NumberFormat", c"DateTimeFormat"];
-const TAGS: [&CStr; 3] = [c"Intl.Collator", c"Intl.NumberFormat", c"Intl.DateTimeFormat"];
+const TAGS: [&CStr; 3] = [
+    c"Intl.Collator",
+    c"Intl.NumberFormat",
+    c"Intl.DateTimeFormat",
+];
 
 const CLASS_NUMBER: q::JSClassID = 4;
 const CLASS_STRING: q::JSClassID = 5;
 const CLASS_DATE: q::JSClassID = 10;
 
 const METHOD: c_int = (q::JS_PROP_WRITABLE | q::JS_PROP_CONFIGURABLE) as c_int;
-const DATA: c_int = (q::JS_PROP_WRITABLE | q::JS_PROP_CONFIGURABLE | q::JS_PROP_ENUMERABLE) as c_int;
+const DATA: c_int =
+    (q::JS_PROP_WRITABLE | q::JS_PROP_CONFIGURABLE | q::JS_PROP_ENUMERABLE) as c_int;
 
 /// The opaque data of Intl objects.
 struct IntlObject {
@@ -50,7 +55,8 @@ enum State {
 static CLASS_IDS: OnceLock<[q::JSClassID; 3]> = OnceLock::new();
 
 unsafe fn class_ids(rt: *mut q::JSRuntime) -> [q::JSClassID; 3] {
-    let ids = *CLASS_IDS.get_or_init(|| std::array::from_fn(|_| super::super::class::new_class_id()));
+    let ids =
+        *CLASS_IDS.get_or_init(|| std::array::from_fn(|_| super::super::class::new_class_id()));
     for (id, name) in ids.iter().zip(NAMES) {
         if q::JS_IsRegisteredClass(rt, *id) == 0 {
             let def = q::JSClassDef {
@@ -97,7 +103,11 @@ fn is_string(v: q::JSValue) -> bool {
 }
 
 unsafe fn arg(argc: c_int, argv: *mut q::JSValue, i: usize) -> q::JSValue {
-    if (i as c_int) < argc { *argv.add(i) } else { q::JS_UNDEFINED }
+    if (i as c_int) < argc {
+        *argv.add(i)
+    } else {
+        q::JS_UNDEFINED
+    }
 }
 
 unsafe fn throw_range<T>(ctx: *mut q::JSContext, msg: &str) -> Result<T> {
@@ -118,7 +128,11 @@ fn ret(r: Result<q::JSValue>) -> q::JSValue {
 
 unsafe fn get(ctx: *mut q::JSContext, obj: q::JSValue, name: &CStr) -> Result<q::JSValue> {
     let v = q::JS_GetPropertyStr(ctx, obj, name.as_ptr());
-    if v.tag() == q::JS_TAG_EXCEPTION { Err(()) } else { Ok(v) }
+    if v.tag() == q::JS_TAG_EXCEPTION {
+        Err(())
+    } else {
+        Ok(v)
+    }
 }
 
 /// ToString, as UTF-8.
@@ -134,7 +148,11 @@ unsafe fn to_string(ctx: *mut q::JSContext, v: q::JSValue) -> Result<String> {
 }
 
 /// Calls `f` with the UTF-16 code units of ToString(`v`).
-unsafe fn with_units<R>(ctx: *mut q::JSContext, v: q::JSValue, f: impl FnOnce(&[u16]) -> R) -> Result<R> {
+unsafe fn with_units<R>(
+    ctx: *mut q::JSContext,
+    v: q::JSValue,
+    f: impl FnOnce(&[u16]) -> R,
+) -> Result<R> {
     let s = q::JS_ToString(ctx, v);
     if s.tag() == q::JS_TAG_EXCEPTION {
         return Err(());
@@ -183,7 +201,10 @@ struct ObjectBuilder {
 
 impl ObjectBuilder {
     unsafe fn new(ctx: *mut q::JSContext) -> ObjectBuilder {
-        ObjectBuilder { ctx, obj: q::JS_NewObject(ctx) }
+        ObjectBuilder {
+            ctx,
+            obj: q::JS_NewObject(ctx),
+        }
     }
 
     unsafe fn value(&self, name: &CStr, v: q::JSValue) -> &Self {
@@ -204,7 +225,10 @@ impl ObjectBuilder {
     }
 }
 
-unsafe fn new_array(ctx: *mut q::JSContext, items: impl IntoIterator<Item = q::JSValue>) -> q::JSValue {
+unsafe fn new_array(
+    ctx: *mut q::JSContext,
+    items: impl IntoIterator<Item = q::JSValue>,
+) -> q::JSValue {
     let array = q::JS_NewArray(ctx);
     for (i, v) in items.into_iter().enumerate() {
         q::JS_DefinePropertyValueUint32(ctx, array, i as u32, v, DATA);
@@ -219,7 +243,8 @@ unsafe fn parts_array(ctx: *mut q::JSContext, text: &[u16], types: &[&str]) -> q
     for i in 1..=text.len() {
         if i == text.len() || types[i] != types[start] {
             let part = ObjectBuilder::new(ctx);
-            part.str(c"type", types[start]).value(c"value", new_string(ctx, &text[start..i]));
+            part.str(c"type", types[start])
+                .value(c"value", new_string(ctx, &text[start..i]));
             parts.push(part.obj);
             start = i;
         }
@@ -237,7 +262,11 @@ unsafe fn options_object(ctx: *mut q::JSContext, options: q::JSValue) -> Result<
     Ok(options)
 }
 
-unsafe fn option_value(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr) -> Result<Option<q::JSValue>> {
+unsafe fn option_value(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+    name: &CStr,
+) -> Result<Option<q::JSValue>> {
     if is_undefined(options) {
         return Ok(None);
     }
@@ -245,7 +274,12 @@ unsafe fn option_value(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr)
     Ok(if is_undefined(v) { None } else { Some(v) })
 }
 
-unsafe fn string_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr, values: &[&'static str]) -> Result<Option<&'static str>> {
+unsafe fn string_option(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+    name: &CStr,
+    values: &[&'static str],
+) -> Result<Option<&'static str>> {
     let Some(v) = option_value(ctx, options, name)? else {
         return Ok(None);
     };
@@ -254,11 +288,18 @@ unsafe fn string_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr
     let s = s?;
     match values.iter().find(|&&x| x == s) {
         Some(&x) => Ok(Some(x)),
-        None => throw_range(ctx, &format!("invalid value {s:?} for option {}", name.to_string_lossy())),
+        None => throw_range(
+            ctx,
+            &format!("invalid value {s:?} for option {}", name.to_string_lossy()),
+        ),
     }
 }
 
-unsafe fn any_string_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr) -> Result<Option<String>> {
+unsafe fn any_string_option(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+    name: &CStr,
+) -> Result<Option<String>> {
     let Some(v) = option_value(ctx, options, name)? else {
         return Ok(None);
     };
@@ -267,16 +308,30 @@ unsafe fn any_string_option(ctx: *mut q::JSContext, options: q::JSValue, name: &
     s.map(Some)
 }
 
-unsafe fn bool_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr) -> Result<Option<bool>> {
+unsafe fn bool_option(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+    name: &CStr,
+) -> Result<Option<bool>> {
     let Some(v) = option_value(ctx, options, name)? else {
         return Ok(None);
     };
     let b = q::JS_ToBool(ctx, v);
     q::JS_FreeValue(ctx, v);
-    if b < 0 { Err(()) } else { Ok(Some(b != 0)) }
+    if b < 0 {
+        Err(())
+    } else {
+        Ok(Some(b != 0))
+    }
 }
 
-unsafe fn number_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr, min: i32, max: i32) -> Result<Option<i32>> {
+unsafe fn number_option(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+    name: &CStr,
+    min: i32,
+    max: i32,
+) -> Result<Option<i32>> {
     let Some(v) = option_value(ctx, options, name)? else {
         return Ok(None);
     };
@@ -287,19 +342,30 @@ unsafe fn number_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr
         return Err(());
     }
     if x.is_nan() || x < min as f64 || x > max as f64 {
-        return throw_range(ctx, &format!("{} value is out of range", name.to_string_lossy()));
+        return throw_range(
+            ctx,
+            &format!("{} value is out of range", name.to_string_lossy()),
+        );
     }
     Ok(Some(x.floor() as i32))
 }
 
 /// A Unicode extension type (`-u-ca-<type>`): 3 to 8 alphanumerics per subtag.
 fn is_type(s: &str) -> bool {
-    !s.is_empty() && s.split('-').all(|t| (3..=8).contains(&t.len()) && t.bytes().all(|b| b.is_ascii_alphanumeric()))
+    !s.is_empty()
+        && s.split('-')
+            .all(|t| (3..=8).contains(&t.len()) && t.bytes().all(|b| b.is_ascii_alphanumeric()))
 }
 
-unsafe fn type_option(ctx: *mut q::JSContext, options: q::JSValue, name: &CStr) -> Result<Option<String>> {
+unsafe fn type_option(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+    name: &CStr,
+) -> Result<Option<String>> {
     match any_string_option(ctx, options, name)? {
-        Some(s) if !is_type(&s) => throw_range(ctx, &format!("invalid {}: {s:?}", name.to_string_lossy())),
+        Some(s) if !is_type(&s) => {
+            throw_range(ctx, &format!("invalid {}: {s:?}", name.to_string_lossy()))
+        }
         s => Ok(s.map(|s| s.to_ascii_lowercase())),
     }
 }
@@ -326,7 +392,11 @@ unsafe fn locale_list(ctx: *mut q::JSContext, locales: q::JSValue) -> Result<Vec
     if r < 0 {
         return Err(());
     }
-    let len = if len.is_nan() || len <= 0.0 { 0 } else { len.min(u32::MAX as f64) as u32 };
+    let len = if len.is_nan() || len <= 0.0 {
+        0
+    } else {
+        len.min(u32::MAX as f64) as u32
+    };
     for i in 0..len {
         let v = q::JS_GetPropertyUint32(ctx, locales, i);
         if v.tag() == q::JS_TAG_EXCEPTION {
@@ -353,7 +423,7 @@ unsafe fn push_tag(ctx: *mut q::JSContext, out: &mut Vec<String>, tag: &str) -> 
                 out.push(tag);
             }
             Ok(())
-        },
+        }
         None => throw_range(ctx, &format!("invalid language tag: {tag}")),
     }
 }
@@ -361,7 +431,10 @@ unsafe fn push_tag(ctx: *mut q::JSContext, out: &mut Vec<String>, tag: &str) -> 
 /// Splits a tag into its part before any extension, and the keys and types of its -u- extension.
 fn split_extension(tag: &str) -> (String, Vec<(String, String)>) {
     let subtags: Vec<&str> = tag.split('-').collect();
-    let base_len = subtags.iter().position(|s| s.len() == 1).unwrap_or(subtags.len());
+    let base_len = subtags
+        .iter()
+        .position(|s| s.len() == 1)
+        .unwrap_or(subtags.len());
     let mut keywords = Vec::new();
     let mut i = base_len;
     while i < subtags.len() {
@@ -414,7 +487,10 @@ thread_local! {
 fn default_locale() -> String {
     DEFAULT_LOCALE.with(|d| {
         d.borrow_mut()
-            .get_or_insert_with(|| best_available(&split_extension(&icu::default_tag()).0).unwrap_or_else(|| "en-US".to_owned()))
+            .get_or_insert_with(|| {
+                best_available(&split_extension(&icu::default_tag()).0)
+                    .unwrap_or_else(|| "en-US".to_owned())
+            })
             .clone()
     })
 }
@@ -431,7 +507,10 @@ fn lookup(requested: &[String]) -> (String, Vec<(String, String)>) {
 }
 
 fn keyword<'a>(keywords: &'a [(String, String)], key: &str) -> Option<&'a str> {
-    keywords.iter().find(|(k, _)| k == key).map(|(_, v)| v.as_str())
+    keywords
+        .iter()
+        .find(|(k, _)| k == key)
+        .map(|(_, v)| v.as_str())
 }
 
 /// A resolved locale.
@@ -462,9 +541,15 @@ impl Locale {
         if let Some(locale) = cache_get(&key) {
             return locale;
         }
-        let id = icu::locale_id(&tag).or_else(|| icu::locale_id(base)).unwrap_or_default();
+        let id = icu::locale_id(&tag)
+            .or_else(|| icu::locale_id(base))
+            .unwrap_or_default();
         let maximized = icu::maximize(&id);
-        let locale = Rc::new(Locale { tag, id: CString::new(id).unwrap_or_default(), maximized });
+        let locale = Rc::new(Locale {
+            tag,
+            id: CString::new(id).unwrap_or_default(),
+            maximized,
+        });
         cache_put(key, locale.clone());
         locale
     }
@@ -473,7 +558,10 @@ impl Locale {
         let (base, mut keywords) = split_extension(&self.tag);
         keywords.retain(|(k, _)| k != key);
         keywords.push((key.to_owned(), value.to_owned()));
-        let keywords: Vec<(&str, &str)> = keywords.iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+        let keywords: Vec<(&str, &str)> = keywords
+            .iter()
+            .map(|(k, v)| (k.as_str(), v.as_str()))
+            .collect();
         Locale::new(&base, &keywords).id.clone()
     }
 }
@@ -487,7 +575,9 @@ thread_local! {
 const CACHE_LIMIT: usize = 256;
 
 fn cache_get<T: 'static>(key: &str) -> Option<Rc<T>> {
-    CACHE.with(|c| c.borrow().get(key).cloned()).and_then(|v| v.downcast().ok())
+    CACHE
+        .with(|c| c.borrow().get(key).cloned())
+        .and_then(|v| v.downcast().ok())
 }
 
 fn cache_put(key: String, v: Rc<dyn Any>) {
@@ -510,7 +600,12 @@ fn cached<T: 'static>(key: String, make: impl FnOnce() -> Option<T>) -> Option<R
 }
 
 /// The cache key of a `toLocaleString`-like call without options and with no or one locale.
-unsafe fn simple_call_key(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JSValue, kind: &str) -> Result<Option<String>> {
+unsafe fn simple_call_key(
+    ctx: *mut q::JSContext,
+    locales: q::JSValue,
+    options: q::JSValue,
+    kind: &str,
+) -> Result<Option<String>> {
     if !is_undefined(options) {
         return Ok(None);
     }
@@ -536,7 +631,11 @@ struct CollatorState {
     collator: Rc<icu::Collator>,
 }
 
-unsafe fn collator_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JSValue) -> Result<Rc<CollatorState>> {
+unsafe fn collator_state(
+    ctx: *mut q::JSContext,
+    locales: q::JSValue,
+    options: q::JSValue,
+) -> Result<Rc<CollatorState>> {
     let key = simple_call_key(ctx, locales, options, "c")?;
     if let Some(state) = key.as_deref().and_then(cache_get) {
         return Ok(state);
@@ -548,7 +647,13 @@ unsafe fn collator_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q
     let collation = type_option(ctx, options, c"collation")?;
     let numeric = bool_option(ctx, options, c"numeric")?;
     let case_first = string_option(ctx, options, c"caseFirst", &["upper", "lower", "false"])?;
-    let sensitivity = string_option(ctx, options, c"sensitivity", &["base", "accent", "case", "variant"])?.unwrap_or("variant");
+    let sensitivity = string_option(
+        ctx,
+        options,
+        c"sensitivity",
+        &["base", "accent", "case", "variant"],
+    )?
+    .unwrap_or("variant");
     let ignore_punctuation = bool_option(ctx, options, c"ignorePunctuation")?;
 
     let (base, requested_keywords) = lookup(&requested);
@@ -559,7 +664,7 @@ unsafe fn collator_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q
         (None, Some(co)) => {
             keywords.push(("co", co));
             co.to_owned()
-        },
+        }
         (None, None) => "default".to_owned(),
     };
     let kn = keyword(&requested_keywords, "kn").filter(|v| ["", "true", "false"].contains(v));
@@ -572,31 +677,61 @@ unsafe fn collator_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q
     }
     let locale = Locale::new(&base, &keywords);
     let id = if collation != "default" || usage == "search" {
-        locale.with_keyword("co", if usage == "search" { "search" } else { &collation })
+        locale.with_keyword(
+            "co",
+            if usage == "search" {
+                "search"
+            } else {
+                &collation
+            },
+        )
     } else {
         locale.id.clone()
     };
     // Options override the locale's defaults (and its keywords); the rest is read back from ICU.
     let mut attributes = vec![
-        (icu::UCOL_STRENGTH, match sensitivity {
-            "base" | "case" => icu::UCOL_PRIMARY,
-            "accent" => icu::UCOL_SECONDARY,
-            _ => icu::UCOL_TERTIARY,
-        }),
-        (icu::UCOL_CASE_LEVEL, if sensitivity == "case" { icu::UCOL_ON } else { icu::UCOL_OFF }),
+        (
+            icu::UCOL_STRENGTH,
+            match sensitivity {
+                "base" | "case" => icu::UCOL_PRIMARY,
+                "accent" => icu::UCOL_SECONDARY,
+                _ => icu::UCOL_TERTIARY,
+            },
+        ),
+        (
+            icu::UCOL_CASE_LEVEL,
+            if sensitivity == "case" {
+                icu::UCOL_ON
+            } else {
+                icu::UCOL_OFF
+            },
+        ),
     ];
     if let Some(numeric) = numeric {
-        attributes.push((icu::UCOL_NUMERIC_COLLATION, if numeric { icu::UCOL_ON } else { icu::UCOL_OFF }));
+        attributes.push((
+            icu::UCOL_NUMERIC_COLLATION,
+            if numeric { icu::UCOL_ON } else { icu::UCOL_OFF },
+        ));
     }
     if let Some(case_first) = case_first {
-        attributes.push((icu::UCOL_CASE_FIRST, match case_first {
-            "upper" => icu::UCOL_UPPER_FIRST,
-            "lower" => icu::UCOL_LOWER_FIRST,
-            _ => icu::UCOL_OFF,
-        }));
+        attributes.push((
+            icu::UCOL_CASE_FIRST,
+            match case_first {
+                "upper" => icu::UCOL_UPPER_FIRST,
+                "lower" => icu::UCOL_LOWER_FIRST,
+                _ => icu::UCOL_OFF,
+            },
+        ));
     }
     if let Some(ignore) = ignore_punctuation {
-        attributes.push((icu::UCOL_ALTERNATE_HANDLING, if ignore { icu::UCOL_SHIFTED } else { icu::UCOL_NON_IGNORABLE }));
+        attributes.push((
+            icu::UCOL_ALTERNATE_HANDLING,
+            if ignore {
+                icu::UCOL_SHIFTED
+            } else {
+                icu::UCOL_NON_IGNORABLE
+            },
+        ));
     }
     let cache_key = format!("C|{}|{attributes:?}", id.to_string_lossy());
     let Some(collator) = cached(cache_key, || icu::Collator::open(&id, &attributes)) else {
@@ -625,8 +760,15 @@ unsafe fn collator_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q
     Ok(state)
 }
 
-unsafe fn compare(ctx: *mut q::JSContext, state: &CollatorState, x: q::JSValue, y: q::JSValue) -> Result<q::JSValue> {
-    let r = with_units(ctx, x, |a| with_units(ctx, y, |b| state.collator.compare(a, b)))??;
+unsafe fn compare(
+    ctx: *mut q::JSContext,
+    state: &CollatorState,
+    x: q::JSValue,
+    y: q::JSValue,
+) -> Result<q::JSValue> {
+    let r = with_units(ctx, x, |a| {
+        with_units(ctx, y, |b| state.collator.compare(a, b))
+    })??;
     Ok(q::JS_NewInt32(ctx, r))
 }
 
@@ -698,8 +840,10 @@ impl NumberState {
             _ => digits,
         };
         if self.sign_display != "auto" {
-            let sign = matches!(self.sign_display, "always") || (self.sign_display == "exceptZero" && !zero);
-            self.format.set(icu::UNUM_SIGN_ALWAYS_SHOWN, (sign && !negative) as i32);
+            let sign = matches!(self.sign_display, "always")
+                || (self.sign_display == "exceptZero" && !zero);
+            self.format
+                .set(icu::UNUM_SIGN_ALWAYS_SHOWN, (sign && !negative) as i32);
         }
         self.format.format_decimal(digits)
     }
@@ -710,7 +854,11 @@ fn currency_code(s: &str) -> Option<String> {
     (s.len() == 3 && s.bytes().all(|b| b.is_ascii_alphabetic())).then(|| s.to_ascii_uppercase())
 }
 
-unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JSValue) -> Result<Rc<NumberState>> {
+unsafe fn number_state(
+    ctx: *mut q::JSContext,
+    locales: q::JSValue,
+    options: q::JSValue,
+) -> Result<Rc<NumberState>> {
     let key = simple_call_key(ctx, locales, options, "n")?;
     if let Some(state) = key.as_deref().and_then(cache_get) {
         return Ok(state);
@@ -721,7 +869,13 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
     let numbering_system = type_option(ctx, options, c"numberingSystem")?;
     let (base, requested_keywords) = lookup(&requested);
 
-    let style = string_option(ctx, options, c"style", &["decimal", "percent", "currency", "unit"])?.unwrap_or("decimal");
+    let style = string_option(
+        ctx,
+        options,
+        c"style",
+        &["decimal", "percent", "currency", "unit"],
+    )?
+    .unwrap_or("decimal");
     let currency = match any_string_option(ctx, options, c"currency")? {
         Some(c) => match currency_code(&c) {
             Some(c) => Some(c),
@@ -729,8 +883,15 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
         },
         None => None,
     };
-    let currency_display = string_option(ctx, options, c"currencyDisplay", &["code", "symbol", "narrowSymbol", "name"])?.unwrap_or("symbol");
-    let currency_sign = string_option(ctx, options, c"currencySign", &["standard", "accounting"])?.unwrap_or("standard");
+    let currency_display = string_option(
+        ctx,
+        options,
+        c"currencyDisplay",
+        &["code", "symbol", "narrowSymbol", "name"],
+    )?
+    .unwrap_or("symbol");
+    let currency_sign = string_option(ctx, options, c"currencySign", &["standard", "accounting"])?
+        .unwrap_or("standard");
     let unit = any_string_option(ctx, options, c"unit")?;
     string_option(ctx, options, c"unitDisplay", &["short", "narrow", "long"])?;
     if style == "currency" && currency.is_none() {
@@ -739,17 +900,36 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
     if style == "unit" {
         return throw_range(ctx, &format!("unit style is not supported (unit {unit:?})"));
     }
-    let notation = string_option(ctx, options, c"notation", &["standard", "scientific", "engineering", "compact"])?.unwrap_or("standard");
+    let notation = string_option(
+        ctx,
+        options,
+        c"notation",
+        &["standard", "scientific", "engineering", "compact"],
+    )?
+    .unwrap_or("standard");
 
     let min_integer = number_option(ctx, options, c"minimumIntegerDigits", 1, 21)?.unwrap_or(1);
     let mnfd = number_option(ctx, options, c"minimumFractionDigits", 0, 100)?;
     let mxfd = number_option(ctx, options, c"maximumFractionDigits", 0, 100)?;
     let mnsd = number_option(ctx, options, c"minimumSignificantDigits", 1, 21)?;
     let mxsd = number_option(ctx, options, c"maximumSignificantDigits", 1, 21)?;
-    let compact_display = string_option(ctx, options, c"compactDisplay", &["short", "long"])?.unwrap_or("short");
+    let compact_display =
+        string_option(ctx, options, c"compactDisplay", &["short", "long"])?.unwrap_or("short");
     let grouping = match option_value(ctx, options, c"useGrouping")? {
-        None => if notation == "compact" { Grouping::Min2 } else { Grouping::Auto },
-        Some(v) if v.tag() == q::JS_TAG_BOOL => if v.int() != 0 { Grouping::Always } else { Grouping::Off },
+        None => {
+            if notation == "compact" {
+                Grouping::Min2
+            } else {
+                Grouping::Auto
+            }
+        }
+        Some(v) if v.tag() == q::JS_TAG_BOOL => {
+            if v.int() != 0 {
+                Grouping::Always
+            } else {
+                Grouping::Off
+            }
+        }
         Some(v) => {
             let s = to_string(ctx, v);
             q::JS_FreeValue(ctx, v);
@@ -758,19 +938,35 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
                 "auto" | "true" | "false" => Grouping::Auto,
                 "min2" => Grouping::Min2,
                 "" => Grouping::Off,
-                s => return throw_range(ctx, &format!("invalid value {s:?} for option useGrouping")),
+                s => {
+                    return throw_range(ctx, &format!("invalid value {s:?} for option useGrouping"))
+                }
             }
-        },
+        }
     };
-    let sign_display = string_option(ctx, options, c"signDisplay", &["auto", "never", "always", "exceptZero", "negative"])?.unwrap_or("auto");
+    let sign_display = string_option(
+        ctx,
+        options,
+        c"signDisplay",
+        &["auto", "never", "always", "exceptZero", "negative"],
+    )?
+    .unwrap_or("auto");
 
     let mut keywords: Vec<(&str, &str)> = Vec::new();
-    let nu = numbering_system.as_deref().or_else(|| keyword(&requested_keywords, "nu"));
+    let nu = numbering_system
+        .as_deref()
+        .or_else(|| keyword(&requested_keywords, "nu"));
     if let Some(nu) = nu {
         keywords.push(("nu", nu));
     }
     let locale = Locale::new(&base, &keywords);
-    let icu_style = match (style, notation, currency_display, currency_sign, compact_display) {
+    let icu_style = match (
+        style,
+        notation,
+        currency_display,
+        currency_sign,
+        compact_display,
+    ) {
         ("percent", ..) => icu::UNUM_PERCENT,
         ("currency", _, "code", ..) => icu::UNUM_CURRENCY_ISO,
         ("currency", _, "name", ..) => icu::UNUM_CURRENCY_PLURAL,
@@ -792,10 +988,14 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
             })
             .map(|f| f.get(icu::UNUM_MAX_FRACTION_DIGITS))
             .unwrap_or(2)
-        },
+        }
         _ => 0,
     };
-    let mnfd_default = if style == "currency" && notation == "standard" { currency_digits } else { 0 };
+    let mnfd_default = if style == "currency" && notation == "standard" {
+        currency_digits
+    } else {
+        0
+    };
     let mxfd_default = match style {
         "currency" if notation == "standard" => mnfd_default.max(currency_digits),
         "percent" => mnfd_default,
@@ -806,7 +1006,10 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
     let significant = if has_sd {
         let (min, max) = (mnsd.unwrap_or(1), mxsd.unwrap_or(21));
         if min > max {
-            return throw_range(ctx, "minimumSignificantDigits is greater than maximumSignificantDigits");
+            return throw_range(
+                ctx,
+                "minimumSignificantDigits is greater than maximumSignificantDigits",
+            );
         }
         Some((min, max))
     } else {
@@ -818,7 +1021,12 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
         (None, None) => (mnfd_default, mxfd_default),
         (Some(min), None) => (min, mxfd_default.max(min)),
         (None, Some(max)) => (mnfd_default.min(max), max),
-        (Some(min), Some(max)) if min > max => return throw_range(ctx, "minimumFractionDigits is greater than maximumFractionDigits"),
+        (Some(min), Some(max)) if min > max => {
+            return throw_range(
+                ctx,
+                "minimumFractionDigits is greater than maximumFractionDigits",
+            )
+        }
         (Some(min), Some(max)) => (min, max),
     };
 
@@ -847,15 +1055,15 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
             f.set(icu::UNUM_MIN_FRACTION_DIGITS, fraction.0);
         }
         match grouping {
-            Grouping::Auto => {},
+            Grouping::Auto => {}
             Grouping::Always => {
                 f.set(icu::UNUM_GROUPING_USED, 1);
                 f.set(icu::UNUM_MINIMUM_GROUPING_DIGITS, 1);
-            },
+            }
             Grouping::Min2 => {
                 f.set(icu::UNUM_GROUPING_USED, 1);
                 f.set(icu::UNUM_MINIMUM_GROUPING_DIGITS, 2);
-            },
+            }
             Grouping::Off => f.set(icu::UNUM_GROUPING_USED, 0),
         }
         if sign_display == "always" {
@@ -875,7 +1083,11 @@ unsafe fn number_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::
         currency_sign,
         min_integer,
         fraction,
-        significant: if compact_rounding { Some((1, 2)) } else { significant },
+        significant: if compact_rounding {
+            Some((1, 2))
+        } else {
+            significant
+        },
         grouping,
         notation,
         compact_display,
@@ -892,7 +1104,11 @@ unsafe fn is_bigint(ctx: *mut q::JSContext, v: q::JSValue) -> bool {
     q::JS_IsBigInt(ctx, v) != 0
 }
 
-unsafe fn format_number(ctx: *mut q::JSContext, state: &NumberState, v: q::JSValue) -> Result<q::JSValue> {
+unsafe fn format_number(
+    ctx: *mut q::JSContext,
+    state: &NumberState,
+    v: q::JSValue,
+) -> Result<q::JSValue> {
     if is_bigint(ctx, v) {
         let digits = to_string(ctx, v)?;
         return formatted(ctx, state.format_decimal(&digits));
@@ -904,7 +1120,11 @@ unsafe fn format_number(ctx: *mut q::JSContext, state: &NumberState, v: q::JSVal
     formatted(ctx, state.format(x))
 }
 
-unsafe fn format_number_to_parts(ctx: *mut q::JSContext, state: &NumberState, v: q::JSValue) -> Result<q::JSValue> {
+unsafe fn format_number_to_parts(
+    ctx: *mut q::JSContext,
+    state: &NumberState,
+    v: q::JSValue,
+) -> Result<q::JSValue> {
     let mut x = 0.0;
     if q::JS_ToFloat64(ctx, &mut x, v) < 0 {
         return Err(());
@@ -947,30 +1167,36 @@ unsafe fn format_number_to_parts(ctx: *mut q::JSContext, state: &NumberState, v:
 
 unsafe fn number_resolved_options(ctx: *mut q::JSContext, s: &NumberState) -> q::JSValue {
     let o = ObjectBuilder::new(ctx);
-    o.str(c"locale", &s.locale).str(c"numberingSystem", &s.numbering_system).str(c"style", s.style);
+    o.str(c"locale", &s.locale)
+        .str(c"numberingSystem", &s.numbering_system)
+        .str(c"style", s.style);
     if let Some(c) = &s.currency {
-        o.str(c"currency", c).str(c"currencyDisplay", s.currency_display).str(c"currencySign", s.currency_sign);
+        o.str(c"currency", c)
+            .str(c"currencyDisplay", s.currency_display)
+            .str(c"currencySign", s.currency_sign);
     }
     o.int(c"minimumIntegerDigits", s.min_integer);
     if s.significant.is_none() || s.notation == "compact" {
-        o.int(c"minimumFractionDigits", s.fraction.0).int(c"maximumFractionDigits", s.fraction.1);
+        o.int(c"minimumFractionDigits", s.fraction.0)
+            .int(c"maximumFractionDigits", s.fraction.1);
     }
     if let Some((min, max)) = s.significant {
-        o.int(c"minimumSignificantDigits", min).int(c"maximumSignificantDigits", max);
+        o.int(c"minimumSignificantDigits", min)
+            .int(c"maximumSignificantDigits", max);
     }
     match s.grouping {
         Grouping::Off => {
             o.bool(c"useGrouping", false);
-        },
+        }
         Grouping::Auto => {
             o.str(c"useGrouping", "auto");
-        },
+        }
         Grouping::Always => {
             o.str(c"useGrouping", "always");
-        },
+        }
         Grouping::Min2 => {
             o.str(c"useGrouping", "min2");
-        },
+        }
     }
     o.str(c"notation", s.notation);
     if s.notation == "compact" {
@@ -1011,11 +1237,21 @@ struct DateState {
 fn hour_cycles(maximized: &str) -> &'static str {
     let mut parts = maximized.split('_');
     let language = parts.next().unwrap_or("");
-    let region = parts.filter(|p| p.len() == 2 || p.len() == 3 && p.bytes().all(|b| b.is_ascii_digit())).next_back().unwrap_or("001");
+    let region = parts
+        .filter(|p| p.len() == 2 || p.len() == 3 && p.bytes().all(|b| b.is_ascii_digit()))
+        .next_back()
+        .unwrap_or("001");
     let find = |key: &str| {
-        patterns::HOUR_CYCLES.split(',').find_map(|entry| entry.strip_prefix(key).and_then(|rest| rest.strip_prefix(':')))
+        patterns::HOUR_CYCLES.split(',').find_map(|entry| {
+            entry
+                .strip_prefix(key)
+                .and_then(|rest| rest.strip_prefix(':'))
+        })
     };
-    find(&format!("{language}_{region}")).or_else(|| find(region)).or_else(|| find("001")).unwrap_or("H")
+    find(&format!("{language}_{region}"))
+        .or_else(|| find(region))
+        .or_else(|| find("001"))
+        .unwrap_or("H")
 }
 
 /// The pattern generator of a locale: from the table if listed, else ICU's style patterns and
@@ -1026,8 +1262,16 @@ fn generator(locale: &Locale) -> Option<Rc<Generator>> {
         let decimal = icu::NumberFormat::open(icu::UNUM_DECIMAL, &locale.id)
             .map(|f| String::from_utf16_lossy(&f.decimal_separator()))
             .unwrap_or_else(|| ".".to_owned());
-        if let Some((_, data)) = patterns::LOCALES.iter().find(|(id, _)| *id == locale.maximized) {
-            return Some(Generator::new(&LocaleData::parse(data), true, default_hour, &decimal));
+        if let Some((_, data)) = patterns::LOCALES
+            .iter()
+            .find(|(id, _)| *id == locale.maximized)
+        {
+            return Some(Generator::new(
+                &LocaleData::parse(data),
+                true,
+                default_hour,
+                &decimal,
+            ));
         }
         let style = |date: i32, time: i32| {
             icu::DateFormat::open(&locale.id, None, None, (date, time))
@@ -1035,16 +1279,23 @@ fn generator(locale: &Locale) -> Option<Rc<Generator>> {
                 .map(|p| String::from_utf16_lossy(&p))
                 .unwrap_or_default()
         };
-        let styles: Vec<String> = (0..4).map(|i| style(icu::UDAT_NONE, i)).chain((0..4).map(|i| style(i, icu::UDAT_NONE))).collect();
+        let styles: Vec<String> = (0..4)
+            .map(|i| style(icu::UDAT_NONE, i))
+            .chain((0..4).map(|i| style(i, icu::UDAT_NONE)))
+            .collect();
         let both = style(3, 3);
         let glue = match (both.find(&styles[7]), styles[3].is_empty()) {
             (Some(pos), false) => {
                 let glue = format!("{}{{1}}{}", &both[..pos], &both[pos + styles[7].len()..]);
                 glue.replacen(&styles[3], "{0}", 1)
-            },
+            }
             _ => "{1} {0}".to_owned(),
         };
-        let glue = if glue.contains("{0}") && glue.contains("{1}") { glue } else { "{1} {0}".to_owned() };
+        let glue = if glue.contains("{0}") && glue.contains("{1}") {
+            glue
+        } else {
+            "{1} {0}".to_owned()
+        };
         let mut data = LocaleData::parse(patterns::ROOT);
         data.styles = std::array::from_fn(|i| styles[i].as_str());
         data.glue = [glue.as_str(); 4];
@@ -1054,7 +1305,9 @@ fn generator(locale: &Locale) -> Option<Rc<Generator>> {
 
 fn best_pattern(locale: &Locale, generator: &Generator, skeleton: &str) -> String {
     let key = format!("P|{}|{skeleton}", locale.id.to_string_lossy());
-    cached(key, || Some(generator.best_pattern(skeleton))).map(|p| String::clone(&p)).unwrap_or_default()
+    cached(key, || Some(generator.best_pattern(skeleton)))
+        .map(|p| String::clone(&p))
+        .unwrap_or_default()
 }
 
 /// Replaces the hour fields of a pattern with `hc`, like V8's ReplaceHourCycleInPattern.
@@ -1066,7 +1319,11 @@ fn replace_hour_cycle(pattern: &str, hc: char) -> String {
             if c == '\'' {
                 quoted = !quoted;
             }
-            if !quoted && matches!(c, 'h' | 'H' | 'k' | 'K') { hc } else { c }
+            if !quoted && matches!(c, 'h' | 'H' | 'k' | 'K') {
+                hc
+            } else {
+                c
+            }
         })
         .collect()
 }
@@ -1076,29 +1333,60 @@ fn is_12_hour(c: char) -> bool {
 }
 
 /// The canonical name and ICU ID of a `timeZone` option.
-unsafe fn time_zone(ctx: *mut q::JSContext, options: q::JSValue) -> Result<(String, Option<Vec<u16>>)> {
-    let utc = |name: &str| matches!(name.to_ascii_uppercase().as_str(), "UTC" | "ETC/UTC" | "ETC/GMT" | "GMT" | "ETC/UCT" | "UCT" | "ETC/ZULU" | "ZULU" | "ETC/UNIVERSAL" | "UNIVERSAL" | "ETC/GMT0" | "GMT0" | "ETC/GREENWICH" | "GREENWICH");
+unsafe fn time_zone(
+    ctx: *mut q::JSContext,
+    options: q::JSValue,
+) -> Result<(String, Option<Vec<u16>>)> {
+    let utc = |name: &str| {
+        matches!(
+            name.to_ascii_uppercase().as_str(),
+            "UTC"
+                | "ETC/UTC"
+                | "ETC/GMT"
+                | "GMT"
+                | "ETC/UCT"
+                | "UCT"
+                | "ETC/ZULU"
+                | "ZULU"
+                | "ETC/UNIVERSAL"
+                | "UNIVERSAL"
+                | "ETC/GMT0"
+                | "GMT0"
+                | "ETC/GREENWICH"
+                | "GREENWICH"
+        )
+    };
     match any_string_option(ctx, options, c"timeZone")? {
         None => {
             let name = icu::system_time_zone();
             let units = name.encode_utf16().collect();
-            Ok((if utc(&name) { "UTC".to_owned() } else { name }, Some(units)))
-        },
+            Ok((
+                if utc(&name) { "UTC".to_owned() } else { name },
+                Some(units),
+            ))
+        }
         Some(name) if utc(&name) => Ok(("UTC".to_owned(), Some("UTC".encode_utf16().collect()))),
         Some(name) => match icu::canonical_time_zone(&name) {
             Some(id) => {
                 let units = id.encode_utf16().collect();
                 Ok((if utc(&id) { "UTC".to_owned() } else { id }, Some(units)))
-            },
+            }
             None => throw_range(ctx, &format!("invalid time zone: {name}")),
         },
     }
 }
 
 /// InitializeDateTimeFormat, with ToDateTimeOptions(`required`, `defaults`).
-unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JSValue, required: Fields, defaults: Fields) -> Result<Rc<DateState>> {
+unsafe fn date_state(
+    ctx: *mut q::JSContext,
+    locales: q::JSValue,
+    options: q::JSValue,
+    required: Fields,
+    defaults: Fields,
+) -> Result<Rc<DateState>> {
     let kind = format!("d{}{}", required as u8, defaults as u8);
-    let key = simple_call_key(ctx, locales, options, &kind)?.map(|key| key + "|" + &icu::system_time_zone());
+    let key = simple_call_key(ctx, locales, options, &kind)?
+        .map(|key| key + "|" + &icu::system_time_zone());
     if let Some(state) = key.as_deref().and_then(cache_get) {
         return Ok(state);
     }
@@ -1117,23 +1405,47 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
     let weekday = string_option(ctx, options, c"weekday", narrow_short_long)?;
     let era = string_option(ctx, options, c"era", narrow_short_long)?;
     let mut year = string_option(ctx, options, c"year", numeric)?;
-    let mut month = string_option(ctx, options, c"month", &["2-digit", "numeric", "narrow", "short", "long"])?;
+    let mut month = string_option(
+        ctx,
+        options,
+        c"month",
+        &["2-digit", "numeric", "narrow", "short", "long"],
+    )?;
     let mut day = string_option(ctx, options, c"day", numeric)?;
     let day_period = string_option(ctx, options, c"dayPeriod", narrow_short_long)?;
     let mut hour = string_option(ctx, options, c"hour", numeric)?;
     let mut minute = string_option(ctx, options, c"minute", numeric)?;
     let mut second = string_option(ctx, options, c"second", numeric)?;
     let fractional = number_option(ctx, options, c"fractionalSecondDigits", 1, 3)?;
-    let time_zone_name = string_option(ctx, options, c"timeZoneName", &["short", "long", "shortOffset", "longOffset", "shortGeneric", "longGeneric"])?;
+    let time_zone_name = string_option(
+        ctx,
+        options,
+        c"timeZoneName",
+        &[
+            "short",
+            "long",
+            "shortOffset",
+            "longOffset",
+            "shortGeneric",
+            "longGeneric",
+        ],
+    )?;
     string_option(ctx, options, c"formatMatcher", &["basic", "best fit"])?;
     let date_style = string_option(ctx, options, c"dateStyle", &STYLES)?;
     let time_style = string_option(ctx, options, c"timeStyle", &STYLES)?;
 
     let has_date = weekday.is_some() || year.is_some() || month.is_some() || day.is_some();
-    let has_time = day_period.is_some() || hour.is_some() || minute.is_some() || second.is_some() || fractional.is_some();
+    let has_time = day_period.is_some()
+        || hour.is_some()
+        || minute.is_some()
+        || second.is_some()
+        || fractional.is_some();
     if date_style.is_some() || time_style.is_some() {
         if has_date || has_time || era.is_some() || time_zone_name.is_some() {
-            return throw_type(ctx, "dateStyle and timeStyle cannot be combined with other date and time options");
+            return throw_type(
+                ctx,
+                "dateStyle and timeStyle cannot be combined with other date and time options",
+            );
         }
         if required == Fields::Date && time_style.is_some() {
             return throw_type(ctx, "timeStyle is not allowed here");
@@ -1142,7 +1454,8 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
             return throw_type(ctx, "dateStyle is not allowed here");
         }
     } else {
-        let need_defaults = !(matches!(required, Fields::Date | Fields::Any) && has_date) && !(matches!(required, Fields::Time | Fields::Any) && has_time);
+        let need_defaults = !(matches!(required, Fields::Date | Fields::Any) && has_date)
+            && !(matches!(required, Fields::Time | Fields::Any) && has_time);
         if need_defaults && matches!(defaults, Fields::Date | Fields::Any) {
             (year, month, day) = (Some("numeric"), Some("numeric"), Some("numeric"));
         }
@@ -1152,15 +1465,20 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
     }
 
     let mut keywords: Vec<(&str, &str)> = Vec::new();
-    let ca = calendar.as_deref().or_else(|| keyword(&requested_keywords, "ca"));
+    let ca = calendar
+        .as_deref()
+        .or_else(|| keyword(&requested_keywords, "ca"));
     if let Some(ca) = ca {
         keywords.push(("ca", ca));
     }
-    let nu = numbering_system.as_deref().or_else(|| keyword(&requested_keywords, "nu"));
+    let nu = numbering_system
+        .as_deref()
+        .or_else(|| keyword(&requested_keywords, "nu"));
     if let Some(nu) = nu {
         keywords.push(("nu", nu));
     }
-    let hc_keyword = keyword(&requested_keywords, "hc").filter(|hc| ["h11", "h12", "h23", "h24"].contains(hc));
+    let hc_keyword =
+        keyword(&requested_keywords, "hc").filter(|hc| ["h11", "h12", "h23", "h24"].contains(hc));
     if hour12.is_none() && hour_cycle.is_none() {
         if let Some(hc) = hc_keyword {
             keywords.push(("hc", hc));
@@ -1176,8 +1494,20 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
         _ => 'H',
     };
     let explicit_hour = match (hour12, hour_cycle.or(hc_keyword)) {
-        (Some(true), _) => Some(cycles.iter().copied().find(|&c| is_12_hour(c)).unwrap_or('h')),
-        (Some(false), _) => Some(cycles.iter().copied().find(|&c| !is_12_hour(c)).unwrap_or('H')),
+        (Some(true), _) => Some(
+            cycles
+                .iter()
+                .copied()
+                .find(|&c| is_12_hour(c))
+                .unwrap_or('h'),
+        ),
+        (Some(false), _) => Some(
+            cycles
+                .iter()
+                .copied()
+                .find(|&c| !is_12_hour(c))
+                .unwrap_or('H'),
+        ),
         (None, Some(hc)) => Some(hc_char(hc)),
         (None, None) => None,
     };
@@ -1186,9 +1516,14 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
     };
 
     let pattern = if date_style.is_some() || time_style.is_some() {
-        let index = |s: Option<&str>| s.and_then(|s| STYLES.iter().position(|&x| x == s)).map_or(icu::UDAT_NONE, |i| i as i32);
+        let index = |s: Option<&str>| {
+            s.and_then(|s| STYLES.iter().position(|&x| x == s))
+                .map_or(icu::UDAT_NONE, |i| i as i32)
+        };
         let style_pattern = |date: i32, time: i32| {
-            icu::DateFormat::open(&locale.id, None, None, (date, time)).and_then(|f| f.pattern()).map(|p| String::from_utf16_lossy(&p))
+            icu::DateFormat::open(&locale.id, None, None, (date, time))
+                .and_then(|f| f.pattern())
+                .map(|p| String::from_utf16_lossy(&p))
         };
         let (ds, ts) = (index(date_style), index(time_style));
         let Some(mut pattern) = style_pattern(ds, ts) else {
@@ -1201,13 +1536,23 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
                 let skeleton: String = dtpg::pattern_skeleton(&time)
                     .fields()
                     .filter(|&(c, _)| !matches!(c, 'a' | 'b' | 'B'))
-                    .flat_map(|(c, n)| std::iter::repeat_n(if matches!(c, 'h' | 'H' | 'k' | 'K') { hc } else { c }, n))
+                    .flat_map(|(c, n)| {
+                        std::iter::repeat_n(
+                            if matches!(c, 'h' | 'H' | 'k' | 'K') {
+                                hc
+                            } else {
+                                c
+                            },
+                            n,
+                        )
+                    })
                     .collect();
                 let new_time = best_pattern(&locale, &generator, &skeleton);
                 pattern = match (ds != icu::UDAT_NONE, style_pattern(ds, icu::UDAT_NONE)) {
-                    (true, Some(date)) => {
-                        generator.glue(ds as usize).replace("{1}", &date).replace("{0}", &new_time)
-                    },
+                    (true, Some(date)) => generator
+                        .glue(ds as usize)
+                        .replace("{1}", &date)
+                        .replace("{0}", &new_time),
                     _ => new_time,
                 };
             }
@@ -1222,20 +1567,54 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
                 skeleton.push_str(v);
             }
         };
-        push(weekday, &[("narrow", "EEEEE"), ("short", "E"), ("long", "EEEE")]);
-        push(era, &[("narrow", "GGGGG"), ("short", "G"), ("long", "GGGG")]);
+        push(
+            weekday,
+            &[("narrow", "EEEEE"), ("short", "E"), ("long", "EEEE")],
+        );
+        push(
+            era,
+            &[("narrow", "GGGGG"), ("short", "G"), ("long", "GGGG")],
+        );
         push(year, &[("2-digit", "yy"), ("numeric", "y")]);
-        push(month, &[("2-digit", "MM"), ("numeric", "M"), ("narrow", "MMMMM"), ("short", "MMM"), ("long", "MMMM")]);
+        push(
+            month,
+            &[
+                ("2-digit", "MM"),
+                ("numeric", "M"),
+                ("narrow", "MMMMM"),
+                ("short", "MMM"),
+                ("long", "MMMM"),
+            ],
+        );
         push(day, &[("2-digit", "dd"), ("numeric", "d")]);
         if hour.is_some() && is_12_hour(hour_char) {
-            push(day_period, &[("narrow", "BBBBB"), ("short", "B"), ("long", "BBBB")]);
+            push(
+                day_period,
+                &[("narrow", "BBBBB"), ("short", "B"), ("long", "BBBB")],
+            );
         }
         let hour_fields = [hour_char.to_string(), hour_char.to_string().repeat(2)];
-        push(hour, &[("numeric", &hour_fields[0]), ("2-digit", &hour_fields[1])]);
+        push(
+            hour,
+            &[("numeric", &hour_fields[0]), ("2-digit", &hour_fields[1])],
+        );
         push(minute, &[("2-digit", "mm"), ("numeric", "m")]);
         push(second, &[("2-digit", "ss"), ("numeric", "s")]);
-        push(fractional.map(|n| ["S", "SS", "SSS"][n as usize - 1]), &[("S", "S"), ("SS", "SS"), ("SSS", "SSS")]);
-        push(time_zone_name, &[("short", "z"), ("long", "zzzz"), ("shortOffset", "O"), ("longOffset", "OOOO"), ("shortGeneric", "v"), ("longGeneric", "vvvv")]);
+        push(
+            fractional.map(|n| ["S", "SS", "SSS"][n as usize - 1]),
+            &[("S", "S"), ("SS", "SS"), ("SSS", "SSS")],
+        );
+        push(
+            time_zone_name,
+            &[
+                ("short", "z"),
+                ("long", "zzzz"),
+                ("shortOffset", "O"),
+                ("longOffset", "OOOO"),
+                ("shortGeneric", "v"),
+                ("longGeneric", "vvvv"),
+            ],
+        );
         let pattern = best_pattern(&locale, &generator, &skeleton);
         match explicit_hour {
             Some(hc) if hour.is_some() => replace_hour_cycle(&pattern, hc),
@@ -1244,7 +1623,10 @@ unsafe fn date_state(ctx: *mut q::JSContext, locales: q::JSValue, options: q::JS
     };
 
     let units: Vec<u16> = pattern.encode_utf16().collect();
-    let tz_key = tz_id.as_ref().map(|t| String::from_utf16_lossy(t)).unwrap_or_default();
+    let tz_key = tz_id
+        .as_ref()
+        .map(|t| String::from_utf16_lossy(t))
+        .unwrap_or_default();
     let cache_key = format!("D|{}|{tz_key}|{pattern}", locale.id.to_string_lossy());
     let format = cached(cache_key, || {
         let f = icu::DateFormat::open(&locale.id, tz_id.as_deref(), Some(&units), (0, 0))?;
@@ -1292,7 +1674,11 @@ unsafe fn time_value(ctx: *mut q::JSContext, v: q::JSValue) -> Result<f64> {
     Ok(t.trunc() + 0.0)
 }
 
-unsafe fn format_date_to_parts(ctx: *mut q::JSContext, state: &DateState, t: f64) -> Result<q::JSValue> {
+unsafe fn format_date_to_parts(
+    ctx: *mut q::JSContext,
+    state: &DateState,
+    t: f64,
+) -> Result<q::JSValue> {
     let Some((text, spans)) = state.format.format_to_parts(t) else {
         return throw_range(ctx, "formatting failed");
     };
@@ -1328,7 +1714,10 @@ unsafe fn date_resolved_options(ctx: *mut q::JSContext, s: &DateState) -> q::JSV
         .str(c"timeZone", &s.time_zone);
     let skeleton = dtpg::pattern_skeleton(&s.pattern);
     let fields: Vec<(char, usize)> = skeleton.fields().collect();
-    if let Some(&(c, _)) = fields.iter().find(|(c, _)| matches!(c, 'h' | 'H' | 'k' | 'K')) {
+    if let Some(&(c, _)) = fields
+        .iter()
+        .find(|(c, _)| matches!(c, 'h' | 'H' | 'k' | 'K'))
+    {
         let hc = match c {
             'K' => "h11",
             'h' => "h12",
@@ -1356,44 +1745,54 @@ unsafe fn date_resolved_options(ctx: *mut q::JSContext, s: &DateState) -> q::JSV
         match c {
             'E' | 'c' | 'e' => {
                 o.str(c"weekday", text(n));
-            },
+            }
             'G' => {
                 o.str(c"era", text(n));
-            },
+            }
             'y' | 'Y' | 'u' | 'r' | 'U' => {
                 o.str(c"year", digits(n));
-            },
+            }
             'M' | 'L' => {
                 o.str(c"month", if n <= 2 { digits(n) } else { text(n) });
-            },
+            }
             'd' => {
                 o.str(c"day", digits(n));
-            },
+            }
             'B' | 'b' => {
                 o.str(c"dayPeriod", text(n));
-            },
+            }
             'h' | 'H' | 'k' | 'K' => {
                 o.str(c"hour", digits(n));
-            },
+            }
             'm' => {
                 o.str(c"minute", digits(n));
-            },
+            }
             's' => {
                 o.str(c"second", digits(n));
-            },
+            }
             'S' => {
                 o.int(c"fractionalSecondDigits", n as i32);
-            },
+            }
             'z' => {
                 o.str(c"timeZoneName", if n >= 4 { "long" } else { "short" });
-            },
+            }
             'O' => {
-                o.str(c"timeZoneName", if n >= 4 { "longOffset" } else { "shortOffset" });
-            },
+                o.str(
+                    c"timeZoneName",
+                    if n >= 4 { "longOffset" } else { "shortOffset" },
+                );
+            }
             'v' | 'V' => {
-                o.str(c"timeZoneName", if n >= 4 { "longGeneric" } else { "shortGeneric" });
-            },
-            _ => {},
+                o.str(
+                    c"timeZoneName",
+                    if n >= 4 {
+                        "longGeneric"
+                    } else {
+                        "shortGeneric"
+                    },
+                );
+            }
+            _ => {}
         }
     }
     o.obj
@@ -1401,7 +1800,13 @@ unsafe fn date_resolved_options(ctx: *mut q::JSContext, s: &DateState) -> q::JSV
 
 // Native functions.
 
-unsafe extern "C" fn construct(ctx: *mut q::JSContext, new_target: q::JSValue, argc: c_int, argv: *mut q::JSValue, magic: c_int) -> q::JSValue {
+unsafe extern "C" fn construct(
+    ctx: *mut q::JSContext,
+    new_target: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    magic: c_int,
+) -> q::JSValue {
     let kind = magic as usize;
     let (locales, options) = (arg(argc, argv, 0), arg(argc, argv, 1));
     let state = match kind {
@@ -1429,27 +1834,54 @@ unsafe extern "C" fn construct(ctx: *mut q::JSContext, new_target: q::JSValue, a
     if obj.tag() == q::JS_TAG_EXCEPTION {
         return obj;
     }
-    q::JS_SetOpaque(obj, Box::into_raw(Box::new(IntlObject { state, bound: q::JS_UNDEFINED })) as *mut _);
+    q::JS_SetOpaque(
+        obj,
+        Box::into_raw(Box::new(IntlObject {
+            state,
+            bound: q::JS_UNDEFINED,
+        })) as *mut _,
+    );
     obj
 }
 
-unsafe fn this_object<'a>(ctx: *mut q::JSContext, this: q::JSValue, kind: usize) -> Result<&'a mut IntlObject> {
+unsafe fn this_object<'a>(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    kind: usize,
+) -> Result<&'a mut IntlObject> {
     match intl_object(this, kind) {
         Some(obj) => Ok(obj),
-        None => throw_type(ctx, &format!("not an Intl.{} object", NAMES[kind].to_string_lossy())),
+        None => throw_type(
+            ctx,
+            &format!("not an Intl.{} object", NAMES[kind].to_string_lossy()),
+        ),
     }
 }
 
-unsafe extern "C" fn resolved_options(ctx: *mut q::JSContext, this: q::JSValue, _argc: c_int, _argv: *mut q::JSValue, magic: c_int) -> q::JSValue {
-    ret(this_object(ctx, this, magic as usize).map(|obj| match &obj.state {
-        State::Collator(s) => collator_resolved_options(ctx, s),
-        State::Number(s) => number_resolved_options(ctx, s),
-        State::Date(s) => date_resolved_options(ctx, s),
-    }))
+unsafe extern "C" fn resolved_options(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    _argc: c_int,
+    _argv: *mut q::JSValue,
+    magic: c_int,
+) -> q::JSValue {
+    ret(
+        this_object(ctx, this, magic as usize).map(|obj| match &obj.state {
+            State::Collator(s) => collator_resolved_options(ctx, s),
+            State::Number(s) => number_resolved_options(ctx, s),
+            State::Date(s) => date_resolved_options(ctx, s),
+        }),
+    )
 }
 
 /// The `format` and `compare` getters: a function bound to the object, created once.
-unsafe extern "C" fn get_bound(ctx: *mut q::JSContext, this: q::JSValue, _argc: c_int, _argv: *mut q::JSValue, magic: c_int) -> q::JSValue {
+unsafe extern "C" fn get_bound(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    _argc: c_int,
+    _argv: *mut q::JSValue,
+    magic: c_int,
+) -> q::JSValue {
     let obj = match this_object(ctx, this, magic as usize) {
         Ok(obj) => obj,
         Err(()) => return q::JS_EXCEPTION,
@@ -1466,7 +1898,14 @@ unsafe extern "C" fn get_bound(ctx: *mut q::JSContext, this: q::JSValue, _argc: 
     q::JS_DupValue(ctx, obj.bound)
 }
 
-unsafe extern "C" fn call_bound(ctx: *mut q::JSContext, _this: q::JSValue, argc: c_int, argv: *mut q::JSValue, magic: c_int, data: *mut q::JSValue) -> q::JSValue {
+unsafe extern "C" fn call_bound(
+    ctx: *mut q::JSContext,
+    _this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    magic: c_int,
+    data: *mut q::JSValue,
+) -> q::JSValue {
     let Some(obj) = intl_object(*data, magic as usize) else {
         return q::JS_EXCEPTION;
     };
@@ -1476,11 +1915,17 @@ unsafe extern "C" fn call_bound(ctx: *mut q::JSContext, _this: q::JSValue, argc:
         State::Date(s) => {
             let s = s.clone();
             time_value(ctx, arg(argc, argv, 0)).and_then(|t| formatted(ctx, s.format.format(t)))
-        },
+        }
     })
 }
 
-unsafe extern "C" fn format_to_parts(ctx: *mut q::JSContext, this: q::JSValue, argc: c_int, argv: *mut q::JSValue, magic: c_int) -> q::JSValue {
+unsafe extern "C" fn format_to_parts(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    magic: c_int,
+) -> q::JSValue {
     let state = match this_object(ctx, this, magic as usize) {
         Ok(obj) => match &obj.state {
             State::Number(s) => Ok(State::Number(s.clone())),
@@ -1491,36 +1936,75 @@ unsafe extern "C" fn format_to_parts(ctx: *mut q::JSContext, this: q::JSValue, a
     };
     ret(match state {
         Ok(State::Number(s)) => format_number_to_parts(ctx, &s, arg(argc, argv, 0)),
-        Ok(State::Date(s)) => time_value(ctx, arg(argc, argv, 0)).and_then(|t| format_date_to_parts(ctx, &s, t)),
+        Ok(State::Date(s)) => {
+            time_value(ctx, arg(argc, argv, 0)).and_then(|t| format_date_to_parts(ctx, &s, t))
+        }
         _ => Err(()),
     })
 }
 
-unsafe extern "C" fn supported_locales_of(ctx: *mut q::JSContext, _this: q::JSValue, argc: c_int, argv: *mut q::JSValue, _magic: c_int) -> q::JSValue {
+unsafe extern "C" fn supported_locales_of(
+    ctx: *mut q::JSContext,
+    _this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    _magic: c_int,
+) -> q::JSValue {
     let r = (|| {
         let requested = locale_list(ctx, arg(argc, argv, 0))?;
         let options = options_object(ctx, arg(argc, argv, 1))?;
         string_option(ctx, options, c"localeMatcher", &["lookup", "best fit"])?;
-        let supported: Vec<String> = requested.into_iter().filter(|tag| best_available(&split_extension(tag).0).is_some()).collect();
-        Ok(new_array(ctx, supported.iter().map(|tag| new_str(ctx, tag))))
+        let supported: Vec<String> = requested
+            .into_iter()
+            .filter(|tag| best_available(&split_extension(tag).0).is_some())
+            .collect();
+        Ok(new_array(
+            ctx,
+            supported.iter().map(|tag| new_str(ctx, tag)),
+        ))
     })();
     ret(r)
 }
 
-unsafe extern "C" fn get_canonical_locales(ctx: *mut q::JSContext, _this: q::JSValue, argc: c_int, argv: *mut q::JSValue) -> q::JSValue {
-    ret(locale_list(ctx, arg(argc, argv, 0)).map(|tags| new_array(ctx, tags.iter().map(|tag| new_str(ctx, tag)))))
+unsafe extern "C" fn get_canonical_locales(
+    ctx: *mut q::JSContext,
+    _this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+) -> q::JSValue {
+    ret(locale_list(ctx, arg(argc, argv, 0))
+        .map(|tags| new_array(ctx, tags.iter().map(|tag| new_str(ctx, tag)))))
 }
 
-unsafe extern "C" fn number_to_locale_string(ctx: *mut q::JSContext, this: q::JSValue, argc: c_int, argv: *mut q::JSValue) -> q::JSValue {
+unsafe extern "C" fn number_to_locale_string(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+) -> q::JSValue {
     let value = match this.tag() {
         q::JS_TAG_INT | q::JS_TAG_FLOAT64 => this,
-        q::JS_TAG_OBJECT if q::JS_GetClassID(this) == CLASS_NUMBER => q::JS_GetPrimitiveObjectData(ctx, this),
-        _ => return ret(throw_type(ctx, "Number.prototype.toLocaleString called on an incompatible receiver")),
+        q::JS_TAG_OBJECT if q::JS_GetClassID(this) == CLASS_NUMBER => {
+            q::JS_GetPrimitiveObjectData(ctx, this)
+        }
+        _ => {
+            return ret(throw_type(
+                ctx,
+                "Number.prototype.toLocaleString called on an incompatible receiver",
+            ))
+        }
     };
-    ret(number_state(ctx, arg(argc, argv, 0), arg(argc, argv, 1)).and_then(|s| format_number(ctx, &s, value)))
+    ret(number_state(ctx, arg(argc, argv, 0), arg(argc, argv, 1))
+        .and_then(|s| format_number(ctx, &s, value)))
 }
 
-unsafe extern "C" fn date_to_locale_string(ctx: *mut q::JSContext, this: q::JSValue, argc: c_int, argv: *mut q::JSValue, magic: c_int) -> q::JSValue {
+unsafe extern "C" fn date_to_locale_string(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    magic: c_int,
+) -> q::JSValue {
     if this.tag() != q::JS_TAG_OBJECT || q::JS_GetClassID(this) != CLASS_DATE {
         return ret(throw_type(ctx, "not a Date object"));
     }
@@ -1532,7 +2016,13 @@ unsafe extern "C" fn date_to_locale_string(ctx: *mut q::JSContext, this: q::JSVa
         2 => (Fields::Time, Fields::Time),
         _ => (Fields::Any, Fields::Any),
     };
-    let state = date_state(ctx, arg(argc, argv, 0), arg(argc, argv, 1), required, defaults);
+    let state = date_state(
+        ctx,
+        arg(argc, argv, 0),
+        arg(argc, argv, 1),
+        required,
+        defaults,
+    );
     ret(state.and_then(|s| {
         if t.is_nan() {
             Ok(new_str(ctx, "Invalid Date"))
@@ -1549,7 +2039,12 @@ unsafe fn require_object_coercible(ctx: *mut q::JSContext, this: q::JSValue) -> 
     Ok(())
 }
 
-unsafe extern "C" fn string_locale_compare(ctx: *mut q::JSContext, this: q::JSValue, argc: c_int, argv: *mut q::JSValue) -> q::JSValue {
+unsafe extern "C" fn string_locale_compare(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+) -> q::JSValue {
     let r = (|| {
         require_object_coercible(ctx, this)?;
         let s = q::JS_ToString(ctx, this);
@@ -1561,7 +2056,8 @@ unsafe extern "C" fn string_locale_compare(ctx: *mut q::JSContext, this: q::JSVa
             q::JS_FreeValue(ctx, s);
             return Err(());
         }
-        let r = collator_state(ctx, arg(argc, argv, 1), arg(argc, argv, 2)).and_then(|state| compare(ctx, &state, s, that));
+        let r = collator_state(ctx, arg(argc, argv, 1), arg(argc, argv, 2))
+            .and_then(|state| compare(ctx, &state, s, that));
         q::JS_FreeValue(ctx, s);
         q::JS_FreeValue(ctx, that);
         r
@@ -1569,13 +2065,33 @@ unsafe extern "C" fn string_locale_compare(ctx: *mut q::JSContext, this: q::JSVa
     ret(r)
 }
 
-unsafe extern "C" fn string_to_locale_case(ctx: *mut q::JSContext, this: q::JSValue, argc: c_int, argv: *mut q::JSValue, magic: c_int) -> q::JSValue {
+unsafe extern "C" fn string_to_locale_case(
+    ctx: *mut q::JSContext,
+    this: q::JSValue,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    magic: c_int,
+) -> q::JSValue {
     let r = (|| {
         require_object_coercible(ctx, this)?;
         let requested = locale_list(ctx, arg(argc, argv, 0))?;
         let tag = requested.into_iter().next().unwrap_or_else(default_locale);
-        let language = CString::new(split_extension(&tag).0.split('-').next().unwrap_or("").to_owned()).unwrap_or_default();
-        let units = with_units(ctx, this, |s| if magic == 0 { icu::to_upper(s, &language) } else { icu::to_lower(s, &language) })?;
+        let language = CString::new(
+            split_extension(&tag)
+                .0
+                .split('-')
+                .next()
+                .unwrap_or("")
+                .to_owned(),
+        )
+        .unwrap_or_default();
+        let units = with_units(ctx, this, |s| {
+            if magic == 0 {
+                icu::to_upper(s, &language)
+            } else {
+                icu::to_lower(s, &language)
+            }
+        })?;
         formatted(ctx, units)
     })();
     ret(r)
@@ -1583,18 +2099,49 @@ unsafe extern "C" fn string_to_locale_case(ctx: *mut q::JSContext, this: q::JSVa
 
 // Installation.
 
-unsafe fn define_function(ctx: *mut q::JSContext, obj: q::JSValue, name: &CStr, f: q::JSCFunction, length: c_int) {
+unsafe fn define_function(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    name: &CStr,
+    f: q::JSCFunction,
+    length: c_int,
+) {
     let f = q::JS_NewCFunction2(ctx, f, name.as_ptr(), length, q::JS_CFUNC_generic, 0);
     q::JS_DefinePropertyValueStr(ctx, obj, name.as_ptr(), f, METHOD);
 }
 
-unsafe fn define_magic_function(ctx: *mut q::JSContext, obj: q::JSValue, name: &CStr, f: q::JSCFunctionMagic, length: c_int, magic: usize) {
-    let f = q::JS_NewCFunctionMagic(ctx, f, name.as_ptr(), length, q::JS_CFUNC_generic_magic, magic as c_int);
+unsafe fn define_magic_function(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    name: &CStr,
+    f: q::JSCFunctionMagic,
+    length: c_int,
+    magic: usize,
+) {
+    let f = q::JS_NewCFunctionMagic(
+        ctx,
+        f,
+        name.as_ptr(),
+        length,
+        q::JS_CFUNC_generic_magic,
+        magic as c_int,
+    );
     q::JS_DefinePropertyValueStr(ctx, obj, name.as_ptr(), f, METHOD);
 }
 
-unsafe fn define_to_string_tag(ctx: *mut q::JSContext, obj: q::JSValue, atom: q::JSAtom, tag: &CStr) {
-    q::JS_DefinePropertyValue(ctx, obj, atom, q::JS_NewString(ctx, tag.as_ptr()), q::JS_PROP_CONFIGURABLE as c_int);
+unsafe fn define_to_string_tag(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    atom: q::JSAtom,
+    tag: &CStr,
+) {
+    q::JS_DefinePropertyValue(
+        ctx,
+        obj,
+        atom,
+        q::JS_NewString(ctx, tag.as_ptr()),
+        q::JS_PROP_CONFIGURABLE as c_int,
+    );
 }
 
 /// Defines `Intl` on the global object of `ctx` and replaces the locale-sensitive methods of
@@ -1610,17 +2157,62 @@ pub(super) unsafe fn install(ctx: *mut q::JSContext) {
 
     let intl = q::JS_NewObject(ctx);
     define_to_string_tag(ctx, intl, to_string_tag, c"Intl");
-    define_function(ctx, intl, c"getCanonicalLocales", Some(get_canonical_locales), 1);
+    define_function(
+        ctx,
+        intl,
+        c"getCanonicalLocales",
+        Some(get_canonical_locales),
+        1,
+    );
     for kind in [COLLATOR, NUMBER_FORMAT, DATE_TIME_FORMAT] {
         let proto = q::JS_NewObject(ctx);
-        let ctor = q::JS_NewCFunctionMagic(ctx, Some(construct), NAMES[kind].as_ptr(), 0, q::JS_CFUNC_constructor_or_func_magic, kind as c_int);
+        let ctor = q::JS_NewCFunctionMagic(
+            ctx,
+            Some(construct),
+            NAMES[kind].as_ptr(),
+            0,
+            q::JS_CFUNC_constructor_or_func_magic,
+            kind as c_int,
+        );
         q::JS_SetConstructor(ctx, ctor, proto);
-        define_magic_function(ctx, ctor, c"supportedLocalesOf", Some(supported_locales_of), 1, kind);
-        define_magic_function(ctx, proto, c"resolvedOptions", Some(resolved_options), 0, kind);
-        let (name, getter_name) = if kind == COLLATOR { (c"compare", c"get compare") } else { (c"format", c"get format") };
-        let getter = q::JS_NewCFunctionMagic(ctx, Some(get_bound), getter_name.as_ptr(), 0, q::JS_CFUNC_generic_magic, kind as c_int);
+        define_magic_function(
+            ctx,
+            ctor,
+            c"supportedLocalesOf",
+            Some(supported_locales_of),
+            1,
+            kind,
+        );
+        define_magic_function(
+            ctx,
+            proto,
+            c"resolvedOptions",
+            Some(resolved_options),
+            0,
+            kind,
+        );
+        let (name, getter_name) = if kind == COLLATOR {
+            (c"compare", c"get compare")
+        } else {
+            (c"format", c"get format")
+        };
+        let getter = q::JS_NewCFunctionMagic(
+            ctx,
+            Some(get_bound),
+            getter_name.as_ptr(),
+            0,
+            q::JS_CFUNC_generic_magic,
+            kind as c_int,
+        );
         let atom = q::JS_NewAtom(ctx, name.as_ptr());
-        q::JS_DefinePropertyGetSet(ctx, proto, atom, getter, q::JS_UNDEFINED, q::JS_PROP_CONFIGURABLE as c_int);
+        q::JS_DefinePropertyGetSet(
+            ctx,
+            proto,
+            atom,
+            getter,
+            q::JS_UNDEFINED,
+            q::JS_PROP_CONFIGURABLE as c_int,
+        );
         q::JS_FreeAtom(ctx, atom);
         if kind != COLLATOR {
             define_magic_function(ctx, proto, c"formatToParts", Some(format_to_parts), 1, kind);
@@ -1634,16 +2226,63 @@ pub(super) unsafe fn install(ctx: *mut q::JSContext) {
     q::JS_FreeValue(ctx, global);
 
     let number = q::JS_GetClassProto(ctx, CLASS_NUMBER);
-    define_function(ctx, number, c"toLocaleString", Some(number_to_locale_string), 0);
+    define_function(
+        ctx,
+        number,
+        c"toLocaleString",
+        Some(number_to_locale_string),
+        0,
+    );
     q::JS_FreeValue(ctx, number);
     let string = q::JS_GetClassProto(ctx, CLASS_STRING);
-    define_function(ctx, string, c"localeCompare", Some(string_locale_compare), 1);
-    define_magic_function(ctx, string, c"toLocaleUpperCase", Some(string_to_locale_case), 0, 0);
-    define_magic_function(ctx, string, c"toLocaleLowerCase", Some(string_to_locale_case), 0, 1);
+    define_function(
+        ctx,
+        string,
+        c"localeCompare",
+        Some(string_locale_compare),
+        1,
+    );
+    define_magic_function(
+        ctx,
+        string,
+        c"toLocaleUpperCase",
+        Some(string_to_locale_case),
+        0,
+        0,
+    );
+    define_magic_function(
+        ctx,
+        string,
+        c"toLocaleLowerCase",
+        Some(string_to_locale_case),
+        0,
+        1,
+    );
     q::JS_FreeValue(ctx, string);
     let date = q::JS_GetClassProto(ctx, CLASS_DATE);
-    define_magic_function(ctx, date, c"toLocaleString", Some(date_to_locale_string), 0, 0);
-    define_magic_function(ctx, date, c"toLocaleDateString", Some(date_to_locale_string), 0, 1);
-    define_magic_function(ctx, date, c"toLocaleTimeString", Some(date_to_locale_string), 0, 2);
+    define_magic_function(
+        ctx,
+        date,
+        c"toLocaleString",
+        Some(date_to_locale_string),
+        0,
+        0,
+    );
+    define_magic_function(
+        ctx,
+        date,
+        c"toLocaleDateString",
+        Some(date_to_locale_string),
+        0,
+        1,
+    );
+    define_magic_function(
+        ctx,
+        date,
+        c"toLocaleTimeString",
+        Some(date_to_locale_string),
+        0,
+        2,
+    );
     q::JS_FreeValue(ctx, date);
 }

@@ -420,7 +420,11 @@ impl<T: RootKind> JS::Rooted<T> {
     pub unsafe fn add_to_root_stack(this: *mut Self, cx: *mut JSContext) {
         let base = unsafe { &raw mut (*this).base };
         RootedBase::add_to_root_stack(base, cx, T::KIND);
-        crate::engine::retain_rooted(cx, T::KIND, &raw const (*this).data as *const std::ffi::c_void);
+        crate::engine::retain_rooted(
+            cx,
+            T::KIND,
+            &raw const (*this).data as *const std::ffi::c_void,
+        );
     }
 
     pub unsafe fn remove_from_root_stack(&mut self) {

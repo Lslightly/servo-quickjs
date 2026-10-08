@@ -13,7 +13,10 @@ use mozjs::jsapi::OnNewGlobalHookOption;
 use mozjs::jsval::UndefinedValue;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
-use mozjs::rust::{evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
+use mozjs::rust::{
+    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS,
+};
 
 /// The string value of `expr`, or "throws " and the error's name (and message if `verbose`).
 unsafe fn eval(cx: &mut JSContext, global: HandleObject, expr: &str, verbose: bool) -> String {
@@ -21,7 +24,8 @@ unsafe fn eval(cx: &mut JSContext, global: HandleObject, expr: &str, verbose: bo
     let source = format!("String((() => {{ try {{ return {expr}; }} catch (e) {{ return 'throws ' + e.name{message}; }} }})())");
     rooted!(&in(cx) let mut rval = UndefinedValue());
     let options = CompileOptionsWrapper::new(cx, c"qjs_intl.js".to_owned(), 1);
-    evaluate_script(cx, global, &source, rval.handle_mut(), options).unwrap_or_else(|_| panic!("evaluating {expr:?} failed"));
+    evaluate_script(cx, global, &source, rval.handle_mut(), options)
+        .unwrap_or_else(|_| panic!("evaluating {expr:?} failed"));
     jsstr_to_string(cx, NonNull::new(rval.get().to_string()).unwrap())
 }
 
@@ -31,10 +35,18 @@ unsafe fn check(cx: &mut JSContext, global: HandleObject, cases: &[(&str, &str)]
         let actual = eval(cx, global, expr, false);
         if actual != *expected {
             let actual = eval(cx, global, expr, true);
-            failures.push(format!("{expr}\n    expected {expected:?}\n    got      {actual:?}"));
+            failures.push(format!(
+                "{expr}\n    expected {expected:?}\n    got      {actual:?}"
+            ));
         }
     }
-    assert!(failures.is_empty(), "{} of {} cases failed:\n{}", failures.len(), cases.len(), failures.join("\n"));
+    assert!(
+        failures.is_empty(),
+        "{} of {} cases failed:\n{}",
+        failures.len(),
+        cases.len(),
+        failures.join("\n")
+    );
 }
 
 #[test]
@@ -73,45 +85,130 @@ fn qjs_intl() {
 /// The calls of real pages that motivated the subset.
 #[cfg(target_env = "ohos")]
 unsafe fn from_pages(cx: &mut JSContext, global: HandleObject) {
-    check(cx, global, &[
-        (r#"new Date(2026, 9, 7).toLocaleDateString("zh-CN")"#, "2026/10/7"),
-        (r#"new Date(2026, 9, 7).toLocaleDateString("en-US", {day: "2-digit", month: "short"})"#, "Oct 07"),
-        (r#"(12345.678).toLocaleString("en-US")"#, "12,345.678"),
-        (r#"["张三", "李四", "王五"].sort((a, b) => a.localeCompare(b, "zh-CN")).join()"#, "李四,王五,张三"),
-        (r#"new Intl.NumberFormat("zh-CN", {style: "percent"}).format(0.25)"#, "25%"),
-    ]);
+    check(
+        cx,
+        global,
+        &[
+            (
+                r#"new Date(2026, 9, 7).toLocaleDateString("zh-CN")"#,
+                "2026/10/7",
+            ),
+            (
+                r#"new Date(2026, 9, 7).toLocaleDateString("en-US", {day: "2-digit", month: "short"})"#,
+                "Oct 07",
+            ),
+            (r#"(12345.678).toLocaleString("en-US")"#, "12,345.678"),
+            (
+                r#"["张三", "李四", "王五"].sort((a, b) => a.localeCompare(b, "zh-CN")).join()"#,
+                "李四,王五,张三",
+            ),
+            (
+                r#"new Intl.NumberFormat("zh-CN", {style: "percent"}).format(0.25)"#,
+                "25%",
+            ),
+        ],
+    );
 }
 
 #[cfg(target_env = "ohos")]
 unsafe fn numbers(cx: &mut JSContext, global: HandleObject) {
-    check(cx, global, &[
-        (r#"(12345.678).toLocaleString("de-DE")"#, "12.345,678"),
-        (r#"(1234.5).toLocaleString("en-US", {style: "currency", currency: "USD"})"#, "$1,234.50"),
-        (r#"(1234.5).toLocaleString("zh-CN", {style: "currency", currency: "CNY"})"#, "¥1,234.50"),
-        (r#"(1234.5).toLocaleString("en-US", {style: "currency", currency: "JPY"})"#, "¥1,235"),
-        (r#"(1234.5).toLocaleString("en-US", {style: "currency", currency: "EUR", currencyDisplay: "code"})"#, "EUR\u{a0}1,234.50"),
-        (r#"(2).toLocaleString("en-US", {style: "currency", currency: "USD", currencyDisplay: "name"})"#, "2.00 US dollars"),
-        (r#"(1.5).toLocaleString("en-US", {minimumFractionDigits: 2})"#, "1.50"),
-        (r#"(2.5).toLocaleString("en-US", {maximumFractionDigits: 0})"#, "3"),
-        (r#"(1.005).toLocaleString("en-US", {maximumFractionDigits: 2})"#, "1.01"),
-        (r#"(5).toLocaleString("en-US", {minimumIntegerDigits: 3})"#, "005"),
-        (r#"(12345).toLocaleString("en-US", {useGrouping: false})"#, "12345"),
-        (r#"(1234.5678).toLocaleString("en-US", {maximumSignificantDigits: 3})"#, "1,230"),
-        (r#"(12345).toLocaleString("en-US", {notation: "compact"})"#, "12K"),
-        (r#"(12345).toLocaleString("zh-CN", {notation: "compact"})"#, "1.2万"),
-        (r#"(5).toLocaleString("en-US", {signDisplay: "always"})"#, "+5"),
-        (r#"(0).toLocaleString("en-US", {signDisplay: "exceptZero"})"#, "0"),
-        (r#"(-0).toLocaleString("en-US")"#, "-0"),
-        (r#"NaN.toLocaleString("en-US")"#, "NaN"),
-        (r#"new Intl.NumberFormat("en-US").format(12345678901234567890n)"#, "12,345,678,901,234,567,890"),
-        (r#"new Intl.NumberFormat("en-US").formatToParts(-12345.6).map(p => p.type + ":" + p.value).join("|")"#, "minusSign:-|integer:12|group:,|integer:345|decimal:.|fraction:6"),
-        (r#"JSON.stringify(new Intl.NumberFormat("en-US", {style: "currency", currency: "usd"}).resolvedOptions())"#,
-         r#"{"locale":"en-US","numberingSystem":"latn","style":"currency","currency":"USD","currencyDisplay":"symbol","currencySign":"standard","minimumIntegerDigits":1,"minimumFractionDigits":2,"maximumFractionDigits":2,"useGrouping":"auto","notation":"standard","signDisplay":"auto","roundingIncrement":1,"roundingMode":"halfExpand","roundingPriority":"auto","trailingZeroDisplay":"auto"}"#),
-        (r#"new Intl.NumberFormat("en", {style: "currency"})"#, "throws TypeError"),
-        (r#"new Intl.NumberFormat("en", {style: "unit", unit: "meter"})"#, "throws RangeError"),
-        (r#"new Intl.NumberFormat("en", {maximumFractionDigits: 101})"#, "throws RangeError"),
-        (r#"Number.prototype.toLocaleString.call("1")"#, "throws TypeError"),
-    ]);
+    check(
+        cx,
+        global,
+        &[
+            (r#"(12345.678).toLocaleString("de-DE")"#, "12.345,678"),
+            (
+                r#"(1234.5).toLocaleString("en-US", {style: "currency", currency: "USD"})"#,
+                "$1,234.50",
+            ),
+            (
+                r#"(1234.5).toLocaleString("zh-CN", {style: "currency", currency: "CNY"})"#,
+                "¥1,234.50",
+            ),
+            (
+                r#"(1234.5).toLocaleString("en-US", {style: "currency", currency: "JPY"})"#,
+                "¥1,235",
+            ),
+            (
+                r#"(1234.5).toLocaleString("en-US", {style: "currency", currency: "EUR", currencyDisplay: "code"})"#,
+                "EUR\u{a0}1,234.50",
+            ),
+            (
+                r#"(2).toLocaleString("en-US", {style: "currency", currency: "USD", currencyDisplay: "name"})"#,
+                "2.00 US dollars",
+            ),
+            (
+                r#"(1.5).toLocaleString("en-US", {minimumFractionDigits: 2})"#,
+                "1.50",
+            ),
+            (
+                r#"(2.5).toLocaleString("en-US", {maximumFractionDigits: 0})"#,
+                "3",
+            ),
+            (
+                r#"(1.005).toLocaleString("en-US", {maximumFractionDigits: 2})"#,
+                "1.01",
+            ),
+            (
+                r#"(5).toLocaleString("en-US", {minimumIntegerDigits: 3})"#,
+                "005",
+            ),
+            (
+                r#"(12345).toLocaleString("en-US", {useGrouping: false})"#,
+                "12345",
+            ),
+            (
+                r#"(1234.5678).toLocaleString("en-US", {maximumSignificantDigits: 3})"#,
+                "1,230",
+            ),
+            (
+                r#"(12345).toLocaleString("en-US", {notation: "compact"})"#,
+                "12K",
+            ),
+            (
+                r#"(12345).toLocaleString("zh-CN", {notation: "compact"})"#,
+                "1.2万",
+            ),
+            (
+                r#"(5).toLocaleString("en-US", {signDisplay: "always"})"#,
+                "+5",
+            ),
+            (
+                r#"(0).toLocaleString("en-US", {signDisplay: "exceptZero"})"#,
+                "0",
+            ),
+            (r#"(-0).toLocaleString("en-US")"#, "-0"),
+            (r#"NaN.toLocaleString("en-US")"#, "NaN"),
+            (
+                r#"new Intl.NumberFormat("en-US").format(12345678901234567890n)"#,
+                "12,345,678,901,234,567,890",
+            ),
+            (
+                r#"new Intl.NumberFormat("en-US").formatToParts(-12345.6).map(p => p.type + ":" + p.value).join("|")"#,
+                "minusSign:-|integer:12|group:,|integer:345|decimal:.|fraction:6",
+            ),
+            (
+                r#"JSON.stringify(new Intl.NumberFormat("en-US", {style: "currency", currency: "usd"}).resolvedOptions())"#,
+                r#"{"locale":"en-US","numberingSystem":"latn","style":"currency","currency":"USD","currencyDisplay":"symbol","currencySign":"standard","minimumIntegerDigits":1,"minimumFractionDigits":2,"maximumFractionDigits":2,"useGrouping":"auto","notation":"standard","signDisplay":"auto","roundingIncrement":1,"roundingMode":"halfExpand","roundingPriority":"auto","trailingZeroDisplay":"auto"}"#,
+            ),
+            (
+                r#"new Intl.NumberFormat("en", {style: "currency"})"#,
+                "throws TypeError",
+            ),
+            (
+                r#"new Intl.NumberFormat("en", {style: "unit", unit: "meter"})"#,
+                "throws RangeError",
+            ),
+            (
+                r#"new Intl.NumberFormat("en", {maximumFractionDigits: 101})"#,
+                "throws RangeError",
+            ),
+            (
+                r#"Number.prototype.toLocaleString.call("1")"#,
+                "throws TypeError",
+            ),
+        ],
+    );
 }
 
 #[cfg(target_env = "ohos")]
@@ -155,44 +252,117 @@ unsafe fn dates(cx: &mut JSContext, global: HandleObject) {
 
 #[cfg(target_env = "ohos")]
 unsafe fn collation_and_case(cx: &mut JSContext, global: HandleObject) {
-    check(cx, global, &[
-        (r#"new Intl.Collator("en", {sensitivity: "base"}).compare("a", "A")"#, "0"),
-        (r#"new Intl.Collator("en").compare("a", "A")"#, "-1"),
-        (r#"new Intl.Collator("en", {sensitivity: "accent"}).compare("a", "á")"#, "-1"),
-        (r#"["a10", "a2", "a1"].sort(new Intl.Collator("en", {numeric: true}).compare).join()"#, "a1,a2,a10"),
-        (r#"["a10", "a2"].sort(new Intl.Collator("en-u-kn").compare).join()"#, "a2,a10"),
-        (r#"["b", "a-c", "ab"].sort(new Intl.Collator("en", {ignorePunctuation: true}).compare).join()"#, "ab,a-c,b"),
-        (r#"["z", "ä", "a"].sort(new Intl.Collator("de").compare).join()"#, "a,ä,z"),
-        (r#"["z", "ä", "a"].sort(new Intl.Collator("sv").compare).join()"#, "a,z,ä"),
-        (r#""a".localeCompare("B")"#, "-1"),
-        (r#"JSON.stringify(new Intl.Collator("de-u-co-phonebk").resolvedOptions())"#,
-         r#"{"locale":"de-u-co-phonebk","usage":"sort","sensitivity":"variant","ignorePunctuation":false,"collation":"phonebk","numeric":false,"caseFirst":"false"}"#),
-        (r#"new Intl.Collator("da").resolvedOptions().caseFirst"#, "upper"),
-        (r#"new Intl.Collator("da", {caseFirst: "false"}).resolvedOptions().caseFirst"#, "false"),
-        (r#"new Intl.Collator("th").resolvedOptions().ignorePunctuation"#, "true"),
-        (r#""i".toLocaleUpperCase("tr")"#, "İ"),
-        (r#""I".toLocaleLowerCase("tr")"#, "ı"),
-        (r#""i".toLocaleUpperCase("en")"#, "I"),
-        (r#""straße".toLocaleUpperCase("de")"#, "STRASSE"),
-        (r#"String.prototype.localeCompare.call(null, "a")"#, "throws TypeError"),
-    ]);
+    check(
+        cx,
+        global,
+        &[
+            (
+                r#"new Intl.Collator("en", {sensitivity: "base"}).compare("a", "A")"#,
+                "0",
+            ),
+            (r#"new Intl.Collator("en").compare("a", "A")"#, "-1"),
+            (
+                r#"new Intl.Collator("en", {sensitivity: "accent"}).compare("a", "á")"#,
+                "-1",
+            ),
+            (
+                r#"["a10", "a2", "a1"].sort(new Intl.Collator("en", {numeric: true}).compare).join()"#,
+                "a1,a2,a10",
+            ),
+            (
+                r#"["a10", "a2"].sort(new Intl.Collator("en-u-kn").compare).join()"#,
+                "a2,a10",
+            ),
+            (
+                r#"["b", "a-c", "ab"].sort(new Intl.Collator("en", {ignorePunctuation: true}).compare).join()"#,
+                "ab,a-c,b",
+            ),
+            (
+                r#"["z", "ä", "a"].sort(new Intl.Collator("de").compare).join()"#,
+                "a,ä,z",
+            ),
+            (
+                r#"["z", "ä", "a"].sort(new Intl.Collator("sv").compare).join()"#,
+                "a,z,ä",
+            ),
+            (r#""a".localeCompare("B")"#, "-1"),
+            (
+                r#"JSON.stringify(new Intl.Collator("de-u-co-phonebk").resolvedOptions())"#,
+                r#"{"locale":"de-u-co-phonebk","usage":"sort","sensitivity":"variant","ignorePunctuation":false,"collation":"phonebk","numeric":false,"caseFirst":"false"}"#,
+            ),
+            (
+                r#"new Intl.Collator("da").resolvedOptions().caseFirst"#,
+                "upper",
+            ),
+            (
+                r#"new Intl.Collator("da", {caseFirst: "false"}).resolvedOptions().caseFirst"#,
+                "false",
+            ),
+            (
+                r#"new Intl.Collator("th").resolvedOptions().ignorePunctuation"#,
+                "true",
+            ),
+            (r#""i".toLocaleUpperCase("tr")"#, "İ"),
+            (r#""I".toLocaleLowerCase("tr")"#, "ı"),
+            (r#""i".toLocaleUpperCase("en")"#, "I"),
+            (r#""straße".toLocaleUpperCase("de")"#, "STRASSE"),
+            (
+                r#"String.prototype.localeCompare.call(null, "a")"#,
+                "throws TypeError",
+            ),
+        ],
+    );
 }
 
 #[cfg(target_env = "ohos")]
 unsafe fn locales_and_objects(cx: &mut JSContext, global: HandleObject) {
-    check(cx, global, &[
-        (r#"Object.prototype.toString.call(Intl)"#, "[object Intl]"),
-        (r#"Intl.getCanonicalLocales(["EN-us", "zh-cn", "en-US"]).join()"#, "en-US,zh-CN"),
-        (r#"Intl.getCanonicalLocales("en_US")"#, "throws RangeError"),
-        (r#"Intl.NumberFormat.supportedLocalesOf(["zh-CN", "xx-YY", "en-GB"]).join()"#, "zh-CN,en-GB"),
-        (r#"new Intl.NumberFormat("xx-YY").resolvedOptions().locale === new Intl.NumberFormat().resolvedOptions().locale"#, "true"),
-        (r#"new Intl.NumberFormat(["xx", "de-CH"]).resolvedOptions().locale"#, "de-CH"),
-        (r#"Intl.NumberFormat("en").format(1)"#, "1"),
-        (r#"(() => { const f = new Intl.NumberFormat("en"); return f.format === f.format; })()"#, "true"),
-        (r#"(() => { const f = new Intl.NumberFormat("en"); return [1000, 2000].map(f.format).join("|"); })()"#, "1,000|2,000"),
-        (r#"(() => { class X extends Intl.NumberFormat {} const x = new X("en"); return x instanceof X && x.format(1234); })()"#, "1,234"),
-        (r#"Object.prototype.toString.call(new Intl.DateTimeFormat())"#, "[object Intl.DateTimeFormat]"),
-        (r#"Intl.NumberFormat.prototype.resolvedOptions.call(new Intl.Collator())"#, "throws TypeError"),
-        (r#"(() => { for (let i = 0; i < 2000; i++) new Intl.Collator("en", {numeric: i % 2 == 0}).compare; return "ok"; })()"#, "ok"),
-    ]);
+    check(
+        cx,
+        global,
+        &[
+            (r#"Object.prototype.toString.call(Intl)"#, "[object Intl]"),
+            (
+                r#"Intl.getCanonicalLocales(["EN-us", "zh-cn", "en-US"]).join()"#,
+                "en-US,zh-CN",
+            ),
+            (r#"Intl.getCanonicalLocales("en_US")"#, "throws RangeError"),
+            (
+                r#"Intl.NumberFormat.supportedLocalesOf(["zh-CN", "xx-YY", "en-GB"]).join()"#,
+                "zh-CN,en-GB",
+            ),
+            (
+                r#"new Intl.NumberFormat("xx-YY").resolvedOptions().locale === new Intl.NumberFormat().resolvedOptions().locale"#,
+                "true",
+            ),
+            (
+                r#"new Intl.NumberFormat(["xx", "de-CH"]).resolvedOptions().locale"#,
+                "de-CH",
+            ),
+            (r#"Intl.NumberFormat("en").format(1)"#, "1"),
+            (
+                r#"(() => { const f = new Intl.NumberFormat("en"); return f.format === f.format; })()"#,
+                "true",
+            ),
+            (
+                r#"(() => { const f = new Intl.NumberFormat("en"); return [1000, 2000].map(f.format).join("|"); })()"#,
+                "1,000|2,000",
+            ),
+            (
+                r#"(() => { class X extends Intl.NumberFormat {} const x = new X("en"); return x instanceof X && x.format(1234); })()"#,
+                "1,234",
+            ),
+            (
+                r#"Object.prototype.toString.call(new Intl.DateTimeFormat())"#,
+                "[object Intl.DateTimeFormat]",
+            ),
+            (
+                r#"Intl.NumberFormat.prototype.resolvedOptions.call(new Intl.Collator())"#,
+                "throws TypeError",
+            ),
+            (
+                r#"(() => { for (let i = 0; i < 2000; i++) new Intl.Collator("en", {numeric: i % 2 == 0}).compare; return "ok"; })()"#,
+                "ok",
+            ),
+        ],
+    );
 }

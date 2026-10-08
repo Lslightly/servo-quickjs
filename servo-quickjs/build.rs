@@ -6,9 +6,15 @@ fn main() {
     let mut build = cc::Build::new();
     build
         .files(
-            ["quickjs.c", "dtoa.c", "libregexp.c", "libunicode.c", "cutils.c"]
-                .iter()
-                .map(|f| dir.join(f)),
+            [
+                "quickjs.c",
+                "dtoa.c",
+                "libregexp.c",
+                "libunicode.c",
+                "cutils.c",
+            ]
+            .iter()
+            .map(|f| dir.join(f)),
         )
         .file("src/static_wrappers.c")
         .include(dir)

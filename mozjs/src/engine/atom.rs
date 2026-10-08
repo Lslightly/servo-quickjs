@@ -41,13 +41,19 @@ pub(crate) unsafe fn atom_is_symbol(atom: q::JSAtom) -> bool {
 /// The atom of a string; retained by the pool.
 pub(crate) unsafe fn string_ptr_to_atom(s: *mut root::JSString) -> q::JSAtom {
     let cx = current();
-    let atom = q::JS_ValueToAtom(cx.base_ctx, q::JSValue::mkptr(q::JS_TAG_STRING, s as *mut _));
+    let atom = q::JS_ValueToAtom(
+        cx.base_ctx,
+        q::JSValue::mkptr(q::JS_TAG_STRING, s as *mut _),
+    );
     cx.adopt_atom(atom)
 }
 
 /// The atom of a symbol; retained by the pool.
 pub(crate) unsafe fn symbol_ptr_to_atom(s: *mut root::JS::Symbol) -> q::JSAtom {
     let cx = current();
-    let atom = q::JS_ValueToAtom(cx.base_ctx, q::JSValue::mkptr(q::JS_TAG_SYMBOL, s as *mut _));
+    let atom = q::JS_ValueToAtom(
+        cx.base_ctx,
+        q::JSValue::mkptr(q::JS_TAG_SYMBOL, s as *mut _),
+    );
     cx.adopt_atom(atom)
 }

@@ -54,7 +54,11 @@ pub(crate) unsafe fn release_realm(realm: *mut RealmData) {
 
 /// Marks a reference added by `hold_realm` from a `gc_mark` hook.
 #[inline]
-pub(crate) unsafe fn mark_realm(rt: *mut q::JSRuntime, realm: *mut RealmData, mark: q::JS_MarkFunc) {
+pub(crate) unsafe fn mark_realm(
+    rt: *mut q::JSRuntime,
+    realm: *mut RealmData,
+    mark: q::JS_MarkFunc,
+) {
     if !realm.is_null() {
         super::verify::mark_context((*realm).qctx, mark);
         q::JS_MarkContextRef(rt, (*realm).qctx, mark);
@@ -82,7 +86,12 @@ pub(crate) unsafe extern "C" fn context_finalized(qctx: *mut q::JSContext) {
 }
 
 pub(crate) fn realm_of_global(global: *mut root::JSObject) -> *mut RealmData {
-    GLOBALS.with(|g| g.borrow().get(&(global as usize)).copied().unwrap_or(ptr::null_mut()))
+    GLOBALS.with(|g| {
+        g.borrow()
+            .get(&(global as usize))
+            .copied()
+            .unwrap_or(ptr::null_mut())
+    })
 }
 
 /// The realm of `obj`: exact for globals, otherwise derived from the function or prototype chain
@@ -93,7 +102,11 @@ pub(crate) fn realm_of_object(cx: &Cx, obj: *mut root::JSObject) -> *mut RealmDa
         return realm;
     }
     let realm = unsafe { realm_of_plain_object(cx, obj) };
-    if realm.is_null() { cx.current_realm() } else { realm }
+    if realm.is_null() {
+        cx.current_realm()
+    } else {
+        realm
+    }
 }
 
 pub(crate) fn realm_of_qctx(qctx: *mut q::JSContext) -> *mut RealmData {
@@ -182,7 +195,13 @@ pub(crate) fn realm_count() -> usize {
     GLOBALS.with(|g| g.borrow().len())
 }
 
-pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const root::JSClass, principals: *mut root::JSPrincipals, hookOption: root::JS::OnNewGlobalHookOption, options: *const root::JS::RealmOptions) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewGlobalObject(
+    cx: *mut root::JSContext,
+    clasp: *const root::JSClass,
+    principals: *mut root::JSPrincipals,
+    hookOption: root::JS::OnNewGlobalHookOption,
+    options: *const root::JS::RealmOptions,
+) -> *mut root::JSObject {
     let _ = hookOption;
     let cx = Cx::from_raw(cx);
     let qctx = q::JS_NewContext(cx.rt);
@@ -191,7 +210,11 @@ pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const 
     }
     super::intl::install_intl(qctx);
     let class_id = super::class::class_id(cx.rt, clasp);
-    assert_eq!(q::JS_SetGlobalObjectClass(qctx, class_id), 0, "global classes cannot be callable");
+    assert_eq!(
+        q::JS_SetGlobalObjectClass(qctx, class_id),
+        0,
+        "global classes cannot be callable"
+    );
     let global_val = q::JS_GetGlobalObject(qctx);
     let global = val_obj(global_val);
     // The context keeps its global alive.
@@ -199,7 +222,10 @@ pub(crate) unsafe fn JS_NewGlobalObject(cx: *mut root::JSContext, clasp: *const 
     let (creation_options, behaviors) = if options.is_null() {
         (std::mem::zeroed(), std::mem::zeroed())
     } else {
-        (ptr::read(&(*options).creationOptions_), ptr::read(&(*options).behaviors_))
+        (
+            ptr::read(&(*options).creationOptions_),
+            ptr::read(&(*options).behaviors_),
+        )
     };
     if !creation_options.sharedMemoryAndAtomics_ {
         delete_global(qctx, global, c"Atomics");
@@ -237,15 +263,24 @@ unsafe fn delete_global(qctx: *mut q::JSContext, global: *mut root::JSObject, na
     q::JS_FreeAtom(qctx, atom);
 }
 
-pub(crate) unsafe fn JS_FireOnNewGlobalObject(cx: *mut root::JSContext, global: root::JS::HandleObject) {
+pub(crate) unsafe fn JS_FireOnNewGlobalObject(
+    cx: *mut root::JSContext,
+    global: root::JS::HandleObject,
+) {
     let _ = (cx, global);
 }
 
-pub(crate) unsafe fn EnterRealm(cx: *mut root::JSContext, target: *mut root::JSObject) -> *mut root::JS::Realm {
+pub(crate) unsafe fn EnterRealm(
+    cx: *mut root::JSContext,
+    target: *mut root::JSObject,
+) -> *mut root::JS::Realm {
     let cx = Cx::from_raw(cx);
     let old = cx.current_realm();
     let realm = super::class::object_realm(cx, target);
-    assert!(!realm.is_null(), "EnterRealm on an object without a known realm");
+    assert!(
+        !realm.is_null(),
+        "EnterRealm on an object without a known realm"
+    );
     cx.enter_realm(realm);
     old as *mut root::JS::Realm
 }
@@ -262,11 +297,19 @@ pub(crate) unsafe fn GetCurrentRealmOrNull(cx: *mut root::JSContext) -> *mut roo
 
 pub(crate) unsafe fn CurrentGlobalOrNull(cx: *mut root::JSContext) -> *mut root::JSObject {
     let realm = Cx::from_raw(cx).current_realm();
-    if realm.is_null() { ptr::null_mut() } else { (*realm).global }
+    if realm.is_null() {
+        ptr::null_mut()
+    } else {
+        (*realm).global
+    }
 }
 
 pub(crate) unsafe fn GetRealmGlobalOrNull(realm: *mut root::JS::Realm) -> *mut root::JSObject {
-    if realm.is_null() { ptr::null_mut() } else { (*(realm as *mut RealmData)).global }
+    if realm.is_null() {
+        ptr::null_mut()
+    } else {
+        (*(realm as *mut RealmData)).global
+    }
 }
 
 pub(crate) unsafe fn GetObjectRealmOrNull(obj: *mut root::JSObject) -> *mut root::JS::Realm {
@@ -275,18 +318,28 @@ pub(crate) unsafe fn GetObjectRealmOrNull(obj: *mut root::JSObject) -> *mut root
 
 pub(crate) unsafe fn GetNonCCWObjectGlobal(obj: *mut root::JSObject) -> *mut root::JSObject {
     let realm = super::class::object_realm(super::current(), obj);
-    if realm.is_null() { ptr::null_mut() } else { (*realm).global }
+    if realm.is_null() {
+        ptr::null_mut()
+    } else {
+        (*realm).global
+    }
 }
 
 pub(crate) unsafe fn GetRealmPrivate(realm: *mut root::JS::Realm) -> *mut ::std::os::raw::c_void {
     (*(realm as *mut RealmData)).private
 }
 
-pub(crate) unsafe fn SetRealmPrivate(realm: *mut root::JS::Realm, data: *mut ::std::os::raw::c_void) {
+pub(crate) unsafe fn SetRealmPrivate(
+    realm: *mut root::JS::Realm,
+    data: *mut ::std::os::raw::c_void,
+) {
     (*(realm as *mut RealmData)).private = data;
 }
 
-pub(crate) unsafe fn JS_GlobalObjectTraceHook(trc: *mut root::JSTracer, global: *mut root::JSObject) {
+pub(crate) unsafe fn JS_GlobalObjectTraceHook(
+    trc: *mut root::JSTracer,
+    global: *mut root::JSObject,
+) {
     let realm = realm_of_global(global);
     if realm.is_null() {
         return;

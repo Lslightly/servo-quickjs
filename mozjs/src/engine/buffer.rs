@@ -164,7 +164,9 @@ fn qjs_type(ty: Type) -> q::JSTypedArrayEnum {
         Type::Float64 => q::JS_TYPED_ARRAY_FLOAT64,
         Type::BigInt64 => q::JS_TYPED_ARRAY_BIG_INT64,
         Type::BigUint64 => q::JS_TYPED_ARRAY_BIG_UINT64,
-        Type::MaxTypedArrayViewType | Type::Int64 | Type::Simd128 => unreachable!("not a typed array type"),
+        Type::MaxTypedArrayViewType | Type::Int64 | Type::Simd128 => {
+            unreachable!("not a typed array type")
+        }
     }
 }
 
@@ -214,13 +216,20 @@ unsafe extern "C" fn free_external(rt: *mut q::JSRuntime, opaque: *mut c_void, p
 
 // ArrayBuffers
 
-pub(crate) unsafe fn NewArrayBuffer(cx: *mut root::JSContext, nbytes: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn NewArrayBuffer(
+    cx: *mut root::JSContext,
+    nbytes: usize,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let v = q::JS_NewArrayBufferCopy(cx.qctx(), ptr::null(), nbytes);
     adopt_object(cx, v)
 }
 
-pub(crate) unsafe fn NewArrayBufferWithContents(cx: *mut root::JSContext, nbytes: usize, contents: *mut ::std::os::raw::c_void) -> *mut root::JSObject {
+pub(crate) unsafe fn NewArrayBufferWithContents(
+    cx: *mut root::JSContext,
+    nbytes: usize,
+    contents: *mut ::std::os::raw::c_void,
+) -> *mut root::JSObject {
     if contents.is_null() {
         return NewArrayBuffer(cx, 0);
     }
@@ -233,19 +242,39 @@ pub(crate) unsafe fn NewArrayBufferWithContents(cx: *mut root::JSContext, nbytes
     adopt_object(cx, v)
 }
 
-pub(crate) unsafe fn NewArrayBufferWithUserOwnedContents(cx: *mut root::JSContext, nbytes: usize, contents: *mut ::std::os::raw::c_void) -> *mut root::JSObject {
+pub(crate) unsafe fn NewArrayBufferWithUserOwnedContents(
+    cx: *mut root::JSContext,
+    nbytes: usize,
+    contents: *mut ::std::os::raw::c_void,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
-    let v = q::JS_NewArrayBuffer(cx.qctx(), contents as *mut u8, nbytes, None, ptr::null_mut(), 0);
+    let v = q::JS_NewArrayBuffer(
+        cx.qctx(),
+        contents as *mut u8,
+        nbytes,
+        None,
+        ptr::null_mut(),
+        0,
+    );
     adopt_object(cx, v)
 }
 
-pub(crate) unsafe fn NewExternalArrayBuffer(cx: *mut root::JSContext, nbytes: usize, contents: *mut ::std::os::raw::c_void, freeFunc: root::JS::BufferContentsFreeFunc, freeUserData: *mut ::std::os::raw::c_void) -> *mut root::JSObject {
+pub(crate) unsafe fn NewExternalArrayBuffer(
+    cx: *mut root::JSContext,
+    nbytes: usize,
+    contents: *mut ::std::os::raw::c_void,
+    freeFunc: root::JS::BufferContentsFreeFunc,
+    freeUserData: *mut ::std::os::raw::c_void,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     // Null contents are never freed (SpiderMonkey's UniquePtr deleter skips null).
     let (free_func, opaque): (q::JSFreeArrayBufferDataFunc, *mut c_void) = if contents.is_null() {
         (None, ptr::null_mut())
     } else {
-        let ext = Box::new(ExternalContents { free: freeFunc, user_data: freeUserData });
+        let ext = Box::new(ExternalContents {
+            free: freeFunc,
+            user_data: freeUserData,
+        });
         (Some(free_external), Box::into_raw(ext) as *mut c_void)
     };
     let v = q::JS_NewArrayBuffer(cx.qctx(), contents as *mut u8, nbytes, free_func, opaque, 0);
@@ -292,15 +321,27 @@ pub(crate) unsafe fn IsResizableArrayBufferMaybeShared(obj: *mut root::JSObject)
 }
 
 pub(crate) unsafe fn UnwrapArrayBuffer(obj: *mut root::JSObject) -> *mut root::JSObject {
-    if array_buffer(obj).is_some() { obj } else { ptr::null_mut() }
+    if array_buffer(obj).is_some() {
+        obj
+    } else {
+        ptr::null_mut()
+    }
 }
 
 pub(crate) unsafe fn UnwrapSharedArrayBuffer(obj: *mut root::JSObject) -> *mut root::JSObject {
-    if shared_array_buffer(obj).is_some() { obj } else { ptr::null_mut() }
+    if shared_array_buffer(obj).is_some() {
+        obj
+    } else {
+        ptr::null_mut()
+    }
 }
 
 pub(crate) unsafe fn UnwrapArrayBufferMaybeShared(obj: *mut root::JSObject) -> *mut root::JSObject {
-    if any_buffer(obj).is_some() { obj } else { ptr::null_mut() }
+    if any_buffer(obj).is_some() {
+        obj
+    } else {
+        ptr::null_mut()
+    }
 }
 
 pub(crate) unsafe fn GetArrayBufferByteLength(obj: *mut root::JSObject) -> usize {
@@ -311,7 +352,11 @@ pub(crate) unsafe fn GetSharedArrayBufferByteLength(obj: *mut root::JSObject) ->
     shared_array_buffer(obj).map_or(0, |b| b.byte_length())
 }
 
-pub(crate) unsafe fn GetArrayBufferData(obj: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u8 {
+pub(crate) unsafe fn GetArrayBufferData(
+    obj: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u8 {
     let _ = arg1;
     let Some(b) = array_buffer(obj) else {
         return ptr::null_mut();
@@ -320,7 +365,11 @@ pub(crate) unsafe fn GetArrayBufferData(obj: *mut root::JSObject, isSharedMemory
     b.data()
 }
 
-pub(crate) unsafe fn GetSharedArrayBufferData(obj: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u8 {
+pub(crate) unsafe fn GetSharedArrayBufferData(
+    obj: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u8 {
     let _ = arg1;
     let Some(b) = shared_array_buffer(obj) else {
         return ptr::null_mut();
@@ -329,7 +378,11 @@ pub(crate) unsafe fn GetSharedArrayBufferData(obj: *mut root::JSObject, isShared
     b.data()
 }
 
-pub(crate) unsafe fn GetArrayBufferMaybeSharedData(obj: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u8 {
+pub(crate) unsafe fn GetArrayBufferMaybeSharedData(
+    obj: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u8 {
     let _ = arg1;
     let Some(b) = any_buffer(obj) else {
         return ptr::null_mut();
@@ -339,34 +392,58 @@ pub(crate) unsafe fn GetArrayBufferMaybeSharedData(obj: *mut root::JSObject, isS
 }
 
 /// Writes the length (in elements) and data of `buf`, or zeros if there is none.
-unsafe fn length_and_data<T>(buf: Option<Buf>, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut T) {
+unsafe fn length_and_data<T>(
+    buf: Option<Buf>,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut T,
+) {
     match buf {
         Some(b) => {
             set(length, b.byte_length() / size_of::<T>());
             set(isSharedMemory, b.shared());
             set(data, b.data() as *mut T);
-        },
+        }
         None => {
             set(length, 0);
             set(isSharedMemory, false);
             set(data, ptr::null_mut());
-        },
+        }
     }
 }
 
-pub(crate) unsafe fn GetArrayBufferLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) {
+pub(crate) unsafe fn GetArrayBufferLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) {
     length_and_data(array_buffer(obj), length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn GetSharedArrayBufferLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) {
+pub(crate) unsafe fn GetSharedArrayBufferLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) {
     length_and_data(shared_array_buffer(obj), length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn GetArrayBufferMaybeSharedLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) {
+pub(crate) unsafe fn GetArrayBufferMaybeSharedLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) {
     length_and_data(any_buffer(obj), length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn GetObjectAsArrayBuffer(obj: *mut root::JSObject, length: *mut usize, data: *mut *mut u8) -> *mut root::JSObject {
+pub(crate) unsafe fn GetObjectAsArrayBuffer(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    data: *mut *mut u8,
+) -> *mut root::JSObject {
     let Some(b) = array_buffer(obj) else {
         return ptr::null_mut();
     };
@@ -383,7 +460,10 @@ unsafe fn array_buffer_or_throw(cx: &Cx, obj: *mut root::JSObject) -> Option<Buf
     b
 }
 
-pub(crate) unsafe fn DetachArrayBuffer(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>) -> bool {
+pub(crate) unsafe fn DetachArrayBuffer(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     if array_buffer_or_throw(cx, *obj.ptr).is_none() {
         return false;
@@ -392,7 +472,11 @@ pub(crate) unsafe fn DetachArrayBuffer(cx: *mut root::JSContext, obj: root::JS::
     true
 }
 
-pub(crate) unsafe fn HasDefinedArrayBufferDetachKey(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, isDefined: *mut bool) -> bool {
+pub(crate) unsafe fn HasDefinedArrayBufferDetachKey(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    isDefined: *mut bool,
+) -> bool {
     // Detach keys only exist for WebAssembly memories.
     let cx = Cx::from_raw(cx);
     if array_buffer_or_throw(cx, *obj.ptr).is_none() {
@@ -402,13 +486,19 @@ pub(crate) unsafe fn HasDefinedArrayBufferDetachKey(cx: *mut root::JSContext, ob
     true
 }
 
-pub(crate) unsafe fn StealArrayBufferContents(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>) -> *mut ::std::os::raw::c_void {
+pub(crate) unsafe fn StealArrayBufferContents(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+) -> *mut ::std::os::raw::c_void {
     let cx = Cx::from_raw(cx);
     let mut len = 0;
     q::JS_StealArrayBuffer(cx.qctx(), &mut len, obj_val(*obj.ptr)) as *mut c_void
 }
 
-pub(crate) unsafe fn CopyArrayBuffer(cx: *mut root::JSContext, maybeArrayBuffer: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn CopyArrayBuffer(
+    cx: *mut root::JSContext,
+    maybeArrayBuffer: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let Some(b) = array_buffer_or_throw(cx, *maybeArrayBuffer.ptr) else {
         return ptr::null_mut();
@@ -421,7 +511,12 @@ pub(crate) unsafe fn CopyArrayBuffer(cx: *mut root::JSContext, maybeArrayBuffer:
     adopt_object(cx, v)
 }
 
-pub(crate) unsafe fn ArrayBufferClone(cx: *mut root::JSContext, srcBuffer: root::JS::Handle<*mut root::JSObject>, srcByteOffset: usize, srcLength: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn ArrayBufferClone(
+    cx: *mut root::JSContext,
+    srcBuffer: root::JS::Handle<*mut root::JSObject>,
+    srcByteOffset: usize,
+    srcLength: usize,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let Some(b) = any_buffer(*srcBuffer.ptr) else {
         throw_type_error(cx, c"argument is not an ArrayBuffer");
@@ -431,7 +526,10 @@ pub(crate) unsafe fn ArrayBufferClone(cx: *mut root::JSContext, srcBuffer: root:
         throw_type_error(cx, c"ArrayBuffer is detached");
         return ptr::null_mut();
     }
-    if srcByteOffset.checked_add(srcLength).is_none_or(|end| end > b.byte_length()) {
+    if srcByteOffset
+        .checked_add(srcLength)
+        .is_none_or(|end| end > b.byte_length())
+    {
         throw_range_error(cx, c"invalid ArrayBuffer range");
         return ptr::null_mut();
     }
@@ -439,13 +537,24 @@ pub(crate) unsafe fn ArrayBufferClone(cx: *mut root::JSContext, srcBuffer: root:
     adopt_object(cx, v)
 }
 
-pub(crate) unsafe fn ArrayBufferCopyData(cx: *mut root::JSContext, toBlock: root::JS::Handle<*mut root::JSObject>, toIndex: usize, fromBlock: root::JS::Handle<*mut root::JSObject>, fromIndex: usize, count: usize) -> bool {
+pub(crate) unsafe fn ArrayBufferCopyData(
+    cx: *mut root::JSContext,
+    toBlock: root::JS::Handle<*mut root::JSObject>,
+    toIndex: usize,
+    fromBlock: root::JS::Handle<*mut root::JSObject>,
+    fromIndex: usize,
+    count: usize,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let (Some(to), Some(from)) = (any_buffer(*toBlock.ptr), any_buffer(*fromBlock.ptr)) else {
         throw_type_error(cx, c"argument is not an ArrayBuffer");
         return false;
     };
-    let in_range = |index: usize, b: &Buf| index.checked_add(count).is_some_and(|end| end <= b.byte_length());
+    let in_range = |index: usize, b: &Buf| {
+        index
+            .checked_add(count)
+            .is_some_and(|end| end <= b.byte_length())
+    };
     if !in_range(toIndex, &to) || !in_range(fromIndex, &from) {
         throw_range_error(cx, c"invalid ArrayBuffer range");
         return false;
@@ -456,7 +565,10 @@ pub(crate) unsafe fn ArrayBufferCopyData(cx: *mut root::JSContext, toBlock: root
     true
 }
 
-pub(crate) unsafe fn EnsureNonInlineArrayBufferOrView(cx: *mut root::JSContext, obj: *mut root::JSObject) -> bool {
+pub(crate) unsafe fn EnsureNonInlineArrayBufferOrView(
+    cx: *mut root::JSContext,
+    obj: *mut root::JSObject,
+) -> bool {
     // QuickJS buffer contents are never inline and never move.
     let cx = Cx::from_raw(cx);
     if Buf::of(obj).is_none() {
@@ -466,13 +578,23 @@ pub(crate) unsafe fn EnsureNonInlineArrayBufferOrView(cx: *mut root::JSContext, 
     true
 }
 
-pub(crate) unsafe fn NewSharedArrayBuffer(cx: *mut root::JSContext, nbytes: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn NewSharedArrayBuffer(
+    cx: *mut root::JSContext,
+    nbytes: usize,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let data = q::js_mallocz(cx.qctx(), nbytes.max(1)) as *mut u8;
     if data.is_null() {
         return ptr::null_mut();
     }
-    let v = q::JS_NewArrayBuffer(cx.qctx(), data, nbytes, Some(free_quickjs), ptr::null_mut(), 1);
+    let v = q::JS_NewArrayBuffer(
+        cx.qctx(),
+        data,
+        nbytes,
+        Some(free_quickjs),
+        ptr::null_mut(),
+        1,
+    );
     if v.tag() == q::JS_TAG_EXCEPTION {
         q::js_free_rt(cx.rt, data as *mut c_void);
     }
@@ -496,14 +618,22 @@ pub(crate) unsafe fn JS_IsTypedArrayObject(obj: *mut root::JSObject) -> bool {
 }
 
 pub(crate) unsafe fn UnwrapArrayBufferView(obj: *mut root::JSObject) -> *mut root::JSObject {
-    if view(obj).is_some() { obj } else { ptr::null_mut() }
+    if view(obj).is_some() {
+        obj
+    } else {
+        ptr::null_mut()
+    }
 }
 
 pub(crate) unsafe fn JS_GetArrayBufferViewType(obj: *mut root::JSObject) -> root::JS::Scalar::Type {
     view(obj).map_or(Type::MaxTypedArrayViewType, |b| b.scalar_type())
 }
 
-pub(crate) unsafe fn JS_GetArrayBufferViewBuffer(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>, isSharedMemory: *mut bool) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetArrayBufferViewBuffer(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+    isSharedMemory: *mut bool,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let Some(b) = view(*obj.ptr) else {
         throw_type_error(cx, c"argument is not an ArrayBufferView");
@@ -522,7 +652,11 @@ pub(crate) unsafe fn JS_GetArrayBufferViewByteOffset(obj: *mut root::JSObject) -
     view(obj).map_or(0, |b| b.byte_offset())
 }
 
-pub(crate) unsafe fn JS_GetArrayBufferViewData(obj: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut ::std::os::raw::c_void {
+pub(crate) unsafe fn JS_GetArrayBufferViewData(
+    obj: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut ::std::os::raw::c_void {
     let _ = arg1;
     let Some(b) = view(obj) else {
         return ptr::null_mut();
@@ -531,7 +665,11 @@ pub(crate) unsafe fn JS_GetArrayBufferViewData(obj: *mut root::JSObject, isShare
     b.data() as *mut c_void
 }
 
-pub(crate) unsafe fn JS_GetArrayBufferViewFixedData(obj: *mut root::JSObject, buffer: *mut u8, bufSize: usize) -> *mut u8 {
+pub(crate) unsafe fn JS_GetArrayBufferViewFixedData(
+    obj: *mut root::JSObject,
+    buffer: *mut u8,
+    bufSize: usize,
+) -> *mut u8 {
     // Data is never inline, so `buffer` is not needed.
     let _ = (buffer, bufSize);
     match view(obj) {
@@ -540,11 +678,21 @@ pub(crate) unsafe fn JS_GetArrayBufferViewFixedData(obj: *mut root::JSObject, bu
     }
 }
 
-pub(crate) unsafe fn GetArrayBufferViewLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) {
+pub(crate) unsafe fn GetArrayBufferViewLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) {
     length_and_data(view(obj), length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_GetObjectAsArrayBufferView(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsArrayBufferView(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) -> *mut root::JSObject {
     let Some(b) = view(obj) else {
         return ptr::null_mut();
     };
@@ -586,7 +734,12 @@ pub(crate) unsafe fn JS_GetTypedArraySharedness(obj: *mut root::JSObject) -> boo
     typed_array(obj).is_some_and(|b| b.shared())
 }
 
-pub(crate) unsafe fn JS_NewDataView(cx: *mut root::JSContext, buffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, byteLength: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewDataView(
+    cx: *mut root::JSContext,
+    buffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    byteLength: usize,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let v = q::JS_NewDataView(cx.qctx(), obj_val(*buffer.ptr), byteOffset, byteLength);
     adopt_object(cx, v)
@@ -594,18 +747,35 @@ pub(crate) unsafe fn JS_NewDataView(cx: *mut root::JSContext, buffer: root::JS::
 
 // Typed arrays of one element type
 
-unsafe fn new_typed_array(cx: *mut root::JSContext, ty: Type, args: &mut [q::JSValue]) -> *mut root::JSObject {
+unsafe fn new_typed_array(
+    cx: *mut root::JSContext,
+    ty: Type,
+    args: &mut [q::JSValue],
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
-    let v = q::JS_NewTypedArray(cx.qctx(), args.len() as c_int, args.as_mut_ptr(), qjs_type(ty));
+    let v = q::JS_NewTypedArray(
+        cx.qctx(),
+        args.len() as c_int,
+        args.as_mut_ptr(),
+        qjs_type(ty),
+    );
     adopt_object(cx, v)
 }
 
-unsafe fn new_with_length(cx: *mut root::JSContext, ty: Type, nelements: usize) -> *mut root::JSObject {
+unsafe fn new_with_length(
+    cx: *mut root::JSContext,
+    ty: Type,
+    nelements: usize,
+) -> *mut root::JSObject {
     let mut args = [size_val(Cx::from_raw(cx).qctx(), nelements)];
     new_typed_array(cx, ty, &mut args)
 }
 
-unsafe fn new_from_array(cx: *mut root::JSContext, ty: Type, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+unsafe fn new_from_array(
+    cx: *mut root::JSContext,
+    ty: Type,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     let other = *array.ptr;
     // QuickJS would create a view; SpiderMonkey treats a buffer as an array-like without length.
     if any_buffer(other).is_some() {
@@ -615,7 +785,13 @@ unsafe fn new_from_array(cx: *mut root::JSContext, ty: Type, array: root::JS::Ha
     new_typed_array(cx, ty, &mut args)
 }
 
-unsafe fn new_with_buffer(cx: *mut root::JSContext, ty: Type, buffer: root::JS::Handle<*mut root::JSObject>, byte_offset: usize, length: i64) -> *mut root::JSObject {
+unsafe fn new_with_buffer(
+    cx: *mut root::JSContext,
+    ty: Type,
+    buffer: root::JS::Handle<*mut root::JSObject>,
+    byte_offset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     let qctx = Cx::from_raw(cx).qctx();
     let buffer = *buffer.ptr;
     if any_buffer(buffer).is_none() {
@@ -623,13 +799,21 @@ unsafe fn new_with_buffer(cx: *mut root::JSContext, ty: Type, buffer: root::JS::
         return ptr::null_mut();
     }
     // A length of -1 means up to the end of the buffer.
-    let length = if length < 0 { q::JS_UNDEFINED } else { q::JS_NewInt64(qctx, length) };
+    let length = if length < 0 {
+        q::JS_UNDEFINED
+    } else {
+        q::JS_NewInt64(qctx, length)
+    };
     let mut args = [obj_val(buffer), size_val(qctx, byte_offset), length];
     new_typed_array(cx, ty, &mut args)
 }
 
 unsafe fn unwrap_typed(obj: *mut root::JSObject, ty: Type) -> *mut root::JSObject {
-    if typed_array_of(obj, ty).is_some() { obj } else { ptr::null_mut() }
+    if typed_array_of(obj, ty).is_some() {
+        obj
+    } else {
+        ptr::null_mut()
+    }
 }
 
 unsafe fn typed_data<T>(obj: *mut root::JSObject, ty: Type, isSharedMemory: *mut bool) -> *mut T {
@@ -640,7 +824,13 @@ unsafe fn typed_data<T>(obj: *mut root::JSObject, ty: Type, isSharedMemory: *mut
     b.data() as *mut T
 }
 
-unsafe fn typed_object_as<T>(obj: *mut root::JSObject, ty: Type, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut T) -> *mut root::JSObject {
+unsafe fn typed_object_as<T>(
+    obj: *mut root::JSObject,
+    ty: Type,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut T,
+) -> *mut root::JSObject {
     let Some(b) = typed_array_of(obj, ty) else {
         return ptr::null_mut();
     };
@@ -648,273 +838,574 @@ unsafe fn typed_object_as<T>(obj: *mut root::JSObject, ty: Type, length: *mut us
     obj
 }
 
-unsafe fn typed_length_and_data<T>(obj: *mut root::JSObject, ty: Type, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut T) {
+unsafe fn typed_length_and_data<T>(
+    obj: *mut root::JSObject,
+    ty: Type,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut T,
+) {
     length_and_data(typed_array_of(obj, ty), length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewInt8Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt8Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Int8, nelements)
 }
-pub(crate) unsafe fn JS_NewInt8ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt8ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Int8, array)
 }
-pub(crate) unsafe fn JS_NewInt8ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt8ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Int8, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapInt8Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Int8)
 }
-pub(crate) unsafe fn JS_GetInt8ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut i8 {
+pub(crate) unsafe fn JS_GetInt8ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut i8 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Int8, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsInt8Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i8) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsInt8Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i8,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Int8, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetInt8ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i8) {
+pub(crate) unsafe fn GetInt8ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i8,
+) {
     typed_length_and_data(obj, Type::Int8, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewUint8Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint8Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Uint8, nelements)
 }
-pub(crate) unsafe fn JS_NewUint8ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint8ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Uint8, array)
 }
-pub(crate) unsafe fn JS_NewUint8ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint8ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Uint8, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapUint8Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Uint8)
 }
-pub(crate) unsafe fn JS_GetUint8ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u8 {
+pub(crate) unsafe fn JS_GetUint8ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u8 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Uint8, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsUint8Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsUint8Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Uint8, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetUint8ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) {
+pub(crate) unsafe fn GetUint8ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) {
     typed_length_and_data(obj, Type::Uint8, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewUint8ClampedArray(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint8ClampedArray(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Uint8Clamped, nelements)
 }
-pub(crate) unsafe fn JS_NewUint8ClampedArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint8ClampedArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Uint8Clamped, array)
 }
-pub(crate) unsafe fn JS_NewUint8ClampedArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint8ClampedArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Uint8Clamped, arrayBuffer, byteOffset, length)
 }
-pub(crate) unsafe fn UnwrapUint8ClampedArray(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
+pub(crate) unsafe fn UnwrapUint8ClampedArray(
+    maybeWrapped: *mut root::JSObject,
+) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Uint8Clamped)
 }
-pub(crate) unsafe fn JS_GetUint8ClampedArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u8 {
+pub(crate) unsafe fn JS_GetUint8ClampedArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u8 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Uint8Clamped, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsUint8ClampedArray(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) -> *mut root::JSObject {
-    typed_object_as(maybeWrapped, Type::Uint8Clamped, length, isSharedMemory, data)
+pub(crate) unsafe fn JS_GetObjectAsUint8ClampedArray(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) -> *mut root::JSObject {
+    typed_object_as(
+        maybeWrapped,
+        Type::Uint8Clamped,
+        length,
+        isSharedMemory,
+        data,
+    )
 }
-pub(crate) unsafe fn GetUint8ClampedArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u8) {
+pub(crate) unsafe fn GetUint8ClampedArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u8,
+) {
     typed_length_and_data(obj, Type::Uint8Clamped, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewInt16Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt16Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Int16, nelements)
 }
-pub(crate) unsafe fn JS_NewInt16ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt16ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Int16, array)
 }
-pub(crate) unsafe fn JS_NewInt16ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt16ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Int16, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapInt16Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Int16)
 }
-pub(crate) unsafe fn JS_GetInt16ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut i16 {
+pub(crate) unsafe fn JS_GetInt16ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut i16 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Int16, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsInt16Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i16) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsInt16Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i16,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Int16, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetInt16ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i16) {
+pub(crate) unsafe fn GetInt16ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i16,
+) {
     typed_length_and_data(obj, Type::Int16, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewUint16Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint16Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Uint16, nelements)
 }
-pub(crate) unsafe fn JS_NewUint16ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint16ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Uint16, array)
 }
-pub(crate) unsafe fn JS_NewUint16ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint16ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Uint16, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapUint16Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Uint16)
 }
-pub(crate) unsafe fn JS_GetUint16ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u16 {
+pub(crate) unsafe fn JS_GetUint16ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u16 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Uint16, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsUint16Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u16) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsUint16Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u16,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Uint16, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetUint16ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u16) {
+pub(crate) unsafe fn GetUint16ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u16,
+) {
     typed_length_and_data(obj, Type::Uint16, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewInt32Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt32Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Int32, nelements)
 }
-pub(crate) unsafe fn JS_NewInt32ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt32ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Int32, array)
 }
-pub(crate) unsafe fn JS_NewInt32ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewInt32ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Int32, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapInt32Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Int32)
 }
-pub(crate) unsafe fn JS_GetInt32ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut i32 {
+pub(crate) unsafe fn JS_GetInt32ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut i32 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Int32, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsInt32Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i32) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsInt32Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i32,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Int32, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetInt32ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i32) {
+pub(crate) unsafe fn GetInt32ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i32,
+) {
     typed_length_and_data(obj, Type::Int32, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewUint32Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint32Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Uint32, nelements)
 }
-pub(crate) unsafe fn JS_NewUint32ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint32ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Uint32, array)
 }
-pub(crate) unsafe fn JS_NewUint32ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewUint32ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Uint32, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapUint32Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Uint32)
 }
-pub(crate) unsafe fn JS_GetUint32ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u32 {
+pub(crate) unsafe fn JS_GetUint32ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u32 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Uint32, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsUint32Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u32) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsUint32Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u32,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Uint32, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetUint32ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u32) {
+pub(crate) unsafe fn GetUint32ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u32,
+) {
     typed_length_and_data(obj, Type::Uint32, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewFloat32Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat32Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Float32, nelements)
 }
-pub(crate) unsafe fn JS_NewFloat32ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat32ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Float32, array)
 }
-pub(crate) unsafe fn JS_NewFloat32ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat32ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Float32, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapFloat32Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Float32)
 }
-pub(crate) unsafe fn JS_GetFloat32ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut f32 {
+pub(crate) unsafe fn JS_GetFloat32ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut f32 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Float32, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsFloat32Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut f32) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsFloat32Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut f32,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Float32, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetFloat32ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut f32) {
+pub(crate) unsafe fn GetFloat32ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut f32,
+) {
     typed_length_and_data(obj, Type::Float32, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewFloat64Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat64Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Float64, nelements)
 }
-pub(crate) unsafe fn JS_NewFloat64ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat64ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Float64, array)
 }
-pub(crate) unsafe fn JS_NewFloat64ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat64ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Float64, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapFloat64Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Float64)
 }
-pub(crate) unsafe fn JS_GetFloat64ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut f64 {
+pub(crate) unsafe fn JS_GetFloat64ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut f64 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Float64, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsFloat64Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut f64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsFloat64Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut f64,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Float64, length, isSharedMemory, data)
 }
-pub(crate) unsafe fn GetFloat64ArrayLengthAndData(obj: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut f64) {
+pub(crate) unsafe fn GetFloat64ArrayLengthAndData(
+    obj: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut f64,
+) {
     typed_length_and_data(obj, Type::Float64, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewBigInt64Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewBigInt64Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::BigInt64, nelements)
 }
-pub(crate) unsafe fn JS_NewBigInt64ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewBigInt64ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::BigInt64, array)
 }
-pub(crate) unsafe fn JS_NewBigInt64ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewBigInt64ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::BigInt64, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapBigInt64Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::BigInt64)
 }
-pub(crate) unsafe fn JS_GetBigInt64ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut i64 {
+pub(crate) unsafe fn JS_GetBigInt64ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut i64 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::BigInt64, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsBigInt64Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsBigInt64Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut i64,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::BigInt64, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewBigUint64Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewBigUint64Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::BigUint64, nelements)
 }
-pub(crate) unsafe fn JS_NewBigUint64ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewBigUint64ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::BigUint64, array)
 }
-pub(crate) unsafe fn JS_NewBigUint64ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewBigUint64ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::BigUint64, arrayBuffer, byteOffset, length)
 }
-pub(crate) unsafe fn UnwrapBigUint64Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
+pub(crate) unsafe fn UnwrapBigUint64Array(
+    maybeWrapped: *mut root::JSObject,
+) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::BigUint64)
 }
-pub(crate) unsafe fn JS_GetBigUint64ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u64 {
+pub(crate) unsafe fn JS_GetBigUint64ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u64 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::BigUint64, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsBigUint64Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsBigUint64Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u64,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::BigUint64, length, isSharedMemory, data)
 }
 
-pub(crate) unsafe fn JS_NewFloat16Array(cx: *mut root::JSContext, nelements: usize) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat16Array(
+    cx: *mut root::JSContext,
+    nelements: usize,
+) -> *mut root::JSObject {
     new_with_length(cx, Type::Float16, nelements)
 }
-pub(crate) unsafe fn JS_NewFloat16ArrayFromArray(cx: *mut root::JSContext, array: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat16ArrayFromArray(
+    cx: *mut root::JSContext,
+    array: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     new_from_array(cx, Type::Float16, array)
 }
-pub(crate) unsafe fn JS_NewFloat16ArrayWithBuffer(cx: *mut root::JSContext, arrayBuffer: root::JS::Handle<*mut root::JSObject>, byteOffset: usize, length: i64) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewFloat16ArrayWithBuffer(
+    cx: *mut root::JSContext,
+    arrayBuffer: root::JS::Handle<*mut root::JSObject>,
+    byteOffset: usize,
+    length: i64,
+) -> *mut root::JSObject {
     new_with_buffer(cx, Type::Float16, arrayBuffer, byteOffset, length)
 }
 pub(crate) unsafe fn UnwrapFloat16Array(maybeWrapped: *mut root::JSObject) -> *mut root::JSObject {
     unwrap_typed(maybeWrapped, Type::Float16)
 }
-pub(crate) unsafe fn JS_GetFloat16ArrayData(maybeWrapped: *mut root::JSObject, isSharedMemory: *mut bool, arg1: *const root::JS::AutoRequireNoGC) -> *mut u16 {
+pub(crate) unsafe fn JS_GetFloat16ArrayData(
+    maybeWrapped: *mut root::JSObject,
+    isSharedMemory: *mut bool,
+    arg1: *const root::JS::AutoRequireNoGC,
+) -> *mut u16 {
     let _ = arg1;
     typed_data(maybeWrapped, Type::Float16, isSharedMemory)
 }
-pub(crate) unsafe fn JS_GetObjectAsFloat16Array(maybeWrapped: *mut root::JSObject, length: *mut usize, isSharedMemory: *mut bool, data: *mut *mut u16) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_GetObjectAsFloat16Array(
+    maybeWrapped: *mut root::JSObject,
+    length: *mut usize,
+    isSharedMemory: *mut bool,
+    data: *mut *mut u16,
+) -> *mut root::JSObject {
     typed_object_as(maybeWrapped, Type::Float16, length, isSharedMemory, data)
 }

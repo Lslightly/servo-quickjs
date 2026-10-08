@@ -6,13 +6,16 @@
 
 use std::ptr;
 
-use mozjs::jsapi::{HandleValueArray, JS_GetFunctionObject, JS_NewPlainObject, OnNewGlobalHookOption, SupportUnscopables};
+use mozjs::jsapi::{
+    HandleValueArray, JS_GetFunctionObject, JS_NewPlainObject, OnNewGlobalHookOption,
+    SupportUnscopables,
+};
 use mozjs::jsval::{Int32Value, UndefinedValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{Call, CompileFunction, JS_NewGlobalObject, JS_SetProperty};
 use mozjs::rust::{
-    transform_u16_to_source_text, CompileOptionsWrapper, EnvironmentChain,
-    JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    transform_u16_to_source_text, CompileOptionsWrapper, EnvironmentChain, JSEngine, RealmOptions,
+    Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 #[test]
@@ -37,9 +40,24 @@ fn compile_function_with_environment_chain() {
         rooted!(&in(cx) let inner = JS_NewPlainObject(cx.raw_cx()));
         rooted!(&in(cx) let one = Int32Value(1));
         rooted!(&in(cx) let two = Int32Value(2));
-        assert!(JS_SetProperty(cx, outer.handle(), c"a".as_ptr(), one.handle()));
-        assert!(JS_SetProperty(cx, outer.handle(), c"b".as_ptr(), one.handle()));
-        assert!(JS_SetProperty(cx, inner.handle(), c"b".as_ptr(), two.handle()));
+        assert!(JS_SetProperty(
+            cx,
+            outer.handle(),
+            c"a".as_ptr(),
+            one.handle()
+        ));
+        assert!(JS_SetProperty(
+            cx,
+            outer.handle(),
+            c"b".as_ptr(),
+            one.handle()
+        ));
+        assert!(JS_SetProperty(
+            cx,
+            inner.handle(),
+            c"b".as_ptr(),
+            two.handle()
+        ));
 
         let chain = EnvironmentChain::new(cx, SupportUnscopables::Yes);
         chain.append(outer.get());
@@ -63,8 +81,17 @@ fn compile_function_with_environment_chain() {
         rooted!(&in(cx) let this = UndefinedValue());
         rooted!(&in(cx) let mut rval = UndefinedValue());
         let argv = [Int32Value(10)];
-        let argv = HandleValueArray { length_: 1, elements_: argv.as_ptr() };
-        assert!(Call(cx, this.handle(), funval.handle(), &argv, rval.handle_mut()));
+        let argv = HandleValueArray {
+            length_: 1,
+            elements_: argv.as_ptr(),
+        };
+        assert!(Call(
+            cx,
+            this.handle(),
+            funval.handle(),
+            &argv,
+            rval.handle_mut()
+        ));
         assert_eq!(rval.get().to_int32(), 13);
     }
 }

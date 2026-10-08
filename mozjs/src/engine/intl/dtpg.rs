@@ -46,7 +46,12 @@ struct Row {
 }
 
 const fn row(ch: char, field: usize, ty: i32, min_len: usize) -> Row {
-    Row { ch, field, ty, min_len }
+    Row {
+        ch,
+        field,
+        ty,
+        min_len,
+    }
 }
 
 /// `dtTypes`: the field, type and minimum length of each pattern character.
@@ -145,7 +150,10 @@ fn canonical_row(item: &[char]) -> Option<&'static Row> {
     if item.iter().any(|&c| c != ch) {
         return None;
     }
-    let mut rows = TYPES.iter().skip_while(|r| r.ch != ch).take_while(|r| r.ch == ch);
+    let mut rows = TYPES
+        .iter()
+        .skip_while(|r| r.ch != ch)
+        .take_while(|r| r.ch == ch);
     let mut best = rows.next()?;
     for r in rows {
         if r.min_len > item.len() {
@@ -201,7 +209,8 @@ fn quote_literal(items: &[&[char]], i: &mut usize, out: &mut Vec<char>) {
 /// `FormatParser::isPatternSeparator`, including its use of `items[i]` for the i-th character.
 fn is_separator(field: &[char], items: &[&[char]]) -> bool {
     field.iter().enumerate().all(|(i, c)| {
-        matches!(c, '\'' | '\\' | ' ' | ':' | '"' | ',' | '-') || items.get(i).is_some_and(|item| item[0] == '.')
+        matches!(c, '\'' | '\\' | ' ' | ':' | '"' | ',' | '-')
+            || items.get(i).is_some_and(|item| item[0] == '.')
     })
 }
 
@@ -226,11 +235,15 @@ impl Fields {
     }
 
     fn first_char(&self) -> Option<char> {
-        (0..FIELD_COUNT).find(|&f| self.lens[f] != 0).map(|f| self.chars[f])
+        (0..FIELD_COUNT)
+            .find(|&f| self.lens[f] != 0)
+            .map(|f| self.chars[f])
     }
 
     fn to_chars(&self) -> Vec<char> {
-        (0..FIELD_COUNT).flat_map(|f| std::iter::repeat_n(self.chars[f], self.lens[f] as usize)).collect()
+        (0..FIELD_COUNT)
+            .flat_map(|f| std::iter::repeat_n(self.chars[f], self.lens[f] as usize))
+            .collect()
     }
 }
 
@@ -258,11 +271,18 @@ impl Skeleton {
             if let Some(row) = canonical_row(item) {
                 s.original.set(row.field, item[0], item.len());
                 s.base.set(row.field, row.ch, row.min_len);
-                s.ty[row.field] = if row.ty > 0 { row.ty + item.len() as i32 } else { row.ty };
+                s.ty[row.field] = if row.ty > 0 {
+                    row.ty + item.len() as i32
+                } else {
+                    row.ty
+                };
             }
             i += 1;
         }
-        if !s.original.is_empty(MINUTE) && !s.original.is_empty(FRACTIONAL_SECOND) && s.original.is_empty(SECOND) {
+        if !s.original.is_empty(MINUTE)
+            && !s.original.is_empty(FRACTIONAL_SECOND)
+            && s.original.is_empty(SECOND)
+        {
             s.original.set(SECOND, 's', 1);
             s.base.set(SECOND, 's', 1);
             s.ty[SECOND] = NUMERIC + 1;
@@ -284,14 +304,20 @@ impl Skeleton {
     }
 
     fn field_mask(&self) -> u32 {
-        (0..FIELD_COUNT).filter(|&f| self.ty[f] != 0).fold(0, |m, f| m | 1 << f)
+        (0..FIELD_COUNT)
+            .filter(|&f| self.ty[f] != 0)
+            .fold(0, |m, f| m | 1 << f)
     }
 
     /// `DateTimeMatcher::getDistance`: (distance, missing fields, extra fields).
     fn distance(&self, other: &Skeleton, include: u32) -> (i32, u32, u32) {
         let (mut result, mut missing, mut extra) = (0, 0, 0);
         for f in 0..FIELD_COUNT {
-            let mine = if include & (1 << f) == 0 { 0 } else { self.ty[f] };
+            let mine = if include & (1 << f) == 0 {
+                0
+            } else {
+                self.ty[f]
+            };
             let theirs = other.ty[f];
             if mine == theirs {
                 continue;
@@ -352,7 +378,13 @@ impl<'a> LocaleData<'a> {
         while let (Some(skeleton), Some(pattern)) = (parts.next(), parts.next()) {
             formats.push((skeleton, pattern));
         }
-        LocaleData { styles, glue, append, names, formats }
+        LocaleData {
+            styles,
+            glue,
+            append,
+            names,
+            formats,
+        }
     }
 }
 
@@ -379,17 +411,30 @@ fn bucket(c: char) -> Option<usize> {
 impl Generator {
     /// `initData`. `override_formats` is false to keep the style patterns of a locale whose own
     /// availableFormats are not in the table (`formats` are then root's).
-    pub fn new(data: &LocaleData, override_formats: bool, default_hour: char, decimal: &str) -> Generator {
+    pub fn new(
+        data: &LocaleData,
+        override_formats: bool,
+        default_hour: char,
+        decimal: &str,
+    ) -> Generator {
         let chars = |s: &str| s.chars().collect::<Vec<_>>();
         let mut g = Generator {
             map: (0..52).map(|_| Vec::new()).collect(),
             available: Vec::new(),
             glue: data.glue.map(chars),
             append: std::array::from_fn(|f| {
-                if data.append[f].is_empty() { chars("{0} \u{251C}{2}: {1}\u{2524}") } else { chars(data.append[f]) }
+                if data.append[f].is_empty() {
+                    chars("{0} \u{251C}{2}: {1}\u{2524}")
+                } else {
+                    chars(data.append[f])
+                }
             }),
             names: std::array::from_fn(|f| {
-                if data.names[f].is_empty() { chars(&format!("F{f}")) } else { chars(data.names[f]) }
+                if data.names[f].is_empty() {
+                    chars(&format!("F{f}"))
+                } else {
+                    chars(data.names[f])
+                }
             }),
             default_hour,
             decimal: chars(decimal),
@@ -429,18 +474,28 @@ impl Generator {
         }
         let specified = skeleton_to_use.is_some();
         let list = &mut self.map[index];
-        if let Some(dup) = list.iter_mut().find(|e| e.base == base && e.skeleton.ty == skeleton.ty) {
+        if let Some(dup) = list
+            .iter_mut()
+            .find(|e| e.base == base && e.skeleton.ty == skeleton.ty)
+        {
             dup.pattern = pattern.to_vec();
             dup.specified = specified;
         } else {
-            list.push(Elem { base, skeleton, pattern: pattern.to_vec(), specified });
+            list.push(Elem {
+                base,
+                skeleton,
+                pattern: pattern.to_vec(),
+                specified,
+            });
         }
     }
 
     /// `PatternMap::getPatternFromSkeleton` (by `original`).
     fn find(&self, skeleton: &Skeleton) -> Option<&Elem> {
         let index = bucket(skeleton.base.first_char()?)?;
-        self.map[index].iter().find(|e| e.skeleton.original == skeleton.original)
+        self.map[index]
+            .iter()
+            .find(|e| e.skeleton.original == skeleton.original)
     }
 
     /// `getBestRaw`: the closest element, and the fields it misses and adds.
@@ -450,7 +505,9 @@ impl Generator {
         let mut best_missing: i64 = -1;
         for elem in self.map.iter().flatten() {
             let (distance, missing, extra) = source.distance(&elem.skeleton, include);
-            if distance < best_distance || (distance == best_distance && best_missing < missing as i64) {
+            if distance < best_distance
+                || (distance == best_distance && best_missing < missing as i64)
+            {
                 best_distance = distance;
                 best_missing = missing as i64;
                 best = Some((elem, missing, extra));
@@ -463,7 +520,13 @@ impl Generator {
     }
 
     /// `adjustFieldTypes` with `UDATPG_MATCH_HOUR_FIELD_LENGTH`.
-    fn adjust(&self, pattern: &[char], elem: &Elem, request: &Skeleton, fix_fractional: bool) -> Vec<char> {
+    fn adjust(
+        &self,
+        pattern: &[char],
+        elem: &Elem,
+        request: &Skeleton,
+        fix_fractional: bool,
+    ) -> Vec<char> {
         let specified = elem.specified.then_some(&elem.skeleton);
         let items = tokenize(pattern);
         let mut out = Vec::new();
@@ -489,7 +552,10 @@ impl Generator {
                 out.extend_from_slice(field);
                 out.extend_from_slice(&self.decimal);
                 let n = request.original.lens[FRACTIONAL_SECOND] as usize;
-                out.extend(std::iter::repeat_n(request.original.chars[FRACTIONAL_SECOND], n));
+                out.extend(std::iter::repeat_n(
+                    request.original.chars[FRACTIONAL_SECOND],
+                    n,
+                ));
                 continue;
             }
             if request.ty[ty] == 0 {
@@ -514,8 +580,13 @@ impl Generator {
                     }
                 }
             }
-            let keep_pattern_char = ty == HOUR || ty == MONTH || ty == WEEKDAY || (ty == YEAR && req_char != 'Y');
-            let mut c = if keep_pattern_char { field[0] } else { req_char };
+            let keep_pattern_char =
+                ty == HOUR || ty == MONTH || ty == WEEKDAY || (ty == YEAR && req_char != 'Y');
+            let mut c = if keep_pattern_char {
+                field[0]
+            } else {
+                req_char
+            };
             if c == 'E' && adj_len < 3 {
                 c = 'e';
             }
@@ -553,7 +624,9 @@ impl Generator {
             if last_missing == missing {
                 break;
             }
-            if missing & SECOND_AND_FRACTIONAL_MASK == FRACTIONAL_MASK && fields & SECOND_AND_FRACTIONAL_MASK == SECOND_AND_FRACTIONAL_MASK {
+            if missing & SECOND_AND_FRACTIONAL_MASK == FRACTIONAL_MASK
+                && fields & SECOND_AND_FRACTIONAL_MASK == SECOND_AND_FRACTIONAL_MASK
+            {
                 result = self.adjust(&result, last_elem, request, true);
                 missing &= !FRACTIONAL_MASK;
                 continue;
@@ -566,7 +639,11 @@ impl Generator {
             missing = now_missing;
             let temp = self.adjust(&elem.pattern, elem, request, false);
             let found = starting & !missing;
-            let top = if found == 0 { 0 } else { (31 - found.leading_zeros() as usize).min(FIELD_COUNT - 1) };
+            let top = if found == 0 {
+                0
+            } else {
+                (31 - found.leading_zeros() as usize).min(FIELD_COUNT - 1)
+            };
             let mut name = vec!['\''];
             name.extend_from_slice(&self.names[top]);
             name.push('\'');
@@ -586,7 +663,10 @@ impl Generator {
         let request = Skeleton::of(&skeleton.chars().collect::<Vec<_>>());
         if let Some((elem, missing, extra)) = self.best_raw(&request, u32::MAX) {
             if missing == 0 && extra == 0 {
-                return self.adjust(&elem.pattern, elem, &request, false).into_iter().collect();
+                return self
+                    .adjust(&elem.pattern, elem, &request, false)
+                    .into_iter()
+                    .collect();
             }
         }
         let needed = request.field_mask();
@@ -601,7 +681,9 @@ impl Generator {
             3 => 2,
             _ => 3,
         };
-        substitute(&self.glue[style], &[&time, &date]).into_iter().collect()
+        substitute(&self.glue[style], &[&time, &date])
+            .into_iter()
+            .collect()
     }
 }
 
@@ -611,7 +693,10 @@ fn substitute(pattern: &[char], values: &[&[char]]) -> Vec<char> {
     let mut i = 0;
     while i < pattern.len() {
         if pattern[i] == '{' && i + 2 < pattern.len() && pattern[i + 2] == '}' {
-            if let Some(v) = pattern[i + 1].to_digit(10).and_then(|d| values.get(d as usize)) {
+            if let Some(v) = pattern[i + 1]
+                .to_digit(10)
+                .and_then(|d| values.get(d as usize))
+            {
                 out.extend_from_slice(v);
                 i += 3;
                 continue;
@@ -629,8 +714,15 @@ mod tests {
     use super::*;
 
     fn generator(locale: &str) -> Generator {
-        let (_, data) = patterns::LOCALES.iter().find(|(id, _)| *id == locale).unwrap();
-        let hour = if locale.ends_with("_US") || locale.ends_with("_CN") { 'h' } else { 'H' };
+        let (_, data) = patterns::LOCALES
+            .iter()
+            .find(|(id, _)| *id == locale)
+            .unwrap();
+        let hour = if locale.ends_with("_US") || locale.ends_with("_CN") {
+            'h'
+        } else {
+            'H'
+        };
         Generator::new(&LocaleData::parse(data), true, hour, ".")
     }
 

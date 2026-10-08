@@ -438,7 +438,11 @@ fn jit_info() {
 unsafe extern "C" fn construct_hook(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
     let args = CallArgs::from_vp(vp, argc);
     let obj = mozjs::jsapi::JS_NewPlainObject(cx);
-    let arg = if argc > 0 { *args.get(0).ptr } else { UndefinedValue() };
+    let arg = if argc > 0 {
+        *args.get(0).ptr
+    } else {
+        UndefinedValue()
+    };
     rooted!(in(cx) let obj = obj);
     rooted!(in(cx) let arg = arg);
     assert!(mozjs::jsapi::JS_DefineProperty(
@@ -507,10 +511,17 @@ fn accessor_function_names() {
         JSPropertySpec_AccessorsOrValue_Accessors, JSPropertySpec_Kind,
     };
     with_global(|cx, global| unsafe {
-        let accessor = |op| JSPropertySpec_Accessor { native: JSNativeWrapper { op, info: ptr::null() } };
+        let accessor = |op| JSPropertySpec_Accessor {
+            native: JSNativeWrapper {
+                op,
+                info: ptr::null(),
+            },
+        };
         let specs = [
             JSPropertySpec {
-                name: JSPropertySpec_Name { string_: c"x".as_ptr() },
+                name: JSPropertySpec_Name {
+                    string_: c"x".as_ptr(),
+                },
                 attributes_: JSPROP_ENUMERATE as u8,
                 kind_: JSPropertySpec_Kind::NativeAccessor,
                 u: JSPropertySpec_AccessorsOrValue {
@@ -524,7 +535,11 @@ fn accessor_function_names() {
         ];
         let obj = JS_NewPlainObject(cx);
         rooted!(&in(cx) let obj = obj);
-        assert!(mozjs::rust::wrappers2::JS_DefineProperties(cx, obj.handle(), specs.as_ptr()));
+        assert!(mozjs::rust::wrappers2::JS_DefineProperties(
+            cx,
+            obj.handle(),
+            specs.as_ptr()
+        ));
         set_global(cx, global, c"o", ObjectValue(obj.get()));
         let v = eval(
             cx,
@@ -532,7 +547,8 @@ fn accessor_function_names() {
             "var d = Object.getOwnPropertyDescriptor(o, 'x'); [o.x, d.get.name, d.set.name].join()",
         );
         rooted!(&in(cx) let v = v);
-        let s = mozjs::conversions::jsstr_to_string(cx, std::ptr::NonNull::new(v.to_string()).unwrap());
+        let s =
+            mozjs::conversions::jsstr_to_string(cx, std::ptr::NonNull::new(v.to_string()).unwrap());
         assert_eq!(s, "7,get x,set x");
     });
 }

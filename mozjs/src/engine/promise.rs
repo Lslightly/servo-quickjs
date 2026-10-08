@@ -72,7 +72,11 @@ unsafe fn handle<T>(ptr: *const T) -> root::JS::Handle<T> {
 }
 
 fn object_or_undefined(obj: *mut root::JSObject) -> q::JSValue {
-    if obj.is_null() { q::JS_UNDEFINED } else { obj_val(obj) }
+    if obj.is_null() {
+        q::JS_UNDEFINED
+    } else {
+        obj_val(obj)
+    }
 }
 
 // Promises.
@@ -82,7 +86,10 @@ unsafe fn promise_state(promise: *mut root::JSObject) -> Option<q::JSPromiseStat
     (state <= q::JS_PROMISE_REJECTED).then_some(state)
 }
 
-pub(crate) unsafe fn NewPromiseObject(cx: *mut root::JSContext, executor: root::JS::HandleObject) -> *mut root::JSObject {
+pub(crate) unsafe fn NewPromiseObject(
+    cx: *mut root::JSContext,
+    executor: root::JS::HandleObject,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let qctx = cx.qctx();
     let mut funcs = [q::JS_UNDEFINED; 2];
@@ -93,7 +100,13 @@ pub(crate) unsafe fn NewPromiseObject(cx: *mut root::JSContext, executor: root::
     let mut ok = true;
     if !(*executor.ptr).is_null() {
         // The Promise constructor's steps, without looking up a possibly replaced constructor.
-        let r = q::JS_Call(qctx, obj_val(*executor.ptr), q::JS_UNDEFINED, 2, funcs.as_mut_ptr());
+        let r = q::JS_Call(
+            qctx,
+            obj_val(*executor.ptr),
+            q::JS_UNDEFINED,
+            2,
+            funcs.as_mut_ptr(),
+        );
         if r.tag() != q::JS_TAG_EXCEPTION {
             q::JS_FreeValueRT(cx.rt, r);
         } else if q::JS_HasUncatchableException(qctx) != 0 {
@@ -128,7 +141,10 @@ pub(crate) unsafe fn GetPromiseState(promise: root::JS::HandleObject) -> root::J
     }
 }
 
-pub(crate) unsafe fn JS_GetPromiseResult(promise: root::JS::HandleObject, dest: root::JS::MutableHandleValue) {
+pub(crate) unsafe fn JS_GetPromiseResult(
+    promise: root::JS::HandleObject,
+    dest: root::JS::MutableHandleValue,
+) {
     let cx = super::current();
     let result = q::JS_PromiseResult(cx.base_ctx, obj_val(*promise.ptr));
     *dest.ptr = cx.adopt(result);
@@ -138,7 +154,10 @@ pub(crate) unsafe fn GetPromiseIsHandled(promise: root::JS::HandleObject) -> boo
     q::JS_GetPromiseIsHandled(obj_val(*promise.ptr)) != 0
 }
 
-pub(crate) unsafe fn SetAnyPromiseIsHandled(cx: *mut root::JSContext, promise: root::JS::HandleObject) -> bool {
+pub(crate) unsafe fn SetAnyPromiseIsHandled(
+    cx: *mut root::JSContext,
+    promise: root::JS::HandleObject,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let p = obj_val(*promise.ptr);
     let Some(state) = promise_state(*promise.ptr) else {
@@ -149,39 +168,77 @@ pub(crate) unsafe fn SetAnyPromiseIsHandled(cx: *mut root::JSContext, promise: r
     // Like SpiderMonkey, a settled promise is reported as handled to the rejection tracker.
     if state != q::JS_PROMISE_PENDING {
         let qctx = cx.qctx();
-        notify_rejection_tracker(cx, qctx, *promise.ptr, root::JS::PromiseRejectionHandlingState::Handled);
+        notify_rejection_tracker(
+            cx,
+            qctx,
+            *promise.ptr,
+            root::JS::PromiseRejectionHandlingState::Handled,
+        );
     }
     true
 }
 
-unsafe fn settle(cx: *mut root::JSContext, promise: root::JS::HandleObject, value: root::JS::HandleValue, reject: bool) -> bool {
+unsafe fn settle(
+    cx: *mut root::JSContext,
+    promise: root::JS::HandleObject,
+    value: root::JS::HandleValue,
+    reject: bool,
+) -> bool {
     let cx = Cx::from_raw(cx);
-    q::JS_SettlePromise(cx.qctx(), obj_val(*promise.ptr), (*value.ptr).to_qjs(), reject as c_int) >= 0
+    q::JS_SettlePromise(
+        cx.qctx(),
+        obj_val(*promise.ptr),
+        (*value.ptr).to_qjs(),
+        reject as c_int,
+    ) >= 0
 }
 
-pub(crate) unsafe fn ResolvePromise(cx: *mut root::JSContext, promiseObj: root::JS::HandleObject, resolutionValue: root::JS::HandleValue) -> bool {
+pub(crate) unsafe fn ResolvePromise(
+    cx: *mut root::JSContext,
+    promiseObj: root::JS::HandleObject,
+    resolutionValue: root::JS::HandleValue,
+) -> bool {
     settle(cx, promiseObj, resolutionValue, false)
 }
 
-pub(crate) unsafe fn RejectPromise(cx: *mut root::JSContext, promiseObj: root::JS::HandleObject, rejectionValue: root::JS::HandleValue) -> bool {
+pub(crate) unsafe fn RejectPromise(
+    cx: *mut root::JSContext,
+    promiseObj: root::JS::HandleObject,
+    rejectionValue: root::JS::HandleValue,
+) -> bool {
     settle(cx, promiseObj, rejectionValue, true)
 }
 
-unsafe fn original_resolve(cx: *mut root::JSContext, value: root::JS::HandleValue, reject: bool) -> *mut root::JSObject {
+unsafe fn original_resolve(
+    cx: *mut root::JSContext,
+    value: root::JS::HandleValue,
+    reject: bool,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let p = q::JS_PromiseResolve(cx.qctx(), (*value.ptr).to_qjs(), reject as c_int);
     super::class::adopt_object(cx, p)
 }
 
-pub(crate) unsafe fn CallOriginalPromiseResolve(cx: *mut root::JSContext, resolutionValue: root::JS::HandleValue) -> *mut root::JSObject {
+pub(crate) unsafe fn CallOriginalPromiseResolve(
+    cx: *mut root::JSContext,
+    resolutionValue: root::JS::HandleValue,
+) -> *mut root::JSObject {
     original_resolve(cx, resolutionValue, false)
 }
 
-pub(crate) unsafe fn CallOriginalPromiseReject(cx: *mut root::JSContext, rejectionValue: root::JS::HandleValue) -> *mut root::JSObject {
+pub(crate) unsafe fn CallOriginalPromiseReject(
+    cx: *mut root::JSContext,
+    rejectionValue: root::JS::HandleValue,
+) -> *mut root::JSObject {
     original_resolve(cx, rejectionValue, true)
 }
 
-pub(crate) unsafe fn AddPromiseReactions(cx: *mut root::JSContext, promise: root::JS::HandleObject, onFulfilled: root::JS::HandleObject, onRejected: root::JS::HandleObject) -> bool {
+pub(crate) unsafe fn AddPromiseReactions(
+    cx: *mut root::JSContext,
+    promise: root::JS::HandleObject,
+    onFulfilled: root::JS::HandleObject,
+    onRejected: root::JS::HandleObject,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let r = q::JS_PerformPromiseThen(
         cx.qctx(),
@@ -193,18 +250,27 @@ pub(crate) unsafe fn AddPromiseReactions(cx: *mut root::JSContext, promise: root
     r.tag() != q::JS_TAG_EXCEPTION
 }
 
-pub(crate) unsafe fn SetPromiseUserInputEventHandlingState(promise: root::JS::HandleObject, state: root::JS::PromiseUserInputEventHandlingState) -> bool {
+pub(crate) unsafe fn SetPromiseUserInputEventHandlingState(
+    promise: root::JS::HandleObject,
+    state: root::JS::PromiseUserInputEventHandlingState,
+) -> bool {
     // Not tracked: jobs are enqueued without their promise, so the state is never read back.
     let _ = (promise, state);
     true
 }
 
-pub(crate) unsafe fn GetPromiseUserInputEventHandlingState(promise: root::JS::HandleObject) -> root::JS::PromiseUserInputEventHandlingState {
+pub(crate) unsafe fn GetPromiseUserInputEventHandlingState(
+    promise: root::JS::HandleObject,
+) -> root::JS::PromiseUserInputEventHandlingState {
     let _ = promise;
     root::JS::PromiseUserInputEventHandlingState::DontCare
 }
 
-pub(crate) unsafe fn SetPromiseRejectionTrackerCallback(cx: *mut root::JSContext, callback: root::JS::PromiseRejectionTrackerCallback, data: *mut ::std::os::raw::c_void) {
+pub(crate) unsafe fn SetPromiseRejectionTrackerCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::PromiseRejectionTrackerCallback,
+    data: *mut ::std::os::raw::c_void,
+) {
     let cx = Cx::from_raw(cx);
     cx.hooks.rejection_tracker = callback;
     cx.hooks.rejection_tracker_data = data;
@@ -212,7 +278,13 @@ pub(crate) unsafe fn SetPromiseRejectionTrackerCallback(cx: *mut root::JSContext
     q::JS_SetHostPromiseRejectionTracker(cx.rt, callback.map(|_| track_rejection as _), opaque);
 }
 
-unsafe extern "C" fn track_rejection(ctx: *mut q::JSContext, promise: q::JSValue, reason: q::JSValue, is_handled: c_int, opaque: *mut c_void) {
+unsafe extern "C" fn track_rejection(
+    ctx: *mut q::JSContext,
+    promise: q::JSValue,
+    reason: q::JSValue,
+    is_handled: c_int,
+    opaque: *mut c_void,
+) {
     let _ = reason;
     let state = if is_handled != 0 {
         root::JS::PromiseRejectionHandlingState::Handled
@@ -222,7 +294,12 @@ unsafe extern "C" fn track_rejection(ctx: *mut q::JSContext, promise: q::JSValue
     notify_rejection_tracker(hook_cx(opaque), ctx, val_obj(promise), state);
 }
 
-unsafe fn notify_rejection_tracker(cx: &mut Cx, ctx: *mut q::JSContext, promise: *mut root::JSObject, state: root::JS::PromiseRejectionHandlingState) {
+unsafe fn notify_rejection_tracker(
+    cx: &mut Cx,
+    ctx: *mut q::JSContext,
+    promise: *mut root::JSObject,
+    state: root::JS::PromiseRejectionHandlingState,
+) {
     let Some(callback) = cx.hooks.rejection_tracker else {
         return;
     };
@@ -242,7 +319,11 @@ struct JobQueue {
     interrupt_queues: *mut c_void,
 }
 
-pub(crate) unsafe fn CreateJobQueue(aTraps: *const crate::glue::JobQueueTraps, aQueue: *const ::std::os::raw::c_void, aInterruptQueues: *mut ::std::os::raw::c_void) -> *mut root::JS::JobQueue {
+pub(crate) unsafe fn CreateJobQueue(
+    aTraps: *const crate::glue::JobQueueTraps,
+    aQueue: *const ::std::os::raw::c_void,
+    aInterruptQueues: *mut ::std::os::raw::c_void,
+) -> *mut root::JS::JobQueue {
     let queue = Box::new(JobQueue {
         traps: *aTraps,
         queue: aQueue,
@@ -262,7 +343,11 @@ pub(crate) unsafe fn DeleteJobQueue(queue: *mut root::JS::JobQueue) {
 pub(crate) unsafe fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS::JobQueue) {
     let cx = Cx::from_raw(cx);
     cx.hooks.job_queue = queue as *mut JobQueue;
-    let hook: q::JSEnqueueJobHook = if queue.is_null() { None } else { Some(enqueue_job) };
+    let hook: q::JSEnqueueJobHook = if queue.is_null() {
+        None
+    } else {
+        Some(enqueue_job)
+    };
     q::JS_SetEnqueueJobHook(cx.rt, hook, cx as *mut Cx as *mut c_void);
 }
 
@@ -307,7 +392,13 @@ const JOB_FUNC_SLOT: usize = 0;
 const JOB_ARGS_SLOT: usize = 1;
 
 /// Patch Q4's hook: wraps a QuickJS promise job in a job thunk and passes it to the embedder.
-unsafe extern "C" fn enqueue_job(ctx: *mut q::JSContext, job_func: q::JSJobFunc, argc: c_int, argv: *mut q::JSValue, opaque: *mut c_void) -> c_int {
+unsafe extern "C" fn enqueue_job(
+    ctx: *mut q::JSContext,
+    job_func: q::JSJobFunc,
+    argc: c_int,
+    argv: *mut q::JSValue,
+    opaque: *mut c_void,
+) -> c_int {
     let cx = hook_cx(opaque);
     let queue = cx.hooks.job_queue;
     assert!(!queue.is_null());
@@ -318,7 +409,14 @@ unsafe extern "C" fn enqueue_job(ctx: *mut q::JSContext, job_func: q::JSJobFunc,
     result
 }
 
-unsafe fn enqueue_thunk(cx: &mut Cx, queue: &JobQueue, realm: *mut RealmData, job_func: q::JSJobFunc, argc: c_int, argv: *mut q::JSValue) -> c_int {
+unsafe fn enqueue_thunk(
+    cx: &mut Cx,
+    queue: &JobQueue,
+    realm: *mut RealmData,
+    job_func: q::JSJobFunc,
+    argc: c_int,
+    argv: *mut q::JSValue,
+) -> c_int {
     let qctx = cx.qctx();
     let args = q::JS_NewArray(qctx);
     if args.tag() == q::JS_TAG_EXCEPTION {
@@ -341,7 +439,8 @@ unsafe fn enqueue_thunk(cx: &mut Cx, queue: &JobQueue, realm: *mut RealmData, jo
     // The job runs in the context that enqueued it (the base context has no realm).
     let created_in = std::mem::replace(&mut data.realm, super::hold_realm(realm));
     super::release_realm(created_in);
-    data.slots[JOB_FUNC_SLOT] = q::JSValue::mkptr(q::JS_TAG_FLOAT64, job_func.unwrap() as *mut c_void);
+    data.slots[JOB_FUNC_SLOT] =
+        q::JSValue::mkptr(q::JS_TAG_FLOAT64, job_func.unwrap() as *mut c_void);
     data.slots[JOB_ARGS_SLOT] = args;
 
     let mut host_defined_data: *mut root::JSObject = ptr::null_mut();
@@ -351,9 +450,19 @@ unsafe fn enqueue_thunk(cx: &mut Cx, queue: &JobQueue, realm: *mut RealmData, jo
             return -1;
         }
     }
-    let enqueue = queue.traps.enqueuePromiseJob.expect("JobQueueTraps without enqueuePromiseJob");
+    let enqueue = queue
+        .traps
+        .enqueuePromiseJob
+        .expect("JobQueueTraps without enqueuePromiseJob");
     let null: *mut root::JSObject = ptr::null_mut();
-    let ok = enqueue(queue.queue, cx.as_raw(), handle(&null), handle(&thunk), handle(&null), handle(&host_defined_data));
+    let ok = enqueue(
+        queue.queue,
+        cx.as_raw(),
+        handle(&null),
+        handle(&thunk),
+        handle(&null),
+        handle(&host_defined_data),
+    );
     if !ok {
         if q::JS_HasException(cx.qctx()) == 0 {
             q::JS_ThrowInternalError(cx.qctx(), c"failed to enqueue a promise job".as_ptr());
@@ -374,12 +483,18 @@ unsafe extern "C" fn run_job(cx: *mut root::JSContext, argc: u32, vp: *mut JSVal
         return true;
     }
     let job_func: q::JSJobFunc = std::mem::transmute(data.slots[JOB_FUNC_SLOT].ptr());
-    let ctx = if data.realm.is_null() { cx.base_ctx } else { (*data.realm).qctx };
+    let ctx = if data.realm.is_null() {
+        cx.base_ctx
+    } else {
+        (*data.realm).qctx
+    };
     let mut len = 0u32;
     let len_val = q::JS_GetPropertyStr(ctx, args, c"length".as_ptr());
     q::JS_ToUint32(ctx, &mut len, len_val);
     q::JS_FreeValueRT(cx.rt, len_val);
-    let mut argv: Vec<q::JSValue> = (0..len).map(|i| q::JS_GetPropertyUint32(ctx, args, i)).collect();
+    let mut argv: Vec<q::JSValue> = (0..len)
+        .map(|i| q::JS_GetPropertyUint32(ctx, args, i))
+        .collect();
     q::JS_FreeValueRT(cx.rt, args);
     let result = job_func.unwrap()(ctx, argv.len() as c_int, argv.as_mut_ptr());
     for v in argv {
@@ -394,7 +509,10 @@ unsafe extern "C" fn run_job(cx: *mut root::JSContext, argc: u32, vp: *mut JSVal
 
 // Interrupts.
 
-pub(crate) unsafe fn JS_AddInterruptCallback(cx: *mut root::JSContext, callback: root::JSInterruptCallback) -> bool {
+pub(crate) unsafe fn JS_AddInterruptCallback(
+    cx: *mut root::JSContext,
+    callback: root::JSInterruptCallback,
+) -> bool {
     let cx = Cx::from_raw(cx);
     cx.hooks.interrupt_callbacks.push(callback);
     q::JS_SetInterruptHandler(cx.rt, Some(interrupt_handler), cx as *mut Cx as *mut c_void);
@@ -441,25 +559,45 @@ unsafe extern "C" fn interrupt_handler(rt: *mut q::JSRuntime, opaque: *mut c_voi
 
 // Security callbacks.
 
-pub(crate) unsafe fn JS_SetSecurityCallbacks(cx: *mut root::JSContext, callbacks: *const root::JSSecurityCallbacks) {
+pub(crate) unsafe fn JS_SetSecurityCallbacks(
+    cx: *mut root::JSContext,
+    callbacks: *const root::JSSecurityCallbacks,
+) {
     let cx = Cx::from_raw(cx);
     cx.hooks.security_callbacks = callbacks;
     let checks = !callbacks.is_null() && (*callbacks).contentSecurityPolicyAllows.is_some();
-    let hook: q::JSCanCompileStringsHook = if checks { Some(can_compile_strings) } else { None };
+    let hook: q::JSCanCompileStringsHook = if checks {
+        Some(can_compile_strings)
+    } else {
+        None
+    };
     q::JS_SetCanCompileStringsHook(cx.rt, hook, cx as *mut Cx as *mut c_void);
 }
 
-pub(crate) unsafe fn JS_GetSecurityCallbacks(cx: *mut root::JSContext) -> *const root::JSSecurityCallbacks {
+pub(crate) unsafe fn JS_GetSecurityCallbacks(
+    cx: *mut root::JSContext,
+) -> *const root::JSSecurityCallbacks {
     Cx::from_raw(cx).hooks.security_callbacks
 }
 
-pub(crate) unsafe fn JS_SetTrustedPrincipals(cx: *mut root::JSContext, prin: *mut root::JSPrincipals) {
+pub(crate) unsafe fn JS_SetTrustedPrincipals(
+    cx: *mut root::JSContext,
+    prin: *mut root::JSPrincipals,
+) {
     // There are no system compartments to select.
     let _ = (cx, prin);
 }
 
 /// Patch Q5's hook: SpiderMonkey's `contentSecurityPolicyAllows` for eval and `Function`.
-unsafe extern "C" fn can_compile_strings(ctx: *mut q::JSContext, kind: q::JSCompileKindEnum, code: q::JSValue, argc: c_int, arg_strings: *mut q::JSValue, args: *mut q::JSValue, opaque: *mut c_void) -> c_int {
+unsafe extern "C" fn can_compile_strings(
+    ctx: *mut q::JSContext,
+    kind: q::JSCompileKindEnum,
+    code: q::JSValue,
+    argc: c_int,
+    arg_strings: *mut q::JSValue,
+    args: *mut q::JSValue,
+    opaque: *mut c_void,
+) -> c_int {
     let cx = hook_cx(opaque);
     let Some(allows) = (*cx.hooks.security_callbacks).contentSecurityPolicyAllows else {
         return 1;
@@ -475,10 +613,14 @@ unsafe extern "C" fn can_compile_strings(ctx: *mut q::JSContext, kind: q::JSComp
             parameter_args.push(JSVal::from_qjs(*args.add(i)));
         }
         let (body_string, body_arg) = if argc > 0 {
-            let body = cx.retain(JSVal::from_qjs(*arg_strings.add(params))).to_string();
+            let body = cx
+                .retain(JSVal::from_qjs(*arg_strings.add(params)))
+                .to_string();
             (body, JSVal::from_qjs(*args.add(params)))
         } else {
-            let empty = cx.adopt(q::JS_NewStringLen(ctx, c"".as_ptr(), 0)).to_string();
+            let empty = cx
+                .adopt(q::JS_NewStringLen(ctx, c"".as_ptr(), 0))
+                .to_string();
             (empty, UndefinedValue())
         };
         (root::JS::CompilationType::Function, body_string, body_arg)

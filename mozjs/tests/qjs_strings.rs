@@ -12,20 +12,20 @@ use std::slice;
 use mozjs::context::JSContext;
 use mozjs::conversions::{jsstr_to_string, ToJSValConvertible};
 use mozjs::jsapi::{
-    jsid, JSString, JSType, OnNewGlobalHookOption, SymbolCode, JS_ClearPendingException,
-    JS_DeprecatedStringHasLatin1Chars, JS_IsExceptionPending,
+    jsid, JSString, JSType, JS_ClearPendingException, JS_DeprecatedStringHasLatin1Chars,
+    JS_IsExceptionPending, OnNewGlobalHookOption, SymbolCode,
 };
 use mozjs::jsval::{DoubleValue, Int32Value, JSVal, StringValue, UndefinedValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     EncodeStringToUTF8, GetWellKnownSymbol, JS_AtomizeAndPinString, JS_CompareStrings,
-    JS_ConcatStrings, JS_DefinePropertyById2, JS_GetLatin1StringCharsAndLength,
-    JS_GetStringCharAt, JS_GetTwoByteStringCharsAndLength, JS_IdToValue, JS_IndexToId,
-    JS_IsIdentifier, JS_NewDependentString, JS_NewGlobalObject, JS_NewStringCopyN,
-    JS_NewUCStringCopyN, JS_ParseJSON, JS_ParseJSONWithReviver, JS_SetProperty, JS_Stringify,
-    JS_TypeOfValue, JS_ValueToId, JS_ValueToSource, OrdinaryToPrimitive, SameValue,
-    StrictlyEqual, ToInt16Slow, ToInt8Slow, ToJSON, ToPrimitive, ToUint8Slow,
-    RUST_INTERNED_STRING_TO_JSID, RUST_SYMBOL_TO_JSID,
+    JS_ConcatStrings, JS_DefinePropertyById2, JS_GetLatin1StringCharsAndLength, JS_GetStringCharAt,
+    JS_GetTwoByteStringCharsAndLength, JS_IdToValue, JS_IndexToId, JS_IsIdentifier,
+    JS_NewDependentString, JS_NewGlobalObject, JS_NewStringCopyN, JS_NewUCStringCopyN,
+    JS_ParseJSON, JS_ParseJSONWithReviver, JS_SetProperty, JS_Stringify, JS_TypeOfValue,
+    JS_ValueToId, JS_ValueToSource, OrdinaryToPrimitive, SameValue, StrictlyEqual, ToInt16Slow,
+    ToInt8Slow, ToJSON, ToPrimitive, ToUint8Slow, RUST_INTERNED_STRING_TO_JSID,
+    RUST_SYMBOL_TO_JSID,
 };
 use mozjs::rust::{
     evaluate_script, CompileOptionsWrapper, HandleObject, HandleValue, JSEngine, RealmOptions,
@@ -75,7 +75,10 @@ unsafe fn units(cx: &mut JSContext, s: *mut JSString) -> Vec<u16> {
     let mut len = 0;
     if JS_DeprecatedStringHasLatin1Chars(s) {
         let p = JS_GetLatin1StringCharsAndLength(cx, s, &mut len);
-        slice::from_raw_parts(p, len).iter().map(|&b| b as u16).collect()
+        slice::from_raw_parts(p, len)
+            .iter()
+            .map(|&b| b as u16)
+            .collect()
     } else {
         let p = JS_GetTwoByteStringCharsAndLength(cx, s, &mut len);
         slice::from_raw_parts(p, len).to_vec()
@@ -145,7 +148,12 @@ unsafe fn latin1_and_two_byte(cx: &mut JSContext, global: HandleObject) {
     assert!(order < 0);
     assert!(JS_CompareStrings(cx, cat.get(), latin1.get(), &mut order));
     assert!(order > 0);
-    assert!(JS_CompareStrings(cx, latin1.get(), latin1.get(), &mut order));
+    assert!(JS_CompareStrings(
+        cx,
+        latin1.get(),
+        latin1.get(),
+        &mut order
+    ));
     assert_eq!(order, 0);
 
     thread_local!(static ENCODED: RefCell<Vec<u8>> = const { RefCell::new(Vec::new()) });
@@ -165,7 +173,11 @@ unsafe fn lone_surrogates(cx: &mut JSContext, global: HandleObject) {
 
     // Through script and back.
     set_global(cx, global, c"lone", StringValue(&*s));
-    let v = eval(cx, global, "lone.length === 4 && lone.charCodeAt(1) === 0xd800 && lone.charCodeAt(3) === 0xdc00");
+    let v = eval(
+        cx,
+        global,
+        "lone.length === 4 && lone.charCodeAt(1) === 0xd800 && lone.charCodeAt(3) === 0xdc00",
+    );
     assert!(v.to_boolean());
     let s = eval(cx, global, "lone.slice(1, 2) + '\\udbff\\udfff'").to_string();
     assert_eq!(units(cx, s), [0xd800, 0xdbff, 0xdfff]);
@@ -177,7 +189,10 @@ unsafe fn lone_surrogates(cx: &mut JSContext, global: HandleObject) {
         ENCODED.with(|e| *e.borrow_mut() = CStr::from_ptr(s).to_bytes().to_vec());
     }
     EncodeStringToUTF8(cx, s.handle(), record);
-    assert_eq!(ENCODED.with(|e| e.borrow().clone()), "\u{fffd}\u{10ffff}".as_bytes());
+    assert_eq!(
+        ENCODED.with(|e| e.borrow().clone()),
+        "\u{fffd}\u{10ffff}".as_bytes()
+    );
 }
 
 unsafe fn number_conversions(cx: &mut JSContext, global: HandleObject) {
@@ -213,7 +228,14 @@ unsafe fn number_conversions(cx: &mut JSContext, global: HandleObject) {
         (f64::NAN, 0, 0, 0, 0, 0),
         (f64::INFINITY, 0, 0, 0, 0, 0),
         (18446744073709555712.0, 4096, 4096, 4096, 4096, 4096),
-        (-9007199254740993.0, 0, 0, 0, -9007199254740992, 18437736874454810624),
+        (
+            -9007199254740993.0,
+            0,
+            0,
+            0,
+            -9007199254740992,
+            18437736874454810624,
+        ),
     ];
     for (d, i32_, u32_, u16_, i64_, u64_) in cases {
         v.set(DoubleValue(d));
@@ -234,7 +256,14 @@ unsafe fn number_conversions(cx: &mut JSContext, global: HandleObject) {
     assert!(ToUint8Slow(cx, v.handle(), &mut u8_));
     assert_eq!(u8_, 0xff);
 
-    for (source, expected) in [("''", false), ("'0'", true), ("0n", false), ("5n", true), ("({})", true), ("NaN", false)] {
+    for (source, expected) in [
+        ("''", false),
+        ("'0'", true),
+        ("0n", false),
+        ("5n", true),
+        ("({})", true),
+        ("NaN", false),
+    ] {
         v.set(eval(cx, global, source));
         assert_eq!(ToBoolean(v.handle()), expected, "ToBoolean({source})");
     }
@@ -260,7 +289,10 @@ unsafe fn string_conversions(cx: &mut JSContext, global: HandleObject) {
         ("({})", "[object Object]"),
         ("[1, [2, 3], null]", "1,2,3,"),
         ("({ toString() { return 'custom'; } })", "custom"),
-        ("({ [Symbol.toPrimitive](hint) { return hint; } })", "string"),
+        (
+            "({ [Symbol.toPrimitive](hint) { return hint; } })",
+            "string",
+        ),
         ("12345678901234567890n", "12345678901234567890"),
         ("'a' + 'b'.repeat(3)", "abbb"),
     ] {
@@ -286,13 +318,28 @@ unsafe fn primitives_and_equality(cx: &mut JSContext, global: HandleObject) {
     }
 
     rooted!(&in(cx) let obj = eval(cx, global, "({ valueOf() { return 1; }, toString() { return 's'; } })").to_object());
-    assert!(ToPrimitive(cx, obj.handle(), JSType::JSTYPE_UNDEFINED, v.handle_mut()));
+    assert!(ToPrimitive(
+        cx,
+        obj.handle(),
+        JSType::JSTYPE_UNDEFINED,
+        v.handle_mut()
+    ));
     assert_eq!(v.get().to_int32(), 1);
-    assert!(OrdinaryToPrimitive(cx, obj.handle(), JSType::JSTYPE_STRING, v.handle_mut()));
+    assert!(OrdinaryToPrimitive(
+        cx,
+        obj.handle(),
+        JSType::JSTYPE_STRING,
+        v.handle_mut()
+    ));
     assert_eq!(to_rust(cx, v.get().to_string()), "s");
 
     rooted!(&in(cx) let obj = eval(cx, global, "({ valueOf() { return {}; }, toString() { return {}; } })").to_object());
-    assert!(!ToPrimitive(cx, obj.handle(), JSType::JSTYPE_NUMBER, v.handle_mut()));
+    assert!(!ToPrimitive(
+        cx,
+        obj.handle(),
+        JSType::JSTYPE_NUMBER,
+        v.handle_mut()
+    ));
     assert!(take_exception(cx));
 
     for (source, expected) in [
@@ -321,8 +368,14 @@ unsafe fn primitives_and_equality(cx: &mut JSContext, global: HandleObject) {
         assert!(StrictlyEqual(cx, a.handle(), b.handle(), &mut strict));
         (same, strict)
     };
-    assert_eq!(compare(cx, DoubleValue(f64::NAN), DoubleValue(f64::NAN)), (true, false));
-    assert_eq!(compare(cx, DoubleValue(0.0), DoubleValue(-0.0)), (false, true));
+    assert_eq!(
+        compare(cx, DoubleValue(f64::NAN), DoubleValue(f64::NAN)),
+        (true, false)
+    );
+    assert_eq!(
+        compare(cx, DoubleValue(0.0), DoubleValue(-0.0)),
+        (false, true)
+    );
     assert_eq!(compare(cx, Int32Value(3), DoubleValue(3.0)), (true, true));
     let s1 = eval(cx, global, "'ab' + 'c'");
     let s2 = eval(cx, global, "'a' + 'bc'");
@@ -352,20 +405,33 @@ unsafe fn value_to_source(cx: &mut JSContext, global: HandleObject) {
         ("Symbol()", "Symbol()"),
         ("Symbol.for('k')", r#"Symbol.for("k")"#),
         ("[1, 'x', [null]]", r#"[1, "x", [null]]"#),
-        (r#"({a: 1, 'b c': [2], 3: undefined, [Symbol.iterator]: 0})"#, r#"({3:(void 0), a:1, "b c":[2], [Symbol.iterator]:0})"#),
+        (
+            r#"({a: 1, 'b c': [2], 3: undefined, [Symbol.iterator]: 0})"#,
+            r#"({3:(void 0), a:1, "b c":[2], [Symbol.iterator]:0})"#,
+        ),
         ("({})", "({})"),
-        ("(() => { const o = {}; o.self = o; return o; })()", "({self:{}})"),
+        (
+            "(() => { const o = {}; o.self = o; return o; })()",
+            "({self:{}})",
+        ),
         ("new Number(5)", "(new Number(5))"),
         ("new String('s')", r#"(new String("s"))"#),
         ("new Boolean(false)", "(new Boolean(false))"),
         ("new Date(0)", "(new Date(0))"),
         ("/a+/g", "/a+/g"),
-        ("(function f(a) { return a; })", "function f(a) { return a; }"),
+        (
+            "(function f(a) { return a; })",
+            "function f(a) { return a; }",
+        ),
         ("({ toSource() { return 'mine'; } })", "mine"),
         ("new TypeError('boom')", r#"(new TypeError("boom"))"#),
     ] {
         v.set(eval(cx, global, source));
-        assert_eq!(source_of(cx, v.handle()), expected, "ValueToSource({source})");
+        assert_eq!(
+            source_of(cx, v.handle()),
+            expected,
+            "ValueToSource({source})"
+        );
     }
 }
 
@@ -385,11 +451,23 @@ unsafe fn ids(cx: &mut JSContext, global: HandleObject) {
     assert!(JS_IdToValue(cx, id.get(), v.handle_mut()));
     assert_eq!(to_rust(cx, v.get().to_string()), "4294967294");
 
-    for (source, int) in [("'17'", Some(17)), ("17", Some(17)), ("17.0", Some(17)), ("'017'", None), ("'-1'", None), ("-1", None), ("2147483648", None)] {
+    for (source, int) in [
+        ("'17'", Some(17)),
+        ("17", Some(17)),
+        ("17.0", Some(17)),
+        ("'017'", None),
+        ("'-1'", None),
+        ("-1", None),
+        ("2147483648", None),
+    ] {
         v.set(eval(cx, global, source));
         assert!(JS_ValueToId(cx, v.handle(), id.handle_mut()));
         match int {
-            Some(i) => assert_eq!((id.get().is_int(), id.get().to_int()), (true, i), "id of {source}"),
+            Some(i) => assert_eq!(
+                (id.get().is_int(), id.get().to_int()),
+                (true, i),
+                "id of {source}"
+            ),
             None => assert!(id.get().is_string(), "id of {source}"),
         }
     }
@@ -424,11 +502,34 @@ unsafe fn ids(cx: &mut JSContext, global: HandleObject) {
     // Ids work as property keys from both sides.
     rooted!(&in(cx) let obj = eval(cx, global, "globalThis.keyed = {}; keyed").to_object());
     rooted!(&in(cx) let value = Int32Value(9));
-    assert!(JS_DefinePropertyById2(cx, obj.handle(), interned.handle(), value.handle(), 1));
-    assert!(JS_DefinePropertyById2(cx, obj.handle(), well_known.handle(), value.handle(), 1));
+    assert!(JS_DefinePropertyById2(
+        cx,
+        obj.handle(),
+        interned.handle(),
+        value.handle(),
+        1
+    ));
+    assert!(JS_DefinePropertyById2(
+        cx,
+        obj.handle(),
+        well_known.handle(),
+        value.handle(),
+        1
+    ));
     assert!(JS_IndexToId(cx, 3, id.handle_mut()));
-    assert!(JS_DefinePropertyById2(cx, obj.handle(), id.handle(), value.handle(), 1));
-    assert!(eval(cx, global, "keyed.name === 9 && keyed[Symbol.iterator] === 9 && keyed[3] === 9").to_boolean());
+    assert!(JS_DefinePropertyById2(
+        cx,
+        obj.handle(),
+        id.handle(),
+        value.handle(),
+        1
+    ));
+    assert!(eval(
+        cx,
+        global,
+        "keyed.name === 9 && keyed[Symbol.iterator] === 9 && keyed[3] === 9"
+    )
+    .to_boolean());
 
     for (name, expected) in [
         ("foo", true),
@@ -455,68 +556,155 @@ unsafe fn ids(cx: &mut JSContext, global: HandleObject) {
     assert!(JS_IsIdentifier(cx, s.handle(), &mut is_identifier));
     assert!(!is_identifier);
 
-    for (s, expected) in [("0", Some(0)), ("123", Some(123)), ("0123", None), ("4294967294", Some(4294967294)), ("4294967295", None), ("", None), ("12a", None)] {
+    for (s, expected) in [
+        ("0", Some(0)),
+        ("123", Some(123)),
+        ("0123", None),
+        ("4294967294", Some(4294967294)),
+        ("4294967295", None),
+        ("", None),
+        ("12a", None),
+    ] {
         let utf16: Vec<u16> = s.encode_utf16().collect();
         let mut index = 0;
-        let is_index = mozjs::jsapi::js::StringIsArrayIndex1(utf16.as_ptr(), utf16.len() as u32, &mut index);
-        assert_eq!(is_index.then_some(index), expected, "StringIsArrayIndex({s:?})");
+        let is_index =
+            mozjs::jsapi::js::StringIsArrayIndex1(utf16.as_ptr(), utf16.len() as u32, &mut index);
+        assert_eq!(
+            is_index.then_some(index),
+            expected,
+            "StringIsArrayIndex({s:?})"
+        );
     }
 }
 
 unsafe extern "C" fn append_json(buf: *const u16, len: u32, data: *mut c_void) -> bool {
     let out = &mut *(data as *mut Option<String>);
-    out.get_or_insert_with(String::new).push_str(&String::from_utf16_lossy(slice::from_raw_parts(buf, len as usize)));
+    out.get_or_insert_with(String::new)
+        .push_str(&String::from_utf16_lossy(slice::from_raw_parts(
+            buf,
+            len as usize,
+        )));
     true
 }
 
 unsafe fn to_json(cx: &mut JSContext, v: HandleValue) -> Option<String> {
     let mut out: Option<String> = None;
-    assert!(ToJSON(cx, v, HandleObject::null(), HandleValue::null(), Some(append_json), &mut out as *mut _ as *mut c_void));
+    assert!(ToJSON(
+        cx,
+        v,
+        HandleObject::null(),
+        HandleValue::null(),
+        Some(append_json),
+        &mut out as *mut _ as *mut c_void
+    ));
     out
 }
 
 unsafe fn json(cx: &mut JSContext, global: HandleObject) {
     rooted!(&in(cx) let mut v = UndefinedValue());
-    let text: Vec<u16> = r#"{"a": [1, 2.5, {"b": "é€"}], "c": null, "d": true}"#.encode_utf16().collect();
-    assert!(JS_ParseJSON(cx, text.as_ptr(), text.len() as u32, v.handle_mut()));
+    let text: Vec<u16> = r#"{"a": [1, 2.5, {"b": "é€"}], "c": null, "d": true}"#
+        .encode_utf16()
+        .collect();
+    assert!(JS_ParseJSON(
+        cx,
+        text.as_ptr(),
+        text.len() as u32,
+        v.handle_mut()
+    ));
     assert!(v.get().is_object());
-    assert_eq!(to_json(cx, v.handle()).unwrap(), r#"{"a":[1,2.5,{"b":"é€"}],"c":null,"d":true}"#);
+    assert_eq!(
+        to_json(cx, v.handle()).unwrap(),
+        r#"{"a":[1,2.5,{"b":"é€"}],"c":null,"d":true}"#
+    );
     set_global(cx, global, c"parsed", v.get());
-    assert!(eval(cx, global, "parsed.a[2].b === '\\u00e9\\u20ac' && parsed.a[1] === 2.5").to_boolean());
+    assert!(eval(
+        cx,
+        global,
+        "parsed.a[2].b === '\\u00e9\\u20ac' && parsed.a[1] === 2.5"
+    )
+    .to_boolean());
 
     let bad: Vec<u16> = "{a: 1}".encode_utf16().collect();
-    assert!(!JS_ParseJSON(cx, bad.as_ptr(), bad.len() as u32, v.handle_mut()));
+    assert!(!JS_ParseJSON(
+        cx,
+        bad.as_ptr(),
+        bad.len() as u32,
+        v.handle_mut()
+    ));
     assert!(take_exception(cx));
 
     // A raw lone surrogate inside a JSON string survives parsing.
     let lone = [0x22, 0xd800, 0x78, 0x22];
-    assert!(JS_ParseJSON(cx, lone.as_ptr(), lone.len() as u32, v.handle_mut()));
+    assert!(JS_ParseJSON(
+        cx,
+        lone.as_ptr(),
+        lone.len() as u32,
+        v.handle_mut()
+    ));
     assert_eq!(units(cx, v.get().to_string()), [0xd800, 0x78]);
     assert_eq!(to_json(cx, v.handle()).unwrap(), r#""\ud800x""#);
 
     rooted!(&in(cx) let reviver = eval(cx, global, "(k, v) => typeof v === 'number' ? v * 2 : v"));
     let text: Vec<u16> = "[1, [2]]".encode_utf16().collect();
-    assert!(JS_ParseJSONWithReviver(cx, text.as_ptr(), text.len() as u32, reviver.handle(), v.handle_mut()));
+    assert!(JS_ParseJSONWithReviver(
+        cx,
+        text.as_ptr(),
+        text.len() as u32,
+        reviver.handle(),
+        v.handle_mut()
+    ));
     assert_eq!(to_json(cx, v.handle()).unwrap(), "[2,[4]]");
 
     // ToJSON writes nothing for undefined, JS_Stringify writes "null".
     v.set(UndefinedValue());
     assert_eq!(to_json(cx, v.handle()), None);
     let mut out: Option<String> = None;
-    assert!(JS_Stringify(cx, v.handle_mut(), HandleObject::null(), HandleValue::null(), Some(append_json), &mut out as *mut _ as *mut c_void));
+    assert!(JS_Stringify(
+        cx,
+        v.handle_mut(),
+        HandleObject::null(),
+        HandleValue::null(),
+        Some(append_json),
+        &mut out as *mut _ as *mut c_void
+    ));
     assert_eq!(out.as_deref(), Some("null"));
 
-    v.set(eval(cx, global, "({a: [1], toJSON() { return {b: this.a}; }})"));
+    v.set(eval(
+        cx,
+        global,
+        "({a: [1], toJSON() { return {b: this.a}; }})",
+    ));
     rooted!(&in(cx) let space = Int32Value(2));
     let mut out: Option<String> = None;
-    assert!(JS_Stringify(cx, v.handle_mut(), HandleObject::null(), space.handle(), Some(append_json), &mut out as *mut _ as *mut c_void));
+    assert!(JS_Stringify(
+        cx,
+        v.handle_mut(),
+        HandleObject::null(),
+        space.handle(),
+        Some(append_json),
+        &mut out as *mut _ as *mut c_void
+    ));
     assert_eq!(out.as_deref(), Some("{\n  \"b\": [\n    1\n  ]\n}"));
 
     v.set(eval(cx, global, "({ get x() { throw new Error('no'); } })"));
     let mut out: Option<String> = None;
-    assert!(!ToJSON(cx, v.handle(), HandleObject::null(), HandleValue::null(), Some(append_json), &mut out as *mut _ as *mut c_void));
+    assert!(!ToJSON(
+        cx,
+        v.handle(),
+        HandleObject::null(),
+        HandleValue::null(),
+        Some(append_json),
+        &mut out as *mut _ as *mut c_void
+    ));
     assert!(take_exception(cx));
     v.set(eval(cx, global, "1n"));
-    assert!(!ToJSON(cx, v.handle(), HandleObject::null(), HandleValue::null(), Some(append_json), &mut out as *mut _ as *mut c_void));
+    assert!(!ToJSON(
+        cx,
+        v.handle(),
+        HandleObject::null(),
+        HandleValue::null(),
+        Some(append_json),
+        &mut out as *mut _ as *mut c_void
+    ));
     assert!(take_exception(cx));
 }

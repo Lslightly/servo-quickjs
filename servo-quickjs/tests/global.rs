@@ -1,7 +1,7 @@
 //! Servo patches: a global object of an embedder class, a separate global `this`, and lazy
 //! global properties defined during enumeration.
 
-use std::ffi::{CStr, CString, c_char, c_int, c_void};
+use std::ffi::{c_char, c_int, c_void, CStr, CString};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use servo_quickjs::*;
@@ -13,7 +13,15 @@ static RESOLVED: AtomicUsize = AtomicUsize::new(0);
 unsafe fn eval(ctx: *mut JSContext, src: &str) -> JSValue {
     let src = CString::new(src).unwrap();
     let flags = JS_EVAL_TYPE_GLOBAL as c_int;
-    unsafe { JS_Eval(ctx, src.as_ptr(), src.as_bytes().len(), c"<global>".as_ptr(), flags) }
+    unsafe {
+        JS_Eval(
+            ctx,
+            src.as_ptr(),
+            src.as_bytes().len(),
+            c"<global>".as_ptr(),
+            flags,
+        )
+    }
 }
 
 unsafe fn eval_bool(ctx: *mut JSContext, src: &str) -> bool {
@@ -99,24 +107,47 @@ fn global_class_and_global_this() {
         assert_eq!(JS_GetOpaque(global, class_id) as usize, 0x5678);
 
         // Global variables keep working on the embedder-class global.
-        assert!(eval_bool(ctx, "var a = 1; let b = 2; function f() { return a + b; } f() === 3"));
+        assert!(eval_bool(
+            ctx,
+            "var a = 1; let b = 2; function f() { return a + b; } f() === 3"
+        ));
         assert!(eval_bool(ctx, "a = 5; globalThis.a === 5 && Object.getOwnPropertyDescriptor(globalThis, 'a').value === 5"));
-        assert!(eval_bool(ctx, "delete globalThis.c; c = 3; c === 3 && 'c' in globalThis"));
+        assert!(eval_bool(
+            ctx,
+            "delete globalThis.c; c = 3; c === 3 && 'c' in globalThis"
+        ));
 
         // Lazy properties, for direct and global variable access, and during enumeration.
         assert!(eval_bool(ctx, "lazy === 7 && typeof lazy === 'number'"));
-        assert!(eval_bool(ctx, "delete globalThis.lazy; Object.getOwnPropertyNames(globalThis).includes('lazy')"));
-        assert!(eval_bool(ctx, "delete globalThis.lazy; (function() { return lazy; })() === 7"));
+        assert!(eval_bool(
+            ctx,
+            "delete globalThis.lazy; Object.getOwnPropertyNames(globalThis).includes('lazy')"
+        ));
+        assert!(eval_bool(
+            ctx,
+            "delete globalThis.lazy; (function() { return lazy; })() === 7"
+        ));
         assert!(RESOLVED.load(Ordering::SeqCst) >= 3);
 
         // A separate global `this`.
         let window_proxy = JS_NewObject(ctx);
-        JS_SetPropertyStr(ctx, global, c"proxy".as_ptr(), JS_DupValue(ctx, window_proxy));
+        JS_SetPropertyStr(
+            ctx,
+            global,
+            c"proxy".as_ptr(),
+            JS_DupValue(ctx, window_proxy),
+        );
         JS_SetGlobalThis(ctx, window_proxy);
         assert!(eval_bool(ctx, "this === proxy && globalThis === proxy"));
         assert!(eval_bool(ctx, "(function() { return this; })() === proxy"));
-        assert!(eval_bool(ctx, "(function() { 'use strict'; return this; })() === undefined"));
-        assert!(eval_bool(ctx, "(0, eval)('this') === proxy && (() => this)() === proxy"));
+        assert!(eval_bool(
+            ctx,
+            "(function() { 'use strict'; return this; })() === undefined"
+        ));
+        assert!(eval_bool(
+            ctx,
+            "(0, eval)('this') === proxy && (() => this)() === proxy"
+        ));
         let this = JS_GetGlobalThis(ctx);
         assert_eq!(this.ptr(), window_proxy.ptr());
         JS_FreeValue(ctx, this);

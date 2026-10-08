@@ -21,11 +21,17 @@ pub(crate) struct CompileOptions {
     pub filename: CString,
 }
 
-pub(crate) unsafe fn options<'a>(options: *const root::JS::ReadOnlyCompileOptions) -> &'a CompileOptions {
+pub(crate) unsafe fn options<'a>(
+    options: *const root::JS::ReadOnlyCompileOptions,
+) -> &'a CompileOptions {
     &*(options as *const CompileOptions)
 }
 
-pub(crate) unsafe fn NewCompileOptions(aCx: *mut root::JSContext, aFile: *const c_char, aLine: c_uint) -> *mut root::JS::ReadOnlyCompileOptions {
+pub(crate) unsafe fn NewCompileOptions(
+    aCx: *mut root::JSContext,
+    aFile: *const c_char,
+    aLine: c_uint,
+) -> *mut root::JS::ReadOnlyCompileOptions {
     let _ = aCx;
     let mut base: root::JS::ReadOnlyCompileOptions = std::mem::zeroed();
     base.lineno = aLine;
@@ -66,10 +72,19 @@ unsafe fn eval(cx: &mut Cx, options: &CompileOptions, src: &[u8], mut flags: i32
     )
 }
 
-pub(crate) unsafe fn Evaluate2(cx: *mut root::JSContext, options: *const root::JS::ReadOnlyCompileOptions, srcBuf: *mut root::JS::SourceText<root::mozilla::Utf8Unit>, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn Evaluate2(
+    cx: *mut root::JSContext,
+    options: *const root::JS::ReadOnlyCompileOptions,
+    srcBuf: *mut root::JS::SourceText<root::mozilla::Utf8Unit>,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let options = self::options(options);
-    let src = source_buffer(options.base.lineno, (*srcBuf).units_ as *const u8, (*srcBuf).length_ as usize);
+    let src = source_buffer(
+        options.base.lineno,
+        (*srcBuf).units_ as *const u8,
+        (*srcBuf).length_ as usize,
+    );
     let result = eval(cx, options, &src, q::JS_EVAL_TYPE_GLOBAL as i32);
     if result.tag() == q::JS_TAG_EXCEPTION {
         return false;
@@ -78,10 +93,18 @@ pub(crate) unsafe fn Evaluate2(cx: *mut root::JSContext, options: *const root::J
     true
 }
 
-pub(crate) unsafe fn Compile1(cx: *mut root::JSContext, options: *const root::JS::ReadOnlyCompileOptions, srcBuf: *mut root::JS::SourceText<root::mozilla::Utf8Unit>) -> *mut root::JSScript {
+pub(crate) unsafe fn Compile1(
+    cx: *mut root::JSContext,
+    options: *const root::JS::ReadOnlyCompileOptions,
+    srcBuf: *mut root::JS::SourceText<root::mozilla::Utf8Unit>,
+) -> *mut root::JSScript {
     let cx = Cx::from_raw(cx);
     let options = self::options(options);
-    let src = source_buffer(options.base.lineno, (*srcBuf).units_ as *const u8, (*srcBuf).length_ as usize);
+    let src = source_buffer(
+        options.base.lineno,
+        (*srcBuf).units_ as *const u8,
+        (*srcBuf).length_ as usize,
+    );
     let flags = (q::JS_EVAL_TYPE_GLOBAL | q::JS_EVAL_FLAG_COMPILE_ONLY) as i32;
     let result = eval(cx, options, &src, flags);
     if result.tag() == q::JS_TAG_EXCEPTION {
@@ -90,7 +113,11 @@ pub(crate) unsafe fn Compile1(cx: *mut root::JSContext, options: *const root::JS
     cx.adopt(result).asBits_ as usize as *mut root::JSScript
 }
 
-pub(crate) unsafe fn JS_ExecuteScript(cx: *mut root::JSContext, script: root::JS::Handle<*mut root::JSScript>, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn JS_ExecuteScript(
+    cx: *mut root::JSContext,
+    script: root::JS::Handle<*mut root::JSScript>,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let fun = q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, *script.ptr as *mut _);
     // JS_EvalFunction consumes a reference; the script stays retained by the pool.
@@ -101,7 +128,6 @@ pub(crate) unsafe fn JS_ExecuteScript(cx: *mut root::JSContext, script: root::JS
     *rval.ptr = cx.adopt(result);
     true
 }
-
 
 pub(crate) unsafe fn utf16_source(srcBuf: *mut root::JS::SourceText<u16>) -> String {
     let len = (*srcBuf).length_ as usize;
@@ -120,7 +146,12 @@ fn source_buffer_from(lineno: u32, src: &[u8]) -> Vec<u8> {
     unsafe { source_buffer(lineno, src.as_ptr(), src.len()) }
 }
 
-pub(crate) unsafe fn Evaluate(cx: *mut root::JSContext, options: *const root::JS::ReadOnlyCompileOptions, srcBuf: *mut root::JS::SourceText<u16>, rval: root::JS::MutableHandle<root::JS::Value>) -> bool {
+pub(crate) unsafe fn Evaluate(
+    cx: *mut root::JSContext,
+    options: *const root::JS::ReadOnlyCompileOptions,
+    srcBuf: *mut root::JS::SourceText<u16>,
+    rval: root::JS::MutableHandle<root::JS::Value>,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let options = self::options(options);
     let src = padded(options.base.lineno, &utf16_source(srcBuf));
@@ -132,7 +163,11 @@ pub(crate) unsafe fn Evaluate(cx: *mut root::JSContext, options: *const root::JS
     true
 }
 
-pub(crate) unsafe fn Compile(cx: *mut root::JSContext, options: *const root::JS::ReadOnlyCompileOptions, srcBuf: *mut root::JS::SourceText<u16>) -> *mut root::JSScript {
+pub(crate) unsafe fn Compile(
+    cx: *mut root::JSContext,
+    options: *const root::JS::ReadOnlyCompileOptions,
+    srcBuf: *mut root::JS::SourceText<u16>,
+) -> *mut root::JSScript {
     let cx = Cx::from_raw(cx);
     let options = self::options(options);
     let src = padded(options.base.lineno, &utf16_source(srcBuf));
@@ -144,20 +179,32 @@ pub(crate) unsafe fn Compile(cx: *mut root::JSContext, options: *const root::JS:
     cx.adopt(result).asBits_ as usize as *mut root::JSScript
 }
 
-pub(crate) unsafe fn JS_ExecuteScript1(cx: *mut root::JSContext, script: root::JS::Handle<*mut root::JSScript>) -> bool {
+pub(crate) unsafe fn JS_ExecuteScript1(
+    cx: *mut root::JSContext,
+    script: root::JS::Handle<*mut root::JSScript>,
+) -> bool {
     let mut rval = JSVal::default();
-    let handle = root::JS::MutableHandle { ptr: &mut rval, _phantom_0: std::marker::PhantomData };
+    let handle = root::JS::MutableHandle {
+        ptr: &mut rval,
+        _phantom_0: std::marker::PhantomData,
+    };
     JS_ExecuteScript(cx, script, handle)
 }
 
 // Environment chains: the objects of `with`-like scopes, outermost first (event handlers).
 
-pub(crate) unsafe fn NewEnvironmentChain(cx: *mut root::JSContext, supportUnscopables: root::JS::SupportUnscopables) -> *mut root::JS::EnvironmentChain {
+pub(crate) unsafe fn NewEnvironmentChain(
+    cx: *mut root::JSContext,
+    supportUnscopables: root::JS::SupportUnscopables,
+) -> *mut root::JS::EnvironmentChain {
     let _ = (cx, supportUnscopables);
     Box::into_raw(Box::new(Vec::<q::JSValue>::new())) as *mut root::JS::EnvironmentChain
 }
 
-pub(crate) unsafe fn AppendToEnvironmentChain(chain: *mut root::JS::EnvironmentChain, obj: *mut root::JSObject) -> bool {
+pub(crate) unsafe fn AppendToEnvironmentChain(
+    chain: *mut root::JS::EnvironmentChain,
+    obj: *mut root::JSObject,
+) -> bool {
     let chain = &mut *(chain as *mut Vec<q::JSValue>);
     chain.push(q::JS_DupValueRT(super::current().rt, super::obj_val(obj)));
     true
@@ -174,14 +221,41 @@ pub(crate) unsafe fn DeleteEnvironmentChain(chain: *mut root::JS::EnvironmentCha
 /// Compiles `body` as a function `name(args)` whose free variables resolve through the chain's
 /// objects (innermost last), like SpiderMonkey's non-syntactic environments: the function is
 /// created inside nested `with` statements over the chain objects.
-unsafe fn compile_function(cx: &mut Cx, chain: *const root::JS::EnvironmentChain, options: &CompileOptions, name: *const c_char, nargs: c_uint, argnames: *const *const c_char, body: &str) -> *mut root::JSFunction {
-    let scopes: &[q::JSValue] = if chain.is_null() { &[] } else { &*(chain as *const Vec<q::JSValue>) };
-    let name = if name.is_null() { String::new() } else { std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned() };
+unsafe fn compile_function(
+    cx: &mut Cx,
+    chain: *const root::JS::EnvironmentChain,
+    options: &CompileOptions,
+    name: *const c_char,
+    nargs: c_uint,
+    argnames: *const *const c_char,
+    body: &str,
+) -> *mut root::JSFunction {
+    let scopes: &[q::JSValue] = if chain.is_null() {
+        &[]
+    } else {
+        &*(chain as *const Vec<q::JSValue>)
+    };
+    let name = if name.is_null() {
+        String::new()
+    } else {
+        std::ffi::CStr::from_ptr(name)
+            .to_string_lossy()
+            .into_owned()
+    };
     let args: Vec<String> = (0..nargs as usize)
-        .map(|i| std::ffi::CStr::from_ptr(*argnames.add(i)).to_string_lossy().into_owned())
+        .map(|i| {
+            std::ffi::CStr::from_ptr(*argnames.add(i))
+                .to_string_lossy()
+                .into_owned()
+        })
         .collect();
-    let scope_params: Vec<String> = (0..scopes.len()).map(|i| format!("__servo_scope{i}")).collect();
-    let withs: String = scope_params.iter().map(|p| format!("with ({p}) ")).collect();
+    let scope_params: Vec<String> = (0..scopes.len())
+        .map(|i| format!("__servo_scope{i}"))
+        .collect();
+    let withs: String = scope_params
+        .iter()
+        .map(|p| format!("with ({p}) "))
+        .collect();
     // The header goes on the line before the body so that line numbers match.
     let src = format!(
         "(function({}) {{ {}return function {}({}) {{\n{}\n}}; }})",
@@ -197,7 +271,13 @@ unsafe fn compile_function(cx: &mut Cx, chain: *const root::JS::EnvironmentChain
         return ptr::null_mut();
     }
     let mut argv: Vec<q::JSValue> = scopes.to_vec();
-    let f = q::JS_Call(cx.qctx(), outer, q::JS_UNDEFINED, argv.len() as i32, argv.as_mut_ptr());
+    let f = q::JS_Call(
+        cx.qctx(),
+        outer,
+        q::JS_UNDEFINED,
+        argv.len() as i32,
+        argv.as_mut_ptr(),
+    );
     q::JS_FreeValueRT(cx.rt, outer);
     if f.tag() == q::JS_TAG_EXCEPTION {
         return ptr::null_mut();
@@ -205,16 +285,50 @@ unsafe fn compile_function(cx: &mut Cx, chain: *const root::JS::EnvironmentChain
     cx.adopt(f).to_object() as *mut root::JSFunction
 }
 
-pub(crate) unsafe fn CompileFunction(cx: *mut root::JSContext, envChain: *const root::JS::EnvironmentChain, options: *const root::JS::ReadOnlyCompileOptions, name: *const ::std::os::raw::c_char, nargs: ::std::os::raw::c_uint, argnames: *const *const ::std::os::raw::c_char, srcBuf: *mut root::JS::SourceText<u16>) -> *mut root::JSFunction {
+pub(crate) unsafe fn CompileFunction(
+    cx: *mut root::JSContext,
+    envChain: *const root::JS::EnvironmentChain,
+    options: *const root::JS::ReadOnlyCompileOptions,
+    name: *const ::std::os::raw::c_char,
+    nargs: ::std::os::raw::c_uint,
+    argnames: *const *const ::std::os::raw::c_char,
+    srcBuf: *mut root::JS::SourceText<u16>,
+) -> *mut root::JSFunction {
     let cx = Cx::from_raw(cx);
     let body = utf16_source(srcBuf);
-    compile_function(cx, envChain, self::options(options), name, nargs, argnames, &body)
+    compile_function(
+        cx,
+        envChain,
+        self::options(options),
+        name,
+        nargs,
+        argnames,
+        &body,
+    )
 }
 
-pub(crate) unsafe fn CompileFunctionUtf8(cx: *mut root::JSContext, envChain: *const root::JS::EnvironmentChain, options: *const root::JS::ReadOnlyCompileOptions, name: *const ::std::os::raw::c_char, nargs: ::std::os::raw::c_uint, argnames: *const *const ::std::os::raw::c_char, utf8: *const ::std::os::raw::c_char, length: usize) -> *mut root::JSFunction {
+pub(crate) unsafe fn CompileFunctionUtf8(
+    cx: *mut root::JSContext,
+    envChain: *const root::JS::EnvironmentChain,
+    options: *const root::JS::ReadOnlyCompileOptions,
+    name: *const ::std::os::raw::c_char,
+    nargs: ::std::os::raw::c_uint,
+    argnames: *const *const ::std::os::raw::c_char,
+    utf8: *const ::std::os::raw::c_char,
+    length: usize,
+) -> *mut root::JSFunction {
     let cx = Cx::from_raw(cx);
-    let body = String::from_utf8_lossy(std::slice::from_raw_parts(utf8 as *const u8, length)).into_owned();
-    compile_function(cx, envChain, self::options(options), name, nargs, argnames, &body)
+    let body =
+        String::from_utf8_lossy(std::slice::from_raw_parts(utf8 as *const u8, length)).into_owned();
+    compile_function(
+        cx,
+        envChain,
+        self::options(options),
+        name,
+        nargs,
+        argnames,
+        &body,
+    )
 }
 
 // Script privates (fetch options of classic scripts), stored by QuickJS (patch Q16) and shared
@@ -224,12 +338,17 @@ pub(crate) unsafe fn SetScriptPrivate(script: *mut root::JSScript, value: *const
     let cx = super::current();
     let v = (*value).to_qjs();
     let script = q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, script as *mut c_void);
-    if q::JS_SetScriptPrivateValue(cx.base_ctx, script, q::JS_DupValueRT(cx.rt, v)) == 0 && v.tag() != q::JS_TAG_UNDEFINED {
+    if q::JS_SetScriptPrivateValue(cx.base_ctx, script, q::JS_DupValueRT(cx.rt, v)) == 0
+        && v.tag() != q::JS_TAG_UNDEFINED
+    {
         super::module::add_ref_script_private(cx.rt, v);
     }
 }
 
-pub(crate) unsafe fn JS_GetScriptPrivate(script: *mut root::JSScript, dest: root::JS::MutableHandleValue) {
+pub(crate) unsafe fn JS_GetScriptPrivate(
+    script: *mut root::JSScript,
+    dest: root::JS::MutableHandleValue,
+) {
     let cx = super::current();
     let script = q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, script as *mut c_void);
     *dest.ptr = cx.adopt(q::JS_GetScriptPrivateValue(cx.base_ctx, script));

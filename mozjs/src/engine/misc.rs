@@ -61,7 +61,11 @@ pub(crate) unsafe fn GetWarningReporter(cx: *mut root::JSContext) -> root::JS::W
 
 // Permanent roots (Servo's `PermanentRoot`): one reference per rooted location.
 
-pub(crate) unsafe fn AddRawValueRoot(cx: *mut root::JSContext, vp: *mut root::JS::Value, name: *const c_char) -> bool {
+pub(crate) unsafe fn AddRawValueRoot(
+    cx: *mut root::JSContext,
+    vp: *mut root::JS::Value,
+    name: *const c_char,
+) -> bool {
     let _ = name;
     let cx = Cx::from_raw(cx);
     let v = q::JS_DupValueRT(cx.rt, (*vp).to_qjs());
@@ -84,7 +88,11 @@ pub(crate) unsafe fn RemoveRawValueRoot(cx: *mut root::JSContext, vp: *mut root:
 // GC: QuickJS frees by reference counting and runs its cycle collector on allocation; only an
 // explicit full collection is meaningful.
 
-pub(crate) unsafe fn NonIncrementalGC(cx: *mut root::JSContext, options: root::JS::GCOptions, reason: root::JS::GCReason) {
+pub(crate) unsafe fn NonIncrementalGC(
+    cx: *mut root::JSContext,
+    options: root::JS::GCOptions,
+    reason: root::JS::GCReason,
+) {
     let _ = (options, reason);
     q::JS_RunGC(Cx::from_raw(cx).rt);
 }
@@ -101,12 +109,21 @@ pub(crate) unsafe fn PrepareForIncrementalGC(cx: *mut root::JSContext) {
     let _ = cx;
 }
 
-pub(crate) unsafe fn StartIncrementalGC(cx: *mut root::JSContext, options: root::JS::GCOptions, reason: root::JS::GCReason, budget: *const root::JS::SliceBudget) {
+pub(crate) unsafe fn StartIncrementalGC(
+    cx: *mut root::JSContext,
+    options: root::JS::GCOptions,
+    reason: root::JS::GCReason,
+    budget: *const root::JS::SliceBudget,
+) {
     let _ = (options, reason, budget);
     q::JS_RunGC(Cx::from_raw(cx).rt);
 }
 
-pub(crate) unsafe fn IncrementalGCSlice(cx: *mut root::JSContext, reason: root::JS::GCReason, budget: *const root::JS::SliceBudget) {
+pub(crate) unsafe fn IncrementalGCSlice(
+    cx: *mut root::JSContext,
+    reason: root::JS::GCReason,
+    budget: *const root::JS::SliceBudget,
+) {
     let _ = (cx, reason, budget);
 }
 
@@ -151,73 +168,130 @@ pub(crate) unsafe fn JS_ResetGCParameter(cx: *mut root::JSContext, key: root::JS
     let _ = (cx, key);
 }
 
-pub(crate) unsafe fn JS_SetGCParametersBasedOnAvailableMemory(cx: *mut root::JSContext, availMemMB: u32) {
+pub(crate) unsafe fn JS_SetGCParametersBasedOnAvailableMemory(
+    cx: *mut root::JSContext,
+    availMemMB: u32,
+) {
     let _ = (cx, availMemMB);
 }
 
-pub(crate) unsafe fn JS_SetGCCallback(cx: *mut root::JSContext, cb: root::JSGCCallback, data: *mut c_void) {
+pub(crate) unsafe fn JS_SetGCCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSGCCallback,
+    data: *mut c_void,
+) {
     let _ = (cx, cb, data);
 }
 
-pub(crate) unsafe fn SetGCSliceCallback(cx: *mut root::JSContext, callback: root::JS::GCSliceCallback) -> root::JS::GCSliceCallback {
+pub(crate) unsafe fn SetGCSliceCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::GCSliceCallback,
+) -> root::JS::GCSliceCallback {
     let _ = (cx, callback);
     None
 }
 
-pub(crate) unsafe fn SetDoCycleCollectionCallback(cx: *mut root::JSContext, callback: root::JS::DoCycleCollectionCallback) -> root::JS::DoCycleCollectionCallback {
+pub(crate) unsafe fn SetDoCycleCollectionCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::DoCycleCollectionCallback,
+) -> root::JS::DoCycleCollectionCallback {
     let _ = (cx, callback);
     None
 }
 
-pub(crate) unsafe fn SetCreateGCSliceBudgetCallback(cx: *mut root::JSContext, cb: root::JS::CreateSliceBudgetCallback) {
+pub(crate) unsafe fn SetCreateGCSliceBudgetCallback(
+    cx: *mut root::JSContext,
+    cb: root::JS::CreateSliceBudgetCallback,
+) {
     let _ = (cx, cb);
 }
 
-pub(crate) unsafe fn AddGCNurseryCollectionCallback(cx: *mut root::JSContext, callback: root::JS::GCNurseryCollectionCallback, data: *mut c_void) -> bool {
+pub(crate) unsafe fn AddGCNurseryCollectionCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::GCNurseryCollectionCallback,
+    data: *mut c_void,
+) -> bool {
     let _ = (cx, callback, data);
     true
 }
 
-pub(crate) unsafe fn RemoveGCNurseryCollectionCallback(cx: *mut root::JSContext, callback: root::JS::GCNurseryCollectionCallback, data: *mut c_void) {
+pub(crate) unsafe fn RemoveGCNurseryCollectionCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::GCNurseryCollectionCallback,
+    data: *mut c_void,
+) {
     let _ = (cx, callback, data);
 }
 
-pub(crate) unsafe fn JS_AddFinalizeCallback(cx: *mut root::JSContext, cb: root::JSFinalizeCallback, data: *mut c_void) -> bool {
+pub(crate) unsafe fn JS_AddFinalizeCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSFinalizeCallback,
+    data: *mut c_void,
+) -> bool {
     let _ = (cx, cb, data);
     true
 }
 
-pub(crate) unsafe fn JS_RemoveFinalizeCallback(cx: *mut root::JSContext, cb: root::JSFinalizeCallback) {
+pub(crate) unsafe fn JS_RemoveFinalizeCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSFinalizeCallback,
+) {
     let _ = (cx, cb);
 }
 
-pub(crate) unsafe fn JS_AddWeakPointerZonesCallback(cx: *mut root::JSContext, cb: root::JSWeakPointerZonesCallback, data: *mut c_void) -> bool {
+pub(crate) unsafe fn JS_AddWeakPointerZonesCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSWeakPointerZonesCallback,
+    data: *mut c_void,
+) -> bool {
     let _ = (cx, cb, data);
     true
 }
 
-pub(crate) unsafe fn JS_AddWeakPointerCompartmentCallback(cx: *mut root::JSContext, cb: root::JSWeakPointerCompartmentCallback, data: *mut c_void) -> bool {
+pub(crate) unsafe fn JS_AddWeakPointerCompartmentCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSWeakPointerCompartmentCallback,
+    data: *mut c_void,
+) -> bool {
     let _ = (cx, cb, data);
     true
 }
 
-pub(crate) unsafe fn JS_SetGrayGCRootsTracer(cx: *mut root::JSContext, traceOp: root::JSGrayRootsTracer, data: *mut c_void) {
+pub(crate) unsafe fn JS_SetGrayGCRootsTracer(
+    cx: *mut root::JSContext,
+    traceOp: root::JSGrayRootsTracer,
+    data: *mut c_void,
+) {
     let _ = (cx, traceOp, data);
 }
 
-pub(crate) unsafe fn JS_RemoveExtraGCRootsTracer(cx: *mut root::JSContext, traceOp: root::JSTraceDataOp, data: *mut c_void) {
+pub(crate) unsafe fn JS_RemoveExtraGCRootsTracer(
+    cx: *mut root::JSContext,
+    traceOp: root::JSTraceDataOp,
+    data: *mut c_void,
+) {
     let _ = (cx, traceOp, data);
 }
 
-pub(crate) unsafe fn JS_SetObjectsTenuredCallback(cx: *mut root::JSContext, cb: root::JSObjectsTenuredCallback, data: *mut c_void) {
+pub(crate) unsafe fn JS_SetObjectsTenuredCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSObjectsTenuredCallback,
+    data: *mut c_void,
+) {
     let _ = (cx, cb, data);
 }
 
-pub(crate) unsafe fn JS_SetSizeOfIncludingThisCompartmentCallback(cx: *mut root::JSContext, callback: root::JSSizeOfIncludingThisCompartmentCallback) {
+pub(crate) unsafe fn JS_SetSizeOfIncludingThisCompartmentCallback(
+    cx: *mut root::JSContext,
+    callback: root::JSSizeOfIncludingThisCompartmentCallback,
+) {
     let _ = (cx, callback);
 }
 
-pub(crate) unsafe fn JS_SetDestroyZoneCallback(cx: *mut root::JSContext, callback: root::JSDestroyZoneCallback) {
+pub(crate) unsafe fn JS_SetDestroyZoneCallback(
+    cx: *mut root::JSContext,
+    callback: root::JSDestroyZoneCallback,
+) {
     let _ = (cx, callback);
 }
 
@@ -227,7 +301,11 @@ pub(crate) unsafe fn SetLowMemoryState(cx: *mut root::JSContext, newState: bool)
     }
 }
 
-pub(crate) unsafe fn SetOutOfMemoryCallback(cx: *mut root::JSContext, cb: root::JS::OutOfMemoryCallback, data: *mut c_void) {
+pub(crate) unsafe fn SetOutOfMemoryCallback(
+    cx: *mut root::JSContext,
+    cb: root::JS::OutOfMemoryCallback,
+    data: *mut c_void,
+) {
     let _ = (cx, cb, data);
 }
 
@@ -235,11 +313,18 @@ pub(crate) unsafe fn ClearKeptObjects(cx: *mut root::JSContext) {
     let _ = cx;
 }
 
-pub(crate) unsafe fn SetHostCleanupFinalizationRegistryCallback(cx: *mut root::JSContext, cb: root::JSHostCleanupFinalizationRegistryCallback, data: *mut c_void) {
+pub(crate) unsafe fn SetHostCleanupFinalizationRegistryCallback(
+    cx: *mut root::JSContext,
+    cb: root::JSHostCleanupFinalizationRegistryCallback,
+    data: *mut c_void,
+) {
     let _ = (cx, cb, data);
 }
 
-pub(crate) unsafe fn SetHostEnsureCanAddPrivateElementHook(cx: *mut root::JSContext, op: root::JS::EnsureCanAddPrivateElementOp) {
+pub(crate) unsafe fn SetHostEnsureCanAddPrivateElementHook(
+    cx: *mut root::JSContext,
+    op: root::JS::EnsureCanAddPrivateElementOp,
+) {
     let _ = (cx, op);
 }
 
@@ -259,13 +344,22 @@ pub(crate) unsafe fn GetGCHeapUsage(cx: *mut root::JSContext) -> u64 {
     malloc_size(Cx::from_raw(cx)) as u64
 }
 
-pub(crate) unsafe fn CollectServoSizes(cx: *mut root::JSContext, sizes: *mut root::JS::ServoSizes, gs: crate::sys::glue::GetSize) -> bool {
+pub(crate) unsafe fn CollectServoSizes(
+    cx: *mut root::JSContext,
+    sizes: *mut root::JS::ServoSizes,
+    gs: crate::sys::glue::GetSize,
+) -> bool {
     let _ = gs;
     (*sizes).gcHeapUsed += malloc_size(Cx::from_raw(cx));
     true
 }
 
-pub(crate) unsafe fn AddServoSizeOf(cx: *mut root::JSContext, mallocSizeOf: root::mozilla::MallocSizeOf, opv: *mut root::JS::ObjectPrivateVisitor, sizes: *mut root::JS::ServoSizes) -> bool {
+pub(crate) unsafe fn AddServoSizeOf(
+    cx: *mut root::JSContext,
+    mallocSizeOf: root::mozilla::MallocSizeOf,
+    opv: *mut root::JS::ObjectPrivateVisitor,
+    sizes: *mut root::JS::ServoSizes,
+) -> bool {
     let _ = (mallocSizeOf, opv);
     (*sizes).gcHeapUsed += malloc_size(Cx::from_raw(cx));
     true
@@ -275,11 +369,19 @@ pub(crate) unsafe fn InitializeMemoryReporter(wtm: crate::sys::glue::WantToMeasu
     let _ = wtm;
 }
 
-pub(crate) unsafe fn AddAssociatedMemory(obj: *mut root::JSObject, nbytes: usize, use_: root::JS::MemoryUse) {
+pub(crate) unsafe fn AddAssociatedMemory(
+    obj: *mut root::JSObject,
+    nbytes: usize,
+    use_: root::JS::MemoryUse,
+) {
     let _ = (obj, nbytes, use_);
 }
 
-pub(crate) unsafe fn RemoveAssociatedMemory(obj: *mut root::JSObject, nbytes: usize, use_: root::JS::MemoryUse) {
+pub(crate) unsafe fn RemoveAssociatedMemory(
+    obj: *mut root::JSObject,
+    nbytes: usize,
+    use_: root::JS::MemoryUse,
+) {
     let _ = (obj, nbytes, use_);
 }
 
@@ -287,11 +389,19 @@ pub(crate) unsafe fn RemoveAssociatedMemory(obj: *mut root::JSObject, nbytes: us
 
 pub(crate) unsafe fn DisableJitBackend() {}
 
-pub(crate) unsafe fn JS_SetGlobalJitCompilerOption(cx: *mut root::JSContext, opt: root::JSJitCompilerOption, value: u32) {
+pub(crate) unsafe fn JS_SetGlobalJitCompilerOption(
+    cx: *mut root::JSContext,
+    opt: root::JSJitCompilerOption,
+    value: u32,
+) {
     let _ = (cx, opt, value);
 }
 
-pub(crate) unsafe fn JS_GetGlobalJitCompilerOption(cx: *mut root::JSContext, opt: root::JSJitCompilerOption, valueOut: *mut u32) -> bool {
+pub(crate) unsafe fn JS_GetGlobalJitCompilerOption(
+    cx: *mut root::JSContext,
+    opt: root::JSJitCompilerOption,
+    valueOut: *mut u32,
+) -> bool {
     let _ = (cx, opt);
     *valueOut = 0;
     true
@@ -301,7 +411,10 @@ pub(crate) unsafe fn JS_SetOffthreadIonCompilationEnabled(cx: *mut root::JSConte
     let _ = (cx, enabled);
 }
 
-pub(crate) unsafe fn JS_SetOffthreadBaselineCompilationEnabled(cx: *mut root::JSContext, enabled: bool) {
+pub(crate) unsafe fn JS_SetOffthreadBaselineCompilationEnabled(
+    cx: *mut root::JSContext,
+    enabled: bool,
+) {
     let _ = (cx, enabled);
 }
 
@@ -313,20 +426,37 @@ pub(crate) unsafe fn SetProcessBuildIdOp(buildIdOp: root::JS::BuildIdOp) {
     let _ = buildIdOp;
 }
 
-pub(crate) unsafe fn SetBuildId(buildId: *mut root::JS::BuildIdCharVector, chars: *const c_char, len: usize) -> bool {
+pub(crate) unsafe fn SetBuildId(
+    buildId: *mut root::JS::BuildIdCharVector,
+    chars: *const c_char,
+    len: usize,
+) -> bool {
     let _ = (buildId, chars, len);
     true
 }
 
-pub(crate) unsafe fn InitConsumeStreamCallback(cx: *mut root::JSContext, consume: root::JS::ConsumeStreamCallback, report: root::JS::ReportStreamErrorCallback) {
+pub(crate) unsafe fn InitConsumeStreamCallback(
+    cx: *mut root::JSContext,
+    consume: root::JS::ConsumeStreamCallback,
+    report: root::JS::ReportStreamErrorCallback,
+) {
     let _ = (cx, consume, report);
 }
 
-pub(crate) unsafe fn InitDispatchsToEventLoop(cx: *mut root::JSContext, callback: root::JS::DispatchToEventLoopCallback, delayedCallback: root::JS::DelayedDispatchToEventLoopCallback, closure: *mut c_void) {
+pub(crate) unsafe fn InitDispatchsToEventLoop(
+    cx: *mut root::JSContext,
+    callback: root::JS::DispatchToEventLoopCallback,
+    delayedCallback: root::JS::DelayedDispatchToEventLoopCallback,
+    closure: *mut c_void,
+) {
     let _ = (cx, callback, delayedCallback, closure);
 }
 
-pub(crate) unsafe fn SetUpEventLoopDispatch(cx: *mut root::JSContext, callback: crate::sys::glue::RustDispatchToEventLoopCallback, closure: *mut c_void) {
+pub(crate) unsafe fn SetUpEventLoopDispatch(
+    cx: *mut root::JSContext,
+    callback: crate::sys::glue::RustDispatchToEventLoopCallback,
+    closure: *mut c_void,
+) {
     let _ = (cx, callback, closure);
 }
 
@@ -338,11 +468,17 @@ pub(crate) unsafe fn EnableContextProfilingStack(cx: *mut root::JSContext, enabl
     let _ = (cx, enabled);
 }
 
-pub(crate) unsafe fn SetContextProfilingStack(cx: *mut root::JSContext, profilingStack: *mut root::ProfilingStack) {
+pub(crate) unsafe fn SetContextProfilingStack(
+    cx: *mut root::JSContext,
+    profilingStack: *mut root::ProfilingStack,
+) {
     let _ = (cx, profilingStack);
 }
 
-pub(crate) unsafe fn SetScriptEnvironmentPreparer(cx: *mut root::JSContext, preparer: *mut root::js::ScriptEnvironmentPreparer) {
+pub(crate) unsafe fn SetScriptEnvironmentPreparer(
+    cx: *mut root::JSContext,
+    preparer: *mut root::js::ScriptEnvironmentPreparer,
+) {
     let _ = (cx, preparer);
 }
 

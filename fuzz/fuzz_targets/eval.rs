@@ -32,15 +32,15 @@ use mozjs::jsapi::{
     JS_GetOwnPropertyDescriptorById, JS_HasOwnPropertyById, JS_NewObjectWithGivenProto,
     MutableHandle, MutableHandleIdVector, MutableHandleValue as RawMutableHandleValue,
     ObjectOpResult, OnNewGlobalHookOption, PropertyDescriptor, PropertyKey, Value,
-    JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT,
-    JSITER_HIDDEN, JSITER_OWNONLY, JSITER_SYMBOLS, JSPROP_ENUMERATE,
+    JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN,
+    JSITER_OWNONLY, JSITER_SYMBOLS, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, ObjectValue, PrivateValue, UndefinedValue};
 use mozjs::qjs;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     AppendToIdVector, GetPropertyKeys, GetRealmObjectPrototype, JS_AtomizeAndPinString,
-    JS_DefineProperty, JS_NewGlobalObject, RUST_INTERNED_STRING_TO_JSID, JS_GC,
+    JS_DefineProperty, JS_NewGlobalObject, JS_GC, RUST_INTERNED_STRING_TO_JSID,
 };
 use mozjs::rust::{evaluate_script, CompileOptionsWrapper, RealmOptions, SIMPLE_GLOBAL_CLASS};
 
@@ -58,7 +58,10 @@ unsafe fn id_name(cx: *mut RawJSContext, id: HandleId) -> Option<String> {
     if !(*id).is_string() {
         return None;
     }
-    Some(jsstr_to_string(&context(cx), NonNull::new((*id).to_string()).unwrap()))
+    Some(jsstr_to_string(
+        &context(cx),
+        NonNull::new((*id).to_string()).unwrap(),
+    ))
 }
 
 unsafe fn named(proxy: *mut JSObject) -> &'static Named {
@@ -70,7 +73,11 @@ unsafe fn named(proxy: *mut JSObject) -> &'static Named {
 unsafe fn expando(proxy: *mut JSObject) -> *mut JSObject {
     let mut v = UndefinedValue();
     GetProxyPrivate(proxy, &mut v);
-    if v.is_object() { v.to_object() } else { ptr::null_mut() }
+    if v.is_object() {
+        v.to_object()
+    } else {
+        ptr::null_mut()
+    }
 }
 
 unsafe fn ensure_expando(cx: *mut RawJSContext, proxy: *mut JSObject) -> *mut JSObject {
@@ -95,7 +102,13 @@ unsafe extern "C" fn get_own_property_descriptor(
 ) -> bool {
     let exp = expando(*proxy);
     if !exp.is_null() {
-        if !JS_GetOwnPropertyDescriptorById(cx, Handle::from_marked_location(&exp), id, desc, is_none) {
+        if !JS_GetOwnPropertyDescriptorById(
+            cx,
+            Handle::from_marked_location(&exp),
+            id,
+            desc,
+            is_none,
+        ) {
             return false;
         }
         if !*is_none {
@@ -103,7 +116,8 @@ unsafe extern "C" fn get_own_property_descriptor(
         }
     }
     *is_none = true;
-    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied()) {
+    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied())
+    {
         let d = &mut *desc.ptr;
         *d = PropertyDescriptor::default();
         d.set_hasConfigurable_(true);
@@ -133,7 +147,9 @@ unsafe extern "C" fn define_property(
     }
     if let Some(name) = name.filter(|name| name.starts_with('n')) {
         let v = (*desc).value_;
-        named(*proxy).borrow_mut().insert(name, if v.is_int32() { v.to_int32() } else { 0 });
+        named(*proxy)
+            .borrow_mut()
+            .insert(name, if v.is_int32() { v.to_int32() } else { 0 });
         (*result).code_ = 0;
         return true;
     }
@@ -155,11 +171,17 @@ unsafe fn string_id(cx: &mut JSContext, name: &str) -> Option<PropertyKey> {
     Some(id.get())
 }
 
-unsafe extern "C" fn own_property_keys(cx: *mut RawJSContext, proxy: RawHandleObject, props: MutableHandleIdVector) -> bool {
+unsafe extern "C" fn own_property_keys(
+    cx: *mut RawJSContext,
+    proxy: RawHandleObject,
+    props: MutableHandleIdVector,
+) -> bool {
     let mut context = context(cx);
     let names: Vec<String> = named(*proxy).borrow().keys().cloned().collect();
     for name in names {
-        let Some(id) = string_id(&mut context, &name) else { continue };
+        let Some(id) = string_id(&mut context, &name) else {
+            continue;
+        };
         if !AppendToIdVector(props, mozjs::rust::Handle::from_marked_location(&id)) {
             return false;
         }
@@ -168,10 +190,20 @@ unsafe extern "C" fn own_property_keys(cx: *mut RawJSContext, proxy: RawHandleOb
     if exp.is_null() {
         return true;
     }
-    GetPropertyKeys(&mut context, mozjs::rust::Handle::from_marked_location(&exp), JSITER_OWNONLY | JSITER_HIDDEN | JSITER_SYMBOLS, props)
+    GetPropertyKeys(
+        &mut context,
+        mozjs::rust::Handle::from_marked_location(&exp),
+        JSITER_OWNONLY | JSITER_HIDDEN | JSITER_SYMBOLS,
+        props,
+    )
 }
 
-unsafe extern "C" fn delete(cx: *mut RawJSContext, proxy: RawHandleObject, id: HandleId, result: *mut ObjectOpResult) -> bool {
+unsafe extern "C" fn delete(
+    cx: *mut RawJSContext,
+    proxy: RawHandleObject,
+    id: HandleId,
+    result: *mut ObjectOpResult,
+) -> bool {
     if let Some(name) = id_name(cx, id) {
         if named(*proxy).borrow_mut().remove(&name).is_some() {
             (*result).code_ = 0;
@@ -186,7 +218,13 @@ unsafe extern "C" fn delete(cx: *mut RawJSContext, proxy: RawHandleObject, id: H
     JS_DeletePropertyById(cx, Handle::from_marked_location(&exp), id, result)
 }
 
-unsafe extern "C" fn get(cx: *mut RawJSContext, proxy: RawHandleObject, receiver: RawHandleValue, id: HandleId, vp: RawMutableHandleValue) -> bool {
+unsafe extern "C" fn get(
+    cx: *mut RawJSContext,
+    proxy: RawHandleObject,
+    receiver: RawHandleValue,
+    id: HandleId,
+    vp: RawMutableHandleValue,
+) -> bool {
     let exp = expando(*proxy);
     if !exp.is_null() {
         let mut found = false;
@@ -194,10 +232,17 @@ unsafe extern "C" fn get(cx: *mut RawJSContext, proxy: RawHandleObject, receiver
             return false;
         }
         if found {
-            return mozjs::jsapi::JS_ForwardGetPropertyTo(cx, Handle::from_marked_location(&exp), id, receiver, vp);
+            return mozjs::jsapi::JS_ForwardGetPropertyTo(
+                cx,
+                Handle::from_marked_location(&exp),
+                id,
+                receiver,
+                vp,
+            );
         }
     }
-    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied()) {
+    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied())
+    {
         *vp.ptr = Int32Value(value);
         return true;
     }
@@ -209,15 +254,29 @@ unsafe extern "C" fn get(cx: *mut RawJSContext, proxy: RawHandleObject, receiver
         *vp.ptr = UndefinedValue();
         return true;
     }
-    mozjs::jsapi::JS_ForwardGetPropertyTo(cx, Handle::from_marked_location(&proto), id, receiver, vp)
+    mozjs::jsapi::JS_ForwardGetPropertyTo(
+        cx,
+        Handle::from_marked_location(&proto),
+        id,
+        receiver,
+        vp,
+    )
 }
 
-unsafe extern "C" fn prevent_extensions(_: *mut RawJSContext, _: RawHandleObject, result: *mut ObjectOpResult) -> bool {
+unsafe extern "C" fn prevent_extensions(
+    _: *mut RawJSContext,
+    _: RawHandleObject,
+    result: *mut ObjectOpResult,
+) -> bool {
     (*result).code_ = JSErrNum::JSMSG_CANT_PREVENT_EXTENSIONS as usize;
     true
 }
 
-unsafe extern "C" fn is_extensible(_: *mut RawJSContext, _: RawHandleObject, extensible: *mut bool) -> bool {
+unsafe extern "C" fn is_extensible(
+    _: *mut RawJSContext,
+    _: RawHandleObject,
+    extensible: *mut bool,
+) -> bool {
     *extensible = true;
     true
 }
@@ -264,10 +323,21 @@ static PROXY_CLASS: JSClass = JSClass {
 unsafe fn new_dom_proxy(cx: &mut JSContext) -> *mut JSObject {
     let proto = GetRealmObjectPrototype(cx);
     let undefined = UndefinedValue();
-    let proxy = NewProxyObject(cx.raw_cx(), HANDLER.0, Handle::from_marked_location(&undefined), proto, &PROXY_CLASS, false);
+    let proxy = NewProxyObject(
+        cx.raw_cx(),
+        HANDLER.0,
+        Handle::from_marked_location(&undefined),
+        proto,
+        &PROXY_CLASS,
+        false,
+    );
     if !proxy.is_null() {
         let map: Named = RefCell::new(BTreeMap::from([("n1".to_owned(), 1), ("n2".to_owned(), 2)]));
-        SetProxyReservedSlot(proxy, 0, &PrivateValue(Box::into_raw(Box::new(map)) as *const c_void));
+        SetProxyReservedSlot(
+            proxy,
+            0,
+            &PrivateValue(Box::into_raw(Box::new(map)) as *const c_void),
+        );
     }
     proxy
 }
@@ -283,23 +353,48 @@ unsafe extern "C" fn gc(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> boo
 
 unsafe extern "C" fn host(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
     let args = CallArgs::from_vp(vp, argc);
-    let obj = common::new_host(cx, if argc > 0 { *args.get(0).ptr } else { UndefinedValue() });
+    let obj = common::new_host(
+        cx,
+        if argc > 0 {
+            *args.get(0).ptr
+        } else {
+            UndefinedValue()
+        },
+    );
     args.rval().set(common::object_value(obj));
     !obj.is_null()
 }
 
 unsafe extern "C" fn clone(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
     let args = CallArgs::from_vp(vp, argc);
-    let v = if argc > 0 { *args.get(0).ptr } else { UndefinedValue() };
-    let transfer = if argc > 1 { *args.get(1).ptr } else { UndefinedValue() };
+    let v = if argc > 0 {
+        *args.get(0).ptr
+    } else {
+        UndefinedValue()
+    };
+    let transfer = if argc > 1 {
+        *args.get(1).ptr
+    } else {
+        UndefinedValue()
+    };
     let mut context = context(cx);
-    let Some(bytes) = common::write(&mut context, v, transfer) else { return false };
+    let Some(bytes) = common::write(&mut context, v, transfer) else {
+        return false;
+    };
     // Seeds for the clone_read target.
     if let Some(dir) = std::env::var_os("FUZZ_DUMP_CLONES") {
-        let name = format!("seed-{:016x}", bytes.iter().fold(0xcbf29ce484222325u64, |h, &b| (h ^ b as u64).wrapping_mul(0x100000001b3)));
+        let name = format!(
+            "seed-{:016x}",
+            bytes
+                .iter()
+                .fold(0xcbf29ce484222325u64, |h, &b| (h ^ b as u64)
+                    .wrapping_mul(0x100000001b3))
+        );
         let _ = std::fs::write(std::path::Path::new(&dir).join(name), &bytes);
     }
-    let Some(out) = common::read(&mut context, &bytes) else { return false };
+    let Some(out) = common::read(&mut context, &bytes) else {
+        return false;
+    };
     args.rval().set(out);
     true
 }
@@ -314,7 +409,13 @@ unsafe extern "C" fn dom(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bo
 unsafe extern "C" fn new_global(cx: *mut RawJSContext, argc: u32, vp: *mut Value) -> bool {
     let args = CallArgs::from_vp(vp, argc);
     let mut context = context(cx);
-    let global = JS_NewGlobalObject(&mut context, &SIMPLE_GLOBAL_CLASS, ptr::null_mut(), OnNewGlobalHookOption::FireOnNewGlobalHook, &*RealmOptions::default());
+    let global = JS_NewGlobalObject(
+        &mut context,
+        &SIMPLE_GLOBAL_CLASS,
+        ptr::null_mut(),
+        OnNewGlobalHookOption::FireOnNewGlobalHook,
+        &*RealmOptions::default(),
+    );
     if !global.is_null() {
         define_natives(cx, global);
     }
@@ -348,7 +449,13 @@ fuzz_target!(|data: &[u8]| {
         define_natives(cx.raw_cx(), global.get());
         let proxy = new_dom_proxy(cx);
         rooted!(&in(cx) let proxy = common::object_value(proxy));
-        JS_DefineProperty(cx, global, c"document".as_ptr(), proxy.handle(), JSPROP_ENUMERATE as u32);
+        JS_DefineProperty(
+            cx,
+            global,
+            c"document".as_ptr(),
+            proxy.handle(),
+            JSPROP_ENUMERATE as u32,
+        );
         common::with_deadline(Duration::from_millis(200), || {
             rooted!(&in(cx) let mut rval = UndefinedValue());
             let options = CompileOptionsWrapper::new(cx, c"fuzz.js".to_owned(), 1);

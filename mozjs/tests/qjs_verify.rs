@@ -10,7 +10,9 @@ use std::process::Command;
 use std::ptr;
 
 use mozjs::glue::CallValueTracer;
-use mozjs::jsapi::{GCReason, Heap, JSClass, JSClassOps, JSObject, JSTracer, OnNewGlobalHookOption};
+use mozjs::jsapi::{
+    GCReason, Heap, JSClass, JSClassOps, JSObject, JSTracer, OnNewGlobalHookOption,
+};
 use mozjs::jsval::{JSVal, ObjectValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject, JS_GC};

@@ -133,7 +133,11 @@ fn is_string(v: q::JSValue) -> bool {
 }
 
 fn number(v: q::JSValue) -> f64 {
-    if v.tag() == q::JS_TAG_INT { v.int() as f64 } else { v.float64() }
+    if v.tag() == q::JS_TAG_INT {
+        v.int() as f64
+    } else {
+        v.float64()
+    }
 }
 
 fn scerr_message(id: u32) -> &'static CStr {
@@ -150,18 +154,27 @@ fn scerr_message(id: u32) -> &'static CStr {
 
 /// SpiderMonkey's `ReportDataCloneError`: the `reportError` callback if there is one (no
 /// exception is set), otherwise a TypeError.
-unsafe fn report_error(cx: &mut Cx, callbacks: *const root::JSStructuredCloneCallbacks, closure: *mut c_void, id: u32) {
+unsafe fn report_error(
+    cx: &mut Cx,
+    callbacks: *const root::JSStructuredCloneCallbacks,
+    closure: *mut c_void,
+    id: u32,
+) {
     let message = scerr_message(id);
     match callbacks.as_ref().and_then(|c| c.reportError) {
         Some(report) => report(cx.as_raw(), id, closure, message.as_ptr()),
         None => {
             q::JS_ThrowTypeError(cx.qctx(), c"%s".as_ptr(), message.as_ptr());
-        },
+        }
     }
 }
 
 unsafe fn bad_data(cx: &Cx, what: &CStr) {
-    q::JS_ThrowInternalError(cx.qctx(), c"bad serialized structured data (%s)".as_ptr(), what.as_ptr());
+    q::JS_ThrowInternalError(
+        cx.qctx(),
+        c"bad serialized structured data (%s)".as_ptr(),
+        what.as_ptr(),
+    );
 }
 
 /// A flat string for a string or rope value; `None` for anything else.
@@ -171,7 +184,7 @@ unsafe fn flat_string(cx: &Cx, v: q::JSValue) -> Option<Owned> {
         q::JS_TAG_STRING_ROPE => {
             let s = q::JS_ToString(cx.qctx(), v);
             (!is_exception(s)).then(|| Owned::new(cx, s))
-        },
+        }
         _ => None,
     }
 }
@@ -252,11 +265,19 @@ impl Drop for Atoms {
 /// A container whose children are being written.
 enum WriteFrame {
     /// The keys of an object or array, collected when it was started.
-    Properties { obj: q::JSValue, keys: Atoms, next: usize },
+    Properties {
+        obj: q::JSValue,
+        keys: Atoms,
+        next: usize,
+    },
     /// A snapshot of the entries of a Map or Set.
     Entries { records: Owned, len: u32, next: u32 },
     /// The cause and errors of an Error, then its stack.
-    Error { values: [Option<Owned>; 2], stack: Option<Owned>, next: usize },
+    Error {
+        values: [Option<Owned>; 2],
+        stack: Option<Owned>,
+        next: usize,
+    },
 }
 
 /// What a `JSStructuredCloneWriter*` points to.
@@ -283,7 +304,12 @@ impl Drop for Writer {
 }
 
 impl Writer {
-    fn new(cx: &mut Cx, scope: root::JS::StructuredCloneScope, callbacks: *const root::JSStructuredCloneCallbacks, closure: *mut c_void) -> Writer {
+    fn new(
+        cx: &mut Cx,
+        scope: root::JS::StructuredCloneScope,
+        callbacks: *const root::JSStructuredCloneCallbacks,
+        closure: *mut c_void,
+    ) -> Writer {
         Writer {
             cx,
             out: Vec::new(),
@@ -331,7 +357,8 @@ impl Writer {
 
     unsafe fn put_raw(&mut self, p: *const u8, len: usize) {
         if len > 0 {
-            self.out.extend_from_slice(std::slice::from_raw_parts(p, len));
+            self.out
+                .extend_from_slice(std::slice::from_raw_parts(p, len));
         }
     }
 
@@ -354,9 +381,11 @@ impl Writer {
         match q::JS_IsArray(cx.qctx(), list) {
             r if r < 0 => return false,
             0 => return self.report(root::JS_SCERR_TRANSFERABLE),
-            _ => {},
+            _ => {}
         }
-        let Some(len) = array_length(cx, list) else { return false };
+        let Some(len) = array_length(cx, list) else {
+            return false;
+        };
         for i in 0..len {
             let item = Owned::new(cx, q::JS_GetPropertyUint32(cx.qctx(), list, i));
             if is_exception(item.v) {
@@ -367,10 +396,13 @@ impl Writer {
             }
             let mut info = q::JSBufferInfo::default();
             match q::JS_GetBufferInfo(item.v, &mut info) {
-                q::JS_BUFFER_SHARED_ARRAY_BUFFER => return self.report(root::JS_SCERR_SHMEM_TRANSFERABLE),
-                q::JS_BUFFER_ARRAY_BUFFER => {},
+                q::JS_BUFFER_SHARED_ARRAY_BUFFER => {
+                    return self.report(root::JS_SCERR_SHMEM_TRANSFERABLE)
+                }
+                q::JS_BUFFER_ARRAY_BUFFER => {}
                 _ => {
-                    let Some(can_transfer) = self.callbacks.as_ref().and_then(|c| c.canTransfer) else {
+                    let Some(can_transfer) = self.callbacks.as_ref().and_then(|c| c.canTransfer)
+                    else {
                         return self.report(root::JS_SCERR_TRANSFERABLE);
                     };
                     let obj = val_obj(item.v);
@@ -379,14 +411,15 @@ impl Writer {
                         cx.enter_realm(realm);
                     }
                     let mut same_process = false;
-                    let ok = can_transfer(cx.as_raw(), handle(&obj), &mut same_process, self.closure);
+                    let ok =
+                        can_transfer(cx.as_raw(), handle(&obj), &mut same_process, self.closure);
                     if !realm.is_null() {
                         cx.leave_realm();
                     }
                     if !ok {
                         return self.report(root::JS_SCERR_TRANSFERABLE);
                     }
-                },
+                }
             }
             if self.memory.contains_key(&(item.v.ptr() as usize)) {
                 return self.report(root::JS_SCERR_DUP_TRANSFERABLE);
@@ -410,7 +443,7 @@ impl Writer {
                 Ok(None) => {
                     stack.pop();
                     continue;
-                },
+                }
                 Err(()) => return false,
             };
             if !self.start(child.v, &mut stack) {
@@ -429,19 +462,19 @@ impl Writer {
             q::JS_TAG_INT => {
                 self.put_u8(T_INT32);
                 self.put_u32(v.int() as u32);
-            },
+            }
             q::JS_TAG_FLOAT64 => {
                 self.put_u8(T_DOUBLE);
                 self.put_f64(v.float64());
-            },
+            }
             q::JS_TAG_STRING | q::JS_TAG_STRING_ROPE => {
                 self.put_u8(T_STRING);
                 return self.write_string(v);
-            },
+            }
             q::JS_TAG_SHORT_BIG_INT | q::JS_TAG_BIG_INT => {
                 self.put_u8(T_BIGINT);
                 self.write_bigint(v);
-            },
+            }
             q::JS_TAG_OBJECT => return self.start_object(v, stack),
             _ => return self.report(root::JS_SCERR_UNSUPPORTED_TYPE),
         }
@@ -450,7 +483,9 @@ impl Writer {
 
     /// A string payload: `(length << 1) | wide` and the Latin-1 or UTF-16 code units.
     unsafe fn write_string(&mut self, v: q::JSValue) -> bool {
-        let Some(s) = flat_string(self.cx(), v) else { return false };
+        let Some(s) = flat_string(self.cx(), v) else {
+            return false;
+        };
         let mut data = ptr::null();
         let mut wide = 0;
         let len = q::JS_GetStringData(s.v, &mut data, &mut wide);
@@ -490,16 +525,20 @@ impl Writer {
             CLASS_OBJECT => {
                 self.put_u8(T_OBJECT);
                 self.properties(v)
-            },
+            }
             CLASS_ARRAY => {
-                let Some(len) = array_length(self.cx(), v) else { return false };
+                let Some(len) = array_length(self.cx(), v) else {
+                    return false;
+                };
                 self.put_u8(T_ARRAY);
                 self.put_u32(len);
                 self.properties(v)
-            },
+            }
             CLASS_MAP | CLASS_SET => self.start_map(v, class == CLASS_SET),
             CLASS_ERROR => self.start_error(v),
-            CLASS_NUMBER | CLASS_STRING | CLASS_BOOLEAN | CLASS_BIG_INT | CLASS_DATE => return self.write_primitive_object(v, class),
+            CLASS_NUMBER | CLASS_STRING | CLASS_BOOLEAN | CLASS_BIG_INT | CLASS_DATE => {
+                return self.write_primitive_object(v, class)
+            }
             CLASS_REGEXP => return self.write_regexp(v),
             _ => return self.write_other(v),
         };
@@ -507,7 +546,7 @@ impl Writer {
             Some(frame) => {
                 stack.push(frame);
                 true
-            },
+            }
             None => false,
         }
     }
@@ -535,15 +574,23 @@ impl Writer {
                     }
                     return Ok(Some(value));
                 }
-            },
+            }
             WriteFrame::Entries { records, len, next } => {
                 if *next < *len {
                     let item = Owned::new(cx, q::JS_GetPropertyUint32(ctx, records.v, *next));
                     *next += 1;
-                    return if is_exception(item.v) { Err(()) } else { Ok(Some(item)) };
+                    return if is_exception(item.v) {
+                        Err(())
+                    } else {
+                        Ok(Some(item))
+                    };
                 }
-            },
-            WriteFrame::Error { values, stack, next } => {
+            }
+            WriteFrame::Error {
+                values,
+                stack,
+                next,
+            } => {
                 while let Some(value) = values.get_mut(*next) {
                     *next += 1;
                     self.put_u8(value.is_some() as u8);
@@ -558,7 +605,7 @@ impl Writer {
                     }
                 }
                 return Ok(None);
-            },
+            }
         }
         self.put_u8(T_END);
         Ok(None)
@@ -570,30 +617,33 @@ impl Writer {
             CLASS_NUMBER => {
                 self.put_u8(T_NUMBER_OBJECT);
                 self.put_f64(number(data.v));
-            },
+            }
             CLASS_DATE => {
                 self.put_u8(T_DATE);
                 self.put_f64(number(data.v));
-            },
+            }
             CLASS_BOOLEAN => {
                 self.put_u8(T_BOOLEAN_OBJECT);
                 self.put_u8((data.v.int() != 0) as u8);
-            },
+            }
             CLASS_STRING => {
                 self.put_u8(T_STRING_OBJECT);
                 return self.write_string(data.v);
-            },
+            }
             _ => {
                 self.put_u8(T_BIGINT_OBJECT);
                 self.write_bigint(data.v);
-            },
+            }
         }
         true
     }
 
     unsafe fn write_regexp(&mut self, v: q::JSValue) -> bool {
         let mut flags = q::JS_UNDEFINED;
-        let source = Owned::new(self.cx(), q::JS_GetRegExpOriginal(self.ctx(), v, &mut flags));
+        let source = Owned::new(
+            self.cx(),
+            q::JS_GetRegExpOriginal(self.ctx(), v, &mut flags),
+        );
         let flags = Owned::new(self.cx(), flags);
         if is_exception(source.v) {
             return false;
@@ -608,7 +658,9 @@ impl Writer {
             // A detached buffer goes to the write callback, like in SpiderMonkey.
             q::JS_BUFFER_ARRAY_BUFFER if info.detached == 0 => self.write_array_buffer(v, &info),
             q::JS_BUFFER_SHARED_ARRAY_BUFFER => self.report(root::JS_SCERR_NOT_CLONABLE),
-            kind @ (q::JS_BUFFER_TYPED_ARRAY | q::JS_BUFFER_DATA_VIEW) => self.write_view(kind, &info),
+            kind @ (q::JS_BUFFER_TYPED_ARRAY | q::JS_BUFFER_DATA_VIEW) => {
+                self.write_view(kind, &info)
+            }
             _ => self.write_host(v),
         }
     }
@@ -623,9 +675,16 @@ impl Writer {
         if q::JS_GetOwnPropertyNames(ctx, &mut tab, &mut len, obj, flags) < 0 {
             return None;
         }
-        let mut keys = Atoms { atoms: Vec::with_capacity(len as usize), rt: cx.rt };
+        let mut keys = Atoms {
+            atoms: Vec::with_capacity(len as usize),
+            rt: cx.rt,
+        };
         if len > 0 {
-            keys.atoms.extend(std::slice::from_raw_parts(tab, len as usize).iter().map(|e| q::JS_DupAtom(ctx, e.atom)));
+            keys.atoms.extend(
+                std::slice::from_raw_parts(tab, len as usize)
+                    .iter()
+                    .map(|e| q::JS_DupAtom(ctx, e.atom)),
+            );
         }
         q::JS_FreePropertyEnum(ctx, tab, len);
         Some(WriteFrame::Properties { obj, keys, next: 0 })
@@ -654,7 +713,11 @@ impl Writer {
         }
         let len = array_length(cx, records.v)?;
         self.put_u8(if is_set { T_SET } else { T_MAP });
-        Some(WriteFrame::Entries { records, len, next: 0 })
+        Some(WriteFrame::Entries {
+            records,
+            len,
+            next: 0,
+        })
     }
 
     /// HTML's name (from the allowed list) and message, plus SpiderMonkey's extensions: cause,
@@ -667,7 +730,10 @@ impl Writer {
             return None;
         }
         let kind = match flat_string(cx, name.v) {
-            Some(s) => ERROR_KINDS.iter().find(|(n, _)| string_eq(s.v, n)).map_or(-1, |&(_, k)| k),
+            Some(s) => ERROR_KINDS
+                .iter()
+                .find(|(n, _)| string_eq(s.v, n))
+                .map_or(-1, |&(_, k)| k),
             None if is_string(name.v) => return None,
             None => -1,
         };
@@ -678,7 +744,7 @@ impl Writer {
                     return None;
                 }
                 Some(s)
-            },
+            }
             None => None,
         };
         let cause = own_data_property(cx, obj, c"cause").ok()?;
@@ -691,7 +757,9 @@ impl Writer {
         } else {
             None
         };
-        let stack = own_data_property(cx, obj, c"stack").ok()?.filter(|s| is_string(s.v));
+        let stack = own_data_property(cx, obj, c"stack")
+            .ok()?
+            .filter(|s| is_string(s.v));
         self.put_u8(T_ERROR);
         self.put_u8(kind as u8);
         self.put_u8(message.is_some() as u8);
@@ -700,7 +768,11 @@ impl Writer {
                 return None;
             }
         }
-        Some(WriteFrame::Error { values: [cause, errors], stack, next: 0 })
+        Some(WriteFrame::Error {
+            values: [cause, errors],
+            stack,
+            next: 0,
+        })
     }
 
     /// Length, maximum length (`u64::MAX` if not resizable) and contents.
@@ -727,10 +799,18 @@ impl Writer {
             let ty = info.type_ as usize;
             self.put_u8(T_TYPED_ARRAY);
             self.put_u8(ty as u8);
-            self.put_u64(if tracking { TRACKING_LENGTH } else { (info.byte_length / ELEMENT_SIZES[ty]) as u64 });
+            self.put_u64(if tracking {
+                TRACKING_LENGTH
+            } else {
+                (info.byte_length / ELEMENT_SIZES[ty]) as u64
+            });
         } else {
             self.put_u8(T_DATA_VIEW);
-            self.put_u64(if tracking { TRACKING_LENGTH } else { info.byte_length as u64 });
+            self.put_u64(if tracking {
+                TRACKING_LENGTH
+            } else {
+                info.byte_length as u64
+            });
         }
         if !self.write_value(info.buffer) {
             return false;
@@ -762,7 +842,13 @@ impl Writer {
             for &(tag, ownership, content, extra) in &custom {
                 if let Some(free) = free {
                     if ownership >= root::JS::TransferableOwnership::SCTAG_TMO_FIRST_OWNED as u32 {
-                        free(tag, transfer_ownership(ownership), content as *mut c_void, extra, self.closure);
+                        free(
+                            tag,
+                            transfer_ownership(ownership),
+                            content as *mut c_void,
+                            extra,
+                            self.closure,
+                        );
                     }
                 }
             }
@@ -771,7 +857,11 @@ impl Writer {
         Some(map)
     }
 
-    unsafe fn transfer_into(&mut self, map: &mut Vec<u8>, custom: &mut Vec<(u32, u32, usize, u64)>) -> bool {
+    unsafe fn transfer_into(
+        &mut self,
+        map: &mut Vec<u8>,
+        custom: &mut Vec<(u32, u32, usize, u64)>,
+    ) -> bool {
         let out = std::mem::take(&mut self.out);
         let mut ok = true;
         for t in self.transferables.clone() {
@@ -795,7 +885,15 @@ impl Writer {
             let mut ownership = root::JS::TransferableOwnership::SCTAG_TMO_UNFILLED;
             let mut content = ptr::null_mut();
             let mut extra = 0;
-            if !write_transfer(self.cx().as_raw(), handle(&obj), self.closure, &mut tag, &mut ownership, &mut content, &mut extra) {
+            if !write_transfer(
+                self.cx().as_raw(),
+                handle(&obj),
+                self.closure,
+                &mut tag,
+                &mut ownership,
+                &mut content,
+                &mut extra,
+            ) {
                 ok = false;
                 break;
             }
@@ -815,7 +913,11 @@ impl Writer {
         let mut bytes = Vec::with_capacity(HEADER_LEN + map.len() + self.out.len());
         bytes.extend_from_slice(&MAGIC.to_le_bytes());
         bytes.extend_from_slice(&FORMAT_VERSION.to_le_bytes());
-        let state = if count > 0 { TRANSFER_UNREAD } else { TRANSFER_NONE };
+        let state = if count > 0 {
+            TRANSFER_UNREAD
+        } else {
+            TRANSFER_NONE
+        };
         bytes.extend_from_slice(&state.to_le_bytes());
         bytes.extend_from_slice(&count.to_le_bytes());
         bytes.extend_from_slice(&map);
@@ -825,7 +927,10 @@ impl Writer {
 }
 
 fn handle(obj: &*mut root::JSObject) -> root::JS::Handle<*mut root::JSObject> {
-    root::JS::Handle { ptr: obj, _phantom_0: PhantomData }
+    root::JS::Handle {
+        ptr: obj,
+        _phantom_0: PhantomData,
+    }
 }
 
 unsafe fn writer<'a>(w: *mut root::JSStructuredCloneWriter) -> &'a mut Writer {
@@ -834,7 +939,14 @@ unsafe fn writer<'a>(w: *mut root::JSStructuredCloneWriter) -> &'a mut Writer {
 
 /// Serializes `v` with its transfer list; `None` on failure (exception pending or error
 /// reported).
-unsafe fn write_clone(cx: &mut Cx, v: q::JSValue, scope: root::JS::StructuredCloneScope, callbacks: *const root::JSStructuredCloneCallbacks, closure: *mut c_void, transferable: q::JSValue) -> Option<Vec<u8>> {
+unsafe fn write_clone(
+    cx: &mut Cx,
+    v: q::JSValue,
+    scope: root::JS::StructuredCloneScope,
+    callbacks: *const root::JSStructuredCloneCallbacks,
+    closure: *mut c_void,
+    transferable: q::JSValue,
+) -> Option<Vec<u8>> {
     let mut w = Writer::new(cx, scope, callbacks, closure);
     if !w.parse_transferables(transferable) || !w.write_value(v) {
         return None;
@@ -861,7 +973,11 @@ enum ReadFrame {
     /// An object or array, and the key of the value being read.
     Properties { obj: Owned, key: Option<Atoms> },
     /// A Map or Set, and the key of the value being read.
-    Entries { map: Owned, is_set: bool, key: Option<Owned> },
+    Entries {
+        map: Owned,
+        is_set: bool,
+        key: Option<Owned>,
+    },
     /// An Error, and how many of `ERROR_FIELDS` were read.
     Error { error: Owned, next: usize },
 }
@@ -936,11 +1052,13 @@ impl<'a> Reader<'a> {
     }
 
     unsafe fn u32(&mut self) -> Option<u32> {
-        self.take(4).map(|b| u32::from_le_bytes(b.try_into().unwrap()))
+        self.take(4)
+            .map(|b| u32::from_le_bytes(b.try_into().unwrap()))
     }
 
     unsafe fn u64(&mut self) -> Option<u64> {
-        self.take(8).map(|b| u64::from_le_bytes(b.try_into().unwrap()))
+        self.take(8)
+            .map(|b| u64::from_le_bytes(b.try_into().unwrap()))
     }
 
     unsafe fn f64(&mut self) -> Option<f64> {
@@ -954,7 +1072,7 @@ impl<'a> Reader<'a> {
             Err(_) => {
                 bad_data(self.cx(), c"length");
                 None
-            },
+            }
         }
     }
 
@@ -986,7 +1104,10 @@ impl<'a> Reader<'a> {
         let ctx = self.ctx();
         let s = if header & 1 != 0 {
             let bytes = self.take(len * 2)?;
-            let units: Vec<u16> = bytes.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
+            let units: Vec<u16> = bytes
+                .chunks_exact(2)
+                .map(|c| u16::from_le_bytes([c[0], c[1]]))
+                .collect();
             q::JS_NewStringUTF16(ctx, units.as_ptr(), len)
         } else {
             let bytes = self.take(len)?;
@@ -998,7 +1119,10 @@ impl<'a> Reader<'a> {
     unsafe fn read_bigint(&mut self) -> Option<Owned> {
         let n = self.u32()? as usize;
         let bytes = self.take(n * 4)?;
-        let words: Vec<u32> = bytes.chunks_exact(4).map(|c| u32::from_le_bytes(c.try_into().unwrap())).collect();
+        let words: Vec<u32> = bytes
+            .chunks_exact(4)
+            .map(|c| u32::from_le_bytes(c.try_into().unwrap()))
+            .collect();
         self.owned(q::JS_NewBigIntWords(self.ctx(), words.as_ptr(), n))
     }
 
@@ -1018,25 +1142,52 @@ impl<'a> Reader<'a> {
         let Some(kind) = self.u32() else { return false };
         match kind {
             XFER_ARRAY_BUFFER => {
-                let Some(buffer) = self.read_array_buffer() else { return false };
+                let Some(buffer) = self.read_array_buffer() else {
+                    return false;
+                };
                 self.all_objs.push(buffer.take());
                 true
-            },
+            }
             XFER_CUSTOM => {
-                let (Some(tag), Some(_ownership), Some(content), Some(extra)) = (self.u32(), self.u32(), self.u64(), self.u64()) else {
+                let (Some(tag), Some(_ownership), Some(content), Some(extra)) =
+                    (self.u32(), self.u32(), self.u64(), self.u64())
+                else {
                     return false;
                 };
                 let cx = self.cx();
-                let Some(read_transfer) = self.callbacks.as_ref().and_then(|c| c.readTransfer) else {
-                    report_error(cx, self.callbacks, self.closure, root::JS_SCERR_TRANSFERABLE);
+                let Some(read_transfer) = self.callbacks.as_ref().and_then(|c| c.readTransfer)
+                else {
+                    report_error(
+                        cx,
+                        self.callbacks,
+                        self.closure,
+                        root::JS_SCERR_TRANSFERABLE,
+                    );
                     return false;
                 };
                 let mut obj = ptr::null_mut();
-                let out = root::JS::MutableHandle { ptr: &mut obj, _phantom_0: PhantomData };
+                let out = root::JS::MutableHandle {
+                    ptr: &mut obj,
+                    _phantom_0: PhantomData,
+                };
                 let (policy, closure) = (self.policy, self.closure);
-                if !read_transfer(cx.as_raw(), self.raw(), policy, tag, content as usize as *mut c_void, extra, closure, out) {
+                if !read_transfer(
+                    cx.as_raw(),
+                    self.raw(),
+                    policy,
+                    tag,
+                    content as usize as *mut c_void,
+                    extra,
+                    closure,
+                    out,
+                ) {
                     if q::JS_HasException(cx.qctx()) == 0 {
-                        report_error(cx, self.callbacks, self.closure, root::JS_SCERR_TRANSFERABLE);
+                        report_error(
+                            cx,
+                            self.callbacks,
+                            self.closure,
+                            root::JS_SCERR_TRANSFERABLE,
+                        );
                     }
                     return false;
                 }
@@ -1045,11 +1196,11 @@ impl<'a> Reader<'a> {
                 }
                 self.all_objs.push(q::JS_DupValueRT(cx.rt, obj_val(obj)));
                 true
-            },
+            }
             _ => {
                 bad_data(self.cx(), c"transfer map");
                 false
-            },
+            }
         }
     }
 
@@ -1063,7 +1214,9 @@ impl<'a> Reader<'a> {
         };
         loop {
             if let Some(value) = done.take() {
-                let Some(frame) = stack.last_mut() else { return Some(value.take()) };
+                let Some(frame) = stack.last_mut() else {
+                    return Some(value.take());
+                };
                 self.accept(frame, value)?;
             }
             let frame = stack.last_mut().expect("a container being read");
@@ -1097,40 +1250,53 @@ impl<'a> Reader<'a> {
                     _ => {
                         self.bad(c"invalid back reference");
                         return None;
-                    },
+                    }
                 }
-            },
+            }
             T_OBJECT => {
                 let obj = self.new_object(q::JS_NewObject(ctx))?;
                 stack.push(ReadFrame::Properties { obj, key: None });
                 return Some(Started::Container);
-            },
+            }
             T_ARRAY => {
                 let len = self.u32()?;
                 let obj = self.new_object(q::JS_NewArray(ctx))?;
-                if q::JS_SetPropertyStr(ctx, obj.v, c"length".as_ptr(), q::JS_NewUint32(ctx, len)) < 0 {
+                if q::JS_SetPropertyStr(ctx, obj.v, c"length".as_ptr(), q::JS_NewUint32(ctx, len))
+                    < 0
+                {
                     return None;
                 }
                 stack.push(ReadFrame::Properties { obj, key: None });
                 return Some(Started::Container);
-            },
+            }
             T_MAP | T_SET => {
                 let map = self.new_object(q::JS_NewMapOrSet(ctx, (tag == T_SET) as c_int))?;
-                stack.push(ReadFrame::Entries { map, is_set: tag == T_SET, key: None });
+                stack.push(ReadFrame::Entries {
+                    map,
+                    is_set: tag == T_SET,
+                    key: None,
+                });
                 return Some(Started::Container);
-            },
+            }
             T_ERROR => {
                 let kind = self.u8()? as i8;
                 let error = self.new_object(q::JS_NewNativeErrorObject(ctx, kind as c_int))?;
                 if self.u8()? != 0 {
                     let message = self.read_string()?;
-                    if q::JS_DefinePropertyValueStr(ctx, error.v, c"message".as_ptr(), message.take(), ERROR_FIELD_FLAGS) < 0 {
+                    if q::JS_DefinePropertyValueStr(
+                        ctx,
+                        error.v,
+                        c"message".as_ptr(),
+                        message.take(),
+                        ERROR_FIELD_FLAGS,
+                    ) < 0
+                    {
                         return None;
                     }
                 }
                 stack.push(ReadFrame::Error { error, next: 0 });
                 return Some(Started::Container);
-            },
+            }
             _ => return self.read_object(tag).map(Started::Value),
         };
         Some(Started::Value(Owned::new(self.cx(), value)))
@@ -1147,25 +1313,28 @@ impl<'a> Reader<'a> {
                     T_STRING => {
                         let s = self.read_string()?;
                         q::JS_ValueToAtom(ctx, s.v)
-                    },
+                    }
                     _ => {
                         self.bad(c"property key");
                         return None;
-                    },
+                    }
                 };
                 if atom == 0 {
                     return None;
                 }
-                *key = Some(Atoms { atoms: vec![atom], rt: self.cx().rt });
+                *key = Some(Atoms {
+                    atoms: vec![atom],
+                    rt: self.cx().rt,
+                });
                 Some(true)
-            },
+            }
             ReadFrame::Entries { key, .. } => {
                 if key.is_none() && self.peek_u8()? == T_END {
                     self.pos += 1;
                     return Some(false);
                 }
                 Some(true)
-            },
+            }
             ReadFrame::Error { error, next } => {
                 while *next < ERROR_FIELDS.len() {
                     *next += 1;
@@ -1175,12 +1344,19 @@ impl<'a> Reader<'a> {
                 }
                 if self.u8()? != 0 {
                     let stack = self.read_string()?;
-                    if q::JS_DefinePropertyValueStr(ctx, error.v, c"stack".as_ptr(), stack.take(), ERROR_FIELD_FLAGS) < 0 {
+                    if q::JS_DefinePropertyValueStr(
+                        ctx,
+                        error.v,
+                        c"stack".as_ptr(),
+                        stack.take(),
+                        ERROR_FIELD_FLAGS,
+                    ) < 0
+                    {
                         return None;
                     }
                 }
                 Some(false)
-            },
+            }
         }
     }
 
@@ -1190,20 +1366,34 @@ impl<'a> Reader<'a> {
         let ok = match frame {
             ReadFrame::Properties { obj, key } => {
                 let key = key.take().expect("a property key");
-                q::JS_DefinePropertyValue(ctx, obj.v, key.atoms[0], value.take(), q::JS_PROP_C_W_E as c_int) >= 0
-            },
-            ReadFrame::Entries { map, is_set: true, .. } => q::JS_AddMapRecord(ctx, map.v, value.v, q::JS_UNDEFINED) >= 0,
+                q::JS_DefinePropertyValue(
+                    ctx,
+                    obj.v,
+                    key.atoms[0],
+                    value.take(),
+                    q::JS_PROP_C_W_E as c_int,
+                ) >= 0
+            }
+            ReadFrame::Entries {
+                map, is_set: true, ..
+            } => q::JS_AddMapRecord(ctx, map.v, value.v, q::JS_UNDEFINED) >= 0,
             ReadFrame::Entries { map, key, .. } => match key.take() {
                 Some(k) => q::JS_AddMapRecord(ctx, map.v, k.v, value.v) >= 0,
                 None => {
                     *key = Some(value);
                     true
-                },
+                }
             },
             ReadFrame::Error { error, next } => {
                 let name = ERROR_FIELDS[*next - 1];
-                q::JS_DefinePropertyValueStr(ctx, error.v, name.as_ptr(), value.take(), ERROR_FIELD_FLAGS) >= 0
-            },
+                q::JS_DefinePropertyValueStr(
+                    ctx,
+                    error.v,
+                    name.as_ptr(),
+                    value.take(),
+                    ERROR_FIELD_FLAGS,
+                ) >= 0
+            }
         };
         ok.then_some(())
     }
@@ -1215,18 +1405,18 @@ impl<'a> Reader<'a> {
             T_DATE => {
                 let time = self.f64()?;
                 return self.new_object(q::JS_NewDate(ctx, time));
-            },
+            }
             T_REGEXP => {
                 let source = self.read_string()?;
                 let flags = self.read_string()?;
                 return self.new_object(q::JS_NewRegExpOriginal(ctx, source.v, flags.v));
-            },
+            }
             T_ARRAY_BUFFER => {
                 let buffer = self.read_array_buffer()?;
                 let index = self.reserve();
                 self.fill(index, &buffer);
                 return Some(buffer);
-            },
+            }
             T_TYPED_ARRAY | T_DATA_VIEW => return self.read_view(tag),
             T_HOST => return self.read_host(),
             T_NUMBER_OBJECT => Owned::new(self.cx(), q::JS_NewFloat64(ctx, self.f64()?)),
@@ -1236,7 +1426,7 @@ impl<'a> Reader<'a> {
             _ => {
                 self.bad(c"unknown tag");
                 return None;
-            },
+            }
         };
         self.new_object(q::JS_NewPrimitiveObject(ctx, value.v))
     }
@@ -1263,11 +1453,24 @@ impl<'a> Reader<'a> {
             return None;
         }
         let view = if tag == T_TYPED_ARRAY {
-            let length = if tracking { q::JS_UNDEFINED } else { q::JS_NewInt64(ctx, length as i64) };
+            let length = if tracking {
+                q::JS_UNDEFINED
+            } else {
+                q::JS_NewInt64(ctx, length as i64)
+            };
             let mut args = [buffer.v, q::JS_NewInt64(ctx, offset as i64), length];
             q::JS_NewTypedArray(ctx, 3, args.as_mut_ptr(), ty as q::JSTypedArrayEnum)
         } else {
-            q::JS_NewDataView(ctx, buffer.v, offset as usize, if tracking { usize::MAX } else { length as usize })
+            q::JS_NewDataView(
+                ctx,
+                buffer.v,
+                offset as usize,
+                if tracking {
+                    usize::MAX
+                } else {
+                    length as usize
+                },
+            )
         };
         let view = self.owned(view)?;
         self.fill(index, &view);
@@ -1299,7 +1502,13 @@ unsafe fn reader<'a>(r: *mut root::JSStructuredCloneReader) -> &'a mut Reader<'a
 }
 
 /// Deserializes the bytes in `storage` (a new reference), marking its transfer map consumed.
-unsafe fn read_clone(cx: &mut Cx, storage: *mut Vec<u8>, policy: *const root::JS::CloneDataPolicy, callbacks: *const root::JSStructuredCloneCallbacks, closure: *mut c_void) -> Option<q::JSValue> {
+unsafe fn read_clone(
+    cx: &mut Cx,
+    storage: *mut Vec<u8>,
+    policy: *const root::JS::CloneDataPolicy,
+    callbacks: *const root::JSStructuredCloneCallbacks,
+    closure: *mut c_void,
+) -> Option<q::JSValue> {
     let Some(bytes) = storage.as_mut().filter(|b| b.len() >= HEADER_LEN) else {
         bad_data(cx, c"truncated");
         return None;
@@ -1315,7 +1524,8 @@ unsafe fn read_clone(cx: &mut Cx, storage: *mut Vec<u8>, policy: *const root::JS
             report_error(cx, callbacks, closure, root::JS_SCERR_TRANSFERABLE_TWICE);
             return None;
         }
-        bytes[TRANSFER_STATE_OFFSET..TRANSFER_STATE_OFFSET + 4].copy_from_slice(&TRANSFER_CONSUMED.to_le_bytes());
+        bytes[TRANSFER_STATE_OFFSET..TRANSFER_STATE_OFFSET + 4]
+            .copy_from_slice(&TRANSFER_CONSUMED.to_le_bytes());
     }
     let mut r = Reader {
         cx,
@@ -1345,7 +1555,9 @@ unsafe fn discard_transferables(data: *mut root::JSStructuredCloneData) {
     if (*data).ownTransferables_ != root::OwnTransferablePolicy::OwnsTransferablesIfAny {
         return;
     }
-    let Some(free) = (*data).callbacks_.as_ref().and_then(|c| c.freeTransfer) else { return };
+    let Some(free) = (*data).callbacks_.as_ref().and_then(|c| c.freeTransfer) else {
+        return;
+    };
     let bytes = data_bytes(data);
     if bytes.len() < HEADER_LEN {
         return;
@@ -1355,23 +1567,42 @@ unsafe fn discard_transferables(data: *mut root::JSStructuredCloneData) {
         return;
     }
     let mut pos = HEADER_LEN;
-    let u32_at = |p: usize| bytes.get(p..p + 4).map(|b| u32::from_le_bytes(b.try_into().unwrap()));
-    let u64_at = |p: usize| bytes.get(p..p + 8).map(|b| u64::from_le_bytes(b.try_into().unwrap()));
+    let u32_at = |p: usize| {
+        bytes
+            .get(p..p + 4)
+            .map(|b| u32::from_le_bytes(b.try_into().unwrap()))
+    };
+    let u64_at = |p: usize| {
+        bytes
+            .get(p..p + 8)
+            .map(|b| u64::from_le_bytes(b.try_into().unwrap()))
+    };
     for _ in 0..word(12) {
         match u32_at(pos) {
             Some(XFER_ARRAY_BUFFER) => {
                 let Some(len) = u64_at(pos + 4) else { return };
                 pos += 4 + 16 + len as usize;
-            },
+            }
             Some(XFER_CUSTOM) => {
-                let (Some(tag), Some(ownership), Some(content), Some(extra)) = (u32_at(pos + 4), u32_at(pos + 8), u64_at(pos + 12), u64_at(pos + 20)) else {
+                let (Some(tag), Some(ownership), Some(content), Some(extra)) = (
+                    u32_at(pos + 4),
+                    u32_at(pos + 8),
+                    u64_at(pos + 12),
+                    u64_at(pos + 20),
+                ) else {
                     return;
                 };
                 if ownership >= root::JS::TransferableOwnership::SCTAG_TMO_FIRST_OWNED as u32 {
-                    free(tag, transfer_ownership(ownership), content as usize as *mut c_void, extra, (*data).closure_);
+                    free(
+                        tag,
+                        transfer_ownership(ownership),
+                        content as usize as *mut c_void,
+                        extra,
+                        (*data).closure_,
+                    );
                 }
                 pos += 28;
-            },
+            }
             _ => return,
         }
     }
@@ -1409,7 +1640,10 @@ unsafe fn clear_data(data: *mut root::JSStructuredCloneData) {
     (*data).ownTransferables_ = root::OwnTransferablePolicy::NoTransferables;
 }
 
-pub(crate) unsafe fn NewJSAutoStructuredCloneBuffer(scope: root::JS::StructuredCloneScope, callbacks: *const root::JSStructuredCloneCallbacks) -> *mut root::JSAutoStructuredCloneBuffer {
+pub(crate) unsafe fn NewJSAutoStructuredCloneBuffer(
+    scope: root::JS::StructuredCloneScope,
+    callbacks: *const root::JSStructuredCloneCallbacks,
+) -> *mut root::JSAutoStructuredCloneBuffer {
     // The bindgen struct has enum fields without a zero value, so it is filled in place.
     let layout = std::alloc::Layout::new::<root::JSAutoStructuredCloneBuffer>();
     let buf = std::alloc::alloc_zeroed(layout) as *mut root::JSAutoStructuredCloneBuffer;
@@ -1420,45 +1654,81 @@ pub(crate) unsafe fn NewJSAutoStructuredCloneBuffer(scope: root::JS::StructuredC
     ptr::addr_of_mut!((*data).scope_).write(scope);
     ptr::addr_of_mut!((*data).callbacks_).write(callbacks);
     ptr::addr_of_mut!((*data).closure_).write(ptr::null_mut());
-    ptr::addr_of_mut!((*data).ownTransferables_).write(root::OwnTransferablePolicy::NoTransferables);
+    ptr::addr_of_mut!((*data).ownTransferables_)
+        .write(root::OwnTransferablePolicy::NoTransferables);
     ptr::addr_of_mut!((*buf).version_).write(root::JS_STRUCTURED_CLONE_VERSION);
     buf
 }
 
-pub(crate) unsafe fn DeleteJSAutoStructuredCloneBuffer(buf: *mut root::JSAutoStructuredCloneBuffer) {
+pub(crate) unsafe fn DeleteJSAutoStructuredCloneBuffer(
+    buf: *mut root::JSAutoStructuredCloneBuffer,
+) {
     clear_data(ptr::addr_of_mut!((*buf).data_));
-    std::alloc::dealloc(buf as *mut u8, std::alloc::Layout::new::<root::JSAutoStructuredCloneBuffer>());
+    std::alloc::dealloc(
+        buf as *mut u8,
+        std::alloc::Layout::new::<root::JSAutoStructuredCloneBuffer>(),
+    );
 }
 
-pub(crate) unsafe fn GetLengthOfJSStructuredCloneData(data: *mut root::JSStructuredCloneData) -> usize {
+pub(crate) unsafe fn GetLengthOfJSStructuredCloneData(
+    data: *mut root::JSStructuredCloneData,
+) -> usize {
     data_bytes(data).len()
 }
 
-pub(crate) unsafe fn CopyJSStructuredCloneData(src: *mut root::JSStructuredCloneData, dest: *mut u8) {
+pub(crate) unsafe fn CopyJSStructuredCloneData(
+    src: *mut root::JSStructuredCloneData,
+    dest: *mut u8,
+) {
     let bytes = data_bytes(src);
     ptr::copy_nonoverlapping(bytes.as_ptr(), dest, bytes.len());
 }
 
-pub(crate) unsafe fn WriteBytesToJSStructuredCloneData(src: *const u8, len: usize, dest: *mut root::JSStructuredCloneData) -> bool {
+pub(crate) unsafe fn WriteBytesToJSStructuredCloneData(
+    src: *const u8,
+    len: usize,
+    dest: *mut root::JSStructuredCloneData,
+) -> bool {
     if len > 0 {
         data_vec(dest).extend_from_slice(std::slice::from_raw_parts(src, len));
     }
     true
 }
 
-pub(crate) unsafe fn JS_StructuredCloneHasTransferables(data: *mut root::JSStructuredCloneData, hasTransferable: *mut bool) -> bool {
+pub(crate) unsafe fn JS_StructuredCloneHasTransferables(
+    data: *mut root::JSStructuredCloneData,
+    hasTransferable: *mut bool,
+) -> bool {
     let bytes = data_bytes(data);
-    *hasTransferable = bytes.len() >= HEADER_LEN && bytes[12..16] != [0; 4] && u32::from_le_bytes(bytes[8..12].try_into().unwrap()) == TRANSFER_UNREAD;
+    *hasTransferable = bytes.len() >= HEADER_LEN
+        && bytes[12..16] != [0; 4]
+        && u32::from_le_bytes(bytes[8..12].try_into().unwrap()) == TRANSFER_UNREAD;
     true
 }
 
 // Reading and writing.
 
-pub(crate) unsafe fn JS_WriteStructuredClone(cx: *mut root::JSContext, v: root::JS::HandleValue, data: *mut root::JSStructuredCloneData, scope: root::JS::StructuredCloneScope, cloneDataPolicy: *const root::JS::CloneDataPolicy, optionalCallbacks: *const root::JSStructuredCloneCallbacks, closure: *mut ::std::os::raw::c_void, transferable: root::JS::HandleValue) -> bool {
+pub(crate) unsafe fn JS_WriteStructuredClone(
+    cx: *mut root::JSContext,
+    v: root::JS::HandleValue,
+    data: *mut root::JSStructuredCloneData,
+    scope: root::JS::StructuredCloneScope,
+    cloneDataPolicy: *const root::JS::CloneDataPolicy,
+    optionalCallbacks: *const root::JSStructuredCloneCallbacks,
+    closure: *mut ::std::os::raw::c_void,
+    transferable: root::JS::HandleValue,
+) -> bool {
     // Shared memory is never cloned, so the policy does not matter.
     let _ = cloneDataPolicy;
     let cx = Cx::from_raw(cx);
-    let Some(bytes) = write_clone(cx, (*v.ptr).to_qjs(), scope, optionalCallbacks, closure, (*transferable.ptr).to_qjs()) else {
+    let Some(bytes) = write_clone(
+        cx,
+        (*v.ptr).to_qjs(),
+        scope,
+        optionalCallbacks,
+        closure,
+        (*transferable.ptr).to_qjs(),
+    ) else {
         return false;
     };
     clear_data(data);
@@ -1470,18 +1740,39 @@ pub(crate) unsafe fn JS_WriteStructuredClone(cx: *mut root::JSContext, v: root::
     true
 }
 
-pub(crate) unsafe fn JS_ReadStructuredClone(cx: *mut root::JSContext, data: *const root::JSStructuredCloneData, version: u32, scope: root::JS::StructuredCloneScope, vp: root::JS::MutableHandleValue, cloneDataPolicy: *const root::JS::CloneDataPolicy, optionalCallbacks: *const root::JSStructuredCloneCallbacks, closure: *mut ::std::os::raw::c_void) -> bool {
+pub(crate) unsafe fn JS_ReadStructuredClone(
+    cx: *mut root::JSContext,
+    data: *const root::JSStructuredCloneData,
+    version: u32,
+    scope: root::JS::StructuredCloneScope,
+    vp: root::JS::MutableHandleValue,
+    cloneDataPolicy: *const root::JS::CloneDataPolicy,
+    optionalCallbacks: *const root::JSStructuredCloneCallbacks,
+    closure: *mut ::std::os::raw::c_void,
+) -> bool {
     // The format has its own version, and is self-contained for every scope.
     let _ = (version, scope);
     let cx = Cx::from_raw(cx);
-    let Some(v) = read_clone(cx, storage(data), cloneDataPolicy, optionalCallbacks, closure) else {
+    let Some(v) = read_clone(
+        cx,
+        storage(data),
+        cloneDataPolicy,
+        optionalCallbacks,
+        closure,
+    ) else {
         return false;
     };
     *vp.ptr = cx.adopt(v);
     true
 }
 
-pub(crate) unsafe fn JS_StructuredClone(cx: *mut root::JSContext, v: root::JS::HandleValue, vp: root::JS::MutableHandleValue, optionalCallbacks: *const root::JSStructuredCloneCallbacks, closure: *mut ::std::os::raw::c_void) -> bool {
+pub(crate) unsafe fn JS_StructuredClone(
+    cx: *mut root::JSContext,
+    v: root::JS::HandleValue,
+    vp: root::JS::MutableHandleValue,
+    optionalCallbacks: *const root::JSStructuredCloneCallbacks,
+    closure: *mut ::std::os::raw::c_void,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let value = (*v.ptr).to_qjs();
     if is_string(value) {
@@ -1489,10 +1780,20 @@ pub(crate) unsafe fn JS_StructuredClone(cx: *mut root::JSContext, v: root::JS::H
         return true;
     }
     let scope = root::JS::StructuredCloneScope::SameProcess;
-    let Some(mut bytes) = write_clone(cx, value, scope, optionalCallbacks, closure, q::JS_UNDEFINED) else {
+    let Some(mut bytes) = write_clone(
+        cx,
+        value,
+        scope,
+        optionalCallbacks,
+        closure,
+        q::JS_UNDEFINED,
+    ) else {
         return false;
     };
-    let policy = root::JS::CloneDataPolicy { allowIntraClusterClonableSharedObjects_: false, allowSharedMemoryObjects_: false };
+    let policy = root::JS::CloneDataPolicy {
+        allowIntraClusterClonableSharedObjects_: false,
+        allowSharedMemoryObjects_: false,
+    };
     let Some(result) = read_clone(cx, &mut bytes, &policy, optionalCallbacks, closure) else {
         return false;
     };
@@ -1502,22 +1803,36 @@ pub(crate) unsafe fn JS_StructuredClone(cx: *mut root::JSContext, v: root::JS::H
 
 // Callback API: writing.
 
-pub(crate) unsafe fn JS_WriteUint32Pair(w: *mut root::JSStructuredCloneWriter, tag: u32, data: u32) -> bool {
+pub(crate) unsafe fn JS_WriteUint32Pair(
+    w: *mut root::JSStructuredCloneWriter,
+    tag: u32,
+    data: u32,
+) -> bool {
     let w = writer(w);
     w.put_u32(tag);
     w.put_u32(data);
     true
 }
 
-pub(crate) unsafe fn JS_WriteBytes(w: *mut root::JSStructuredCloneWriter, p: *const ::std::os::raw::c_void, len: usize) -> bool {
+pub(crate) unsafe fn JS_WriteBytes(
+    w: *mut root::JSStructuredCloneWriter,
+    p: *const ::std::os::raw::c_void,
+    len: usize,
+) -> bool {
     writer(w).put_raw(p as *const u8, len);
     true
 }
 
-pub(crate) unsafe fn JS_WriteString(w: *mut root::JSStructuredCloneWriter, str_: root::JS::HandleString) -> bool {
+pub(crate) unsafe fn JS_WriteString(
+    w: *mut root::JSStructuredCloneWriter,
+    str_: root::JS::HandleString,
+) -> bool {
     let w = writer(w);
     w.put_u8(T_STRING);
-    w.write_string(q::JSValue::mkptr(q::JS_TAG_STRING, *str_.ptr as *mut c_void))
+    w.write_string(q::JSValue::mkptr(
+        q::JS_TAG_STRING,
+        *str_.ptr as *mut c_void,
+    ))
 }
 
 pub(crate) unsafe fn JS_WriteDouble(w: *mut root::JSStructuredCloneWriter, v: f64) -> bool {
@@ -1525,74 +1840,107 @@ pub(crate) unsafe fn JS_WriteDouble(w: *mut root::JSStructuredCloneWriter, v: f6
     true
 }
 
-pub(crate) unsafe fn JS_WriteTypedArray(w: *mut root::JSStructuredCloneWriter, v: root::JS::HandleValue) -> bool {
+pub(crate) unsafe fn JS_WriteTypedArray(
+    w: *mut root::JSStructuredCloneWriter,
+    v: root::JS::HandleValue,
+) -> bool {
     let w = writer(w);
     let v = (*v.ptr).to_qjs();
     let mut info = q::JSBufferInfo::default();
-    if v.tag() != q::JS_TAG_OBJECT || q::JS_GetBufferInfo(v, &mut info) != q::JS_BUFFER_TYPED_ARRAY {
+    if v.tag() != q::JS_TAG_OBJECT || q::JS_GetBufferInfo(v, &mut info) != q::JS_BUFFER_TYPED_ARRAY
+    {
         q::JS_ThrowTypeError(w.ctx(), c"not a typed array".as_ptr());
         return false;
     }
     w.write_value(v)
 }
 
-pub(crate) unsafe fn JS_ObjectNotWritten(w: *mut root::JSStructuredCloneWriter, obj: root::JS::HandleObject) -> bool {
+pub(crate) unsafe fn JS_ObjectNotWritten(
+    w: *mut root::JSStructuredCloneWriter,
+    obj: root::JS::HandleObject,
+) -> bool {
     writer(w).memory.remove(&(*obj.ptr as usize));
     true
 }
 
-pub(crate) unsafe fn JS_GetStructuredCloneScope(w: *mut root::JSStructuredCloneWriter) -> root::JS::StructuredCloneScope {
+pub(crate) unsafe fn JS_GetStructuredCloneScope(
+    w: *mut root::JSStructuredCloneWriter,
+) -> root::JS::StructuredCloneScope {
     writer(w).scope
 }
 
 // Callback API: reading.
 
-pub(crate) unsafe fn JS_ReadUint32Pair(r: *mut root::JSStructuredCloneReader, p1: *mut u32, p2: *mut u32) -> bool {
+pub(crate) unsafe fn JS_ReadUint32Pair(
+    r: *mut root::JSStructuredCloneReader,
+    p1: *mut u32,
+    p2: *mut u32,
+) -> bool {
     let r = reader(r);
-    let (Some(a), Some(b)) = (r.u32(), r.u32()) else { return false };
+    let (Some(a), Some(b)) = (r.u32(), r.u32()) else {
+        return false;
+    };
     *p1 = a;
     *p2 = b;
     true
 }
 
-pub(crate) unsafe fn JS_ReadBytes(r: *mut root::JSStructuredCloneReader, p: *mut ::std::os::raw::c_void, len: usize) -> bool {
-    let Some(bytes) = reader(r).take(len) else { return false };
+pub(crate) unsafe fn JS_ReadBytes(
+    r: *mut root::JSStructuredCloneReader,
+    p: *mut ::std::os::raw::c_void,
+    len: usize,
+) -> bool {
+    let Some(bytes) = reader(r).take(len) else {
+        return false;
+    };
     ptr::copy_nonoverlapping(bytes.as_ptr(), p as *mut u8, len);
     true
 }
 
-pub(crate) unsafe fn JS_ReadString(r: *mut root::JSStructuredCloneReader, str_: root::JS::MutableHandleString) -> bool {
+pub(crate) unsafe fn JS_ReadString(
+    r: *mut root::JSStructuredCloneReader,
+    str_: root::JS::MutableHandleString,
+) -> bool {
     let r = reader(r);
     match r.u8() {
-        Some(T_STRING) => {},
+        Some(T_STRING) => {}
         Some(_) => {
             r.bad(c"expected string");
             return false;
-        },
+        }
         None => return false,
     }
-    let Some(s) = r.read_string() else { return false };
+    let Some(s) = r.read_string() else {
+        return false;
+    };
     *str_.ptr = r.cx().adopt(s.take()).to_string();
     true
 }
 
 pub(crate) unsafe fn JS_ReadDouble(r: *mut root::JSStructuredCloneReader, v: *mut f64) -> bool {
-    let Some(d) = reader(r).f64() else { return false };
+    let Some(d) = reader(r).f64() else {
+        return false;
+    };
     *v = d;
     true
 }
 
-pub(crate) unsafe fn JS_ReadTypedArray(r: *mut root::JSStructuredCloneReader, vp: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn JS_ReadTypedArray(
+    r: *mut root::JSStructuredCloneReader,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let r = reader(r);
     match r.peek_u8() {
-        Some(T_TYPED_ARRAY | T_BACKREF) => {},
+        Some(T_TYPED_ARRAY | T_BACKREF) => {}
         Some(_) => {
             r.bad(c"expected typed array");
             return false;
-        },
+        }
         None => return false,
     }
-    let Some(v) = r.read_value() else { return false };
+    let Some(v) = r.read_value() else {
+        return false;
+    };
     let v = Owned::new(r.cx(), v);
     let mut info = q::JSBufferInfo::default();
     if q::JS_GetBufferInfo(v.v, &mut info) != q::JS_BUFFER_TYPED_ARRAY {

@@ -114,7 +114,10 @@ impl Cx {
     }
 
     pub unsafe fn leave_realm(&mut self) {
-        let realm = self.realm_stack.pop().expect("leaving a realm that was not entered");
+        let realm = self
+            .realm_stack
+            .pop()
+            .expect("leaving a realm that was not entered");
         release_realm(realm);
     }
 
@@ -182,7 +185,11 @@ pub(crate) fn current<'a>() -> &'a mut Cx {
 #[inline]
 pub(crate) fn try_current<'a>() -> Option<&'a mut Cx> {
     let cx = CURRENT.with(|c| c.get());
-    if cx.is_null() { None } else { Some(unsafe { &mut *cx }) }
+    if cx.is_null() {
+        None
+    } else {
+        Some(unsafe { &mut *cx })
+    }
 }
 
 pub(crate) fn set_current(cx: *mut Cx) {
@@ -218,21 +225,25 @@ pub(crate) unsafe fn retain_stored(kind: root::JS::RootKind, data: *const std::f
 }
 
 /// Retains the initial value of a `JS::Rooted<T>` (see `JS::Rooted::add_to_root_stack`).
-pub(crate) unsafe fn retain_rooted(cx: *mut root::JSContext, kind: root::JS::RootKind, data: *const std::ffi::c_void) {
+pub(crate) unsafe fn retain_rooted(
+    cx: *mut root::JSContext,
+    kind: root::JS::RootKind,
+    data: *const std::ffi::c_void,
+) {
     use root::JS::RootKind;
     let cx = Cx::from_raw(cx);
     let ptr_tag = match kind {
         RootKind::Value => {
             cx.retain(*(data as *const JSVal));
             return;
-        },
+        }
         RootKind::Id => {
             let id = *(data as *const root::jsid);
             if id.is_string() || id.is_symbol() {
                 cx.adopt_atom(q::JS_DupAtom(cx.base_ctx, id.to_atom()));
             }
             return;
-        },
+        }
         RootKind::Object => q::JS_TAG_OBJECT,
         RootKind::String => q::JS_TAG_STRING,
         RootKind::Symbol => q::JS_TAG_SYMBOL,

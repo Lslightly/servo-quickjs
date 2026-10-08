@@ -89,11 +89,18 @@ fn op_ok(result: &root::JS::ObjectOpResult) -> bool {
 }
 
 fn new_op_result() -> root::JS::ObjectOpResult {
-    root::JS::ObjectOpResult { code_: root::JS::ObjectOpResult_SpecialCodes::Uninitialized as usize }
+    root::JS::ObjectOpResult {
+        code_: root::JS::ObjectOpResult_SpecialCodes::Uninitialized as usize,
+    }
 }
 
 /// Reports a failed `ObjectOpResult` as QuickJS does for `flags` (throw, or return false).
-unsafe fn throw_or_false(ctx: *mut q::JSContext, flags: c_int, what: &str, atom: q::JSAtom) -> c_int {
+unsafe fn throw_or_false(
+    ctx: *mut q::JSContext,
+    flags: c_int,
+    what: &str,
+    atom: q::JSAtom,
+) -> c_int {
     let flags = flags as u32;
     let strict = flags & q::JS_PROP_THROW_STRICT != 0 && q::JS_IsStrictMode(ctx) != 0;
     if flags & q::JS_PROP_THROW == 0 && !strict {
@@ -103,7 +110,10 @@ unsafe fn throw_or_false(ctx: *mut q::JSContext, flags: c_int, what: &str, atom:
     let msg = if name.is_null() {
         format!("cannot {what} property")
     } else {
-        let msg = format!("cannot {what} property '{}'", std::ffi::CStr::from_ptr(name).to_string_lossy());
+        let msg = format!(
+            "cannot {what} property '{}'",
+            std::ffi::CStr::from_ptr(name).to_string_lossy()
+        );
         q::JS_FreeCString(ctx, name);
         msg
     };
@@ -134,7 +144,11 @@ unsafe impl Sync for ProxyHandler {}
 
 impl ProxyHandler {
     const fn empty(kind: Kind) -> ProxyHandler {
-        ProxyHandler { traps: unsafe { std::mem::zeroed() }, extra: ptr::null(), kind }
+        ProxyHandler {
+            traps: unsafe { std::mem::zeroed() },
+            extra: ptr::null(),
+            kind,
+        }
     }
 }
 
@@ -147,10 +161,10 @@ static HANDLER_FAMILY: u8 = 0;
 const fn proxy_class_def(name: &'static std::ffi::CStr, slots: u32) -> root::JSClass {
     root::JSClass {
         name: name.as_ptr(),
-        flags: root::JSClass_NON_NATIVE |
-            root::JSCLASS_IS_PROXY |
-            root::JSCLASS_DELAY_METADATA_BUILDER |
-            ((slots & root::JSCLASS_RESERVED_SLOTS_MASK) << root::JSCLASS_RESERVED_SLOTS_SHIFT),
+        flags: root::JSClass_NON_NATIVE
+            | root::JSCLASS_IS_PROXY
+            | root::JSCLASS_DELAY_METADATA_BUILDER
+            | ((slots & root::JSCLASS_RESERVED_SLOTS_MASK) << root::JSCLASS_RESERVED_SLOTS_SHIFT),
         cOps: ptr::null(),
         spec: ptr::null(),
         ext: ptr::null(),
@@ -215,7 +229,9 @@ pub(crate) unsafe fn proxy_class(obj: *mut root::JSObject) -> Option<*const root
 }
 
 pub(crate) unsafe fn proxy_realm(obj: *mut root::JSObject) -> Option<*mut RealmData> {
-    proxy_data(obj).map(|data| data.realm).filter(|realm| !realm.is_null())
+    proxy_data(obj)
+        .map(|data| data.realm)
+        .filter(|realm| !realm.is_null())
 }
 
 fn reserved_slots(clasp: *const root::JSClass) -> usize {
@@ -232,7 +248,11 @@ unsafe fn new_proxy(
     lazy_proto: bool,
 ) -> *mut root::JSObject {
     let clasp = if clasp.is_null() { &PROXY_CLASS } else { clasp };
-    let proto = if lazy_proto { q::JS_NULL } else { obj_or_null_val(proto) };
+    let proto = if lazy_proto {
+        q::JS_NULL
+    } else {
+        obj_or_null_val(proto)
+    };
     let obj = q::JS_NewObjectProtoClass(cx.qctx(), proto, proxy_class_id(cx.rt, lazy_proto));
     if obj.tag() == q::JS_TAG_EXCEPTION {
         return ptr::null_mut();
@@ -277,7 +297,10 @@ unsafe extern "C" fn proxy_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark:
     super::mark_realm(rt, (*data).realm, mark);
     if let Some(trace) = (*(*data).handler).traps.trace {
         let mut tracer = Tracer { rt, mark };
-        trace(&mut tracer as *mut Tracer as *mut root::JSTracer, val_obj(val));
+        trace(
+            &mut tracer as *mut Tracer as *mut root::JSTracer,
+            val_obj(val),
+        );
     }
 }
 
@@ -329,14 +352,25 @@ impl ProxyRef {
         false
     }
 
-    unsafe fn get_own_property_descriptor(&self, id: &root::jsid, desc: &mut root::JS::PropertyDescriptor, is_none: &mut bool) -> bool {
+    unsafe fn get_own_property_descriptor(
+        &self,
+        id: &root::jsid,
+        desc: &mut root::JS::PropertyDescriptor,
+        is_none: &mut bool,
+    ) -> bool {
         *is_none = true;
         match self.traps().getOwnPropertyDescriptor {
             Some(trap) => trap(self.cx, self.proxy(), handle(id), handle_mut(desc), is_none),
             None if self.kind() == Kind::Wrapper => {
                 let target = self.target();
-                super::JS_GetOwnPropertyDescriptorById(self.cx, handle(&target), handle(id), handle_mut(desc), is_none)
-            },
+                super::JS_GetOwnPropertyDescriptorById(
+                    self.cx,
+                    handle(&target),
+                    handle(id),
+                    handle_mut(desc),
+                    is_none,
+                )
+            }
             None => self.unsupported("getOwnPropertyDescriptor"),
         }
     }
@@ -367,7 +401,7 @@ impl ProxyRef {
             None if self.kind() == Kind::Wrapper => {
                 let target = self.target();
                 super::JS_GetPrototype(self.cx, handle(&target), handle_mut(proto))
-            },
+            }
             None => self.unsupported("getPrototype"),
         }
     }
@@ -379,7 +413,7 @@ impl ProxyRef {
                 let r = q::JS_IsExtensible(self.qctx(), obj_val(self.target()));
                 *extensible = r > 0;
                 r >= 0
-            },
+            }
             None => self.unsupported("isExtensible"),
         }
     }
@@ -411,11 +445,23 @@ impl ProxyRef {
 
     unsafe fn get(&self, receiver: &JSVal, id: &root::jsid, vp: &mut JSVal) -> bool {
         if let Some(trap) = self.traps().get {
-            return trap(self.cx, self.proxy(), handle(receiver), handle(id), handle_mut(vp));
+            return trap(
+                self.cx,
+                self.proxy(),
+                handle(receiver),
+                handle(id),
+                handle_mut(vp),
+            );
         }
         if self.kind() == Kind::Wrapper {
             let target = self.target();
-            return super::JS_ForwardGetPropertyTo(self.cx, handle(&target), handle(id), handle(receiver), handle_mut(vp));
+            return super::JS_ForwardGetPropertyTo(
+                self.cx,
+                handle(&target),
+                handle(id),
+                handle(receiver),
+                handle_mut(vp),
+            );
         }
         let mut desc = root::JS::PropertyDescriptor::default();
         let mut is_none = true;
@@ -431,7 +477,13 @@ impl ProxyRef {
                 *vp = UndefinedValue();
                 return true;
             }
-            return super::JS_ForwardGetPropertyTo(self.cx, handle(&proto), handle(id), handle(receiver), handle_mut(vp));
+            return super::JS_ForwardGetPropertyTo(
+                self.cx,
+                handle(&proto),
+                handle(id),
+                handle(receiver),
+                handle_mut(vp),
+            );
         }
         if !desc.hasGetter_() && !desc.hasSetter_() {
             *vp = desc.value_;
@@ -442,16 +494,42 @@ impl ProxyRef {
             return true;
         }
         let getter = ObjectValue(desc.getter_);
-        super::Call(self.cx, handle(receiver), handle(&getter), &root::JS::HandleValueArray::empty(), handle_mut(vp))
+        super::Call(
+            self.cx,
+            handle(receiver),
+            handle(&getter),
+            &root::JS::HandleValueArray::empty(),
+            handle_mut(vp),
+        )
     }
 
-    unsafe fn set(&self, id: &root::jsid, v: &JSVal, receiver: &JSVal, result: &mut root::JS::ObjectOpResult) -> bool {
+    unsafe fn set(
+        &self,
+        id: &root::jsid,
+        v: &JSVal,
+        receiver: &JSVal,
+        result: &mut root::JS::ObjectOpResult,
+    ) -> bool {
         if let Some(trap) = self.traps().set {
-            return trap(self.cx, self.proxy(), handle(id), handle(v), handle(receiver), result);
+            return trap(
+                self.cx,
+                self.proxy(),
+                handle(id),
+                handle(v),
+                handle(receiver),
+                result,
+            );
         }
         if self.kind() == Kind::Wrapper {
             let target = self.target();
-            return super::JS_ForwardSetPropertyTo(self.cx, handle(&target), handle(id), handle(v), handle(receiver), result);
+            return super::JS_ForwardSetPropertyTo(
+                self.cx,
+                handle(&target),
+                handle(id),
+                handle(v),
+                handle(receiver),
+                result,
+            );
         }
         let mut desc = root::JS::PropertyDescriptor::default();
         let mut is_none = true;
@@ -459,17 +537,40 @@ impl ProxyRef {
             return false;
         }
         let desc_handle = handle(&desc);
-        let own_desc = if is_none { ptr::null() } else { &desc_handle as *const _ };
-        super::SetPropertyIgnoringNamedGetter(self.cx, self.proxy(), handle(id), handle(v), handle(receiver), own_desc, result)
+        let own_desc = if is_none {
+            ptr::null()
+        } else {
+            &desc_handle as *const _
+        };
+        super::SetPropertyIgnoringNamedGetter(
+            self.cx,
+            self.proxy(),
+            handle(id),
+            handle(v),
+            handle(receiver),
+            own_desc,
+            result,
+        )
     }
 
-    unsafe fn define_property(&self, id: &root::jsid, desc: &root::JS::PropertyDescriptor, result: &mut root::JS::ObjectOpResult) -> bool {
+    unsafe fn define_property(
+        &self,
+        id: &root::jsid,
+        desc: &root::JS::PropertyDescriptor,
+        result: &mut root::JS::ObjectOpResult,
+    ) -> bool {
         match self.traps().defineProperty {
             Some(trap) => trap(self.cx, self.proxy(), handle(id), handle(desc), result),
             None if self.kind() == Kind::Wrapper => {
                 let target = self.target();
-                super::JS_DefinePropertyById(self.cx, handle(&target), handle(id), handle(desc), result)
-            },
+                super::JS_DefinePropertyById(
+                    self.cx,
+                    handle(&target),
+                    handle(id),
+                    handle(desc),
+                    result,
+                )
+            }
             None => self.unsupported("defineProperty"),
         }
     }
@@ -480,7 +581,7 @@ impl ProxyRef {
             None if self.kind() == Kind::Wrapper => {
                 let target = self.target();
                 super::JS_DeletePropertyById(self.cx, handle(&target), handle(id), result)
-            },
+            }
             None => self.unsupported("delete"),
         }
     }
@@ -492,7 +593,7 @@ impl ProxyRef {
                 let target = self.target();
                 let flags = root::JSITER_OWNONLY | root::JSITER_HIDDEN | root::JSITER_SYMBOLS;
                 super::GetPropertyKeys(self.cx, handle(&target), flags as c_uint, props)
-            },
+            }
             None => self.unsupported("ownPropertyKeys"),
         }
     }
@@ -535,7 +636,12 @@ impl Trap {
             cx.enter_realm(realm);
         }
         let pool_mark = cx.pool_mark();
-        Trap { ctx, proxy: ProxyRef::new(cx.as_raw(), val_obj(obj)), entered, pool_mark }
+        Trap {
+            ctx,
+            proxy: ProxyRef::new(cx.as_raw(), val_obj(obj)),
+            entered,
+            pool_mark,
+        }
     }
 
     unsafe fn failed(&self) -> c_int {
@@ -555,7 +661,10 @@ impl Drop for Trap {
 }
 
 /// A SpiderMonkey descriptor as a QuickJS one, holding its own references.
-unsafe fn to_qjs_desc(ctx: *mut q::JSContext, desc: &root::JS::PropertyDescriptor) -> q::JSPropertyDescriptor {
+unsafe fn to_qjs_desc(
+    ctx: *mut q::JSContext,
+    desc: &root::JS::PropertyDescriptor,
+) -> q::JSPropertyDescriptor {
     let mut flags = 0;
     if desc.configurable_() {
         flags |= q::JS_PROP_CONFIGURABLE;
@@ -564,7 +673,11 @@ unsafe fn to_qjs_desc(ctx: *mut q::JSContext, desc: &root::JS::PropertyDescripto
         flags |= q::JS_PROP_ENUMERABLE;
     }
     let accessor = |present: bool, f: *mut root::JSObject| {
-        if present && !f.is_null() { dup(ctx, obj_val(f)) } else { q::JS_UNDEFINED }
+        if present && !f.is_null() {
+            dup(ctx, obj_val(f))
+        } else {
+            q::JS_UNDEFINED
+        }
     };
     if desc.hasGetter_() || desc.hasSetter_() {
         q::JSPropertyDescriptor {
@@ -577,13 +690,27 @@ unsafe fn to_qjs_desc(ctx: *mut q::JSContext, desc: &root::JS::PropertyDescripto
         if desc.writable_() {
             flags |= q::JS_PROP_WRITABLE;
         }
-        let value = if desc.hasValue_() { dup(ctx, desc.value_.to_qjs()) } else { q::JS_UNDEFINED };
-        q::JSPropertyDescriptor { flags: flags as c_int, value, getter: q::JS_UNDEFINED, setter: q::JS_UNDEFINED }
+        let value = if desc.hasValue_() {
+            dup(ctx, desc.value_.to_qjs())
+        } else {
+            q::JS_UNDEFINED
+        };
+        q::JSPropertyDescriptor {
+            flags: flags as c_int,
+            value,
+            getter: q::JS_UNDEFINED,
+            setter: q::JS_UNDEFINED,
+        }
     }
 }
 
 /// A QuickJS `[[DefineOwnProperty]]` request as a SpiderMonkey descriptor (borrowing the values).
-fn from_qjs_desc(flags: c_int, val: q::JSValue, getter: q::JSValue, setter: q::JSValue) -> root::JS::PropertyDescriptor {
+fn from_qjs_desc(
+    flags: c_int,
+    val: q::JSValue,
+    getter: q::JSValue,
+    setter: q::JSValue,
+) -> root::JS::PropertyDescriptor {
     let flags = flags as u32;
     let mut desc = root::JS::PropertyDescriptor::default();
     if flags & q::JS_PROP_HAS_CONFIGURABLE != 0 {
@@ -633,12 +760,20 @@ static LAZY_PROTO_EXOTIC: q::JSClassExoticMethods = q::JSClassExoticMethods {
     ..STATIC_PROTO_EXOTIC
 };
 
-unsafe extern "C" fn proxy_get_own_property(ctx: *mut q::JSContext, desc: *mut q::JSPropertyDescriptor, obj: q::JSValue, prop: q::JSAtom) -> c_int {
+unsafe extern "C" fn proxy_get_own_property(
+    ctx: *mut q::JSContext,
+    desc: *mut q::JSPropertyDescriptor,
+    obj: q::JSValue,
+    prop: q::JSAtom,
+) -> c_int {
     let t = Trap::new(ctx, obj);
     let id = from_atom(prop);
     let mut sm_desc = root::JS::PropertyDescriptor::default();
     let mut is_none = true;
-    if !t.proxy.get_own_property_descriptor(&id, &mut sm_desc, &mut is_none) {
+    if !t
+        .proxy
+        .get_own_property_descriptor(&id, &mut sm_desc, &mut is_none)
+    {
         return t.failed();
     }
     if is_none {
@@ -650,7 +785,12 @@ unsafe extern "C" fn proxy_get_own_property(ctx: *mut q::JSContext, desc: *mut q
     1
 }
 
-unsafe extern "C" fn proxy_get_own_property_names(ctx: *mut q::JSContext, ptab: *mut *mut q::JSPropertyEnum, plen: *mut u32, obj: q::JSValue) -> c_int {
+unsafe extern "C" fn proxy_get_own_property_names(
+    ctx: *mut q::JSContext,
+    ptab: *mut *mut q::JSPropertyEnum,
+    plen: *mut u32,
+    obj: q::JSValue,
+) -> c_int {
     let t = Trap::new(ctx, obj);
     *ptab = ptr::null_mut();
     *plen = 0;
@@ -661,19 +801,27 @@ unsafe extern "C" fn proxy_get_own_property_names(ctx: *mut q::JSContext, ptab: 
     if ids.is_empty() {
         return 0;
     }
-    let tab = q::js_malloc(ctx, size_of::<q::JSPropertyEnum>() * ids.len()) as *mut q::JSPropertyEnum;
+    let tab =
+        q::js_malloc(ctx, size_of::<q::JSPropertyEnum>() * ids.len()) as *mut q::JSPropertyEnum;
     if tab.is_null() {
         return -1;
     }
     for (i, id) in ids.iter().enumerate() {
-        *tab.add(i) = q::JSPropertyEnum { is_enumerable: 0, atom: q::JS_DupAtom(ctx, id.to_atom()) };
+        *tab.add(i) = q::JSPropertyEnum {
+            is_enumerable: 0,
+            atom: q::JS_DupAtom(ctx, id.to_atom()),
+        };
     }
     *ptab = tab;
     *plen = ids.len() as u32;
     0
 }
 
-unsafe extern "C" fn proxy_delete_property(ctx: *mut q::JSContext, obj: q::JSValue, prop: q::JSAtom) -> c_int {
+unsafe extern "C" fn proxy_delete_property(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    prop: q::JSAtom,
+) -> c_int {
     let t = Trap::new(ctx, obj);
     let mut result = new_op_result();
     if !t.proxy.delete(&from_atom(prop), &mut result) {
@@ -694,7 +842,10 @@ unsafe extern "C" fn proxy_define_own_property(
     let t = Trap::new(ctx, this_obj);
     let desc = from_qjs_desc(flags, val, getter, setter);
     let mut result = new_op_result();
-    if !t.proxy.define_property(&from_atom(prop), &desc, &mut result) {
+    if !t
+        .proxy
+        .define_property(&from_atom(prop), &desc, &mut result)
+    {
         return t.failed();
     }
     if op_ok(&result) {
@@ -704,7 +855,11 @@ unsafe extern "C" fn proxy_define_own_property(
     }
 }
 
-unsafe extern "C" fn proxy_has_property(ctx: *mut q::JSContext, obj: q::JSValue, atom: q::JSAtom) -> c_int {
+unsafe extern "C" fn proxy_has_property(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    atom: q::JSAtom,
+) -> c_int {
     let t = Trap::new(ctx, obj);
     let mut found = false;
     if !t.proxy.has(&from_atom(atom), &mut found) {
@@ -713,10 +868,18 @@ unsafe extern "C" fn proxy_has_property(ctx: *mut q::JSContext, obj: q::JSValue,
     found as c_int
 }
 
-unsafe extern "C" fn proxy_get_property(ctx: *mut q::JSContext, obj: q::JSValue, atom: q::JSAtom, receiver: q::JSValue) -> q::JSValue {
+unsafe extern "C" fn proxy_get_property(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    atom: q::JSAtom,
+    receiver: q::JSValue,
+) -> q::JSValue {
     let t = Trap::new(ctx, obj);
     let mut vp = UndefinedValue();
-    if !t.proxy.get(&JSVal::from_qjs(receiver), &from_atom(atom), &mut vp) {
+    if !t
+        .proxy
+        .get(&JSVal::from_qjs(receiver), &from_atom(atom), &mut vp)
+    {
         t.failed();
         return q::JS_EXCEPTION;
     }
@@ -733,7 +896,12 @@ unsafe extern "C" fn proxy_set_property(
 ) -> c_int {
     let t = Trap::new(ctx, obj);
     let mut result = new_op_result();
-    if !t.proxy.set(&from_atom(atom), &JSVal::from_qjs(value), &JSVal::from_qjs(receiver), &mut result) {
+    if !t.proxy.set(
+        &from_atom(atom),
+        &JSVal::from_qjs(value),
+        &JSVal::from_qjs(receiver),
+        &mut result,
+    ) {
         return t.failed();
     }
     if op_ok(&result) {
@@ -753,7 +921,11 @@ unsafe extern "C" fn proxy_get_prototype(ctx: *mut q::JSContext, obj: q::JSValue
     dup(ctx, obj_or_null_val(proto))
 }
 
-unsafe extern "C" fn proxy_set_prototype(ctx: *mut q::JSContext, obj: q::JSValue, proto_val: q::JSValue) -> c_int {
+unsafe extern "C" fn proxy_set_prototype(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    proto_val: q::JSValue,
+) -> c_int {
     let t = Trap::new(ctx, obj);
     t.proxy.set_prototype(obj_or_null(proto_val))
 }
@@ -774,7 +946,7 @@ unsafe extern "C" fn proxy_prevent_extensions(ctx: *mut q::JSContext, obj: q::JS
         Some(trap) => trap(t.proxy.cx, t.proxy.proxy(), &mut result),
         None if t.proxy.kind() == Kind::Wrapper => {
             return q::JS_PreventExtensions(ctx, obj_val(t.proxy.target()));
-        },
+        }
         None => t.proxy.unsupported("preventExtensions"),
     };
     if !ok {
@@ -785,13 +957,26 @@ unsafe extern "C" fn proxy_prevent_extensions(ctx: *mut q::JSContext, obj: q::JS
 
 // The proxy API.
 
-pub(crate) unsafe fn CreateProxyHandler(aTraps: *const glue::ProxyTraps, aExtra: *const ::std::os::raw::c_void) -> *const ::std::os::raw::c_void {
-    let handler = ProxyHandler { traps: *aTraps, extra: aExtra, kind: Kind::Forwarding };
+pub(crate) unsafe fn CreateProxyHandler(
+    aTraps: *const glue::ProxyTraps,
+    aExtra: *const ::std::os::raw::c_void,
+) -> *const ::std::os::raw::c_void {
+    let handler = ProxyHandler {
+        traps: *aTraps,
+        extra: aExtra,
+        kind: Kind::Forwarding,
+    };
     Box::into_raw(Box::new(handler)) as *const c_void
 }
 
-pub(crate) unsafe fn CreateWrapperProxyHandler(aTraps: *const glue::ProxyTraps) -> *const ::std::os::raw::c_void {
-    let handler = ProxyHandler { traps: *aTraps, extra: ptr::null(), kind: Kind::Wrapper };
+pub(crate) unsafe fn CreateWrapperProxyHandler(
+    aTraps: *const glue::ProxyTraps,
+) -> *const ::std::os::raw::c_void {
+    let handler = ProxyHandler {
+        traps: *aTraps,
+        extra: ptr::null(),
+        kind: Kind::Wrapper,
+    };
     Box::into_raw(Box::new(handler)) as *const c_void
 }
 
@@ -808,17 +993,47 @@ pub(crate) unsafe fn GetSecurityWrapper() -> *const ::std::os::raw::c_void {
 }
 
 /// The glue `NewProxyObject` (SpiderMonkey's own, with `ProxyOptions`, stays a stub).
-pub(crate) unsafe fn NewProxyObject(aCx: *mut root::JSContext, aHandler: *const ::std::os::raw::c_void, aPriv: root::JS::HandleValue, proto: *mut root::JSObject, aClass: *const root::JSClass, aLazyProto: bool) -> *mut root::JSObject {
+pub(crate) unsafe fn NewProxyObject(
+    aCx: *mut root::JSContext,
+    aHandler: *const ::std::os::raw::c_void,
+    aPriv: root::JS::HandleValue,
+    proto: *mut root::JSObject,
+    aClass: *const root::JSClass,
+    aLazyProto: bool,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(aCx);
-    new_proxy(cx, aHandler as *const ProxyHandler, (*aPriv.ptr).to_qjs(), proto, aClass, aLazyProto)
+    new_proxy(
+        cx,
+        aHandler as *const ProxyHandler,
+        (*aPriv.ptr).to_qjs(),
+        proto,
+        aClass,
+        aLazyProto,
+    )
 }
 
-pub(crate) unsafe fn WrapperNew(aCx: *mut root::JSContext, aObj: root::JS::HandleObject, aHandler: *const ::std::os::raw::c_void, aClass: *const root::JSClass) -> *mut root::JSObject {
+pub(crate) unsafe fn WrapperNew(
+    aCx: *mut root::JSContext,
+    aObj: root::JS::HandleObject,
+    aHandler: *const ::std::os::raw::c_void,
+    aClass: *const root::JSClass,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(aCx);
-    new_proxy(cx, aHandler as *const ProxyHandler, obj_val(*aObj.ptr), ptr::null_mut(), aClass, true)
+    new_proxy(
+        cx,
+        aHandler as *const ProxyHandler,
+        obj_val(*aObj.ptr),
+        ptr::null_mut(),
+        aClass,
+        true,
+    )
 }
 
-pub(crate) unsafe fn NewWindowProxy(aCx: *mut root::JSContext, aObj: root::JS::HandleObject, aHandler: *const ::std::os::raw::c_void) -> *mut root::JSObject {
+pub(crate) unsafe fn NewWindowProxy(
+    aCx: *mut root::JSContext,
+    aObj: root::JS::HandleObject,
+    aHandler: *const ::std::os::raw::c_void,
+) -> *mut root::JSObject {
     WrapperNew(aCx, aObj, aHandler, &WINDOW_PROXY_CLASS)
 }
 
@@ -827,10 +1042,14 @@ pub(crate) unsafe fn GetWindowProxyClass() -> *const root::JSClass {
 }
 
 pub(crate) unsafe fn GetProxyHandler(obj: *mut root::JSObject) -> *const ::std::os::raw::c_void {
-    proxy_data(obj).expect("GetProxyHandler on a non-proxy").handler as *const c_void
+    proxy_data(obj)
+        .expect("GetProxyHandler on a non-proxy")
+        .handler as *const c_void
 }
 
-pub(crate) unsafe fn GetProxyHandlerExtra(obj: *mut root::JSObject) -> *const ::std::os::raw::c_void {
+pub(crate) unsafe fn GetProxyHandlerExtra(
+    obj: *mut root::JSObject,
+) -> *const ::std::os::raw::c_void {
     let handler = proxy_handler(obj).expect("GetProxyHandlerExtra on a non-proxy");
     assert!(handler.kind == Kind::Forwarding);
     handler.extra
@@ -851,49 +1070,112 @@ unsafe fn set_counted(slot: &mut q::JSValue, v: JSVal) {
 }
 
 pub(crate) unsafe fn GetProxyPrivate(obj: *mut root::JSObject, dest: *mut root::JS::Value) {
-    *dest = JSVal::from_qjs(proxy_data(obj).expect("GetProxyPrivate on a non-proxy").private);
+    *dest = JSVal::from_qjs(
+        proxy_data(obj)
+            .expect("GetProxyPrivate on a non-proxy")
+            .private,
+    );
 }
 
 pub(crate) unsafe fn SetProxyPrivate(obj: *mut root::JSObject, expando: *const root::JS::Value) {
-    set_counted(&mut proxy_data(obj).expect("SetProxyPrivate on a non-proxy").private, *expando);
+    set_counted(
+        &mut proxy_data(obj)
+            .expect("SetProxyPrivate on a non-proxy")
+            .private,
+        *expando,
+    );
 }
 
-pub(crate) unsafe fn GetProxyReservedSlot(obj: *mut root::JSObject, slot: u32, dest: *mut root::JS::Value) {
-    *dest = JSVal::from_qjs(proxy_data(obj).expect("GetProxyReservedSlot on a non-proxy").slots[slot as usize]);
+pub(crate) unsafe fn GetProxyReservedSlot(
+    obj: *mut root::JSObject,
+    slot: u32,
+    dest: *mut root::JS::Value,
+) {
+    *dest = JSVal::from_qjs(
+        proxy_data(obj)
+            .expect("GetProxyReservedSlot on a non-proxy")
+            .slots[slot as usize],
+    );
 }
 
-pub(crate) unsafe fn SetProxyReservedSlot(obj: *mut root::JSObject, slot: u32, val: *const root::JS::Value) {
+pub(crate) unsafe fn SetProxyReservedSlot(
+    obj: *mut root::JSObject,
+    slot: u32,
+    val: *const root::JS::Value,
+) {
     let data = proxy_data(obj).expect("SetProxyReservedSlot on a non-proxy");
     set_counted(&mut data.slots[slot as usize], *val);
 }
 
-pub(crate) unsafe fn SetDOMProxyInformation(domProxyHandlerFamily: *const ::std::os::raw::c_void, domProxyShadowsCheck: root::JS::DOMProxyShadowsCheck, domRemoteProxyHandlerFamily: *const ::std::os::raw::c_void) {
+pub(crate) unsafe fn SetDOMProxyInformation(
+    domProxyHandlerFamily: *const ::std::os::raw::c_void,
+    domProxyShadowsCheck: root::JS::DOMProxyShadowsCheck,
+    domRemoteProxyHandlerFamily: *const ::std::os::raw::c_void,
+) {
     // Only used by SpiderMonkey's JIT inline caches.
-    let _ = (domProxyHandlerFamily, domProxyShadowsCheck, domRemoteProxyHandlerFamily);
+    let _ = (
+        domProxyHandlerFamily,
+        domProxyShadowsCheck,
+        domRemoteProxyHandlerFamily,
+    );
 }
 
-pub(crate) unsafe fn InvokeGetOwnPropertyDescriptor(handler: *const ::std::os::raw::c_void, cx: *mut root::JSContext, proxy: root::JS::HandleObject, id: root::JS::HandleId, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>, isNone: *mut bool) -> bool {
-    let proxy = ProxyRef { cx, proxy: *proxy.ptr, handler: handler as *const ProxyHandler };
+pub(crate) unsafe fn InvokeGetOwnPropertyDescriptor(
+    handler: *const ::std::os::raw::c_void,
+    cx: *mut root::JSContext,
+    proxy: root::JS::HandleObject,
+    id: root::JS::HandleId,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+    isNone: *mut bool,
+) -> bool {
+    let proxy = ProxyRef {
+        cx,
+        proxy: *proxy.ptr,
+        handler: handler as *const ProxyHandler,
+    };
     proxy.get_own_property_descriptor(&*id.ptr, &mut *desc.ptr, &mut *isNone)
 }
 
-pub(crate) unsafe fn InvokeHasOwn(handler: *const ::std::os::raw::c_void, cx: *mut root::JSContext, proxy: root::JS::HandleObject, id: root::JS::HandleId, bp: *mut bool) -> bool {
-    let proxy = ProxyRef { cx, proxy: *proxy.ptr, handler: handler as *const ProxyHandler };
+pub(crate) unsafe fn InvokeHasOwn(
+    handler: *const ::std::os::raw::c_void,
+    cx: *mut root::JSContext,
+    proxy: root::JS::HandleObject,
+    id: root::JS::HandleId,
+    bp: *mut bool,
+) -> bool {
+    let proxy = ProxyRef {
+        cx,
+        proxy: *proxy.ptr,
+        handler: handler as *const ProxyHandler,
+    };
     proxy.has_own(&*id.ptr, &mut *bp)
 }
 
 // Dead wrappers and wrapper maintenance (nothing to do without cross-compartment wrappers).
 
-pub(crate) unsafe fn JS_NewDeadWrapper(cx: *mut root::JSContext, origObject: *mut root::JSObject) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewDeadWrapper(
+    cx: *mut root::JSContext,
+    origObject: *mut root::JSObject,
+) -> *mut root::JSObject {
     let _ = origObject;
-    new_proxy(Cx::from_raw(cx), &DEAD_HANDLER, q::JS_UNDEFINED, ptr::null_mut(), ptr::null(), false)
+    new_proxy(
+        Cx::from_raw(cx),
+        &DEAD_HANDLER,
+        q::JS_UNDEFINED,
+        ptr::null_mut(),
+        ptr::null(),
+        false,
+    )
 }
 
 pub(crate) unsafe fn JS_IsDeadWrapper(obj: *mut root::JSObject) -> bool {
     proxy_handler(obj).is_some_and(|handler| handler.kind == Kind::Dead)
 }
 
-pub(crate) unsafe fn NukeCrossCompartmentWrapper(cx: *mut root::JSContext, wrapper: *mut root::JSObject) {
+pub(crate) unsafe fn NukeCrossCompartmentWrapper(
+    cx: *mut root::JSContext,
+    wrapper: *mut root::JSObject,
+) {
     let _ = cx;
     if let Some(data) = proxy_data(wrapper) {
         data.handler = &DEAD_HANDLER;
@@ -901,43 +1183,85 @@ pub(crate) unsafe fn NukeCrossCompartmentWrapper(cx: *mut root::JSContext, wrapp
     }
 }
 
-pub(crate) unsafe fn NukeCrossCompartmentWrappers(cx: *mut root::JSContext, sourceFilter: *const root::js::CompartmentFilter, target: *mut root::JS::Realm, nukeReferencesToWindow: root::js::NukeReferencesToWindow, nukeReferencesFromTarget: root::js::NukeReferencesFromTarget) -> bool {
-    let _ = (cx, sourceFilter, target, nukeReferencesToWindow, nukeReferencesFromTarget);
+pub(crate) unsafe fn NukeCrossCompartmentWrappers(
+    cx: *mut root::JSContext,
+    sourceFilter: *const root::js::CompartmentFilter,
+    target: *mut root::JS::Realm,
+    nukeReferencesToWindow: root::js::NukeReferencesToWindow,
+    nukeReferencesFromTarget: root::js::NukeReferencesFromTarget,
+) -> bool {
+    let _ = (
+        cx,
+        sourceFilter,
+        target,
+        nukeReferencesToWindow,
+        nukeReferencesFromTarget,
+    );
     true
 }
 
-pub(crate) unsafe fn NukeCrossCompartmentWrapperIfExists(cx: *mut root::JSContext, source: *mut root::JS::Compartment, target: *mut root::JSObject) {
+pub(crate) unsafe fn NukeCrossCompartmentWrapperIfExists(
+    cx: *mut root::JSContext,
+    source: *mut root::JS::Compartment,
+    target: *mut root::JSObject,
+) {
     let _ = (cx, source, target);
 }
 
-pub(crate) unsafe fn RemapRemoteWindowProxies(cx: *mut root::JSContext, callback: *mut root::js::CompartmentTransplantCallback, newTarget: root::JS::MutableHandleObject) {
+pub(crate) unsafe fn RemapRemoteWindowProxies(
+    cx: *mut root::JSContext,
+    callback: *mut root::js::CompartmentTransplantCallback,
+    newTarget: root::JS::MutableHandleObject,
+) {
     let _ = (cx, callback, newTarget);
 }
 
-pub(crate) unsafe fn RemapAllWrappersForObject(cx: *mut root::JSContext, oldTarget: root::JS::HandleObject, newTarget: root::JS::HandleObject) -> bool {
+pub(crate) unsafe fn RemapAllWrappersForObject(
+    cx: *mut root::JSContext,
+    oldTarget: root::JS::HandleObject,
+    newTarget: root::JS::HandleObject,
+) -> bool {
     let _ = (cx, oldTarget, newTarget);
     true
 }
 
-pub(crate) unsafe fn RemapWrapper(cx: *mut root::JSContext, wobj: *mut root::JSObject, newTarget: *mut root::JSObject) {
+pub(crate) unsafe fn RemapWrapper(
+    cx: *mut root::JSContext,
+    wobj: *mut root::JSObject,
+    newTarget: *mut root::JSObject,
+) {
     let _ = (cx, wobj, newTarget);
 }
 
-pub(crate) unsafe fn RemapDeadWrapper(cx: *mut root::JSContext, wobj: root::JS::HandleObject, newTarget: root::JS::HandleObject) {
+pub(crate) unsafe fn RemapDeadWrapper(
+    cx: *mut root::JSContext,
+    wobj: root::JS::HandleObject,
+    newTarget: root::JS::HandleObject,
+) {
     let _ = (cx, wobj, newTarget);
 }
 
-pub(crate) unsafe fn RecomputeWrappers(cx: *mut root::JSContext, sourceFilter: *const root::js::CompartmentFilter, targetFilter: *const root::js::CompartmentFilter) -> bool {
+pub(crate) unsafe fn RecomputeWrappers(
+    cx: *mut root::JSContext,
+    sourceFilter: *const root::js::CompartmentFilter,
+    targetFilter: *const root::js::CompartmentFilter,
+) -> bool {
     let _ = (cx, sourceFilter, targetFilter);
     true
 }
 
-pub(crate) unsafe fn JS_RefreshCrossCompartmentWrappers(cx: *mut root::JSContext, obj: root::JS::Handle<*mut root::JSObject>) -> bool {
+pub(crate) unsafe fn JS_RefreshCrossCompartmentWrappers(
+    cx: *mut root::JSContext,
+    obj: root::JS::Handle<*mut root::JSObject>,
+) -> bool {
     let _ = (cx, obj);
     true
 }
 
-pub(crate) unsafe fn JS_SetWrapObjectCallbacks(cx: *mut root::JSContext, callbacks: *const root::JSWrapObjectCallbacks) {
+pub(crate) unsafe fn JS_SetWrapObjectCallbacks(
+    cx: *mut root::JSContext,
+    callbacks: *const root::JSWrapObjectCallbacks,
+) {
     // Wrapping is the identity plus outerization, see `JS_WrapObject`.
     let _ = (cx, callbacks);
 }
@@ -969,11 +1293,18 @@ pub(crate) unsafe fn IsWrapper(obj: *mut root::JSObject) -> bool {
     is_wrapper(obj)
 }
 
-pub(crate) unsafe fn UncheckedUnwrapObject(obj: *mut root::JSObject, stopAtWindowProxy: bool) -> *mut root::JSObject {
+pub(crate) unsafe fn UncheckedUnwrapObject(
+    obj: *mut root::JSObject,
+    stopAtWindowProxy: bool,
+) -> *mut root::JSObject {
     unwrap(obj, stopAtWindowProxy)
 }
 
-pub(crate) unsafe fn UncheckedUnwrap(obj: *mut root::JSObject, stopAtWindowProxy: bool, flagsp: *mut ::std::os::raw::c_uint) -> *mut root::JSObject {
+pub(crate) unsafe fn UncheckedUnwrap(
+    obj: *mut root::JSObject,
+    stopAtWindowProxy: bool,
+    flagsp: *mut ::std::os::raw::c_uint,
+) -> *mut root::JSObject {
     if !flagsp.is_null() {
         *flagsp = 0;
     }
@@ -984,7 +1315,11 @@ pub(crate) unsafe fn CheckedUnwrapStatic(obj: *mut root::JSObject) -> *mut root:
     unwrap(obj, false)
 }
 
-pub(crate) unsafe fn CheckedUnwrapDynamic(obj: *mut root::JSObject, cx: *mut root::JSContext, stopAtWindowProxy: bool) -> *mut root::JSObject {
+pub(crate) unsafe fn CheckedUnwrapDynamic(
+    obj: *mut root::JSObject,
+    cx: *mut root::JSContext,
+    stopAtWindowProxy: bool,
+) -> *mut root::JSObject {
     let _ = cx;
     unwrap(obj, stopAtWindowProxy)
 }
@@ -993,12 +1328,20 @@ pub(crate) unsafe fn UnwrapObjectStatic(obj: *mut root::JSObject) -> *mut root::
     unwrap(obj, false)
 }
 
-pub(crate) unsafe fn UnwrapObjectDynamic(obj: *mut root::JSObject, cx: *mut root::JSContext, stopAtWindowProxy: bool) -> *mut root::JSObject {
+pub(crate) unsafe fn UnwrapObjectDynamic(
+    obj: *mut root::JSObject,
+    cx: *mut root::JSContext,
+    stopAtWindowProxy: bool,
+) -> *mut root::JSObject {
     let _ = cx;
     unwrap(obj, stopAtWindowProxy)
 }
 
-pub(crate) unsafe fn UnwrapOneCheckedDynamic(obj: root::JS::HandleObject, cx: *mut root::JSContext, stopAtWindowProxy: bool) -> *mut root::JSObject {
+pub(crate) unsafe fn UnwrapOneCheckedDynamic(
+    obj: root::JS::HandleObject,
+    cx: *mut root::JSContext,
+    stopAtWindowProxy: bool,
+) -> *mut root::JSObject {
     let _ = cx;
     unwrap_one(*obj.ptr, stopAtWindowProxy)
 }
@@ -1012,7 +1355,10 @@ unsafe fn outerize(obj: *mut root::JSObject) -> *mut root::JSObject {
     ToWindowProxyIfWindowSlow(obj)
 }
 
-pub(crate) unsafe fn JS_WrapObject(cx: *mut root::JSContext, objp: root::JS::MutableHandleObject) -> bool {
+pub(crate) unsafe fn JS_WrapObject(
+    cx: *mut root::JSContext,
+    objp: root::JS::MutableHandleObject,
+) -> bool {
     let _ = cx;
     if !(*objp.ptr).is_null() {
         *objp.ptr = outerize(*objp.ptr);
@@ -1020,7 +1366,10 @@ pub(crate) unsafe fn JS_WrapObject(cx: *mut root::JSContext, objp: root::JS::Mut
     true
 }
 
-pub(crate) unsafe fn JS_WrapValue(cx: *mut root::JSContext, vp: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn JS_WrapValue(
+    cx: *mut root::JSContext,
+    vp: root::JS::MutableHandleValue,
+) -> bool {
     let _ = cx;
     if (*vp.ptr).is_object() {
         *vp.ptr = ObjectValue(outerize((*vp.ptr).to_object()));
@@ -1028,7 +1377,10 @@ pub(crate) unsafe fn JS_WrapValue(cx: *mut root::JSContext, vp: root::JS::Mutabl
     true
 }
 
-pub(crate) unsafe fn JS_WrapPropertyDescriptor(cx: *mut root::JSContext, desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>) -> bool {
+pub(crate) unsafe fn JS_WrapPropertyDescriptor(
+    cx: *mut root::JSContext,
+    desc: root::JS::MutableHandle<root::JS::PropertyDescriptor>,
+) -> bool {
     let _ = (cx, desc);
     true
 }
@@ -1063,7 +1415,11 @@ pub(crate) unsafe fn IsWindowProxy(obj: *mut root::JSObject) -> bool {
 
 /// Makes `windowProxy` the WindowProxy of `global`: `this` in its global code (patch Q2),
 /// `globalThis`, and the result of outerizing the global.
-pub(crate) unsafe fn SetWindowProxy(cx: *mut root::JSContext, global: root::JS::Handle<*mut root::JSObject>, windowProxy: root::JS::Handle<*mut root::JSObject>) {
+pub(crate) unsafe fn SetWindowProxy(
+    cx: *mut root::JSContext,
+    global: root::JS::Handle<*mut root::JSObject>,
+    windowProxy: root::JS::Handle<*mut root::JSObject>,
+) {
     let _ = cx;
     let realm = realm_of_global(*global.ptr);
     assert!(!realm.is_null(), "SetWindowProxy on a non-global");
@@ -1095,7 +1451,11 @@ pub(crate) unsafe fn ToWindowIfWindowProxy(obj: *mut root::JSObject) -> *mut roo
 
 /// Swaps the handlers, targets and slots of two proxies, so that `origobj` keeps its identity
 /// and gets `target`'s behaviour (`target` is left with the old one).
-pub(crate) unsafe fn JS_TransplantObject(cx: *mut root::JSContext, origobj: root::JS::HandleObject, target: root::JS::HandleObject) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_TransplantObject(
+    cx: *mut root::JSContext,
+    origobj: root::JS::HandleObject,
+    target: root::JS::HandleObject,
+) -> *mut root::JSObject {
     let _ = cx;
     let (orig, new) = (obj_val(*origobj.ptr), obj_val(*target.ptr));
     assert!(
@@ -1126,23 +1486,42 @@ pub(crate) unsafe fn CompartmentHasLiveGlobal(comp: *mut root::JS::Compartment) 
     true
 }
 
-pub(crate) unsafe fn GetFirstGlobalInCompartment(comp: *mut root::JS::Compartment) -> *mut root::JSObject {
+pub(crate) unsafe fn GetFirstGlobalInCompartment(
+    comp: *mut root::JS::Compartment,
+) -> *mut root::JSObject {
     (*(comp as *mut RealmData)).global
 }
 
-pub(crate) unsafe fn JS_IterateCompartments(cx: *mut root::JSContext, data: *mut ::std::os::raw::c_void, compartmentCallback: root::JSIterateCompartmentCallback) {
+pub(crate) unsafe fn JS_IterateCompartments(
+    cx: *mut root::JSContext,
+    data: *mut ::std::os::raw::c_void,
+    compartmentCallback: root::JSIterateCompartmentCallback,
+) {
     let Some(callback) = compartmentCallback else {
         return;
     };
-    for_each_realm(|realm| callback(cx, data, realm as *mut root::JS::Compartment) != root::JS::CompartmentIterResult::Stop);
+    for_each_realm(|realm| {
+        callback(cx, data, realm as *mut root::JS::Compartment)
+            != root::JS::CompartmentIterResult::Stop
+    });
 }
 
-pub(crate) unsafe fn JS_IterateCompartmentsInZone(cx: *mut root::JSContext, zone: *mut root::JS::Zone, data: *mut ::std::os::raw::c_void, compartmentCallback: root::JSIterateCompartmentCallback) {
+pub(crate) unsafe fn JS_IterateCompartmentsInZone(
+    cx: *mut root::JSContext,
+    zone: *mut root::JS::Zone,
+    data: *mut ::std::os::raw::c_void,
+    compartmentCallback: root::JSIterateCompartmentCallback,
+) {
     let _ = zone;
     JS_IterateCompartments(cx, data, compartmentCallback);
 }
 
-unsafe fn iterate_realms(cx: *mut root::JSContext, data: *mut c_void, callback: root::JS::IterateRealmCallback, filter: impl Fn(*mut RealmData) -> bool) {
+unsafe fn iterate_realms(
+    cx: *mut root::JSContext,
+    data: *mut c_void,
+    callback: root::JS::IterateRealmCallback,
+    filter: impl Fn(*mut RealmData) -> bool,
+) {
     let Some(callback) = callback else {
         return;
     };
@@ -1154,16 +1533,34 @@ unsafe fn iterate_realms(cx: *mut root::JSContext, data: *mut c_void, callback: 
     });
 }
 
-pub(crate) unsafe fn IterateRealms(cx: *mut root::JSContext, data: *mut ::std::os::raw::c_void, realmCallback: root::JS::IterateRealmCallback) {
+pub(crate) unsafe fn IterateRealms(
+    cx: *mut root::JSContext,
+    data: *mut ::std::os::raw::c_void,
+    realmCallback: root::JS::IterateRealmCallback,
+) {
     iterate_realms(cx, data, realmCallback, |_| true);
 }
 
-pub(crate) unsafe fn IterateRealmsInCompartment(cx: *mut root::JSContext, compartment: *mut root::JS::Compartment, data: *mut ::std::os::raw::c_void, realmCallback: root::JS::IterateRealmCallback) {
-    iterate_realms(cx, data, realmCallback, |realm| realm as *mut root::JS::Compartment == compartment);
+pub(crate) unsafe fn IterateRealmsInCompartment(
+    cx: *mut root::JSContext,
+    compartment: *mut root::JS::Compartment,
+    data: *mut ::std::os::raw::c_void,
+    realmCallback: root::JS::IterateRealmCallback,
+) {
+    iterate_realms(cx, data, realmCallback, |realm| {
+        realm as *mut root::JS::Compartment == compartment
+    });
 }
 
-pub(crate) unsafe fn IterateRealmsWithPrincipals(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, data: *mut ::std::os::raw::c_void, realmCallback: root::JS::IterateRealmCallback) {
-    iterate_realms(cx, data, realmCallback, |realm| unsafe { (*realm).principals == principals });
+pub(crate) unsafe fn IterateRealmsWithPrincipals(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    data: *mut ::std::os::raw::c_void,
+    realmCallback: root::JS::IterateRealmCallback,
+) {
+    iterate_realms(cx, data, realmCallback, |realm| unsafe {
+        (*realm).principals == principals
+    });
 }
 
 pub(crate) unsafe fn AssertSameCompartment(cx: *mut root::JSContext, obj: *mut root::JSObject) {
@@ -1175,7 +1572,10 @@ pub(crate) unsafe fn AssertSameCompartment1(cx: *mut root::JSContext, v: root::J
 }
 
 /// Every object can be used from every realm.
-pub(crate) unsafe fn IsObjectInContextCompartment(obj: *mut root::JSObject, cx: *const root::JSContext) -> bool {
+pub(crate) unsafe fn IsObjectInContextCompartment(
+    obj: *mut root::JSObject,
+    cx: *const root::JSContext,
+) -> bool {
     let _ = (obj, cx);
     true
 }
@@ -1199,9 +1599,15 @@ unsafe fn refcount<'a>(principals: *mut root::JSPrincipals) -> &'a AtomicU32 {
     AtomicU32::from_ptr(ptr::addr_of_mut!((*principals).refcount))
 }
 
-pub(crate) unsafe fn CreateRustJSPrincipals(callbacks: *const glue::JSPrincipalsCallbacks, privateData: *mut ::std::os::raw::c_void) -> *mut root::JSPrincipals {
+pub(crate) unsafe fn CreateRustJSPrincipals(
+    callbacks: *const glue::JSPrincipalsCallbacks,
+    privateData: *mut ::std::os::raw::c_void,
+) -> *mut root::JSPrincipals {
     let principals = RustPrincipals {
-        base: root::JSPrincipals { vtable_: ptr::null(), refcount: 0 },
+        base: root::JSPrincipals {
+            vtable_: ptr::null(),
+            refcount: 0,
+        },
         callbacks: *callbacks,
         private: privateData,
     };
@@ -1212,7 +1618,9 @@ pub(crate) unsafe fn DestroyRustJSPrincipals(principals: *mut root::JSPrincipals
     drop(Box::from_raw(principals as *mut RustPrincipals));
 }
 
-pub(crate) unsafe fn GetRustJSPrincipalsPrivate(principals: *mut root::JSPrincipals) -> *mut ::std::os::raw::c_void {
+pub(crate) unsafe fn GetRustJSPrincipalsPrivate(
+    principals: *mut root::JSPrincipals,
+) -> *mut ::std::os::raw::c_void {
     if principals.is_null() {
         ptr::null_mut()
     } else {
@@ -1224,7 +1632,10 @@ pub(crate) unsafe fn JS_HoldPrincipals(principals: *mut root::JSPrincipals) {
     refcount(principals).fetch_add(1, Ordering::Relaxed);
 }
 
-pub(crate) unsafe fn JS_DropPrincipals(cx: *mut root::JSContext, principals: *mut root::JSPrincipals) {
+pub(crate) unsafe fn JS_DropPrincipals(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+) {
     let _ = cx;
     if refcount(principals).fetch_sub(1, Ordering::AcqRel) != 1 {
         return;
@@ -1235,12 +1646,18 @@ pub(crate) unsafe fn JS_DropPrincipals(cx: *mut root::JSContext, principals: *mu
     }
 }
 
-pub(crate) unsafe fn JS_InitReadPrincipalsCallback(cx: *mut root::JSContext, read: root::JSReadPrincipalsOp) {
+pub(crate) unsafe fn JS_InitReadPrincipalsCallback(
+    cx: *mut root::JSContext,
+    read: root::JSReadPrincipalsOp,
+) {
     let _ = cx;
     READ_PRINCIPALS.with(|c| c.set(read));
 }
 
-pub(crate) unsafe fn JS_InitDestroyPrincipalsCallback(cx: *mut root::JSContext, destroyPrincipals: root::JSDestroyPrincipalsOp) {
+pub(crate) unsafe fn JS_InitDestroyPrincipalsCallback(
+    cx: *mut root::JSContext,
+    destroyPrincipals: root::JSDestroyPrincipalsOp,
+) {
     let _ = cx;
     DESTROY_PRINCIPALS.with(|c| c.set(destroyPrincipals));
 }
@@ -1249,7 +1666,10 @@ pub(crate) unsafe fn GetRealmPrincipals(realm: *mut root::JS::Realm) -> *mut roo
     (*(realm as *mut RealmData)).principals
 }
 
-pub(crate) unsafe fn SetRealmPrincipals(realm: *mut root::JS::Realm, principals: *mut root::JSPrincipals) {
+pub(crate) unsafe fn SetRealmPrincipals(
+    realm: *mut root::JS::Realm,
+    principals: *mut root::JSPrincipals,
+) {
     let realm = realm as *mut RealmData;
     let old = std::mem::replace(&mut (*realm).principals, principals);
     if old == principals {
@@ -1270,7 +1690,10 @@ thread_local! {
     static DOM_CALLBACKS: Cell<*const root::js::DOMCallbacks> = const { Cell::new(ptr::null()) };
 }
 
-pub(crate) unsafe fn SetDOMCallbacks(cx: *mut root::JSContext, callbacks: *const root::js::DOMCallbacks) {
+pub(crate) unsafe fn SetDOMCallbacks(
+    cx: *mut root::JSContext,
+    callbacks: *const root::js::DOMCallbacks,
+) {
     let _ = cx;
     DOM_CALLBACKS.with(|c| c.set(callbacks));
 }
@@ -1280,35 +1703,56 @@ pub(crate) unsafe fn GetDOMCallbacks(cx: *mut root::JSContext) -> *const root::j
     DOM_CALLBACKS.with(|c| c.get())
 }
 
-pub(crate) unsafe fn SetPreserveWrapperCallbacks(cx: *mut root::JSContext, preserveWrapper: root::js::PreserveWrapperCallback, hasReleasedWrapper: root::js::HasReleasedWrapperCallback) {
+pub(crate) unsafe fn SetPreserveWrapperCallbacks(
+    cx: *mut root::JSContext,
+    preserveWrapper: root::js::PreserveWrapperCallback,
+    hasReleasedWrapper: root::js::HasReleasedWrapperCallback,
+) {
     let _ = (cx, preserveWrapper, hasReleasedWrapper);
 }
 
-pub(crate) unsafe fn SetRealmNameCallback(cx: *mut root::JSContext, callback: root::JS::RealmNameCallback) {
+pub(crate) unsafe fn SetRealmNameCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::RealmNameCallback,
+) {
     let _ = (cx, callback);
 }
 
-pub(crate) unsafe fn SetDestroyRealmCallback(cx: *mut root::JSContext, callback: root::JS::DestroyRealmCallback) {
+pub(crate) unsafe fn SetDestroyRealmCallback(
+    cx: *mut root::JSContext,
+    callback: root::JS::DestroyRealmCallback,
+) {
     let _ = (cx, callback);
 }
 
-pub(crate) unsafe fn JS_SetDestroyCompartmentCallback(cx: *mut root::JSContext, callback: root::JSDestroyCompartmentCallback) {
+pub(crate) unsafe fn JS_SetDestroyCompartmentCallback(
+    cx: *mut root::JSContext,
+    callback: root::JSDestroyCompartmentCallback,
+) {
     let _ = (cx, callback);
 }
 
-pub(crate) unsafe fn RealmCreationOptionsRef(realm: *mut root::JS::Realm) -> *const root::JS::RealmCreationOptions {
+pub(crate) unsafe fn RealmCreationOptionsRef(
+    realm: *mut root::JS::Realm,
+) -> *const root::JS::RealmCreationOptions {
     &(*(realm as *mut RealmData)).creation_options
 }
 
-pub(crate) unsafe fn RealmCreationOptionsRef1(cx: *mut root::JSContext) -> *const root::JS::RealmCreationOptions {
+pub(crate) unsafe fn RealmCreationOptionsRef1(
+    cx: *mut root::JSContext,
+) -> *const root::JS::RealmCreationOptions {
     RealmCreationOptionsRef(Cx::from_raw(cx).current_realm() as *mut root::JS::Realm)
 }
 
-pub(crate) unsafe fn RealmBehaviorsRef(realm: *mut root::JS::Realm) -> *const root::JS::RealmBehaviors {
+pub(crate) unsafe fn RealmBehaviorsRef(
+    realm: *mut root::JS::Realm,
+) -> *const root::JS::RealmBehaviors {
     &(*(realm as *mut RealmData)).behaviors
 }
 
-pub(crate) unsafe fn RealmBehaviorsRef1(cx: *mut root::JSContext) -> *const root::JS::RealmBehaviors {
+pub(crate) unsafe fn RealmBehaviorsRef1(
+    cx: *mut root::JSContext,
+) -> *const root::JS::RealmBehaviors {
     RealmBehaviorsRef(Cx::from_raw(cx).current_realm() as *mut root::JS::Realm)
 }
 
@@ -1329,9 +1773,13 @@ static RESOLVE_EXOTIC: q::JSClassExoticMethods = q::JSClassExoticMethods {
 };
 
 /// Exotic methods for SpiderMonkey classes with resolve or enumerate hooks (globals), or null.
-pub(crate) unsafe fn resolve_exotic_methods(clasp: *const root::JSClass) -> *mut q::JSClassExoticMethods {
+pub(crate) unsafe fn resolve_exotic_methods(
+    clasp: *const root::JSClass,
+) -> *mut q::JSClassExoticMethods {
     let ops = (*clasp).cOps;
-    if ops.is_null() || ((*ops).resolve.is_none() && (*ops).newEnumerate.is_none() && (*ops).enumerate.is_none()) {
+    if ops.is_null()
+        || ((*ops).resolve.is_none() && (*ops).newEnumerate.is_none() && (*ops).enumerate.is_none())
+    {
         return ptr::null_mut();
     }
     &RESOLVE_EXOTIC as *const _ as *mut _
@@ -1343,7 +1791,11 @@ thread_local! {
 }
 
 /// Runs `f` in the realm of the object `obj` of an SpiderMonkey class.
-unsafe fn in_object_realm<R>(ctx: *mut q::JSContext, obj: *mut root::JSObject, f: impl FnOnce(*mut root::JSContext) -> R) -> R {
+unsafe fn in_object_realm<R>(
+    ctx: *mut q::JSContext,
+    obj: *mut root::JSObject,
+    f: impl FnOnce(*mut root::JSContext) -> R,
+) -> R {
     let cx = cx_of(ctx);
     let realm = class::object_realm(cx, obj);
     cx.enter_realm(realm);
@@ -1352,7 +1804,12 @@ unsafe fn in_object_realm<R>(ctx: *mut q::JSContext, obj: *mut root::JSObject, f
     r
 }
 
-unsafe extern "C" fn resolve_own_property(ctx: *mut q::JSContext, desc: *mut q::JSPropertyDescriptor, obj: q::JSValue, prop: q::JSAtom) -> c_int {
+unsafe extern "C" fn resolve_own_property(
+    ctx: *mut q::JSContext,
+    desc: *mut q::JSPropertyDescriptor,
+    obj: q::JSValue,
+    prop: q::JSAtom,
+) -> c_int {
     let global = val_obj(obj);
     let ops = (*class::object_class(global)).cOps;
     let Some(resolve) = (*ops).resolve else {
@@ -1370,7 +1827,9 @@ unsafe extern "C" fn resolve_own_property(ctx: *mut q::JSContext, desc: *mut q::
     }
     RESOLVING.with(|r| r.borrow_mut().push(key));
     let mut resolved = false;
-    let ok = in_object_realm(ctx, global, |cx| resolve(cx, handle(&global), handle(&id), &mut resolved));
+    let ok = in_object_realm(ctx, global, |cx| {
+        resolve(cx, handle(&global), handle(&id), &mut resolved)
+    });
     let r = if !ok {
         trap_failed(ctx);
         -1
@@ -1385,7 +1844,12 @@ unsafe extern "C" fn resolve_own_property(ctx: *mut q::JSContext, desc: *mut q::
 
 /// Resolves every lazy property (QuickJS reads the shape afterwards, patch Q1), so there are no
 /// exotic keys.
-unsafe extern "C" fn resolve_all(ctx: *mut q::JSContext, ptab: *mut *mut q::JSPropertyEnum, plen: *mut u32, obj: q::JSValue) -> c_int {
+unsafe extern "C" fn resolve_all(
+    ctx: *mut q::JSContext,
+    ptab: *mut *mut q::JSPropertyEnum,
+    plen: *mut u32,
+    obj: q::JSValue,
+) -> c_int {
     *ptab = ptr::null_mut();
     *plen = 0;
     let global = val_obj(obj);
@@ -1393,8 +1857,10 @@ unsafe extern "C" fn resolve_all(ctx: *mut q::JSContext, ptab: *mut *mut q::JSPr
     let ok = in_object_realm(ctx, global, |cx| {
         if let Some(new_enumerate) = (*ops).newEnumerate {
             let mut ids: Vec<root::jsid> = Vec::new();
-            new_enumerate(cx, handle(&global), id_vector_handle(&mut ids), false) &&
-                ids.iter().all(|id| q::JS_GetOwnProperty(ctx, ptr::null_mut(), obj, id.to_atom()) >= 0)
+            new_enumerate(cx, handle(&global), id_vector_handle(&mut ids), false)
+                && ids
+                    .iter()
+                    .all(|id| q::JS_GetOwnProperty(ctx, ptr::null_mut(), obj, id.to_atom()) >= 0)
         } else if let Some(enumerate) = (*ops).enumerate {
             enumerate(cx, handle(&global))
         } else {
@@ -1409,12 +1875,19 @@ unsafe extern "C" fn resolve_all(ctx: *mut q::JSContext, ptab: *mut *mut q::JSPr
     }
 }
 
-pub(crate) unsafe fn JS_NewEnumerateStandardClassesIncludingResolved(cx: *mut root::JSContext, obj: root::JS::HandleObject, properties: root::JS::MutableHandleIdVector, enumerableOnly: bool) -> bool {
+pub(crate) unsafe fn JS_NewEnumerateStandardClassesIncludingResolved(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+    properties: root::JS::MutableHandleIdVector,
+    enumerableOnly: bool,
+) -> bool {
     let _ = (cx, obj, properties, enumerableOnly);
     true
 }
 
 /// A handle to `ids` for SpiderMonkey functions filling a `MutableHandleIdVector`.
 fn id_vector_handle(ids: &mut Vec<root::jsid>) -> root::JS::MutableHandleIdVector {
-    root::JS::MutableHandleIdVector { ptr: ids as *mut Vec<root::jsid> as *mut c_void }
+    root::JS::MutableHandleIdVector {
+        ptr: ids as *mut Vec<root::jsid> as *mut c_void,
+    }
 }

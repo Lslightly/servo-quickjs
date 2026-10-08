@@ -72,9 +72,26 @@ const UDAT_PATTERN: i32 = -2;
 #[link(name = "icu")]
 unsafe extern "C" {
     fn uloc_getDefault() -> *const c_char;
-    fn uloc_forLanguageTag(langtag: *const c_char, locale_id: *mut c_char, capacity: i32, parsed_length: *mut i32, err: *mut UErrorCode) -> i32;
-    fn uloc_toLanguageTag(locale_id: *const c_char, langtag: *mut c_char, capacity: i32, strict: UBool, err: *mut UErrorCode) -> i32;
-    fn uloc_addLikelySubtags(locale_id: *const c_char, maximized: *mut c_char, capacity: i32, err: *mut UErrorCode) -> i32;
+    fn uloc_forLanguageTag(
+        langtag: *const c_char,
+        locale_id: *mut c_char,
+        capacity: i32,
+        parsed_length: *mut i32,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn uloc_toLanguageTag(
+        locale_id: *const c_char,
+        langtag: *mut c_char,
+        capacity: i32,
+        strict: UBool,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn uloc_addLikelySubtags(
+        locale_id: *const c_char,
+        maximized: *mut c_char,
+        capacity: i32,
+        err: *mut UErrorCode,
+    ) -> i32;
     fn uloc_openAvailableByType(kind: i32, err: *mut UErrorCode) -> *mut UEnumeration;
     fn uenum_next(en: *mut UEnumeration, length: *mut i32, err: *mut UErrorCode) -> *const c_char;
     fn uenum_close(en: *mut UEnumeration);
@@ -83,23 +100,99 @@ unsafe extern "C" {
     fn ucol_close(coll: *mut UCollator);
     fn ucol_setAttribute(coll: *mut UCollator, attr: i32, value: i32, err: *mut UErrorCode);
     fn ucol_getAttribute(coll: *const UCollator, attr: i32, err: *mut UErrorCode) -> i32;
-    fn ucol_strcoll(coll: *const UCollator, source: *const UChar, source_length: i32, target: *const UChar, target_length: i32) -> i32;
+    fn ucol_strcoll(
+        coll: *const UCollator,
+        source: *const UChar,
+        source_length: i32,
+        target: *const UChar,
+        target_length: i32,
+    ) -> i32;
 
-    fn unum_open(style: i32, pattern: *const UChar, pattern_length: i32, locale: *const c_char, parse_err: *mut c_void, err: *mut UErrorCode) -> *mut UNumberFormat;
+    fn unum_open(
+        style: i32,
+        pattern: *const UChar,
+        pattern_length: i32,
+        locale: *const c_char,
+        parse_err: *mut c_void,
+        err: *mut UErrorCode,
+    ) -> *mut UNumberFormat;
     fn unum_close(fmt: *mut UNumberFormat);
     fn unum_setAttribute(fmt: *mut UNumberFormat, attr: i32, value: i32);
     fn unum_getAttribute(fmt: *const UNumberFormat, attr: i32) -> i32;
-    fn unum_setTextAttribute(fmt: *mut UNumberFormat, tag: i32, value: *const UChar, length: i32, err: *mut UErrorCode);
-    fn unum_getSymbol(fmt: *const UNumberFormat, symbol: i32, buffer: *mut UChar, size: i32, err: *mut UErrorCode) -> i32;
-    fn unum_formatDouble(fmt: *const UNumberFormat, number: f64, result: *mut UChar, capacity: i32, pos: *mut c_void, err: *mut UErrorCode) -> i32;
-    fn unum_formatDecimal(fmt: *const UNumberFormat, number: *const c_char, length: i32, result: *mut UChar, capacity: i32, pos: *mut c_void, err: *mut UErrorCode) -> i32;
-    fn unum_formatDoubleForFields(fmt: *const UNumberFormat, number: f64, result: *mut UChar, capacity: i32, iter: *mut UFieldPositionIterator, err: *mut UErrorCode) -> i32;
+    fn unum_setTextAttribute(
+        fmt: *mut UNumberFormat,
+        tag: i32,
+        value: *const UChar,
+        length: i32,
+        err: *mut UErrorCode,
+    );
+    fn unum_getSymbol(
+        fmt: *const UNumberFormat,
+        symbol: i32,
+        buffer: *mut UChar,
+        size: i32,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn unum_formatDouble(
+        fmt: *const UNumberFormat,
+        number: f64,
+        result: *mut UChar,
+        capacity: i32,
+        pos: *mut c_void,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn unum_formatDecimal(
+        fmt: *const UNumberFormat,
+        number: *const c_char,
+        length: i32,
+        result: *mut UChar,
+        capacity: i32,
+        pos: *mut c_void,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn unum_formatDoubleForFields(
+        fmt: *const UNumberFormat,
+        number: f64,
+        result: *mut UChar,
+        capacity: i32,
+        iter: *mut UFieldPositionIterator,
+        err: *mut UErrorCode,
+    ) -> i32;
 
-    fn udat_open(time_style: i32, date_style: i32, locale: *const c_char, tz: *const UChar, tz_length: i32, pattern: *const UChar, pattern_length: i32, err: *mut UErrorCode) -> *mut UDateFormat;
+    fn udat_open(
+        time_style: i32,
+        date_style: i32,
+        locale: *const c_char,
+        tz: *const UChar,
+        tz_length: i32,
+        pattern: *const UChar,
+        pattern_length: i32,
+        err: *mut UErrorCode,
+    ) -> *mut UDateFormat;
     fn udat_close(fmt: *mut UDateFormat);
-    fn udat_format(fmt: *const UDateFormat, date: f64, result: *mut UChar, capacity: i32, pos: *mut c_void, err: *mut UErrorCode) -> i32;
-    fn udat_formatForFields(fmt: *const UDateFormat, date: f64, result: *mut UChar, capacity: i32, iter: *mut UFieldPositionIterator, err: *mut UErrorCode) -> i32;
-    fn udat_toPattern(fmt: *const UDateFormat, localized: UBool, result: *mut UChar, capacity: i32, err: *mut UErrorCode) -> i32;
+    fn udat_format(
+        fmt: *const UDateFormat,
+        date: f64,
+        result: *mut UChar,
+        capacity: i32,
+        pos: *mut c_void,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn udat_formatForFields(
+        fmt: *const UDateFormat,
+        date: f64,
+        result: *mut UChar,
+        capacity: i32,
+        iter: *mut UFieldPositionIterator,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn udat_toPattern(
+        fmt: *const UDateFormat,
+        localized: UBool,
+        result: *mut UChar,
+        capacity: i32,
+        err: *mut UErrorCode,
+    ) -> i32;
     fn udat_getCalendar(fmt: *const UDateFormat) -> *const UCalendar;
     fn udat_setCalendar(fmt: *mut UDateFormat, cal: *const UCalendar);
     fn ucal_clone(cal: *const UCalendar, err: *mut UErrorCode) -> *mut UCalendar;
@@ -107,14 +200,36 @@ unsafe extern "C" {
     fn ucal_getType(cal: *const UCalendar, err: *mut UErrorCode) -> *const c_char;
     fn ucal_setGregorianChange(cal: *mut UCalendar, date: f64, err: *mut UErrorCode);
     fn ucal_getDefaultTimeZone(result: *mut UChar, capacity: i32, err: *mut UErrorCode) -> i32;
-    fn ucal_getCanonicalTimeZoneID(id: *const UChar, length: i32, result: *mut UChar, capacity: i32, is_system_id: *mut UBool, err: *mut UErrorCode) -> i32;
+    fn ucal_getCanonicalTimeZoneID(
+        id: *const UChar,
+        length: i32,
+        result: *mut UChar,
+        capacity: i32,
+        is_system_id: *mut UBool,
+        err: *mut UErrorCode,
+    ) -> i32;
 
     fn ufieldpositer_open(err: *mut UErrorCode) -> *mut UFieldPositionIterator;
     fn ufieldpositer_close(iter: *mut UFieldPositionIterator);
-    fn ufieldpositer_next(iter: *mut UFieldPositionIterator, begin: *mut i32, end: *mut i32) -> i32;
+    fn ufieldpositer_next(iter: *mut UFieldPositionIterator, begin: *mut i32, end: *mut i32)
+        -> i32;
 
-    fn u_strToUpper(dest: *mut UChar, capacity: i32, src: *const UChar, length: i32, locale: *const c_char, err: *mut UErrorCode) -> i32;
-    fn u_strToLower(dest: *mut UChar, capacity: i32, src: *const UChar, length: i32, locale: *const c_char, err: *mut UErrorCode) -> i32;
+    fn u_strToUpper(
+        dest: *mut UChar,
+        capacity: i32,
+        src: *const UChar,
+        length: i32,
+        locale: *const c_char,
+        err: *mut UErrorCode,
+    ) -> i32;
+    fn u_strToLower(
+        dest: *mut UChar,
+        capacity: i32,
+        src: *const UChar,
+        length: i32,
+        locale: *const c_char,
+        err: *mut UErrorCode,
+    ) -> i32;
 }
 
 #[link(name = "time_service_ndk")]
@@ -127,7 +242,9 @@ fn failed(err: UErrorCode) -> bool {
 }
 
 /// Calls an ICU function that writes into a buffer, growing it once on overflow.
-fn with_buffer<T: Copy + Default>(mut f: impl FnMut(*mut T, i32, &mut UErrorCode) -> i32) -> Option<Vec<T>> {
+fn with_buffer<T: Copy + Default>(
+    mut f: impl FnMut(*mut T, i32, &mut UErrorCode) -> i32,
+) -> Option<Vec<T>> {
     let mut buf = vec![T::default(); 64];
     let mut err = 0;
     let mut len = f(buf.as_mut_ptr(), buf.len() as i32, &mut err);
@@ -144,7 +261,8 @@ fn with_buffer<T: Copy + Default>(mut f: impl FnMut(*mut T, i32, &mut UErrorCode
 }
 
 fn with_char_buffer(f: impl FnMut(*mut c_char, i32, &mut UErrorCode) -> i32) -> Option<String> {
-    with_buffer::<c_char>(f).and_then(|v| String::from_utf8(v.into_iter().map(|c| c as u8).collect()).ok())
+    with_buffer::<c_char>(f)
+        .and_then(|v| String::from_utf8(v.into_iter().map(|c| c as u8).collect()).ok())
 }
 
 /// The ICU locale ID of a BCP 47 tag, if the whole tag is well-formed.
@@ -154,7 +272,9 @@ pub fn locale_id(tag: &str) -> Option<String> {
     }
     let ctag = CString::new(tag).ok()?;
     let mut parsed = 0;
-    let id = with_char_buffer(|buf, cap, err| unsafe { uloc_forLanguageTag(ctag.as_ptr(), buf, cap, &mut parsed, err) })?;
+    let id = with_char_buffer(|buf, cap, err| unsafe {
+        uloc_forLanguageTag(ctag.as_ptr(), buf, cap, &mut parsed, err)
+    })?;
     (parsed as usize == tag.len()).then_some(id)
 }
 
@@ -174,14 +294,21 @@ pub fn maximize(id: &str) -> String {
     let Ok(cid) = CString::new(base) else {
         return String::new();
     };
-    with_char_buffer(|buf, cap, err| unsafe { uloc_addLikelySubtags(cid.as_ptr(), buf, cap, err) }).unwrap_or_else(|| base.to_owned())
+    with_char_buffer(|buf, cap, err| unsafe { uloc_addLikelySubtags(cid.as_ptr(), buf, cap, err) })
+        .unwrap_or_else(|| base.to_owned())
 }
 
 /// The system's default locale as a BCP 47 tag, without a script subtag its region implies.
 pub fn default_tag() -> String {
-    let id = unsafe { CStr::from_ptr(uloc_getDefault()) }.to_string_lossy().into_owned();
+    let id = unsafe { CStr::from_ptr(uloc_getDefault()) }
+        .to_string_lossy()
+        .into_owned();
     // OpenHarmony's uloc_getDefault returns the system locale parameter, a BCP 47 tag.
-    let id = if id.contains('-') { locale_id(&id).unwrap_or_default() } else { id };
+    let id = if id.contains('-') {
+        locale_id(&id).unwrap_or_default()
+    } else {
+        id
+    };
     let base = id.split('@').next().unwrap_or("").to_owned();
     let parts: Vec<&str> = base.split('_').collect();
     let mut chosen = base.clone();
@@ -191,7 +318,9 @@ pub fn default_tag() -> String {
             chosen = short;
         }
     }
-    language_tag(&chosen).filter(|t| t != "und").unwrap_or_else(|| "en-US".to_owned())
+    language_tag(&chosen)
+        .filter(|t| t != "und")
+        .unwrap_or_else(|| "en-US".to_owned())
 }
 
 thread_local! {
@@ -206,7 +335,9 @@ pub fn is_available(tag: &str) -> bool {
             .get_or_insert_with(|| {
                 let mut set = HashSet::new();
                 let mut err = 0;
-                let en = unsafe { uloc_openAvailableByType(ULOC_AVAILABLE_WITH_LEGACY_ALIASES, &mut err) };
+                let en = unsafe {
+                    uloc_openAvailableByType(ULOC_AVAILABLE_WITH_LEGACY_ALIASES, &mut err)
+                };
                 if en.is_null() {
                     return set;
                 }
@@ -216,7 +347,9 @@ pub fn is_available(tag: &str) -> bool {
                     if id.is_null() || failed(err) {
                         break;
                     }
-                    if let Some(tag) = language_tag(&unsafe { CStr::from_ptr(id) }.to_string_lossy()) {
+                    if let Some(tag) =
+                        language_tag(&unsafe { CStr::from_ptr(id) }.to_string_lossy())
+                    {
                         set.insert(tag.to_ascii_lowercase());
                     }
                 }
@@ -249,7 +382,15 @@ impl Collator {
     }
 
     pub fn compare(&self, a: &[u16], b: &[u16]) -> i32 {
-        unsafe { ucol_strcoll(self.0, a.as_ptr(), a.len() as i32, b.as_ptr(), b.len() as i32) }
+        unsafe {
+            ucol_strcoll(
+                self.0,
+                a.as_ptr(),
+                a.len() as i32,
+                b.as_ptr(),
+                b.len() as i32,
+            )
+        }
     }
 }
 
@@ -264,7 +405,16 @@ pub struct NumberFormat(*mut UNumberFormat);
 impl NumberFormat {
     pub fn open(style: i32, locale: &CStr) -> Option<NumberFormat> {
         let mut err = 0;
-        let fmt = unsafe { unum_open(style, ptr::null(), 0, locale.as_ptr(), ptr::null_mut(), &mut err) };
+        let fmt = unsafe {
+            unum_open(
+                style,
+                ptr::null(),
+                0,
+                locale.as_ptr(),
+                ptr::null_mut(),
+                &mut err,
+            )
+        };
         if fmt.is_null() {
             return None;
         }
@@ -283,27 +433,52 @@ impl NumberFormat {
     pub fn set_currency(&self, code: &str) -> bool {
         let code: Vec<u16> = code.encode_utf16().collect();
         let mut err = 0;
-        unsafe { unum_setTextAttribute(self.0, UNUM_CURRENCY_CODE, code.as_ptr(), code.len() as i32, &mut err) };
+        unsafe {
+            unum_setTextAttribute(
+                self.0,
+                UNUM_CURRENCY_CODE,
+                code.as_ptr(),
+                code.len() as i32,
+                &mut err,
+            )
+        };
         !failed(err)
     }
 
     pub fn decimal_separator(&self) -> Vec<u16> {
-        with_buffer(|buf, cap, err| unsafe { unum_getSymbol(self.0, UNUM_DECIMAL_SEPARATOR_SYMBOL, buf, cap, err) }).unwrap_or_else(|| vec![b'.' as u16])
+        with_buffer(|buf, cap, err| unsafe {
+            unum_getSymbol(self.0, UNUM_DECIMAL_SEPARATOR_SYMBOL, buf, cap, err)
+        })
+        .unwrap_or_else(|| vec![b'.' as u16])
     }
 
     pub fn format(&self, x: f64) -> Option<Vec<u16>> {
-        with_buffer(|buf, cap, err| unsafe { unum_formatDouble(self.0, x, buf, cap, ptr::null_mut(), err) })
+        with_buffer(|buf, cap, err| unsafe {
+            unum_formatDouble(self.0, x, buf, cap, ptr::null_mut(), err)
+        })
     }
 
     /// Formats a decimal number string, e.g. a BigInt's digits.
     pub fn format_decimal(&self, digits: &str) -> Option<Vec<u16>> {
-        with_buffer(|buf, cap, err| unsafe { unum_formatDecimal(self.0, digits.as_ptr() as *const c_char, digits.len() as i32, buf, cap, ptr::null_mut(), err) })
+        with_buffer(|buf, cap, err| unsafe {
+            unum_formatDecimal(
+                self.0,
+                digits.as_ptr() as *const c_char,
+                digits.len() as i32,
+                buf,
+                cap,
+                ptr::null_mut(),
+                err,
+            )
+        })
     }
 
     /// The formatted number and its (UNumberFormatFields, begin, end) spans.
     pub fn format_to_parts(&self, x: f64) -> Option<(Vec<u16>, Vec<(i32, usize, usize)>)> {
         let iter = FieldIterator::new()?;
-        let text = with_buffer(|buf, cap, err| unsafe { unum_formatDoubleForFields(self.0, x, buf, cap, iter.0, err) })?;
+        let text = with_buffer(|buf, cap, err| unsafe {
+            unum_formatDoubleForFields(self.0, x, buf, cap, iter.0, err)
+        })?;
         Some((text, iter.spans()))
     }
 }
@@ -348,14 +523,30 @@ pub struct DateFormat(*mut UDateFormat);
 impl DateFormat {
     /// A formatter for `pattern`, or for the date and time styles (`UDAT_NONE` for neither) if
     /// `pattern` is `None`. `tz` is a time zone ID, `None` for the default zone.
-    pub fn open(locale: &CStr, tz: Option<&[u16]>, pattern: Option<&[u16]>, styles: (i32, i32)) -> Option<DateFormat> {
+    pub fn open(
+        locale: &CStr,
+        tz: Option<&[u16]>,
+        pattern: Option<&[u16]>,
+        styles: (i32, i32),
+    ) -> Option<DateFormat> {
         let (tz_ptr, tz_len) = tz.map_or((ptr::null(), 0), |t| (t.as_ptr(), t.len() as i32));
         let (time, date, pat_ptr, pat_len) = match pattern {
             Some(p) => (UDAT_PATTERN, UDAT_PATTERN, p.as_ptr(), p.len() as i32),
             None => (styles.1, styles.0, ptr::null(), 0),
         };
         let mut err = 0;
-        let fmt = unsafe { udat_open(time, date, locale.as_ptr(), tz_ptr, tz_len, pat_ptr, pat_len, &mut err) };
+        let fmt = unsafe {
+            udat_open(
+                time,
+                date,
+                locale.as_ptr(),
+                tz_ptr,
+                tz_len,
+                pat_ptr,
+                pat_len,
+                &mut err,
+            )
+        };
         if fmt.is_null() {
             return None;
         }
@@ -392,13 +583,17 @@ impl DateFormat {
     }
 
     pub fn format(&self, t: f64) -> Option<Vec<u16>> {
-        with_buffer(|buf, cap, err| unsafe { udat_format(self.0, t, buf, cap, ptr::null_mut(), err) })
+        with_buffer(|buf, cap, err| unsafe {
+            udat_format(self.0, t, buf, cap, ptr::null_mut(), err)
+        })
     }
 
     /// The formatted date and its (UDateFormatField, begin, end) spans.
     pub fn format_to_parts(&self, t: f64) -> Option<(Vec<u16>, Vec<(i32, usize, usize)>)> {
         let iter = FieldIterator::new()?;
-        let text = with_buffer(|buf, cap, err| unsafe { udat_formatForFields(self.0, t, buf, cap, iter.0, err) })?;
+        let text = with_buffer(|buf, cap, err| unsafe {
+            udat_formatForFields(self.0, t, buf, cap, iter.0, err)
+        })?;
         Some((text, iter.spans()))
     }
 }
@@ -417,11 +612,16 @@ thread_local! {
 /// The time zone `Date` uses: `TZ`, else the system's. ICU's default can differ (outside apps it
 /// is a guess from the UTC offset).
 pub fn system_time_zone() -> String {
-    let tz = std::env::var("TZ").ok().map(|tz| tz.trim_start_matches(':').to_owned()).filter(|tz| !tz.is_empty());
+    let tz = std::env::var("TZ")
+        .ok()
+        .map(|tz| tz.trim_start_matches(':').to_owned())
+        .filter(|tz| !tz.is_empty());
     let tz = tz.or_else(|| {
         let mut buf = [0 as c_char; 64];
         let r = unsafe { OH_TimeService_GetTimeZone(buf.as_mut_ptr(), buf.len() as u32) };
-        let tz = unsafe { CStr::from_ptr(buf.as_ptr()) }.to_string_lossy().into_owned();
+        let tz = unsafe { CStr::from_ptr(buf.as_ptr()) }
+            .to_string_lossy()
+            .into_owned();
         (r == 0 && !tz.is_empty()).then_some(tz)
     });
     if let Some(tz) = tz {
@@ -443,14 +643,20 @@ pub fn system_time_zone() -> String {
 pub fn canonical_time_zone(id: &str) -> Option<String> {
     let id: Vec<u16> = id.encode_utf16().collect();
     let mut system = 0;
-    let canonical = with_buffer(|buf, cap, err| unsafe { ucal_getCanonicalTimeZoneID(id.as_ptr(), id.len() as i32, buf, cap, &mut system, err) })?;
+    let canonical = with_buffer(|buf, cap, err| unsafe {
+        ucal_getCanonicalTimeZoneID(id.as_ptr(), id.len() as i32, buf, cap, &mut system, err)
+    })?;
     (system != 0).then(|| String::from_utf16_lossy(&canonical))
 }
 
 pub fn to_upper(s: &[u16], language: &CStr) -> Option<Vec<u16>> {
-    with_buffer(|buf, cap, err| unsafe { u_strToUpper(buf, cap, s.as_ptr(), s.len() as i32, language.as_ptr(), err) })
+    with_buffer(|buf, cap, err| unsafe {
+        u_strToUpper(buf, cap, s.as_ptr(), s.len() as i32, language.as_ptr(), err)
+    })
 }
 
 pub fn to_lower(s: &[u16], language: &CStr) -> Option<Vec<u16>> {
-    with_buffer(|buf, cap, err| unsafe { u_strToLower(buf, cap, s.as_ptr(), s.len() as i32, language.as_ptr(), err) })
+    with_buffer(|buf, cap, err| unsafe {
+        u_strToLower(buf, cap, s.as_ptr(), s.len() as i32, language.as_ptr(), err)
+    })
 }

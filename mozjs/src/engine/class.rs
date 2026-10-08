@@ -12,8 +12,8 @@
 use std::collections::HashMap;
 use std::ffi::{c_int, c_void};
 use std::ptr;
-use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Mutex;
 
 use servo_quickjs as q;
 
@@ -50,7 +50,8 @@ impl ObjectData {
 
 unsafe fn reserved_slot_count(clasp: *const root::JSClass) -> usize {
     let flags = (*clasp).flags;
-    let mut count = ((flags >> root::JSCLASS_RESERVED_SLOTS_SHIFT) & root::JSCLASS_RESERVED_SLOTS_MASK) as usize;
+    let mut count = ((flags >> root::JSCLASS_RESERVED_SLOTS_SHIFT)
+        & root::JSCLASS_RESERVED_SLOTS_MASK) as usize;
     if flags & root::JSCLASS_IS_GLOBAL != 0 {
         count += root::JSCLASS_GLOBAL_SLOT_COUNT as usize;
     }
@@ -241,7 +242,10 @@ unsafe extern "C" fn gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS
     if !ops.is_null() {
         if let Some(trace) = (*ops).trace {
             let mut tracer = Tracer { rt, mark };
-            trace(&mut tracer as *mut Tracer as *mut root::JSTracer, val_obj(val));
+            trace(
+                &mut tracer as *mut Tracer as *mut root::JSTracer,
+                val_obj(val),
+            );
         }
     }
 }
@@ -257,9 +261,22 @@ unsafe extern "C" fn class_call(
     let data = object_data(val_obj(func_obj)).expect("callable SM class without data");
     let ops = (*data.clasp).cOps;
     let constructing = flags & q::JS_CALL_FLAG_CONSTRUCTOR as c_int != 0;
-    let native = if constructing { (*ops).construct } else { (*ops).call };
+    let native = if constructing {
+        (*ops).construct
+    } else {
+        (*ops).call
+    };
     let realm = data.realm;
-    call_native(ctx, native, realm, func_obj, this_val, argc, argv, constructing)
+    call_native(
+        ctx,
+        native,
+        realm,
+        func_obj,
+        this_val,
+        argc,
+        argv,
+        constructing,
+    )
 }
 
 /// Calls a SpiderMonkey `JSNative` with QuickJS arguments; returns a new reference or
@@ -286,14 +303,21 @@ pub(crate) unsafe fn call_native(
     let mut vp: Vec<JSVal> = Vec::with_capacity(argc as usize + 3);
     vp.push(JSVal::from_qjs(func_obj));
     vp.push(if constructing {
-        JSVal { asBits_: root::JSWhyMagic::JS_IS_CONSTRUCTING as u64, tag: TAG_MAGIC }
+        JSVal {
+            asBits_: root::JSWhyMagic::JS_IS_CONSTRUCTING as u64,
+            tag: TAG_MAGIC,
+        }
     } else {
         JSVal::from_qjs(this_val)
     });
     for i in 0..argc as usize {
         let arg = *argv.add(i);
         // Ropes are flattened (and the flat copy retained) so Rust never sees them.
-        vp.push(if arg.tag() == q::JS_TAG_STRING_ROPE { cx.retain(JSVal::from_qjs(arg)) } else { JSVal::from_qjs(arg) });
+        vp.push(if arg.tag() == q::JS_TAG_STRING_ROPE {
+            cx.retain(JSVal::from_qjs(arg))
+        } else {
+            JSVal::from_qjs(arg)
+        });
     }
     if constructing {
         // new.target
@@ -371,7 +395,11 @@ unsafe extern "C" fn function_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
     }
 }
 
-unsafe extern "C" fn function_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
+unsafe extern "C" fn function_gc_mark(
+    rt: *mut q::JSRuntime,
+    val: q::JSValue,
+    mark: q::JS_MarkFunc,
+) {
     let data = q::JS_GetOpaque(val, q::JS_GetClassID(val)) as *mut FunctionData;
     if !data.is_null() {
         for v in (*data).slots.iter() {
@@ -393,7 +421,16 @@ unsafe extern "C" fn function_call(
 ) -> q::JSValue {
     let data = &*(q::JS_GetOpaque(func_obj, q::JS_GetClassID(func_obj)) as *mut FunctionData);
     let constructing = flags & q::JS_CALL_FLAG_CONSTRUCTOR as c_int != 0;
-    call_native(ctx, data.native, data.realm, func_obj, this_val, argc, argv, constructing)
+    call_native(
+        ctx,
+        data.native,
+        data.realm,
+        func_obj,
+        this_val,
+        argc,
+        argv,
+        constructing,
+    )
 }
 
 /// A new native function object (a new reference).
@@ -420,8 +457,18 @@ pub(crate) unsafe fn new_function(
     });
     q::JS_SetOpaque(f, Box::into_raw(data) as *mut c_void);
     let flags = q::JS_PROP_CONFIGURABLE as c_int;
-    q::JS_DefinePropertyValueStr(qctx, f, c"length".as_ptr(), q::JS_NewInt32(qctx, nargs as i32), flags);
-    let name_val = if name == 0 { q::JS_NewString(qctx, c"".as_ptr()) } else { q::JS_AtomToString(qctx, name) };
+    q::JS_DefinePropertyValueStr(
+        qctx,
+        f,
+        c"length".as_ptr(),
+        q::JS_NewInt32(qctx, nargs as i32),
+        flags,
+    );
+    let name_val = if name == 0 {
+        q::JS_NewString(qctx, c"".as_ptr())
+    } else {
+        q::JS_AtomToString(qctx, name)
+    };
     q::JS_DefinePropertyValueStr(qctx, f, c"name".as_ptr(), name_val, flags);
     if constructor {
         q::JS_SetConstructorBit(qctx, f, 1);
@@ -435,7 +482,11 @@ pub(crate) const QJS_CLASS_BYTECODE_FUNCTION: q::JSClassID = 13;
 pub(crate) const QJS_CLASS_OBJECT: q::JSClassID = 1;
 
 /// Creates an object of SpiderMonkey class `clasp` with prototype `proto` (a new reference).
-pub(crate) unsafe fn new_object(cx: &mut Cx, clasp: *const root::JSClass, proto: q::JSValue) -> q::JSValue {
+pub(crate) unsafe fn new_object(
+    cx: &mut Cx,
+    clasp: *const root::JSClass,
+    proto: q::JSValue,
+) -> q::JSValue {
     let qctx = cx.qctx();
     if clasp.is_null() || ptr::eq(clasp, &PLAIN_CLASS) {
         return q::JS_NewObjectProto(qctx, proto);
@@ -453,7 +504,10 @@ pub(crate) unsafe fn new_object(cx: &mut Cx, clasp: *const root::JSClass, proto:
     obj
 }
 
-pub(crate) unsafe fn JS_NewObject(cx: *mut root::JSContext, clasp: *const root::JSClass) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewObject(
+    cx: *mut root::JSContext,
+    clasp: *const root::JSClass,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let proto = q::JS_GetClassProto(cx.qctx(), QJS_CLASS_OBJECT);
     let obj = new_object(cx, clasp, proto);
@@ -461,9 +515,17 @@ pub(crate) unsafe fn JS_NewObject(cx: *mut root::JSContext, clasp: *const root::
     adopt_object(cx, obj)
 }
 
-pub(crate) unsafe fn JS_NewObjectWithGivenProto(cx: *mut root::JSContext, clasp: *const root::JSClass, proto: root::JS::Handle<*mut root::JSObject>) -> *mut root::JSObject {
+pub(crate) unsafe fn JS_NewObjectWithGivenProto(
+    cx: *mut root::JSContext,
+    clasp: *const root::JSClass,
+    proto: root::JS::Handle<*mut root::JSObject>,
+) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
-    let proto = if (*proto.ptr).is_null() { q::JS_NULL } else { obj_val(*proto.ptr) };
+    let proto = if (*proto.ptr).is_null() {
+        q::JS_NULL
+    } else {
+        obj_val(*proto.ptr)
+    };
     let obj = new_object(cx, clasp, proto);
     adopt_object(cx, obj)
 }
@@ -482,12 +544,20 @@ pub(crate) unsafe fn adopt_object(cx: &mut Cx, obj: q::JSValue) -> *mut root::JS
     cx.adopt(obj).to_object()
 }
 
-pub(crate) unsafe fn JS_GetReservedSlot(obj: *mut root::JSObject, index: u32, dest: *mut root::JS::Value) {
+pub(crate) unsafe fn JS_GetReservedSlot(
+    obj: *mut root::JSObject,
+    index: u32,
+    dest: *mut root::JS::Value,
+) {
     let data = object_data(obj).expect("JS_GetReservedSlot on an object without slots");
     *dest = JSVal::from_qjs(data.slots[index as usize]);
 }
 
-pub(crate) unsafe fn JS_SetReservedSlot(obj: *mut root::JSObject, index: u32, v: *const root::JS::Value) {
+pub(crate) unsafe fn JS_SetReservedSlot(
+    obj: *mut root::JSObject,
+    index: u32,
+    v: *const root::JS::Value,
+) {
     let cx = super::current();
     let data = object_data(obj).expect("JS_SetReservedSlot on an object without slots");
     let new = q::JS_DupValueRT(cx.rt, (*v).to_qjs());
@@ -495,10 +565,27 @@ pub(crate) unsafe fn JS_SetReservedSlot(obj: *mut root::JSObject, index: u32, v:
     q::JS_FreeValueRT(cx.rt, old);
 }
 
-pub(crate) unsafe fn JS_NewFunction(cx: *mut root::JSContext, call: root::JSNative, nargs: ::std::os::raw::c_uint, flags: ::std::os::raw::c_uint, name: *const ::std::os::raw::c_char) -> *mut root::JSFunction {
+pub(crate) unsafe fn JS_NewFunction(
+    cx: *mut root::JSContext,
+    call: root::JSNative,
+    nargs: ::std::os::raw::c_uint,
+    flags: ::std::os::raw::c_uint,
+    name: *const ::std::os::raw::c_char,
+) -> *mut root::JSFunction {
     let cx = Cx::from_raw(cx);
-    let atom = if name.is_null() { 0 } else { q::JS_NewAtom(cx.qctx(), name) };
-    let f = new_function(cx, call, ptr::null(), nargs, flags & root::JSFUN_CONSTRUCTOR != 0, atom);
+    let atom = if name.is_null() {
+        0
+    } else {
+        q::JS_NewAtom(cx.qctx(), name)
+    };
+    let f = new_function(
+        cx,
+        call,
+        ptr::null(),
+        nargs,
+        flags & root::JSFUN_CONSTRUCTOR != 0,
+        atom,
+    );
     if atom != 0 {
         q::JS_FreeAtomRT(cx.rt, atom);
     }
@@ -538,37 +625,76 @@ unsafe fn barrier(prev: q::JSValue, next: q::JSValue) {
 }
 
 unsafe fn ptr_val(tag: i32, p: *mut c_void) -> q::JSValue {
-    if p.is_null() { q::JS_UNDEFINED } else { q::JSValue::mkptr(tag, p) }
+    if p.is_null() {
+        q::JS_UNDEFINED
+    } else {
+        q::JSValue::mkptr(tag, p)
+    }
 }
 
-pub(crate) unsafe fn HeapObjectWriteBarriers(objp: *mut *mut root::JSObject, prev: *mut root::JSObject, next: *mut root::JSObject) {
+pub(crate) unsafe fn HeapObjectWriteBarriers(
+    objp: *mut *mut root::JSObject,
+    prev: *mut root::JSObject,
+    next: *mut root::JSObject,
+) {
     let _ = objp;
-    barrier(ptr_val(q::JS_TAG_OBJECT, prev as _), ptr_val(q::JS_TAG_OBJECT, next as _));
+    barrier(
+        ptr_val(q::JS_TAG_OBJECT, prev as _),
+        ptr_val(q::JS_TAG_OBJECT, next as _),
+    );
 }
 
-pub(crate) unsafe fn HeapValueWriteBarriers(valuep: *mut root::JS::Value, prev: *const root::JS::Value, next: *const root::JS::Value) {
+pub(crate) unsafe fn HeapValueWriteBarriers(
+    valuep: *mut root::JS::Value,
+    prev: *const root::JS::Value,
+    next: *const root::JS::Value,
+) {
     let _ = valuep;
     barrier((*prev).to_qjs(), (*next).to_qjs());
 }
 
-pub(crate) unsafe fn HeapStringWriteBarriers(objp: *mut *mut root::JSString, prev: *mut root::JSString, next: *mut root::JSString) {
+pub(crate) unsafe fn HeapStringWriteBarriers(
+    objp: *mut *mut root::JSString,
+    prev: *mut root::JSString,
+    next: *mut root::JSString,
+) {
     let _ = objp;
-    barrier(ptr_val(q::JS_TAG_STRING, prev as _), ptr_val(q::JS_TAG_STRING, next as _));
+    barrier(
+        ptr_val(q::JS_TAG_STRING, prev as _),
+        ptr_val(q::JS_TAG_STRING, next as _),
+    );
 }
 
-pub(crate) unsafe fn HeapScriptWriteBarriers(objp: *mut *mut root::JSScript, prev: *mut root::JSScript, next: *mut root::JSScript) {
+pub(crate) unsafe fn HeapScriptWriteBarriers(
+    objp: *mut *mut root::JSScript,
+    prev: *mut root::JSScript,
+    next: *mut root::JSScript,
+) {
     let _ = objp;
-    barrier(ptr_val(q::JS_TAG_FUNCTION_BYTECODE, prev as _), ptr_val(q::JS_TAG_FUNCTION_BYTECODE, next as _));
+    barrier(
+        ptr_val(q::JS_TAG_FUNCTION_BYTECODE, prev as _),
+        ptr_val(q::JS_TAG_FUNCTION_BYTECODE, next as _),
+    );
 }
 
-pub(crate) unsafe fn HeapBigIntWriteBarriers(bip: *mut *mut root::JS::BigInt, prev: *mut root::JS::BigInt, next: *mut root::JS::BigInt) {
+pub(crate) unsafe fn HeapBigIntWriteBarriers(
+    bip: *mut *mut root::JS::BigInt,
+    prev: *mut root::JS::BigInt,
+    next: *mut root::JS::BigInt,
+) {
     let _ = bip;
-    barrier(ptr_val(q::JS_TAG_BIG_INT, prev as _), ptr_val(q::JS_TAG_BIG_INT, next as _));
+    barrier(
+        ptr_val(q::JS_TAG_BIG_INT, prev as _),
+        ptr_val(q::JS_TAG_BIG_INT, next as _),
+    );
 }
 
 /// Barrier for `Heap<*mut JS::Symbol>` (SpiderMonkey needs none; QuickJS symbols are counted).
 pub(crate) unsafe fn heap_symbol_barrier(prev: *mut root::JS::Symbol, next: *mut root::JS::Symbol) {
-    barrier(ptr_val(q::JS_TAG_SYMBOL, prev as _), ptr_val(q::JS_TAG_SYMBOL, next as _));
+    barrier(
+        ptr_val(q::JS_TAG_SYMBOL, prev as _),
+        ptr_val(q::JS_TAG_SYMBOL, next as _),
+    );
 }
 
 /// Barrier for `Heap<jsid>`: string and symbol ids hold an atom reference.
@@ -587,44 +713,83 @@ pub(crate) unsafe fn heap_id_barrier(prev: root::jsid, next: root::jsid) {
 // Tracing: only `Heap<T>` fields (which hold a count) are marked. Root tracers are for
 // uncounted locations and must not be marked.
 
-pub(crate) unsafe fn CallValueTracer(trc: *mut root::JSTracer, valuep: *mut root::JS::Heap<root::JS::Value>, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallValueTracer(
+    trc: *mut root::JSTracer,
+    valuep: *mut root::JS::Heap<root::JS::Value>,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = name;
     Tracer::mark(trc, (*(*valuep).get_unsafe()).to_qjs());
 }
 
-pub(crate) unsafe fn CallObjectTracer(trc: *mut root::JSTracer, objp: *mut root::JS::Heap<*mut root::JSObject>, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallObjectTracer(
+    trc: *mut root::JSTracer,
+    objp: *mut root::JS::Heap<*mut root::JSObject>,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = name;
     Tracer::mark(trc, ptr_val(q::JS_TAG_OBJECT, *(*objp).get_unsafe() as _));
 }
 
-pub(crate) unsafe fn CallFunctionTracer(trc: *mut root::JSTracer, funp: *mut root::JS::Heap<*mut root::JSFunction>, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallFunctionTracer(
+    trc: *mut root::JSTracer,
+    funp: *mut root::JS::Heap<*mut root::JSFunction>,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = name;
     Tracer::mark(trc, ptr_val(q::JS_TAG_OBJECT, *(*funp).get_unsafe() as _));
 }
 
-pub(crate) unsafe fn CallStringTracer(trc: *mut root::JSTracer, strp: *mut root::JS::Heap<*mut root::JSString>, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallStringTracer(
+    trc: *mut root::JSTracer,
+    strp: *mut root::JS::Heap<*mut root::JSString>,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = name;
     Tracer::mark(trc, ptr_val(q::JS_TAG_STRING, *(*strp).get_unsafe() as _));
 }
 
-pub(crate) unsafe fn CallScriptTracer(trc: *mut root::JSTracer, scriptp: *mut root::JS::Heap<*mut root::JSScript>, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallScriptTracer(
+    trc: *mut root::JSTracer,
+    scriptp: *mut root::JS::Heap<*mut root::JSScript>,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = name;
-    Tracer::mark(trc, ptr_val(q::JS_TAG_FUNCTION_BYTECODE, *(*scriptp).get_unsafe() as _));
+    Tracer::mark(
+        trc,
+        ptr_val(q::JS_TAG_FUNCTION_BYTECODE, *(*scriptp).get_unsafe() as _),
+    );
 }
 
-pub(crate) unsafe fn CallIdTracer(trc: *mut root::JSTracer, idp: *mut root::JS::Heap<root::jsid>, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallIdTracer(
+    trc: *mut root::JSTracer,
+    idp: *mut root::JS::Heap<root::jsid>,
+    name: *const ::std::os::raw::c_char,
+) {
     // Atoms are not cycle-collected; the count held by the Heap<jsid> is enough.
     let _ = (trc, idp, name);
 }
 
-pub(crate) unsafe fn CallObjectRootTracer(trc: *mut root::JSTracer, objp: *mut *mut root::JSObject, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallObjectRootTracer(
+    trc: *mut root::JSTracer,
+    objp: *mut *mut root::JSObject,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = (trc, objp, name);
 }
 
-pub(crate) unsafe fn CallValueRootTracer(trc: *mut root::JSTracer, valp: *mut root::JS::Value, name: *const ::std::os::raw::c_char) {
+pub(crate) unsafe fn CallValueRootTracer(
+    trc: *mut root::JSTracer,
+    valp: *mut root::JS::Value,
+    name: *const ::std::os::raw::c_char,
+) {
     let _ = (trc, valp, name);
 }
 
-pub(crate) unsafe fn TraceValueArray(trc: *mut root::JSTracer, length: usize, elements: *mut root::JS::Value) {
+pub(crate) unsafe fn TraceValueArray(
+    trc: *mut root::JSTracer,
+    length: usize,
+    elements: *mut root::JS::Value,
+) {
     let _ = (trc, length, elements);
 }

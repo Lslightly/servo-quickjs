@@ -18,7 +18,10 @@ pub(crate) unsafe fn JS_Init() -> bool {
 
 pub(crate) unsafe fn JS_ShutDown() {}
 
-pub(crate) unsafe fn JS_NewContext(maxbytes: u32, parentRuntime: *mut root::JSRuntime) -> *mut root::JSContext {
+pub(crate) unsafe fn JS_NewContext(
+    maxbytes: u32,
+    parentRuntime: *mut root::JSRuntime,
+) -> *mut root::JSContext {
     let _ = (maxbytes, parentRuntime);
     let rt = q::JS_NewRuntime();
     if rt.is_null() {
@@ -59,29 +62,49 @@ pub(crate) unsafe fn JS_GetRuntime(cx: *mut root::JSContext) -> *mut root::JSRun
     Cx::from_raw(cx).rt as *mut root::JSRuntime
 }
 
-pub(crate) unsafe fn JS_SetGCParameter(cx: *mut root::JSContext, key: root::JSGCParamKey, value: u32) {
+pub(crate) unsafe fn JS_SetGCParameter(
+    cx: *mut root::JSContext,
+    key: root::JSGCParamKey,
+    value: u32,
+) {
     let _ = (cx, key, value);
 }
 
-pub(crate) unsafe fn JS_AddExtraGCRootsTracer(cx: *mut root::JSContext, traceOp: root::JSTraceDataOp, data: *mut ::std::os::raw::c_void) -> bool {
+pub(crate) unsafe fn JS_AddExtraGCRootsTracer(
+    cx: *mut root::JSContext,
+    traceOp: root::JSTraceDataOp,
+    data: *mut ::std::os::raw::c_void,
+) -> bool {
     // Rust-side roots hold reference counts instead of being traced (see the design doc).
     let _ = (cx, traceOp, data);
     true
 }
 
-pub(crate) unsafe fn JS_SetNativeStackQuota(cx: *mut root::JSContext, systemCodeStackSize: root::JS::NativeStackSize, trustedScriptStackSize: root::JS::NativeStackSize, untrustedScriptStackSize: root::JS::NativeStackSize) {
+pub(crate) unsafe fn JS_SetNativeStackQuota(
+    cx: *mut root::JSContext,
+    systemCodeStackSize: root::JS::NativeStackSize,
+    trustedScriptStackSize: root::JS::NativeStackSize,
+    untrustedScriptStackSize: root::JS::NativeStackSize,
+) {
     let _ = (systemCodeStackSize, trustedScriptStackSize);
     let cx = Cx::from_raw(cx);
     q::JS_SetMaxStackSize(cx.rt, untrustedScriptStackSize as usize);
     q::JS_UpdateStackTop(cx.rt);
 }
 
-pub(crate) unsafe fn InitSelfHostedCode(cx: *mut root::JSContext, cache: root::JS::SelfHostedCache, writer: root::JS::SelfHostedWriter) -> bool {
+pub(crate) unsafe fn InitSelfHostedCode(
+    cx: *mut root::JSContext,
+    cache: root::JS::SelfHostedCache,
+    writer: root::JS::SelfHostedWriter,
+) -> bool {
     let _ = (cx, cache, writer);
     true
 }
 
-pub(crate) unsafe fn SetWarningReporter(cx: *mut root::JSContext, reporter: root::JS::WarningReporter) -> root::JS::WarningReporter {
+pub(crate) unsafe fn SetWarningReporter(
+    cx: *mut root::JSContext,
+    reporter: root::JS::WarningReporter,
+) -> root::JS::WarningReporter {
     std::mem::replace(&mut Cx::from_raw(cx).warning_reporter, reporter)
 }
 
@@ -103,13 +126,16 @@ pub(crate) unsafe fn JS_GC(cx: *mut root::JSContext, reason: root::JS::GCReason)
 
 fn gc_stats_mode() -> Option<&'static str> {
     static MODE: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
-    MODE.get_or_init(|| std::env::var("QJS_GC_STATS").ok().filter(|v| v != "0")).as_deref()
+    MODE.get_or_init(|| std::env::var("QJS_GC_STATS").ok().filter(|v| v != "0"))
+        .as_deref()
 }
 
 /// With `QJS_GC_STATS=roots`, where Rust rooted an object permanently (`AddRawValueRoot`):
 /// the frames of its backtrace in Servo's script crates.
 pub(crate) fn note_root_origin(v: q::JSValue) {
-    if v.tag() != q::JS_TAG_OBJECT || !gc_stats_mode().is_some_and(|mode| mode == "roots" || mode.starts_with("paths:")) {
+    if v.tag() != q::JS_TAG_OBJECT
+        || !gc_stats_mode().is_some_and(|mode| mode == "roots" || mode.starts_with("paths:"))
+    {
         return;
     }
     let trace = std::backtrace::Backtrace::force_capture().to_string();
@@ -118,7 +144,14 @@ pub(crate) fn note_root_origin(v: q::JSValue) {
         .map(str::trim)
         .filter(|l| !l.starts_with("at "))
         .filter_map(|l| l.split_once(": ").map(|(_, f)| f))
-        .filter(|f| !["mozjs::", "std::", "core::", "alloc::", "<alloc", "<core", "<std", "__rust", "rust_"].iter().any(|p| f.starts_with(p)))
+        .filter(|f| {
+            ![
+                "mozjs::", "std::", "core::", "alloc::", "<alloc", "<core", "<std", "__rust",
+                "rust_",
+            ]
+            .iter()
+            .any(|p| f.starts_with(p))
+        })
         .take(10)
         .collect();
     ROOT_ORIGINS.with(|o| o.borrow_mut().insert(v.ptr() as usize, frames.join(" <- ")));
@@ -137,7 +170,13 @@ thread_local! {
 }
 
 /// Only records: during the collection, taking or dropping a reference could free an object.
-unsafe extern "C" fn record_root(rt: *mut q::JSRuntime, gc_obj_type: c_int, ptr: *mut c_void, ref_count: c_int, _opaque: *mut c_void) {
+unsafe extern "C" fn record_root(
+    rt: *mut q::JSRuntime,
+    gc_obj_type: c_int,
+    ptr: *mut c_void,
+    ref_count: c_int,
+    _opaque: *mut c_void,
+) {
     if gc_obj_type >= 0 {
         ROOTS.with(|r| r.borrow_mut().push((gc_obj_type, ptr as usize, ref_count)));
     } else if let Some(class) = gc_stats_mode().and_then(|mode| mode.strip_prefix("paths:")) {
@@ -151,7 +190,9 @@ unsafe fn gc_thing_name(rt: *mut q::JSRuntime, gc_obj_type: i32, ptr: usize) -> 
             let mut buf = [0 as c_char; 64];
             let id = q::JS_GetClassID(super::obj_val(ptr as *mut root::JSObject));
             let name = q::JS_GetClassNameRT(rt, id, buf.as_mut_ptr(), buf.len() as c_int);
-            let name = std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned();
+            let name = std::ffi::CStr::from_ptr(name)
+                .to_string_lossy()
+                .into_owned();
             if name != "Proxy" {
                 return name;
             }
@@ -163,8 +204,11 @@ unsafe fn gc_thing_name(rt: *mut q::JSRuntime, gc_obj_type: i32, ptr: usize) -> 
             let id = q::JS_GetClassID(super::obj_val(proto as *mut root::JSObject));
             let proto = q::JS_GetClassNameRT(rt, id, buf.as_mut_ptr(), buf.len() as c_int);
             let proto = std::ffi::CStr::from_ptr(proto).to_string_lossy();
-            format!("Proxy<{}>", proto.strip_suffix("Prototype").unwrap_or(&proto))
-        },
+            format!(
+                "Proxy<{}>",
+                proto.strip_suffix("Prototype").unwrap_or(&proto)
+            )
+        }
         1 => "(bytecode)".to_owned(),
         2 => "(shape)".to_owned(),
         3 => "(var_ref)".to_owned(),
@@ -182,7 +226,12 @@ struct PathSearch {
     from: usize,
 }
 
-unsafe extern "C" fn visit_child(_rt: *mut q::JSRuntime, gc_obj_type: c_int, ptr: *mut c_void, opaque: *mut c_void) {
+unsafe extern "C" fn visit_child(
+    _rt: *mut q::JSRuntime,
+    gc_obj_type: c_int,
+    ptr: *mut c_void,
+    opaque: *mut c_void,
+) {
     let search = &mut *(opaque as *mut PathSearch);
     if let std::collections::hash_map::Entry::Vacant(e) = search.reached.entry(ptr as usize) {
         e.insert((gc_obj_type, search.from));
@@ -193,7 +242,11 @@ unsafe extern "C" fn visit_child(_rt: *mut q::JSRuntime, gc_obj_type: c_int, ptr
 /// With `QJS_GC_STATS=paths:<class>`, the shortest path from a root to each live object of the
 /// class, grouped by the classes along the path.
 unsafe fn print_paths(rt: *mut q::JSRuntime, class: &str) {
-    let mut search = PathSearch { reached: Default::default(), queue: Default::default(), from: 0 };
+    let mut search = PathSearch {
+        reached: Default::default(),
+        queue: Default::default(),
+        from: 0,
+    };
     ROOTS.with(|r| {
         for &(kind, ptr, _) in r.borrow().iter() {
             search.reached.insert(ptr, (kind, 0));
@@ -202,7 +255,12 @@ unsafe fn print_paths(rt: *mut q::JSRuntime, class: &str) {
     });
     while let Some(ptr) = search.queue.pop_front() {
         search.from = ptr;
-        q::JS_VisitGCChildren(rt, ptr as *mut c_void, Some(visit_child), &mut search as *mut PathSearch as *mut c_void);
+        q::JS_VisitGCChildren(
+            rt,
+            ptr as *mut c_void,
+            Some(visit_child),
+            &mut search as *mut PathSearch as *mut c_void,
+        );
     }
     let mut paths: std::collections::BTreeMap<String, usize> = Default::default();
     for (&ptr, &(kind, _)) in &search.reached {
@@ -244,16 +302,25 @@ unsafe fn print_roots(cx: &Cx) {
                 let obj = ptr as *mut root::JSObject;
                 let id = q::JS_GetClassID(super::obj_val(obj));
                 let name = q::JS_GetClassNameRT(cx.rt, id, buf.as_mut_ptr(), buf.len() as c_int);
-                let mut class = std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned();
+                let mut class = std::ffi::CStr::from_ptr(name)
+                    .to_string_lossy()
+                    .into_owned();
                 if let Some(origin) = ROOT_ORIGINS.with(|o| o.borrow().get(&ptr).cloned()) {
                     class = format!("{class}[{origin}]");
                 }
                 (super::class::object_realm(cx, obj), class)
-            },
-            5 => (super::realm::realm_of_qctx(ptr as *mut q::JSContext), "(realm)".to_owned()),
+            }
+            5 => (
+                super::realm::realm_of_qctx(ptr as *mut q::JSContext),
+                "(realm)".to_owned(),
+            ),
             _ => continue,
         };
-        let entry = by_realm.entry(realm as usize).or_default().entry(class).or_default();
+        let entry = by_realm
+            .entry(realm as usize)
+            .or_default()
+            .entry(class)
+            .or_default();
         entry.0 += 1;
         entry.1 += count as i64;
     }
@@ -261,8 +328,15 @@ unsafe fn print_roots(cx: &Cx) {
         let total: usize = classes.values().map(|c| c.0).sum();
         let mut classes: Vec<_> = classes.into_iter().collect();
         classes.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
-        let list: Vec<String> = classes.iter().take(12).map(|(name, (n, refs))| format!("{name}x{n}({refs})")).collect();
-        eprintln!("qjs-roots: realm {realm:#x}: {total} roots: {}", list.join(" "));
+        let list: Vec<String> = classes
+            .iter()
+            .take(12)
+            .map(|(name, (n, refs))| format!("{name}x{n}({refs})"))
+            .collect();
+        eprintln!(
+            "qjs-roots: realm {realm:#x}: {total} roots: {}",
+            list.join(" ")
+        );
     }
 }
 
@@ -290,12 +364,21 @@ unsafe fn print_gc_stats(rt: *mut q::JSRuntime) {
         return;
     }
     let mut counts = vec![0u32; 8192];
-    let len = (q::JS_CountObjectsByClass(rt, counts.as_mut_ptr(), counts.len() as u32) as usize).min(counts.len());
-    let mut classes: Vec<(u32, usize)> = counts[..len].iter().enumerate().filter(|(_, &n)| n > 0).map(|(id, &n)| (n, id)).collect();
+    let len = (q::JS_CountObjectsByClass(rt, counts.as_mut_ptr(), counts.len() as u32) as usize)
+        .min(counts.len());
+    let mut classes: Vec<(u32, usize)> = counts[..len]
+        .iter()
+        .enumerate()
+        .filter(|(_, &n)| n > 0)
+        .map(|(id, &n)| (n, id))
+        .collect();
     classes.sort_unstable_by(|a, b| b.cmp(a));
     let mut buf = [0 as std::ffi::c_char; 64];
     for (n, id) in classes.into_iter().take(25) {
         let name = q::JS_GetClassNameRT(rt, id as q::JSClassID, buf.as_mut_ptr(), buf.len() as i32);
-        eprintln!("qjs-gc:   {n:7} {}", std::ffi::CStr::from_ptr(name).to_string_lossy());
+        eprintln!(
+            "qjs-gc:   {n:7} {}",
+            std::ffi::CStr::from_ptr(name).to_string_lossy()
+        );
     }
 }

@@ -18,13 +18,12 @@ use mozjs::glue::{
     CreateProxyHandler, CreateRustJSPrincipals, CreateWrapperProxyHandler, DestroyRustJSPrincipals,
     GetProxyHandler, GetProxyHandlerExtra, GetProxyHandlerFamily, GetProxyPrivate,
     GetProxyReservedSlot, GetRustJSPrincipalsPrivate, GetWindowProxyClass, IsProxyHandlerFamily,
-    IsWrapper, JS_GetReservedSlot,
-    JSPrincipalsCallbacks, NewProxyObject, NewWindowProxy, ProxyTraps, SetProxyPrivate,
-    SetProxyReservedSlot, UncheckedUnwrapObject,
+    IsWrapper, JSPrincipalsCallbacks, JS_GetReservedSlot, NewProxyObject, NewWindowProxy,
+    ProxyTraps, SetProxyPrivate, SetProxyReservedSlot, UncheckedUnwrapObject,
 };
 use mozjs::jsapi::{
-    CheckedUnwrapStatic, Compartment, CompartmentIterResult, GCContext, GetObjectRealmOrNull,
-    GetRealmPrincipals, Handle, HandleId, HandleObject as RawHandleObject,
+    CheckedUnwrapStatic, Compartment, CompartmentIterResult, GCContext, GCReason,
+    GetObjectRealmOrNull, GetRealmPrincipals, Handle, HandleId, HandleObject as RawHandleObject,
     HandleValue as RawHandleValue, IsWindowProxy, IsWindowSlow, JSClass, JSClassOps,
     JSContext as RawJSContext, JSErrNum, JSObject, JSPrincipals, JSTracer, JS_DefinePropertyById,
     JS_DeletePropertyById, JS_DropPrincipals, JS_GetOwnPropertyDescriptorById,
@@ -33,9 +32,9 @@ use mozjs::jsapi::{
     JS_SetReservedSlot, JS_TransplantObject, JS_WrapObject, MutableHandle, MutableHandleIdVector,
     MutableHandleValue as RawMutableHandleValue, ObjectOpResult, OnNewGlobalHookOption,
     PropertyDescriptor, PropertyKey, SetWindowProxy, SetWindowProxyClass, ToWindowIfWindowProxy,
-    ToWindowProxyIfWindowSlow, GCReason, JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL,
-    JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN,
-    JSITER_OWNONLY, JSITER_SYMBOLS, JSPROP_ENUMERATE,
+    ToWindowProxyIfWindowSlow, JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY,
+    JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN, JSITER_OWNONLY,
+    JSITER_SYMBOLS, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, PrivateValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -43,7 +42,7 @@ use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     AppendToIdVector, GetPropertyKeys, GetRealmObjectPrototype, JS_AtomizeAndPinString,
     JS_DefineProperty, JS_GetProperty, JS_GetPropertyById, JS_NewGlobalObject, JS_NewPlainObject,
-    RUST_INTERNED_STRING_TO_JSID, JS_GC,
+    JS_GC, RUST_INTERNED_STRING_TO_JSID,
 };
 use mozjs::rust::{
     evaluate_script, get_object_class, CompileOptionsWrapper, HandleObject, JSEngine,
@@ -61,7 +60,10 @@ static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {
 unsafe fn eval(cx: &mut JSContext, global: HandleObject, src: &str) -> JSVal {
     rooted!(&in(cx) let mut rval = UndefinedValue());
     let options = CompileOptionsWrapper::new(cx, c"qjs_proxies".to_owned(), 1);
-    assert!(evaluate_script(cx, global, src, rval.handle_mut(), options).is_ok(), "{src}");
+    assert!(
+        evaluate_script(cx, global, src, rval.handle_mut(), options).is_ok(),
+        "{src}"
+    );
     rval.get()
 }
 
@@ -72,18 +74,40 @@ unsafe fn eval_true(cx: &mut JSContext, global: HandleObject, src: &str) {
 
 unsafe fn set_global(cx: &mut JSContext, global: HandleObject, name: &CStr, v: JSVal) {
     rooted!(&in(cx) let v = v);
-    assert!(JS_DefineProperty(cx, global, name.as_ptr(), v.handle(), JSPROP_ENUMERATE as u32));
+    assert!(JS_DefineProperty(
+        cx,
+        global,
+        name.as_ptr(),
+        v.handle(),
+        JSPROP_ENUMERATE as u32
+    ));
 }
 
 unsafe fn get_int(cx: &mut JSContext, obj: *mut JSObject, name: &CStr) -> JSVal {
     rooted!(&in(cx) let obj = obj);
     rooted!(&in(cx) let mut v = UndefinedValue());
-    assert!(JS_GetProperty(cx, obj.handle(), name.as_ptr(), v.handle_mut()));
+    assert!(JS_GetProperty(
+        cx,
+        obj.handle(),
+        name.as_ptr(),
+        v.handle_mut()
+    ));
     v.get()
 }
 
-unsafe fn new_global(cx: &mut JSContext, clasp: &JSClass, options: &RealmOptions, principals: *mut JSPrincipals) -> *mut JSObject {
-    JS_NewGlobalObject(cx, clasp, principals, OnNewGlobalHookOption::FireOnNewGlobalHook, &**options)
+unsafe fn new_global(
+    cx: &mut JSContext,
+    clasp: &JSClass,
+    options: &RealmOptions,
+    principals: *mut JSPrincipals,
+) -> *mut JSObject {
+    JS_NewGlobalObject(
+        cx,
+        clasp,
+        principals,
+        OnNewGlobalHookOption::FireOnNewGlobalHook,
+        &**options,
+    )
 }
 
 unsafe fn string_id(cx: &mut JSContext, name: &str) -> PropertyKey {
@@ -99,7 +123,10 @@ unsafe fn id_name(cx: *mut RawJSContext, id: HandleId) -> Option<String> {
         return None;
     }
     let cx = JSContext::from_ptr(NonNull::new(cx).unwrap());
-    Some(jsstr_to_string(&cx, NonNull::new((*id).to_string()).unwrap()))
+    Some(jsstr_to_string(
+        &cx,
+        NonNull::new((*id).to_string()).unwrap(),
+    ))
 }
 
 // A DOM-style proxy: named properties in a Rust map (reserved slot 0), other properties in an
@@ -123,7 +150,11 @@ unsafe fn named(proxy: *mut JSObject) -> &'static Named {
 unsafe fn expando(proxy: *mut JSObject) -> *mut JSObject {
     let mut v = UndefinedValue();
     GetProxyPrivate(proxy, &mut v);
-    if v.is_object() { v.to_object() } else { ptr::null_mut() }
+    if v.is_object() {
+        v.to_object()
+    } else {
+        ptr::null_mut()
+    }
 }
 
 unsafe fn ensure_expando(cx: *mut RawJSContext, proxy: *mut JSObject) -> *mut JSObject {
@@ -146,7 +177,13 @@ unsafe extern "C" fn get_own_property_descriptor(
 ) -> bool {
     let exp = expando(*proxy);
     if !exp.is_null() {
-        if !JS_GetOwnPropertyDescriptorById(cx, Handle::from_marked_location(&exp), id, desc, is_none) {
+        if !JS_GetOwnPropertyDescriptorById(
+            cx,
+            Handle::from_marked_location(&exp),
+            id,
+            desc,
+            is_none,
+        ) {
             return false;
         }
         if !*is_none {
@@ -154,7 +191,8 @@ unsafe extern "C" fn get_own_property_descriptor(
         }
     }
     *is_none = true;
-    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied()) {
+    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied())
+    {
         let d = &mut *desc.ptr;
         *d = PropertyDescriptor::default();
         d.set_hasConfigurable_(true);
@@ -183,7 +221,9 @@ unsafe extern "C" fn define_property(
         return true;
     }
     if let Some(name) = name.filter(|name| name.starts_with('n')) {
-        named(*proxy).borrow_mut().insert(name, (*desc).value_.to_int32());
+        named(*proxy)
+            .borrow_mut()
+            .insert(name, (*desc).value_.to_int32());
         (*result).code_ = 0;
         return true;
     }
@@ -191,7 +231,11 @@ unsafe extern "C" fn define_property(
     JS_DefinePropertyById(cx, Handle::from_marked_location(&exp), id, desc, result)
 }
 
-unsafe extern "C" fn own_property_keys(cx: *mut RawJSContext, proxy: RawHandleObject, props: MutableHandleIdVector) -> bool {
+unsafe extern "C" fn own_property_keys(
+    cx: *mut RawJSContext,
+    proxy: RawHandleObject,
+    props: MutableHandleIdVector,
+) -> bool {
     let mut context = JSContext::from_ptr(NonNull::new(cx).unwrap());
     let names: Vec<String> = named(*proxy).borrow().keys().cloned().collect();
     for name in names {
@@ -203,10 +247,20 @@ unsafe extern "C" fn own_property_keys(cx: *mut RawJSContext, proxy: RawHandleOb
         return true;
     }
     let flags = JSITER_OWNONLY | JSITER_HIDDEN | JSITER_SYMBOLS;
-    GetPropertyKeys(&mut context, mozjs::rust::Handle::from_marked_location(&exp), flags, props)
+    GetPropertyKeys(
+        &mut context,
+        mozjs::rust::Handle::from_marked_location(&exp),
+        flags,
+        props,
+    )
 }
 
-unsafe extern "C" fn delete(cx: *mut RawJSContext, proxy: RawHandleObject, id: HandleId, result: *mut ObjectOpResult) -> bool {
+unsafe extern "C" fn delete(
+    cx: *mut RawJSContext,
+    proxy: RawHandleObject,
+    id: HandleId,
+    result: *mut ObjectOpResult,
+) -> bool {
     if let Some(name) = id_name(cx, id) {
         if named(*proxy).borrow_mut().remove(&name).is_some() {
             (*result).code_ = 0;
@@ -235,10 +289,17 @@ unsafe extern "C" fn get(
             return false;
         }
         if found {
-            return mozjs::jsapi::JS_ForwardGetPropertyTo(cx, Handle::from_marked_location(&exp), id, receiver, vp);
+            return mozjs::jsapi::JS_ForwardGetPropertyTo(
+                cx,
+                Handle::from_marked_location(&exp),
+                id,
+                receiver,
+                vp,
+            );
         }
     }
-    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied()) {
+    if let Some(value) = id_name(cx, id).and_then(|name| named(*proxy).borrow().get(&name).copied())
+    {
         *vp.ptr = Int32Value(value);
         return true;
     }
@@ -250,15 +311,29 @@ unsafe extern "C" fn get(
         *vp.ptr = UndefinedValue();
         return true;
     }
-    mozjs::jsapi::JS_ForwardGetPropertyTo(cx, Handle::from_marked_location(&proto), id, receiver, vp)
+    mozjs::jsapi::JS_ForwardGetPropertyTo(
+        cx,
+        Handle::from_marked_location(&proto),
+        id,
+        receiver,
+        vp,
+    )
 }
 
-unsafe extern "C" fn prevent_extensions(_: *mut RawJSContext, _: RawHandleObject, result: *mut ObjectOpResult) -> bool {
+unsafe extern "C" fn prevent_extensions(
+    _: *mut RawJSContext,
+    _: RawHandleObject,
+    result: *mut ObjectOpResult,
+) -> bool {
     (*result).code_ = JSErrNum::JSMSG_CANT_PREVENT_EXTENSIONS as usize;
     true
 }
 
-unsafe extern "C" fn is_extensible(_: *mut RawJSContext, _: RawHandleObject, extensible: *mut bool) -> bool {
+unsafe extern "C" fn is_extensible(
+    _: *mut RawJSContext,
+    _: RawHandleObject,
+    extensible: *mut bool,
+) -> bool {
     *extensible = true;
     true
 }
@@ -294,7 +369,8 @@ fn dom_traps() -> ProxyTraps {
 const fn proxy_class(slots: u32) -> JSClass {
     JSClass {
         name: c"TestProxy".as_ptr(),
-        flags: JSCLASS_IS_PROXY | ((slots & JSCLASS_RESERVED_SLOTS_MASK) << JSCLASS_RESERVED_SLOTS_SHIFT),
+        flags: JSCLASS_IS_PROXY
+            | ((slots & JSCLASS_RESERVED_SLOTS_MASK) << JSCLASS_RESERVED_SLOTS_SHIFT),
         cOps: ptr::null(),
         spec: ptr::null(),
         ext: ptr::null(),
@@ -304,13 +380,28 @@ const fn proxy_class(slots: u32) -> JSClass {
 
 static PROXY_CLASS: JSClass = proxy_class(3);
 
-unsafe fn new_dom_proxy(cx: &mut JSContext, handler: *const c_void, names: &[(&str, i32)]) -> *mut JSObject {
+unsafe fn new_dom_proxy(
+    cx: &mut JSContext,
+    handler: *const c_void,
+    names: &[(&str, i32)],
+) -> *mut JSObject {
     let proto = GetRealmObjectPrototype(cx);
     let undefined = UndefinedValue();
-    let proxy = NewProxyObject(cx.raw_cx(), handler, Handle::from_marked_location(&undefined), proto, &PROXY_CLASS, false);
+    let proxy = NewProxyObject(
+        cx.raw_cx(),
+        handler,
+        Handle::from_marked_location(&undefined),
+        proto,
+        &PROXY_CLASS,
+        false,
+    );
     assert!(!proxy.is_null());
     let map: Named = RefCell::new(names.iter().map(|(k, v)| (k.to_string(), *v)).collect());
-    SetProxyReservedSlot(proxy, 0, &PrivateValue(Box::into_raw(Box::new(map)) as *const c_void));
+    SetProxyReservedSlot(
+        proxy,
+        0,
+        &PrivateValue(Box::into_raw(Box::new(map)) as *const c_void),
+    );
     proxy
 }
 
@@ -332,35 +423,82 @@ fn dom_proxy_traps() {
         assert!(IsProxyHandlerFamily(o.get()));
         assert!(!IsWrapper(o.get()));
         assert_eq!(GetProxyHandler(o.get()), handler);
-        assert_eq!(GetProxyHandlerExtra(o.get()), &EXTRA as *const u8 as *const c_void);
+        assert_eq!(
+            GetProxyHandlerExtra(o.get()),
+            &EXTRA as *const u8 as *const c_void
+        );
         assert!(!GetProxyHandlerFamily().is_null());
         assert_ne!((*get_object_class(o.get())).flags & JSCLASS_IS_PROXY, 0);
 
         // Named getter, `in`, keys and the prototype.
-        eval_true(cx, global.handle(), "o.n1 === 1 && o.n2 === 2 && o.zz === undefined");
-        eval_true(cx, global.handle(), "'n1' in o && !('zz' in o) && 'toString' in o");
+        eval_true(
+            cx,
+            global.handle(),
+            "o.n1 === 1 && o.n2 === 2 && o.zz === undefined",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "'n1' in o && !('zz' in o) && 'toString' in o",
+        );
         eval_true(cx, global.handle(), "Object.keys(o).join() === 'n1,n2'");
-        eval_true(cx, global.handle(), "Object.getPrototypeOf(o) === Object.prototype && typeof o === 'object'");
-        eval_true(cx, global.handle(), "o.hasOwnProperty('n1') && !o.hasOwnProperty('toString')");
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.getPrototypeOf(o) === Object.prototype && typeof o === 'object'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "o.hasOwnProperty('n1') && !o.hasOwnProperty('toString')",
+        );
         eval_true(cx, global.handle(), "String(o) === '[object Object]'");
 
         // Sets: expandos and named setters through defineProperty, then delete.
-        eval_true(cx, global.handle(), "o.y = 5; o.y === 5 && o.hasOwnProperty('y')");
+        eval_true(
+            cx,
+            global.handle(),
+            "o.y = 5; o.y === 5 && o.hasOwnProperty('y')",
+        );
         eval_true(cx, global.handle(), "o.n3 = 7; o.n3 === 7");
         assert_eq!(named(o.get()).borrow().get("n3"), Some(&7));
         assert!(!expando(o.get()).is_null());
-        eval_true(cx, global.handle(), "Object.keys(o).join() === 'n1,n2,n3,y'");
-        eval_true(cx, global.handle(), "JSON.stringify(o) === '{\"n1\":1,\"n2\":2,\"n3\":7,\"y\":5}'");
-        eval_true(cx, global.handle(), "let keys = []; for (let k in o) keys.push(k); keys.join() === 'n1,n2,n3,y'");
-        eval_true(cx, global.handle(), "delete o.n1 && !('n1' in o) && o.n1 === undefined");
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.keys(o).join() === 'n1,n2,n3,y'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "JSON.stringify(o) === '{\"n1\":1,\"n2\":2,\"n3\":7,\"y\":5}'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "let keys = []; for (let k in o) keys.push(k); keys.join() === 'n1,n2,n3,y'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "delete o.n1 && !('n1' in o) && o.n1 === undefined",
+        );
         eval_true(cx, global.handle(), "delete o.y && !('y' in o)");
 
         // Rejected definitions: silent in sloppy mode, TypeError in strict mode.
         eval_true(cx, global.handle(), "o.frozen = 1; o.frozen === undefined");
         eval_true(cx, global.handle(), "(function() { 'use strict'; try { o.frozen = 1; } catch (e) { return e instanceof TypeError; } })()");
         eval_true(cx, global.handle(), "try { Object.defineProperty(o, 'frozen', { value: 1 }); false } catch (e) { e instanceof TypeError }");
-        eval_true(cx, global.handle(), "Reflect.defineProperty(o, 'frozen', { value: 1 }) === false");
-        eval_true(cx, global.handle(), "Object.isExtensible(o) && Reflect.preventExtensions(o) === false");
+        eval_true(
+            cx,
+            global.handle(),
+            "Reflect.defineProperty(o, 'frozen', { value: 1 }) === false",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.isExtensible(o) && Reflect.preventExtensions(o) === false",
+        );
 
         // The traps are reachable from Rust too.
         let id = string_id(cx, "n2");
@@ -378,7 +516,12 @@ fn dom_proxy_traps() {
         assert!(!is_none);
         assert_eq!(desc.get().value_.to_int32(), 2);
         rooted!(&in(cx) let mut v = UndefinedValue());
-        assert!(JS_GetPropertyById(cx, o.handle(), id.handle(), v.handle_mut()));
+        assert!(JS_GetPropertyById(
+            cx,
+            o.handle(),
+            id.handle(),
+            v.handle_mut()
+        ));
         assert_eq!(v.get().to_int32(), 2);
     });
 }
@@ -416,7 +559,11 @@ fn proxy_slots_gc_and_finalize() {
         assert_eq!(FINALIZED.with(|c| c.get()), 0);
 
         // A cycle through a reserved slot is collected, and finalized once.
-        eval(cx, global.handle(), "var cyc = {}; cyc.p = p; p = undefined; 0");
+        eval(
+            cx,
+            global.handle(),
+            "var cyc = {}; cyc.p = p; p = undefined; 0",
+        );
         let mut slot = UndefinedValue();
         GetProxyReservedSlot(proxy, 1, &mut slot);
         rooted!(&in(cx) let slot_obj = slot.to_object());
@@ -437,7 +584,10 @@ unsafe extern "C" fn window_finalize(_gcx: *mut GCContext, _proxy: *mut JSObject
 #[test]
 fn window_proxy_and_transplant() {
     with_runtime(|cx| unsafe {
-        let traps = ProxyTraps { finalize: Some(window_finalize), ..Default::default() };
+        let traps = ProxyTraps {
+            finalize: Some(window_finalize),
+            ..Default::default()
+        };
         let handler = CreateWrapperProxyHandler(&traps);
         SetWindowProxyClass(cx.raw_cx(), GetWindowProxyClass());
 
@@ -468,10 +618,22 @@ fn window_proxy_and_transplant() {
 
         // Top-level and sloppy-mode `this` is the WindowProxy; properties forward to the global.
         assert_eq!(eval(cx, g1.handle(), "var a = 1; this").to_object(), wp);
-        eval_true(cx, g1.handle(), "this === globalThis && this.a === 1 && (function() { return this; })() === this");
-        eval_true(cx, g1.handle(), "(0, eval)('this') === globalThis && Object.getPrototypeOf(this) === Object.prototype");
+        eval_true(
+            cx,
+            g1.handle(),
+            "this === globalThis && this.a === 1 && (function() { return this; })() === this",
+        );
+        eval_true(
+            cx,
+            g1.handle(),
+            "(0, eval)('this') === globalThis && Object.getPrototypeOf(this) === Object.prototype",
+        );
         eval_true(cx, g1.handle(), "'a' in this && Object.keys(this).includes('a') && Object.getOwnPropertyDescriptor(this, 'a').value === 1");
-        eval_true(cx, g1.handle(), "this.b = 2; b === 2 && delete this.b && typeof b === 'undefined'");
+        eval_true(
+            cx,
+            g1.handle(),
+            "this.b = 2; b === 2 && delete this.b && typeof b === 'undefined'",
+        );
         assert_eq!(get_int(cx, wp, c"a").to_int32(), 1);
 
         // Navigation: the same WindowProxy object now forwards to the second global.
@@ -482,7 +644,11 @@ fn window_proxy_and_transplant() {
             SetProxyReservedSlot(new_proxy, 0, &PrivateValue(2 as *const c_void));
             rooted!(&in(cx) let wp_root = wp);
             rooted!(&in(cx) let new_proxy = new_proxy);
-            let result = JS_TransplantObject(cx.raw_cx(), wp_root.handle().into(), new_proxy.handle().into());
+            let result = JS_TransplantObject(
+                cx.raw_cx(),
+                wp_root.handle().into(),
+                new_proxy.handle().into(),
+            );
             assert_eq!(result, wp);
             SetWindowProxy(cx.raw_cx(), g2.handle().into(), wp_root.handle().into());
             let mut slot = UndefinedValue();
@@ -519,7 +685,12 @@ unsafe extern "C" fn finalize_global(_gcx: *mut GCContext, _global: *mut JSObjec
     GLOBAL_FINALIZED.with(|c| c.set(c.get() + 1));
 }
 
-unsafe extern "C" fn resolve_global(cx: *mut RawJSContext, obj: RawHandleObject, id: HandleId, resolved: *mut bool) -> bool {
+unsafe extern "C" fn resolve_global(
+    cx: *mut RawJSContext,
+    obj: RawHandleObject,
+    id: HandleId,
+    resolved: *mut bool,
+) -> bool {
     *resolved = false;
     if id_name(cx, id).as_deref() != Some("lazyThing") {
         return true;
@@ -533,11 +704,20 @@ unsafe extern "C" fn resolve_global(cx: *mut RawJSContext, obj: RawHandleObject,
     true
 }
 
-unsafe extern "C" fn may_resolve_global(_names: *const mozjs::jsapi::JSAtomState, id: PropertyKey, _obj: *mut JSObject) -> bool {
+unsafe extern "C" fn may_resolve_global(
+    _names: *const mozjs::jsapi::JSAtomState,
+    id: PropertyKey,
+    _obj: *mut JSObject,
+) -> bool {
     id.is_string()
 }
 
-unsafe extern "C" fn enumerate_global(cx: *mut RawJSContext, _obj: RawHandleObject, props: MutableHandleIdVector, _enumerable_only: bool) -> bool {
+unsafe extern "C" fn enumerate_global(
+    cx: *mut RawJSContext,
+    _obj: RawHandleObject,
+    props: MutableHandleIdVector,
+    _enumerable_only: bool,
+) -> bool {
     let mut context = JSContext::from_ptr(NonNull::new(cx).unwrap());
     let id = string_id(&mut context, "lazyThing");
     AppendToIdVector(props, mozjs::rust::Handle::from_marked_location(&id))
@@ -558,8 +738,9 @@ static GLOBAL_CLASS_OPS: JSClassOps = JSClassOps {
 
 static GLOBAL_CLASS: JSClass = JSClass {
     name: c"TestGlobal".as_ptr(),
-    flags: JSCLASS_IS_GLOBAL |
-        (((JSCLASS_GLOBAL_SLOT_COUNT + 2) & JSCLASS_RESERVED_SLOTS_MASK) << JSCLASS_RESERVED_SLOTS_SHIFT),
+    flags: JSCLASS_IS_GLOBAL
+        | (((JSCLASS_GLOBAL_SLOT_COUNT + 2) & JSCLASS_RESERVED_SLOTS_MASK)
+            << JSCLASS_RESERVED_SLOTS_SHIFT),
     cOps: &GLOBAL_CLASS_OPS,
     spec: ptr::null(),
     ext: ptr::null(),
@@ -573,7 +754,10 @@ fn global_class_slots_trace_and_resolve() {
         let mut options = RealmOptions::default();
         options.creationOptions_.traceGlobal_ = Some(trace_global);
         rooted!(&in(cx) let global = new_global(cx, &GLOBAL_CLASS, &options, ptr::null_mut()));
-        assert_eq!(get_object_class(global.get()), &GLOBAL_CLASS as *const JSClass);
+        assert_eq!(
+            get_object_class(global.get()),
+            &GLOBAL_CLASS as *const JSClass
+        );
         let mut realm = AutoRealm::new_from_handle(cx, global.handle());
         let cx = &mut *realm;
 
@@ -584,7 +768,11 @@ fn global_class_slots_trace_and_resolve() {
             set_global(cx, obj.handle(), c"x", Int32Value(42));
             JS_SetReservedSlot(global.get(), slot, &ObjectValue(obj.get()));
         }
-        JS_SetReservedSlot(global.get(), JSCLASS_GLOBAL_SLOT_COUNT, &PrivateValue(7 as *const c_void));
+        JS_SetReservedSlot(
+            global.get(),
+            JSCLASS_GLOBAL_SLOT_COUNT,
+            &PrivateValue(7 as *const c_void),
+        );
         mozjs::quickjs::drain_autorelease_pool();
         JS_GC(cx, GCReason::API);
         assert!(GLOBAL_TRACED.with(|c| c.get()) > 0);
@@ -596,9 +784,21 @@ fn global_class_slots_trace_and_resolve() {
 
         // Lazy properties: global variable access, enumeration, and `this` without a WindowProxy.
         assert_eq!(eval(cx, global.handle(), "this").to_object(), global.get());
-        eval_true(cx, global.handle(), "lazyThing === 42 && this.lazyThing === 42 && 'lazyThing' in this");
-        eval_true(cx, global.handle(), "delete lazyThing && Object.getOwnPropertyNames(this).includes('lazyThing')");
-        eval_true(cx, global.handle(), "delete lazyThing && (function() { return lazyThing; })() === 42");
+        eval_true(
+            cx,
+            global.handle(),
+            "lazyThing === 42 && this.lazyThing === 42 && 'lazyThing' in this",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "delete lazyThing && Object.getOwnPropertyNames(this).includes('lazyThing')",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "delete lazyThing && (function() { return lazyThing; })() === 42",
+        );
         eval_true(cx, global.handle(), "typeof notLazy === 'undefined' && Object.keys(this).filter(k => k === 'lazyThing').length === 0");
         assert!(RESOLVED.with(|c| c.get()) >= 3);
         assert_eq!(GLOBAL_FINALIZED.with(|c| c.get()), 0);
@@ -614,11 +814,17 @@ thread_local! {
 
 unsafe extern "C" fn destroy_principals(principals: *mut JSPrincipals) {
     PRINCIPALS_DESTROYED.with(|c| c.set(c.get() + 1));
-    drop(Box::from_raw(GetRustJSPrincipalsPrivate(principals) as *mut u32));
+    drop(Box::from_raw(
+        GetRustJSPrincipalsPrivate(principals) as *mut u32
+    ));
     DestroyRustJSPrincipals(principals);
 }
 
-unsafe extern "C" fn count_compartment(_cx: *mut RawJSContext, data: *mut c_void, _comp: *mut Compartment) -> CompartmentIterResult {
+unsafe extern "C" fn count_compartment(
+    _cx: *mut RawJSContext,
+    data: *mut c_void,
+    _comp: *mut Compartment,
+) -> CompartmentIterResult {
     *(data as *mut usize) += 1;
     CompartmentIterResult::KeepGoing
 }
@@ -628,19 +834,30 @@ fn principals_and_compartments() {
     PRINCIPALS_DESTROYED.with(|c| c.set(0));
     with_runtime(|cx| unsafe {
         JS_InitDestroyPrincipalsCallback(cx.raw_cx(), Some(destroy_principals));
-        let callbacks = JSPrincipalsCallbacks { write: None, isSystemOrAddonPrincipal: None };
-        let principals = CreateRustJSPrincipals(&callbacks, Box::into_raw(Box::new(5u32)) as *mut c_void);
+        let callbacks = JSPrincipalsCallbacks {
+            write: None,
+            isSystemOrAddonPrincipal: None,
+        };
+        let principals =
+            CreateRustJSPrincipals(&callbacks, Box::into_raw(Box::new(5u32)) as *mut c_void);
         JS_HoldPrincipals(principals);
         assert_eq!(*(GetRustJSPrincipalsPrivate(principals) as *const u32), 5);
 
         rooted!(&in(cx) let g1 = new_global(cx, &SIMPLE_GLOBAL_CLASS, &RealmOptions::default(), principals));
         rooted!(&in(cx) let _g2 = new_global(cx, &SIMPLE_GLOBAL_CLASS, &RealmOptions::default(), ptr::null_mut()));
-        assert_eq!(GetRealmPrincipals(GetObjectRealmOrNull(g1.get())), principals);
+        assert_eq!(
+            GetRealmPrincipals(GetObjectRealmOrNull(g1.get())),
+            principals
+        );
         JS_DropPrincipals(cx.raw_cx(), principals);
         assert_eq!(PRINCIPALS_DESTROYED.with(|c| c.get()), 0);
 
         let mut count = 0usize;
-        JS_IterateCompartments(cx.raw_cx(), &mut count as *mut usize as *mut c_void, Some(count_compartment));
+        JS_IterateCompartments(
+            cx.raw_cx(),
+            &mut count as *mut usize as *mut c_void,
+            Some(count_compartment),
+        );
         assert_eq!(count, 2);
     });
     // The realm's reference is dropped with the runtime.

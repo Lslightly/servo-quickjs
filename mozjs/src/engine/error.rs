@@ -38,7 +38,10 @@ struct Frame {
 
 /// Calls `f` for the frames of the current stack, innermost first, until it returns true.
 unsafe fn visit_frames(cx: &Cx, mut f: impl FnMut(&q::JSStackFrameInfo) -> bool) {
-    unsafe extern "C" fn trampoline(opaque: *mut c_void, info: *const q::JSStackFrameInfo) -> c_int {
+    unsafe extern "C" fn trampoline(
+        opaque: *mut c_void,
+        info: *const q::JSStackFrameInfo,
+    ) -> c_int {
         let f = &mut *(opaque as *mut &mut dyn FnMut(&q::JSStackFrameInfo) -> bool);
         f(&*info) as c_int
     }
@@ -85,7 +88,9 @@ pub(crate) unsafe fn current_script_muted(cx: &Cx) -> bool {
 
 /// The realm of the innermost scripted frame, or null.
 pub(crate) unsafe fn innermost_script_realm(cx: &Cx) -> *mut q::JSContext {
-    scripted_frames(cx, 1).first().map_or(ptr::null_mut(), |f| f.realm)
+    scripted_frames(cx, 1)
+        .first()
+        .map_or(ptr::null_mut(), |f| f.realm)
 }
 
 thread_local! {
@@ -154,7 +159,13 @@ unsafe fn frame_name(cx: &Cx, frame: &Frame) -> Option<String> {
     value_to_string(cx, frame.name).filter(|name| !name.is_empty())
 }
 
-pub(crate) unsafe fn DescribeScriptedCaller(cx: *mut root::JSContext, buffer: *mut ::std::os::raw::c_char, buflen: usize, line: *mut u32, col: *mut u32) -> bool {
+pub(crate) unsafe fn DescribeScriptedCaller(
+    cx: *mut root::JSContext,
+    buffer: *mut ::std::os::raw::c_char,
+    buflen: usize,
+    line: *mut u32,
+    col: *mut u32,
+) -> bool {
     let cx = Cx::from_raw(cx);
     if buflen > 0 {
         *buffer = 0;
@@ -182,7 +193,11 @@ pub(crate) unsafe fn GetScriptedCallerGlobal(cx: *mut root::JSContext) -> *mut r
         return ptr::null_mut();
     };
     let realm = q::JS_GetContextOpaque(caller.realm) as *mut RealmData;
-    if realm.is_null() { ptr::null_mut() } else { (*realm).global }
+    if realm.is_null() {
+        ptr::null_mut()
+    } else {
+        (*realm).global
+    }
 }
 
 pub(crate) unsafe fn HideScriptedCaller(cx: *mut root::JSContext) {
@@ -197,18 +212,35 @@ pub(crate) unsafe fn HideScriptedCaller(cx: *mut root::JSContext) {
 
 pub(crate) unsafe fn UnhideScriptedCaller(cx: *mut root::JSContext) {
     let _ = cx;
-    HIDDEN_CALLERS.with(|h| h.borrow_mut().pop().expect("UnhideScriptedCaller without HideScriptedCaller"));
+    HIDDEN_CALLERS.with(|h| {
+        h.borrow_mut()
+            .pop()
+            .expect("UnhideScriptedCaller without HideScriptedCaller")
+    });
 }
 
-pub(crate) unsafe fn JS_GetScriptedCallerPrivate(cx: *mut root::JSContext, dest: root::JS::MutableHandleValue) {
+pub(crate) unsafe fn JS_GetScriptedCallerPrivate(
+    cx: *mut root::JSContext,
+    dest: root::JS::MutableHandleValue,
+) {
     let cx = Cx::from_raw(cx);
     *dest.ptr = match scripted_caller(cx) {
-        Some(caller) => super::module::script_or_module_private(cx, caller.realm, caller.module, caller.script_private),
+        Some(caller) => super::module::script_or_module_private(
+            cx,
+            caller.realm,
+            caller.module,
+            caller.script_private,
+        ),
         None => JSVal::from_qjs(q::JS_UNDEFINED),
     };
 }
 
-pub(crate) unsafe fn DumpJSStack(cx: *mut root::JSContext, showArgs: bool, showLocals: bool, showThisProps: bool) {
+pub(crate) unsafe fn DumpJSStack(
+    cx: *mut root::JSContext,
+    showArgs: bool,
+    showLocals: bool,
+    showThisProps: bool,
+) {
     let _ = (showArgs, showLocals, showThisProps);
     let cx = Cx::from_raw(cx);
     for (i, frame) in scripted_frames(cx, usize::MAX).iter().enumerate() {
@@ -229,7 +261,8 @@ const SAVED_FRAME_SLOTS: u32 = 5;
 
 static SAVED_FRAME_CLASS: root::JSClass = root::JSClass {
     name: c"SavedFrame".as_ptr(),
-    flags: (SAVED_FRAME_SLOTS & root::JSCLASS_RESERVED_SLOTS_MASK) << root::JSCLASS_RESERVED_SLOTS_SHIFT,
+    flags: (SAVED_FRAME_SLOTS & root::JSCLASS_RESERVED_SLOTS_MASK)
+        << root::JSCLASS_RESERVED_SLOTS_SHIFT,
     cOps: ptr::null(),
     spec: ptr::null(),
     ext: ptr::null(),
@@ -250,12 +283,21 @@ pub(crate) unsafe fn JS_StackCapture_MaxFrames(max: u32, capture: *mut root::JS:
     (*capture).0 = [CAPTURE_MAX, max as u64, 0, 0];
 }
 
-pub(crate) unsafe fn JS_StackCapture_FirstSubsumedFrame(cx: *mut root::JSContext, ignoreSelfHostedFrames: bool, capture: *mut root::JS::StackCapture) {
+pub(crate) unsafe fn JS_StackCapture_FirstSubsumedFrame(
+    cx: *mut root::JSContext,
+    ignoreSelfHostedFrames: bool,
+    capture: *mut root::JS::StackCapture,
+) {
     let _ = (cx, ignoreSelfHostedFrames);
     (*capture).0 = [CAPTURE_FIRST_SUBSUMED, 1, 0, 0];
 }
 
-pub(crate) unsafe fn CaptureCurrentStack(cx: *mut root::JSContext, stackp: root::JS::MutableHandleObject, capture: *mut root::JS::StackCapture, startAfter: root::JS::HandleObject) -> bool {
+pub(crate) unsafe fn CaptureCurrentStack(
+    cx: *mut root::JSContext,
+    stackp: root::JS::MutableHandleObject,
+    capture: *mut root::JS::StackCapture,
+    startAfter: root::JS::HandleObject,
+) -> bool {
     let _ = startAfter;
     let cx = Cx::from_raw(cx);
     let [kind, max, ..] = (*capture).0;
@@ -290,7 +332,11 @@ pub(crate) unsafe fn CaptureCurrentStack(cx: *mut root::JSContext, stackp: root:
         data.slots[SAVED_FRAME_PARENT] = parent;
         parent = obj;
     }
-    *stackp.ptr = if parent.tag() == q::JS_TAG_OBJECT { cx.adopt(parent).to_object() } else { ptr::null_mut() };
+    *stackp.ptr = if parent.tag() == q::JS_TAG_OBJECT {
+        cx.adopt(parent).to_object()
+    } else {
+        ptr::null_mut()
+    };
     true
 }
 
@@ -310,18 +356,34 @@ fn uint_slot(v: q::JSValue) -> u32 {
     }
 }
 
-pub(crate) unsafe fn GetSavedFrameSource(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, savedFrame: root::JS::Handle<*mut root::JSObject>, sourcep: root::JS::MutableHandle<*mut root::JSString>, selfHosted: root::JS::SavedFrameSelfHosted) -> root::JS::SavedFrameResult {
+pub(crate) unsafe fn GetSavedFrameSource(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    savedFrame: root::JS::Handle<*mut root::JSObject>,
+    sourcep: root::JS::MutableHandle<*mut root::JSString>,
+    selfHosted: root::JS::SavedFrameSelfHosted,
+) -> root::JS::SavedFrameResult {
     let _ = (principals, selfHosted);
     let cx = Cx::from_raw(cx);
     let Some(slots) = saved_frame(*savedFrame.ptr) else {
-        *sourcep.ptr = cx.adopt(q::JS_NewStringLen(cx.qctx(), c"".as_ptr(), 0)).to_string();
+        *sourcep.ptr = cx
+            .adopt(q::JS_NewStringLen(cx.qctx(), c"".as_ptr(), 0))
+            .to_string();
         return root::JS::SavedFrameResult::AccessDenied;
     };
-    *sourcep.ptr = cx.retain(JSVal::from_qjs(slots[SAVED_FRAME_SOURCE])).to_string();
+    *sourcep.ptr = cx
+        .retain(JSVal::from_qjs(slots[SAVED_FRAME_SOURCE]))
+        .to_string();
     root::JS::SavedFrameResult::Ok
 }
 
-pub(crate) unsafe fn GetSavedFrameLine(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, savedFrame: root::JS::Handle<*mut root::JSObject>, linep: *mut u32, selfHosted: root::JS::SavedFrameSelfHosted) -> root::JS::SavedFrameResult {
+pub(crate) unsafe fn GetSavedFrameLine(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    savedFrame: root::JS::Handle<*mut root::JSObject>,
+    linep: *mut u32,
+    selfHosted: root::JS::SavedFrameSelfHosted,
+) -> root::JS::SavedFrameResult {
     let _ = (cx, principals, selfHosted);
     let Some(slots) = saved_frame(*savedFrame.ptr) else {
         *linep = 0;
@@ -331,7 +393,13 @@ pub(crate) unsafe fn GetSavedFrameLine(cx: *mut root::JSContext, principals: *mu
     root::JS::SavedFrameResult::Ok
 }
 
-pub(crate) unsafe fn GetSavedFrameColumn(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, savedFrame: root::JS::Handle<*mut root::JSObject>, columnp: *mut root::JS::TaggedColumnNumberOneOrigin, selfHosted: root::JS::SavedFrameSelfHosted) -> root::JS::SavedFrameResult {
+pub(crate) unsafe fn GetSavedFrameColumn(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    savedFrame: root::JS::Handle<*mut root::JSObject>,
+    columnp: *mut root::JS::TaggedColumnNumberOneOrigin,
+    selfHosted: root::JS::SavedFrameSelfHosted,
+) -> root::JS::SavedFrameResult {
     let _ = (cx, principals, selfHosted);
     let Some(slots) = saved_frame(*savedFrame.ptr) else {
         (*columnp).value_ = 0;
@@ -341,7 +409,13 @@ pub(crate) unsafe fn GetSavedFrameColumn(cx: *mut root::JSContext, principals: *
     root::JS::SavedFrameResult::Ok
 }
 
-pub(crate) unsafe fn GetSavedFrameFunctionDisplayName(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, savedFrame: root::JS::Handle<*mut root::JSObject>, namep: root::JS::MutableHandle<*mut root::JSString>, selfHosted: root::JS::SavedFrameSelfHosted) -> root::JS::SavedFrameResult {
+pub(crate) unsafe fn GetSavedFrameFunctionDisplayName(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    savedFrame: root::JS::Handle<*mut root::JSObject>,
+    namep: root::JS::MutableHandle<*mut root::JSString>,
+    selfHosted: root::JS::SavedFrameSelfHosted,
+) -> root::JS::SavedFrameResult {
     let _ = (principals, selfHosted);
     let cx = Cx::from_raw(cx);
     *namep.ptr = ptr::null_mut();
@@ -355,7 +429,13 @@ pub(crate) unsafe fn GetSavedFrameFunctionDisplayName(cx: *mut root::JSContext, 
     root::JS::SavedFrameResult::Ok
 }
 
-pub(crate) unsafe fn GetSavedFrameParent(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, savedFrame: root::JS::Handle<*mut root::JSObject>, parentp: root::JS::MutableHandle<*mut root::JSObject>, selfHosted: root::JS::SavedFrameSelfHosted) -> root::JS::SavedFrameResult {
+pub(crate) unsafe fn GetSavedFrameParent(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    savedFrame: root::JS::Handle<*mut root::JSObject>,
+    parentp: root::JS::MutableHandle<*mut root::JSObject>,
+    selfHosted: root::JS::SavedFrameSelfHosted,
+) -> root::JS::SavedFrameResult {
     let _ = (principals, selfHosted);
     let cx = Cx::from_raw(cx);
     *parentp.ptr = ptr::null_mut();
@@ -369,7 +449,14 @@ pub(crate) unsafe fn GetSavedFrameParent(cx: *mut root::JSContext, principals: *
     root::JS::SavedFrameResult::Ok
 }
 
-pub(crate) unsafe fn BuildStackString(cx: *mut root::JSContext, principals: *mut root::JSPrincipals, stack: root::JS::HandleObject, stringp: root::JS::MutableHandleString, indent: usize, stackFormat: root::js::StackFormat) -> bool {
+pub(crate) unsafe fn BuildStackString(
+    cx: *mut root::JSContext,
+    principals: *mut root::JSPrincipals,
+    stack: root::JS::HandleObject,
+    stringp: root::JS::MutableHandleString,
+    indent: usize,
+    stackFormat: root::js::StackFormat,
+) -> bool {
     let _ = principals;
     let cx = Cx::from_raw(cx);
     let mut out = String::new();
@@ -379,15 +466,27 @@ pub(crate) unsafe fn BuildStackString(cx: *mut root::JSContext, principals: *mut
         let line = uint_slot(slots[SAVED_FRAME_LINE]);
         let column = uint_slot(slots[SAVED_FRAME_COLUMN]);
         let name = slots[SAVED_FRAME_NAME];
-        let name = if name.tag() == q::JS_TAG_STRING { value_to_string(cx, name) } else { None };
+        let name = if name.tag() == q::JS_TAG_STRING {
+            value_to_string(cx, name)
+        } else {
+            None
+        };
         out += &" ".repeat(indent);
         match (stackFormat, name) {
-            (root::js::StackFormat::V8, Some(name)) => out += &format!("    at {name} ({source}:{line}:{column})\n"),
-            (root::js::StackFormat::V8, None) => out += &format!("    at {source}:{line}:{column}\n"),
+            (root::js::StackFormat::V8, Some(name)) => {
+                out += &format!("    at {name} ({source}:{line}:{column})\n")
+            }
+            (root::js::StackFormat::V8, None) => {
+                out += &format!("    at {source}:{line}:{column}\n")
+            }
             (_, name) => out += &format!("{}@{source}:{line}:{column}\n", name.unwrap_or_default()),
         }
         let parent = slots[SAVED_FRAME_PARENT];
-        frame = if parent.tag() == q::JS_TAG_OBJECT { super::val_obj(parent) } else { ptr::null_mut() };
+        frame = if parent.tag() == q::JS_TAG_OBJECT {
+            super::val_obj(parent)
+        } else {
+            ptr::null_mut()
+        };
     }
     let s = q::JS_NewStringLen(cx.qctx(), out.as_ptr() as *const c_char, out.len());
     if s.tag() == q::JS_TAG_EXCEPTION {
@@ -407,7 +506,14 @@ unsafe fn pool_owned<T>(cx: &mut Cx, value: Box<T>) -> *mut T {
     }
     let raw = Box::into_raw(value);
     // An empty ArrayBuffer that owns `raw` and is never exposed to script.
-    let holder = q::JS_NewArrayBuffer(cx.qctx(), raw as *mut u8, 0, Some(free::<T>), raw as *mut c_void, 0);
+    let holder = q::JS_NewArrayBuffer(
+        cx.qctx(),
+        raw as *mut u8,
+        0,
+        Some(free::<T>),
+        raw as *mut c_void,
+        0,
+    );
     if holder.tag() == q::JS_TAG_EXCEPTION {
         // Out of memory: leak the value rather than fail.
         q::JS_FreeValueRT(cx.rt, q::JS_GetException(cx.qctx()));
@@ -459,7 +565,11 @@ unsafe fn own_data_property(cx: &Cx, obj: q::JSValue, name: &CStr) -> Option<q::
 
 unsafe fn own_string_property(cx: &Cx, obj: q::JSValue, name: &CStr) -> Option<String> {
     let v = own_data_property(cx, obj, name)?;
-    let s = if v.tag() == q::JS_TAG_STRING || v.tag() == q::JS_TAG_STRING_ROPE { value_to_string(cx, v) } else { None };
+    let s = if v.tag() == q::JS_TAG_STRING || v.tag() == q::JS_TAG_STRING_ROPE {
+        value_to_string(cx, v)
+    } else {
+        None
+    };
     q::JS_FreeValueRT(cx.rt, v);
     s
 }
@@ -514,7 +624,10 @@ unsafe fn lossy_cstring(s: String) -> CString {
     CString::new(s.replace('\0', "")).unwrap()
 }
 
-pub(crate) unsafe fn JS_ErrorFromException(cx: *mut root::JSContext, obj: root::JS::HandleObject) -> *mut root::JSErrorReport {
+pub(crate) unsafe fn JS_ErrorFromException(
+    cx: *mut root::JSContext,
+    obj: root::JS::HandleObject,
+) -> *mut root::JSErrorReport {
     let cx = Cx::from_raw(cx);
     let error = obj_val(*obj.ptr);
     if q::JS_IsError(cx.qctx(), error) == 0 {
@@ -536,7 +649,15 @@ pub(crate) unsafe fn JS_ErrorFromException(cx: *mut root::JSContext, obj: root::
     &mut (*owned).report
 }
 
-pub(crate) unsafe fn PendingExceptionStackInfo(cx: *mut root::JSContext, callback: crate::glue::StringCallback, message_target: *mut ::std::os::raw::c_void, filename_target: *mut ::std::os::raw::c_void, line: *mut u32, col: *mut u32, dest: root::JS::MutableHandleValue) -> bool {
+pub(crate) unsafe fn PendingExceptionStackInfo(
+    cx: *mut root::JSContext,
+    callback: crate::glue::StringCallback,
+    message_target: *mut ::std::os::raw::c_void,
+    filename_target: *mut ::std::os::raw::c_void,
+    line: *mut u32,
+    col: *mut u32,
+    dest: root::JS::MutableHandleValue,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let qctx = cx.qctx();
     if q::JS_HasException(qctx) == 0 {
@@ -544,7 +665,8 @@ pub(crate) unsafe fn PendingExceptionStackInfo(cx: *mut root::JSContext, callbac
     }
     let uncatchable = q::JS_HasUncatchableException(qctx) != 0;
     let mut thrown_at = (0, 0, 0);
-    let has_location = q::JS_GetExceptionLocation(qctx, &mut thrown_at.0, &mut thrown_at.1, &mut thrown_at.2) != 0;
+    let has_location =
+        q::JS_GetExceptionLocation(qctx, &mut thrown_at.0, &mut thrown_at.1, &mut thrown_at.2) != 0;
     let exception = cx.adopt(q::JS_GetException(qctx)).to_qjs();
     if uncatchable {
         return false;
@@ -573,9 +695,17 @@ pub(crate) unsafe fn PendingExceptionStackInfo(cx: *mut root::JSContext, callbac
         info
     };
     let callback = callback.expect("PendingExceptionStackInfo without a callback");
-    callback(info.message.as_ptr() as *const c_char, info.message.len(), message_target);
+    callback(
+        info.message.as_ptr() as *const c_char,
+        info.message.len(),
+        message_target,
+    );
     if !info.filename.is_empty() {
-        callback(info.filename.as_ptr() as *const c_char, info.filename.len(), filename_target);
+        callback(
+            info.filename.as_ptr() as *const c_char,
+            info.filename.len(),
+            filename_target,
+        );
     }
     *line = info.line;
     *col = info.column;
@@ -589,9 +719,18 @@ mod tests {
 
     #[test]
     fn backtrace_lines() {
-        assert_eq!(parse_backtrace_line("    at foo (http://a:80/x.js:3:21)"), Some(("http://a:80/x.js".into(), 3, 21)));
-        assert_eq!(parse_backtrace_line("    at <eval> (test.js:8:16)"), Some(("test.js".into(), 8, 16)));
-        assert_eq!(parse_backtrace_line("    at test.js:2:5"), Some(("test.js".into(), 2, 5)));
+        assert_eq!(
+            parse_backtrace_line("    at foo (http://a:80/x.js:3:21)"),
+            Some(("http://a:80/x.js".into(), 3, 21))
+        );
+        assert_eq!(
+            parse_backtrace_line("    at <eval> (test.js:8:16)"),
+            Some(("test.js".into(), 8, 16))
+        );
+        assert_eq!(
+            parse_backtrace_line("    at test.js:2:5"),
+            Some(("test.js".into(), 2, 5))
+        );
         assert_eq!(parse_backtrace_line("    at parse (native)"), None);
     }
 }

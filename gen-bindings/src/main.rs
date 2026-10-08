@@ -24,6 +24,9 @@ fn main() {
         .expect("write failed");
     let wrappers = out.join("static_wrappers.c");
     let c = std::fs::read_to_string(&wrappers).unwrap();
-    std::fs::write(&wrappers, c.replace("\"servo-quickjs/quickjs/quickjs.h\"", "\"quickjs.h\""))
-        .unwrap();
+    std::fs::write(
+        &wrappers,
+        c.replace("\"servo-quickjs/quickjs/quickjs.h\"", "\"quickjs.h\""),
+    )
+    .unwrap();
 }

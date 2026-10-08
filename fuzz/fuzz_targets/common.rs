@@ -30,8 +30,8 @@ use mozjs::qjs;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
-    JS_ClearPendingException, JS_GC, JS_NewGlobalObject, JS_ReadStructuredClone,
-    JS_WriteStructuredClone,
+    JS_ClearPendingException, JS_NewGlobalObject, JS_ReadStructuredClone, JS_WriteStructuredClone,
+    JS_GC,
 };
 use mozjs::rust::{
     get_object_class, HandleObject, JSAutoStructuredCloneBufferWrapper, JSEngine, JSEngineHandle,
@@ -78,7 +78,10 @@ pub fn with_realm(f: impl FnOnce(&mut JSContext, HandleObject)) {
             unsafe {
                 let rt = mozjs::jsapi::JS_GetRuntime(cx.raw_cx()) as *mut qjs::JSRuntime;
                 qjs::JS_SetMemoryLimit(rt, 256 << 20);
-                assert!(mozjs::jsapi::JS_AddInterruptCallback(cx.raw_cx(), Some(interrupt)));
+                assert!(mozjs::jsapi::JS_AddInterruptCallback(
+                    cx.raw_cx(),
+                    Some(interrupt)
+                ));
             }
             let thread_safe = runtime.thread_safe_js_context();
             static WATCHDOG: Once = Once::new();
@@ -132,8 +135,12 @@ unsafe extern "C" {
 /// growth across inputs that leave nothing behind is a leak.
 fn print_memory_usage(rt: *mut qjs::JSRuntime) {
     static INPUTS: AtomicU64 = AtomicU64::new(0);
-    static EVERY: LazyLock<u64> =
-        LazyLock::new(|| std::env::var("FUZZ_MEMORY_STATS").ok().and_then(|v| v.parse().ok()).unwrap_or(0));
+    static EVERY: LazyLock<u64> = LazyLock::new(|| {
+        std::env::var("FUZZ_MEMORY_STATS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0)
+    });
     let inputs = INPUTS.fetch_add(1, Ordering::Relaxed) + 1;
     if *EVERY == 0 || inputs % *EVERY != 0 {
         return;
@@ -194,8 +201,14 @@ unsafe extern "C" fn write_host(
     }
     let mut v = UndefinedValue();
     JS_GetReservedSlot(*obj.ptr, 0, &mut v);
-    let s = if v.is_string() { v.to_string() } else { JS_NewStringCopyZ(cx, c"host".as_ptr()) };
-    !s.is_null() && JS_WriteUint32Pair(w, HOST_TAG, 7) && JS_WriteString(w, Handle::from_marked_location(&s))
+    let s = if v.is_string() {
+        v.to_string()
+    } else {
+        JS_NewStringCopyZ(cx, c"host".as_ptr())
+    };
+    !s.is_null()
+        && JS_WriteUint32Pair(w, HOST_TAG, 7)
+        && JS_WriteString(w, Handle::from_marked_location(&s))
 }
 
 unsafe extern "C" fn read_host(
@@ -243,7 +256,16 @@ pub fn write(cx: &mut JSContext, v: JSVal, transfer: JSVal) -> Option<Vec<u8>> {
     unsafe {
         let buf = JSAutoStructuredCloneBufferWrapper::new(SCOPE, &CALLBACKS);
         let data = &mut (*buf.as_raw_ptr()).data_;
-        if !JS_WriteStructuredClone(cx, v.handle(), data, SCOPE, &POLICY, &CALLBACKS, ptr::null_mut(), transfer.handle()) {
+        if !JS_WriteStructuredClone(
+            cx,
+            v.handle(),
+            data,
+            SCOPE,
+            &POLICY,
+            &CALLBACKS,
+            ptr::null_mut(),
+            transfer.handle(),
+        ) {
             return None;
         }
         let len = mozjs::glue::GetLengthOfJSStructuredCloneData(data);
@@ -263,13 +285,26 @@ pub fn read(cx: &mut JSContext, bytes: &[u8]) -> Option<JSVal> {
             return None;
         }
         rooted!(&in(cx) let mut rval = UndefinedValue());
-        let ok = JS_ReadStructuredClone(cx, data, JS_STRUCTURED_CLONE_VERSION, SCOPE, rval.handle_mut(), &POLICY, &CALLBACKS, ptr::null_mut());
+        let ok = JS_ReadStructuredClone(
+            cx,
+            data,
+            JS_STRUCTURED_CLONE_VERSION,
+            SCOPE,
+            rval.handle_mut(),
+            &POLICY,
+            &CALLBACKS,
+            ptr::null_mut(),
+        );
         ok.then(|| rval.get())
     }
 }
 
 pub fn object_value(obj: *mut JSObject) -> JSVal {
-    if obj.is_null() { UndefinedValue() } else { ObjectValue(obj) }
+    if obj.is_null() {
+        UndefinedValue()
+    } else {
+        ObjectValue(obj)
+    }
 }
 
 pub fn c(name: &'static CStr) -> *const std::ffi::c_char {

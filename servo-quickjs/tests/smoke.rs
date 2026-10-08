@@ -1,4 +1,4 @@
-use std::ffi::{CStr, CString, c_char, c_int, c_void};
+use std::ffi::{c_char, c_int, c_void, CStr, CString};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use servo_quickjs::*;
@@ -10,7 +10,15 @@ unsafe fn eval(ctx: *mut JSContext, src: &str) -> JSValue {
     let src = CString::new(src).unwrap();
     let name = c"<smoke>";
     let flags = JS_EVAL_TYPE_GLOBAL as c_int;
-    unsafe { JS_Eval(ctx, src.as_ptr(), src.as_bytes().len(), name.as_ptr(), flags) }
+    unsafe {
+        JS_Eval(
+            ctx,
+            src.as_ptr(),
+            src.as_bytes().len(),
+            name.as_ptr(),
+            flags,
+        )
+    }
 }
 
 unsafe extern "C" fn finalizer(_rt: *mut JSRuntime, val: JSValue) {
@@ -76,7 +84,10 @@ fn eval_class_exotic_gc() {
         assert!(EXOTIC_GETS.load(Ordering::SeqCst) >= 1);
 
         // A cycle through a plain object; only the cycle collector can free the node.
-        let v = eval(ctx, "let o = {}; o.n = node; node.o = o; node = undefined; o = undefined; 0");
+        let v = eval(
+            ctx,
+            "let o = {}; o.n = node; node.o = o; node = undefined; o = undefined; 0",
+        );
         JS_FreeValue(ctx, v);
         JS_FreeValue(ctx, global);
         JS_RunGC(rt);
