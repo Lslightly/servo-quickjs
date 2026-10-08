@@ -52227,6 +52227,10 @@ static BOOL js_weakref_is_live(JSValueConst val)
     if (JS_IsUndefined(val))
         return TRUE;
     p = JS_VALUE_GET_PTR(val);
+    /* Servo: a freed object is dead even if references to it are left: when a cycle is
+       freed, Rust holders skip releasing objects that were finalized before them */
+    if (JS_VALUE_GET_TAG(val) == JS_TAG_OBJECT && ((JSObject *)p)->free_mark)
+        return FALSE;
     return (js_rc(p)->ref_count != 0);
 }
 
@@ -52240,7 +52244,8 @@ static void js_weakref_free(JSRuntime *rt, JSValue val)
         /* 'mark' is tested to avoid freeing the object structure when
            it is about to be freed in a cycle or in
            free_zero_refcount() */
-        if (p->weakref_count == 0 && js_rc(p)->ref_count == 0 &&
+        if (p->weakref_count == 0 &&
+            (js_rc(p)->ref_count == 0 || p->free_mark) && /* Servo: see js_weakref_is_live() */
             js_rc(p)->mark == 0) {
             js_free_rt(rt, p);
         }
