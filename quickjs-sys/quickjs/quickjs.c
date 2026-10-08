@@ -394,6 +394,10 @@ struct JSRuntime {
     JSDynamicImportHook *dynamic_import_hook;
     void *dynamic_import_opaque;
     JSScriptPrivateFinalizer *script_private_finalizer;
+    JSGCRootsHook *gc_roots_hook; /* Servo (debugging) */
+    void *gc_roots_opaque;
+    JSGCChildVisitor *gc_child_visitor;
+    void *gc_child_opaque;
     /* timestamp for internal use in module evaluation */
     int64_t module_async_evaluation_next_timestamp;
 
@@ -6949,6 +6953,17 @@ static void JS_RunGCInternal(JSRuntime *rt, BOOL remove_weak_objects)
     /* decrement the reference of the children of each object. mark =
        1 after this pass. */
     gc_decref(rt);
+
+    /* Servo (debugging): what is left with a non zero count is referenced from outside */
+    if (rt->gc_roots_hook) {
+        struct list_head *el;
+        list_for_each(el, &rt->gc_obj_list) {
+            JSGCObjectHeader *gp = list_entry(el, JSGCObjectHeader, link);
+            rt->gc_roots_hook(rt, js_rc(gp)->gc_obj_type, gp, js_rc(gp)->ref_count,
+                              rt->gc_roots_opaque);
+        }
+        rt->gc_roots_hook(rt, -1, NULL, 0, rt->gc_roots_opaque);
+    }
 
     /* keep the GC objects with a non zero refcount and their childs */
     gc_scan(rt);
@@ -62444,6 +62459,57 @@ static int js_servo_dynamic_import(JSContext *ctx, JSValueConst specifier,
 
     return ctx->rt->dynamic_import_hook(ctx, m, script_private, specifier, attributes,
                                         promise, ctx->rt->dynamic_import_opaque);
+}
+
+/* Servo (debugging): live objects per class */
+
+void JS_SetGCRootsHook(JSRuntime *rt, JSGCRootsHook *hook, void *opaque)
+{
+    rt->gc_roots_hook = hook;
+    rt->gc_roots_opaque = opaque;
+}
+
+static void js_visit_gc_child(JSRuntime *rt, JSGCObjectHeader *gp)
+{
+    rt->gc_child_visitor(rt, js_rc(gp)->gc_obj_type, gp, rt->gc_child_opaque);
+}
+
+void JS_VisitGCChildren(JSRuntime *rt, void *ptr, JSGCChildVisitor *visit, void *opaque)
+{
+    rt->gc_child_visitor = visit;
+    rt->gc_child_opaque = opaque;
+    mark_children(rt, ptr, js_visit_gc_child);
+    rt->gc_child_visitor = NULL;
+}
+
+void *JS_GetObjectShapeProto(void *obj)
+{
+    return ((JSObject *)obj)->shape->proto;
+}
+
+uint32_t JS_CountObjectsByClass(JSRuntime *rt, uint32_t *counts, uint32_t len)
+{
+    struct list_head *el;
+
+    memset(counts, 0, sizeof(counts[0]) * len);
+    list_for_each(el, &rt->gc_obj_list) {
+        JSGCObjectHeader *gp = list_entry(el, JSGCObjectHeader, link);
+        if (js_rc(gp)->gc_obj_type == JS_GC_OBJ_TYPE_JS_OBJECT) {
+            JSObject *p = (JSObject *)gp;
+            if (p->class_id < len)
+                counts[p->class_id]++;
+        }
+    }
+    return rt->class_count;
+}
+
+const char *JS_GetClassNameRT(JSRuntime *rt, JSClassID class_id, char *buf, int buf_size)
+{
+    if (class_id >= rt->class_count || !JS_IsRegisteredClass(rt, class_id)) {
+        snprintf(buf, buf_size, "#%u", class_id);
+        return buf;
+    }
+    return JS_AtomGetStrRT(rt, buf, buf_size, rt->class_array[class_id].class_name);
 }
 
 /* Servo: [[ScriptOrModule]] records */

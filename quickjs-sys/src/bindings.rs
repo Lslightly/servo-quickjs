@@ -1818,6 +1818,52 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn JS_GetScriptFileName(ctx: *mut JSContext, script: JSValue) -> JSAtom;
 }
+unsafe extern "C" {
+    pub fn JS_CountObjectsByClass(rt: *mut JSRuntime, counts: *mut u32, len: u32) -> u32;
+}
+pub type JSGCRootsHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        rt: *mut JSRuntime,
+        gc_obj_type: ::std::os::raw::c_int,
+        ptr: *mut ::std::os::raw::c_void,
+        ref_count: ::std::os::raw::c_int,
+        opaque: *mut ::std::os::raw::c_void,
+    ),
+>;
+unsafe extern "C" {
+    pub fn JS_SetGCRootsHook(
+        rt: *mut JSRuntime,
+        hook: JSGCRootsHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+pub type JSGCChildVisitor = ::std::option::Option<
+    unsafe extern "C" fn(
+        rt: *mut JSRuntime,
+        gc_obj_type: ::std::os::raw::c_int,
+        ptr: *mut ::std::os::raw::c_void,
+        opaque: *mut ::std::os::raw::c_void,
+    ),
+>;
+unsafe extern "C" {
+    pub fn JS_VisitGCChildren(
+        rt: *mut JSRuntime,
+        ptr: *mut ::std::os::raw::c_void,
+        visit: JSGCChildVisitor,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+unsafe extern "C" {
+    pub fn JS_GetObjectShapeProto(obj: *mut ::std::os::raw::c_void) -> *mut ::std::os::raw::c_void;
+}
+unsafe extern "C" {
+    pub fn JS_GetClassNameRT(
+        rt: *mut JSRuntime,
+        class_id: JSClassID,
+        buf: *mut ::std::os::raw::c_char,
+        buf_size: ::std::os::raw::c_int,
+    ) -> *const ::std::os::raw::c_char;
+}
 pub type JSScriptPrivateFinalizer =
     ::std::option::Option<unsafe extern "C" fn(rt: *mut JSRuntime, val: JSValue)>;
 unsafe extern "C" {

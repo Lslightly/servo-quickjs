@@ -1122,6 +1122,23 @@ JSModuleDef *JS_FindLoadedModule(JSContext *ctx, JSAtom name);
 /* Servo: the file name of a compiled script (JS_TAG_FUNCTION_BYTECODE), or
    JS_ATOM_NULL */
 JSAtom JS_GetScriptFileName(JSContext *ctx, JSValueConst script);
+/* Servo (debugging): the number of live objects of each class id below 'len' (other
+   counts are not computed), and the runtime's number of class ids. */
+uint32_t JS_CountObjectsByClass(JSRuntime *rt, uint32_t *counts, uint32_t len);
+/* Servo (debugging): called during each GC, before anything is freed, for every GC thing
+   that is referenced from outside the GC heap ('ref_count' external references): the roots
+   of the collection. 'gc_obj_type' is 0 for a JSObject ('ptr'), 5 for a JSContext. A last
+   call with 'gc_obj_type' -1 ends the list. */
+typedef void JSGCRootsHook(JSRuntime *rt, int gc_obj_type, void *ptr, int ref_count, void *opaque);
+void JS_SetGCRootsHook(JSRuntime *rt, JSGCRootsHook *hook, void *opaque);
+/* Servo (debugging): calls 'visit' for every GC thing that the GC thing 'ptr' references.
+   Only valid in a JSGCRootsHook. */
+typedef void JSGCChildVisitor(JSRuntime *rt, int gc_obj_type, void *ptr, void *opaque);
+void JS_VisitGCChildren(JSRuntime *rt, void *ptr, JSGCChildVisitor *visit, void *opaque);
+/* Servo (debugging): the prototype in an object's shape, without a reference, or NULL. */
+void *JS_GetObjectShapeProto(void *obj);
+/* Servo (debugging): a class's name, formatted into 'buf' if needed. */
+const char *JS_GetClassNameRT(JSRuntime *rt, JSClassID class_id, char *buf, int buf_size);
 /* Servo: the host-defined value of a compiled script (JS_TAG_FUNCTION_BYTECODE),
    shared with the eval and Function code it creates. The setter takes ownership
    of 'val' and returns < 0 for modules and non-scripts. The finalizer is called
