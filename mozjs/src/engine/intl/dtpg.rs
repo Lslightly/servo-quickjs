@@ -2,6 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// Ported from ICU, under the Unicode License v3 (LICENSE-UNICODE). ICU's notice:
+// © 2016 and later: Unicode, Inc. and others.
+// License & terms of use: http://www.unicode.org/copyright.html
+// Copyright (C) 2007-2016, International Business Machines Corporation and
+// others. All Rights Reserved.
+
 //! A port of ICU 74's `DateTimePatternGenerator` (`i18n/dtptngen.cpp`, the version the OS's ICU
 //! runs) over the CLDR data of `patterns.rs`: the NDK does not export `udatpg_*`.
 //!

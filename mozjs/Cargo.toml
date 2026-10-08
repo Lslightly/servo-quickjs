@@ -3,7 +3,7 @@ name = "mozjs"
 # Must match the `mozjs` version Servo pins, so `[patch]` can replace it.
 version = "0.23.1"
 edition = "2021"
-license = "MPL-2.0"
+license = "MPL-2.0 AND Unicode-3.0"
 description = "The mozjs (SpiderMonkey) API implemented on QuickJS, for Servo"
 repository = "https://github.com/openharmony-rs/servo-quickjs"
 publish = false
