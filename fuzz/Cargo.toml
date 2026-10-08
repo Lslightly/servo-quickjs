@@ -1,0 +1,38 @@
+[package]
+name = "servo-quickjs-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+license = "MPL-2.0"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+mozjs = { path = "../mozjs" }
+
+# Not part of the main workspace: cargo-fuzz builds it with nightly and sanitizer flags.
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "clone_read"
+path = "fuzz_targets/clone_read.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "eval"
+path = "fuzz_targets/eval.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "strings"
+path = "fuzz_targets/strings.rs"
+test = false
+doc = false
+bench = false

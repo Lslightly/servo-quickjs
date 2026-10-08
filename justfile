@@ -1,5 +1,5 @@
 servo := "../servo"
-target := env_var_or_default("CARGO_TARGET_DIR", "target")
+target := env_var_or_default("QJS_TARGET_DIR", "target")
 servo_target := "../servo/target"
 patch := 'patch.crates-io.mozjs.path="' + justfile_directory() + '/mozjs"'
 
@@ -7,8 +7,25 @@ patch := 'patch.crates-io.mozjs.path="' + justfile_directory() + '/mozjs"'
 gen-bindings:
     LIBCLANG_PATH=/usr/lib/llvm-18/lib CARGO_TARGET_DIR={{target}} cargo run -p gen-bindings
 
+# The mozjs tests that cannot pass on QuickJS: SpiderMonkey's stack positions, and root tracers (no-ops by design).
+by_design := "--skip capture_stack --skip virtual_trace_called --skip custom_auto_rooter_macro"
+clang := env_var_or_default("CLANG", "clang-20")
+clangxx := replace(clang, "clang", "clang++")
+
 test *args:
-    CARGO_TARGET_DIR={{target}} cargo test -p mozjs {{args}}
+    CARGO_TARGET_DIR={{target}} cargo test -p mozjs {{args}} -- {{by_design}}
+
+# Run the tests with the tracing verifier.
+test-verify *args:
+    QJS_VERIFY_TRACING=1 CARGO_TARGET_DIR={{target}} cargo test -p mozjs {{args}} -- {{by_design}}
+
+# Run the tests under ASan and LSan, QuickJS's C code included; `tools/lsan.supp` lists the leaks that are by design.
+test-asan *args:
+    CC={{clang}} CFLAGS=-fsanitize=address RUSTFLAGS="-Zsanitizer=address -C force-frame-pointers=yes" LSAN_OPTIONS=suppressions={{justfile_directory()}}/tools/lsan.supp CARGO_TARGET_DIR={{target}}-asan cargo +nightly test -Zbuild-std --target x86_64-unknown-linux-gnu -p mozjs {{args}} -- {{by_design}}
+
+# Fail if the QuickJS bindings are out of date.
+check-bindings: gen-bindings
+    git diff --exit-code quickjs-sys/src/bindings.rs
 
 # Build Servo's servoshell (in the quickjs-spike worktree) against the shim.
 servo cmd="build":
@@ -21,3 +38,13 @@ run page *args:
 # Run WPT tests (e.g. `dom/nodes`) with the shim-backed servoshell and the tracing verifier.
 wpt log *tests:
     cd {{servo}} && QJS_VERIFY_TRACING=1 PATH=/usr/bin:$PATH ./mach test-wpt --bin {{servo_target}}/debug/servoshell --processes 2 --log-raw {{log}} {{tests}}
+
+fuzz_target := env_var_or_default("FUZZ_TARGET_DIR", "target/fuzz")
+
+# Fuzz a target (clone_read, eval, strings) under ASan, QuickJS's C code included; extra args go to libFuzzer.
+fuzz target *args:
+    CC={{clang}} CXX={{clangxx}} CFLAGS="-fsanitize=address,fuzzer-no-link" LIBCLANG_PATH=/usr/lib/llvm-18/lib CARGO_TARGET_DIR={{fuzz_target}} cargo +nightly fuzz run {{target}} fuzz/corpus/{{target}} -- {{args}}
+
+# Run each fuzz target for `seconds` from its corpus.
+fuzz-smoke seconds="60":
+    for t in clone_read eval strings; do just fuzz $t -max_total_time={{seconds}} -timeout=10 -rss_limit_mb=4096 || exit 1; done

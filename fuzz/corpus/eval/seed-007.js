@@ -1,0 +1,1 @@
+var p = new Proxy({}, {get(t, k) { return k === "then" ? undefined : gc() }}); Promise.resolve(p); for (var k in document) {}

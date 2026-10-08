@@ -1,0 +1,1 @@
+async function a() { for (let i = 0; i < 3; i++) { await null; gc(); } return 1 } a().then(v => { throw v }).catch(() => gc());

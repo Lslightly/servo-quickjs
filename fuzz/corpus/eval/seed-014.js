@@ -1,0 +1,1 @@
+var s = Symbol("s"); var obj = {[s]: 1, [Symbol.toPrimitive]() { return 42 }}; obj + 1; Reflect.ownKeys(obj).length;

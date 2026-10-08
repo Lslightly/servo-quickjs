@@ -1,0 +1,1 @@
+function* gen() { yield* [1, 2, 3]; } [...gen()].map(x => x * x); Array.from({length: 5}, (_, i) => i).sort((a, b) => b - a);

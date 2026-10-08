@@ -1,0 +1,1 @@
+eval("var z = 1; (0, eval)('z + 1')"); new Function("a", "b", "return a + b")(1, 2); try { undefinedThing } catch (e) { e.stack }

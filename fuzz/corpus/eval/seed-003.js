@@ -1,0 +1,1 @@
+var ab = new ArrayBuffer(16, {maxByteLength: 64}); var v = new Uint16Array(ab); var dv = new DataView(ab, 2); var c = clone({v, dv}, [ab]); c.v.buffer.resize(32); c.v.length;

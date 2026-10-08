@@ -1,0 +1,1 @@
+var wr = new WeakRef({}); var fr = new FinalizationRegistry(x => x); fr.register({}, 1); gc(); wr.deref();

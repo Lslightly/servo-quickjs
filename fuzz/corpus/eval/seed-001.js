@@ -1,0 +1,1 @@
+document.n1 + document.n2; document.x = {a: 1}; delete document.n1; Object.keys(document).join(); document.frozen = 1; Object.getOwnPropertyDescriptor(document, "n2");

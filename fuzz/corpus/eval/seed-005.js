@@ -1,0 +1,1 @@
+var g = newGlobal(); var f = g.Function("x", "return x * 2"); f(21); g.eval("var y = {z: 1}; y"); new g.Promise((r, j) => j(new g.Error("e"))).catch(e => e instanceof g.Error);

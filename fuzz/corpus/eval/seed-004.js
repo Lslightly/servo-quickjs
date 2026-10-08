@@ -1,0 +1,1 @@
+var sab = new SharedArrayBuffer(8); Atomics.add(new Int32Array(sab), 0, 5); clone(sab);

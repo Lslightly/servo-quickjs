@@ -1,0 +1,1 @@
+var h = host("text"); clone({a: [1, 2.5, "s", null, undefined, true], m: new Map([[1, {}], ["k", [h]]]), s: new Set([1, "x"]), d: new Date(0), r: /a+b/gi, e: new RangeError("x"), b: 10n ** 30n, h});

@@ -1,0 +1,12 @@
+# LeakSanitizer suppressions for `just test-asan`: leaks that are by design.
+
+# Proxy handlers and external string callbacks live as long as the process, as with SpiderMonkey.
+leak:mozjs::engine::proxy::CreateProxyHandler
+leak:mozjs::engine::proxy::CreateWrapperProxyHandler
+leak:mozjs::engine::string::CreateJSExternalStringCallbacks
+
+# The test leaks its JSJitInfo.
+leak:qjs_objects::jit_info
+
+# The test drops a runtime that has a child, which leaks the runtime.
+leak:runtime_no_outlive

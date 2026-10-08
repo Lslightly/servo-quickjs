@@ -1,0 +1,1 @@
+var t = new Uint8Array([1, 2, 3]); var t2 = t.subarray(1); t.buffer.transfer(); try { t2[0] } catch (e) {} clone(t);

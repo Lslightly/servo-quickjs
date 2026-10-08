@@ -1,0 +1,1 @@
+class A { #x = 1; static s = 2; get x() { return this.#x } } class B extends A { constructor() { super(); this.y = 3 } } new B().x;

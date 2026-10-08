@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  QJS_TARGET_DIR: ${{ github.workspace }}/target
+  FUZZ_TARGET_DIR: ${{ github.workspace }}/target/fuzz
+  CLANG: clang-18
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+      - name: Bindings match quickjs.h
+        run: just check-bindings
+      - name: Tests
+        run: just test
+      - name: Tests with the tracing verifier
+        run: just test-verify
+
+  asan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install nightly --profile minimal --component rust-src
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+      - name: Tests under ASan and LSan
+        run: just test-asan
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install nightly --profile minimal
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just,cargo-fuzz
+      - name: Fuzz each target for a minute
+        run: just fuzz-smoke 60

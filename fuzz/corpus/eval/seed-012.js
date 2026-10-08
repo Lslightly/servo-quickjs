@@ -1,0 +1,1 @@
+var o = {}; for (var i = 0; i < 1000; i++) { o["p" + i] = host(i); } gc(); Object.freeze(o); clone(Object.values(o).slice(0, 10));
