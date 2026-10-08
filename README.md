@@ -1,5 +1,11 @@
 # servo-quickjs
 
+This is an experimental, AI agent-driven experiment of using quickjs instead of spidermonkey in servo.
+The main goals are to reduce the binary size and memory usage of servo.
+Assume basically everything in this repo, besides these first sentences are written by AI.
+
+--------------------------
+
 [QuickJS](https://bellard.org/quickjs/) as an alternative JavaScript engine for [Servo](https://servo.org).
 
 The `mozjs` crate in this repository implements the API of Servo's `mozjs` crate, the SpiderMonkey bindings, on QuickJS. Servo switches engines with a Cargo `[patch]`, without changes to its `Cargo.toml`.
