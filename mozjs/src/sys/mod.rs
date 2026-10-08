@@ -18,7 +18,7 @@ pub use self::generated::root as jsapi;
 #[doc(hidden)]
 #[allow(dead_code, unused_variables, clippy::all)]
 mod generated {
-    #![allow(unnecessary_transmutes)]
+    #![allow(unnecessary_transmutes, unpredictable_function_pointer_comparisons)]
     include!(concat!(env!("OUT_DIR"), "/jsapi.rs"));
 }
 

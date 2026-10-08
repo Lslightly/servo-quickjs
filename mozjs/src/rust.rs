@@ -54,14 +54,14 @@ use crate::jsapi::{JSAutoStructuredCloneBuffer, JSStructuredCloneCallbacks, Stru
 use crate::jsapi::{JSClass, JSClassOps, JSContext, Realm, JSCLASS_RESERVED_SLOTS_SHIFT};
 use crate::jsapi::{JSErrorReport, JSFunctionSpec, JSGCParamKey};
 use crate::jsapi::{JSObject, JSPropertySpec, JSRuntime};
-use crate::jsapi::{JSString, Object, PersistentRootedIdVector};
+use crate::jsapi::{JSString, PersistentRootedIdVector};
 use crate::jsapi::{JS_DestroyContext, JS_ShutDown};
 use crate::jsapi::{JS_EnumerateStandardClasses, JS_GlobalObjectTraceHook};
 use crate::jsapi::{JS_MayResolveStandardClass, JS_NewContext, JS_ResolveStandardClass};
 use crate::jsapi::{JS_RequestInterruptCallback, JS_RequestInterruptCallbackCanWait};
 use crate::jsapi::{JS_SetGCParameter, JS_SetNativeStackQuota, JS_WrapObject, JS_WrapValue};
 use crate::jsapi::{JS_StackCapture_AllFrames, JS_StackCapture_MaxFrames};
-use crate::jsapi::{PersistentRootedObjectVector, ReadOnlyCompileOptions, RootingContext};
+use crate::jsapi::{PersistentRootedObjectVector, ReadOnlyCompileOptions};
 use crate::jsapi::{RootedObject, RootedValue, ToWindowProxyIfWindowSlow};
 use crate::jsapi::{SetWarningReporter, SourceText, ToBooleanSlow};
 use crate::jsval::{JSVal, ObjectValue, UndefinedValue};

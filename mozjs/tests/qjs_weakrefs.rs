@@ -72,7 +72,7 @@ fn freed_target_is_not_live() {
         ));
         let mut realm = AutoRealm::new_from_handle(cx, global.handle());
         let (global, cx) = realm.global_and_reborrow();
-        let mut eval = |cx: &mut mozjs::context::JSContext, source: &str| {
+        let eval = |cx: &mut mozjs::context::JSContext, source: &str| {
             rooted!(&in(cx) let mut rval = UndefinedValue());
             let options = CompileOptionsWrapper::new(cx, c"test.js".to_owned(), 1);
             evaluate_script(cx, global, source, rval.handle_mut(), options).unwrap();

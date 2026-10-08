@@ -59,12 +59,6 @@ impl Atom {
         Atom { atom, rt: cx.rt }
     }
 
-    /// A borrowed atom (the id keeps it alive).
-    pub fn from_id(cx: &Cx, id: root::jsid) -> Atom {
-        let atom = id.to_atom();
-        Atom { atom: unsafe { q::JS_DupAtom(cx.base_ctx, atom) }, rt: cx.rt }
-    }
-
     pub unsafe fn from_spec_name(cx: &mut Cx, name: root::JSPropertySpec_Name) -> Atom {
         let raw = name.symbol_;
         if raw != 0 && raw <= root::JS::SymbolCode::Limit as usize {
