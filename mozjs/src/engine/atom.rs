@@ -6,7 +6,7 @@
 //! A QuickJS atom is a `JSString` itself (`rt->atom_array[atom]`), so the pointers are stable for
 //! as long as the atom lives.
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::current;
 use crate::sys::jsapi as root;

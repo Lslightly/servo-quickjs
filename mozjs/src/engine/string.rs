@@ -12,7 +12,7 @@
 use std::ffi::{c_char, c_int, c_void, CStr};
 use std::{ptr, slice};
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::{obj_val, Cx};
 use crate::sys::glue;

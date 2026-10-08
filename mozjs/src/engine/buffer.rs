@@ -16,7 +16,7 @@ use std::ffi::{c_int, c_void};
 use std::mem::size_of;
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::{adopt_object, obj_val, val_obj, Cx};
 use crate::sys::jsapi as root;

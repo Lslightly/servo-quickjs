@@ -34,7 +34,7 @@ Design: `docs/design.md`. Read it first.
   - Read them with `JS_GetStringData`.
 - **Exceptions.** On failure, return `false` / null with a QuickJS exception pending (`JS_Throw*`). A `false` without an exception means uncatchable termination.
 - **Property keys** (`jsid`) map to QuickJS atoms: `id.to_atom()` (borrowed), `crate::sys::jsid::from_atom`.
-- **QuickJS patches** go in `quickjs-sys/quickjs`:
+- **QuickJS patches** go in `servo-quickjs/quickjs`:
   - Mark them with a `/* Servo: ... */` comment.
   - Add the declaration to `quickjs.h` and run `just gen-bindings`.
   - Commit them separately with a `quickjs:` prefix.

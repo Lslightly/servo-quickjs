@@ -3,7 +3,7 @@
 
 use std::ffi::{CString, c_int};
 
-use quickjs_sys::*;
+use servo_quickjs::*;
 
 unsafe fn eval_to_string(ctx: *mut JSContext, src: &str) -> String {
     let src = CString::new(src).unwrap();

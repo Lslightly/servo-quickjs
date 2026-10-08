@@ -21,7 +21,7 @@ use std::marker::PhantomData;
 use std::ptr;
 use std::sync::OnceLock;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::eval::{options, padded, source_buffer, utf16_source};
 use super::{adopt_object, obj_val, val_obj, Cx, RealmData};

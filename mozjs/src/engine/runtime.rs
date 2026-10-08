@@ -7,7 +7,7 @@
 use std::ffi::{c_char, c_int, c_void};
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::{set_current, Cx};
 use crate::sys::jsapi as root;

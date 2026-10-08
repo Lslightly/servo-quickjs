@@ -28,7 +28,7 @@ use std::ptr;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::OnceLock;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::class::{self, Tracer};
 use super::realm::{for_each_realm, realm_of_global};

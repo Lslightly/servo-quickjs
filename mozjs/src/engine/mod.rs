@@ -14,7 +14,7 @@ use std::cell::Cell;
 use std::ffi::CString;
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;

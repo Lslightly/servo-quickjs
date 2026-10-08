@@ -20,7 +20,7 @@ use std::cell::RefCell;
 use std::sync::atomic::{AtomicU8, Ordering};
 use std::collections::HashMap;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use crate::sys::jsapi as root;
 

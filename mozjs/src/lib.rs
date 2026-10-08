@@ -40,7 +40,7 @@ pub mod sys;
 
 mod engine;
 
-pub use quickjs_sys as qjs;
+pub use servo_quickjs as qjs;
 
 pub mod quickjs;
 

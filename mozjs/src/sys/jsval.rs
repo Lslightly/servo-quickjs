@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 //! `JS::Value` on QuickJS: the 64-bit QuickJS representation (`asBits_` = payload, `tag` = QuickJS
-//! tag), layout-compatible with `quickjs_sys::JSValue`.
+//! tag), layout-compatible with `servo_quickjs::JSValue`.
 //!
 //! Values visible to Rust never carry `JS_TAG_STRING_ROPE`; the shim flattens ropes when values
 //! cross into Rust.
@@ -20,7 +20,7 @@ use crate::sys::jsapi::JS::TraceKind;
 use crate::sys::jsapi::JS::Value;
 
 use libc::c_void;
-use quickjs_sys as q;
+use servo_quickjs as q;
 use std::default::Default;
 
 pub type JSVal = Value;
@@ -295,13 +295,13 @@ impl JSVal {
         }
     }
 
-    /// The same value as a `quickjs_sys::JSValue` (no reference count change).
+    /// The same value as a `servo_quickjs::JSValue` (no reference count change).
     #[inline(always)]
     pub fn to_qjs(self) -> q::JSValue {
         unsafe { std::mem::transmute::<JSVal, q::JSValue>(self) }
     }
 
-    /// Wraps a `quickjs_sys::JSValue` (no reference count change).
+    /// Wraps a `servo_quickjs::JSValue` (no reference count change).
     #[inline(always)]
     pub fn from_qjs(v: q::JSValue) -> JSVal {
         unsafe { std::mem::transmute::<q::JSValue, JSVal>(v) }

@@ -23,7 +23,7 @@ use std::ffi::{c_int, c_void, CStr};
 use std::marker::PhantomData;
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::{obj_val, object_realm, val_obj, Cx};
 use crate::sys::jsapi as root;

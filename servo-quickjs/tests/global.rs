@@ -4,7 +4,7 @@
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use quickjs_sys::*;
+use servo_quickjs::*;
 
 static FINALIZED: AtomicUsize = AtomicUsize::new(0);
 static MARKED: AtomicUsize = AtomicUsize::new(0);

@@ -7,7 +7,7 @@
 use std::ffi::{c_char, c_int, c_uint};
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::class::new_function;
 use super::{obj_val, Cx};

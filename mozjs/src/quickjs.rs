@@ -7,7 +7,7 @@
 
 use crate::jsapi::JSObject;
 
-pub use quickjs_sys as sys;
+pub use servo_quickjs as sys;
 
 /// Adds a reference to `obj` (a counted edge, e.g. Servo's `Dom<T>`).
 ///

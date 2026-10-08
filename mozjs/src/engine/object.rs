@@ -16,7 +16,7 @@ use std::collections::HashSet;
 use std::ffi::{c_int, CStr};
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::class::{adopt_object, function_data, object_data, QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT};
 use super::property::{data_flags, well_known_symbol_atom, Atom};

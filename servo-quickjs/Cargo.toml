@@ -1,9 +1,11 @@
 [package]
-name = "quickjs-sys"
+name = "servo-quickjs"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "Raw bindings to Bellard's QuickJS, vendored with Servo patches"
+repository = "https://github.com/openharmony-rs/servo-quickjs"
+publish = false
 links = "quickjs"
 build = "build.rs"
 

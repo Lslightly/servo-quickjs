@@ -15,7 +15,7 @@ use std::ptr;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;

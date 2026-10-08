@@ -7,7 +7,7 @@
 use std::ffi::{c_char, c_uint, c_void, CString};
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::{cstring_lossy, Cx};
 use crate::sys::jsapi as root;

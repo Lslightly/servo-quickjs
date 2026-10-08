@@ -5,6 +5,7 @@ version = "0.23.1"
 edition = "2021"
 license = "MPL-2.0"
 description = "The mozjs (SpiderMonkey) API implemented on QuickJS, for Servo"
+repository = "https://github.com/openharmony-rs/servo-quickjs"
 publish = false
 
 [lib]
@@ -29,4 +30,4 @@ encoding_rs = "0.8.35"
 libc = "0.2"
 log = "0.4"
 num-traits = "0.2"
-quickjs-sys = { path = "../quickjs-sys" }
+servo-quickjs = { path = "../servo-quickjs" }

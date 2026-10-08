@@ -14,7 +14,7 @@ use std::ptr;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::class::{function_data, new_function};
 use super::{obj_val, val_obj, Cx, RealmData};

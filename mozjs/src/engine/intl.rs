@@ -35,7 +35,7 @@ mod js;
 #[cfg_attr(not(all(target_env = "ohos", feature = "intl")), allow(dead_code))]
 mod patterns;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 /// Installs the Intl subset in a new QuickJS context, before its global gets its class.
 pub(crate) unsafe fn install_intl(ctx: *mut q::JSContext) {

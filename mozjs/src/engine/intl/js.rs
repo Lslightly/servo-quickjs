@@ -13,7 +13,7 @@ use std::rc::Rc;
 use std::slice;
 use std::sync::OnceLock;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::dtpg::{self, Generator, LocaleData};
 use super::{icu, patterns};

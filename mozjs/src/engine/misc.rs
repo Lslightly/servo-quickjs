@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use std::os::raw::{c_char, c_void};
 use std::ptr;
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::Cx;
 use crate::sys::jsapi as root;

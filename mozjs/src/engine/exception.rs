@@ -5,7 +5,7 @@
 //! The pending exception. QuickJS keeps it per runtime; SpiderMonkey's "get" does not clear it, so
 //! reads take it and throw it again.
 
-use quickjs_sys as q;
+use servo_quickjs as q;
 
 use super::Cx;
 use crate::sys::jsapi as root;
