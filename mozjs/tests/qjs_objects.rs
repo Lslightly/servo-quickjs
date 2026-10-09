@@ -628,6 +628,25 @@ fn builtin_conformance() {
              'arraylike:a,b async:1,2 mapfn:true rejected:r:true subclass:true sync:6,9'"
         )
         .to_boolean());
+        // Q29: Error.prototype.stack accessor; errors keep their own stack.
+        assert!(eval(
+            cx,
+            global,
+            "
+            var d = Object.getOwnPropertyDescriptor(Error.prototype, 'stack');
+            var e = new Error('x');
+            var o = Object.create(Error.prototype);
+            var notError = false;
+            try { d.get.call({}); } catch (x) { notError = x instanceof TypeError; }
+            d.set.call(o, 's');
+            var own = Object.getOwnPropertyDescriptor(o, 'stack');
+            typeof d.get === 'function' && typeof d.set === 'function' && !d.enumerable &&
+                d.configurable && typeof e.stack === 'string' && e.hasOwnProperty('stack') &&
+                d.get.call(e) === e.stack && Object.create(Error.prototype).stack === '' &&
+                notError && own.value === 's' && own.enumerable && own.writable
+            "
+        )
+        .to_boolean());
         // Q26: localeCompare returns -1, 0 or 1.
         assert!(eval(
             cx,

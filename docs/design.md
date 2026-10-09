@@ -119,7 +119,7 @@ The cost is memory: values stay alive until the end of the task.
 - **Saved frames** (`CaptureCurrentStack`, `JS_StackCapture_*`, `BuildStackString`) are objects of a shim `SavedFrame` class built from Q9 frames. QuickJS's columns point at the call's `(`, so they differ from SpiderMonkey's.
 - **Scripted caller private:** `JS_GetScriptedCallerPrivate` maps the innermost frame's file name to a script or module private (see "Modules").
 - **eval of an object** asks `codeForEvalGets` for its code (Q22), so `eval(trustedScript)` evaluates the script after the CSP and Trusted Types checks, which see the object as the argument. For `Function`, the checks see the source text `function anonymous(…\n) {\n…\n}`, as with SpiderMonkey.
-- **Known gaps:** code from `new Function` reports its file as `<input>` (SpiderMonkey: `page.html line N > Function`). `stack` is an own data property of errors, as in V8, not an `Error.prototype` accessor as in SpiderMonkey (the error-stack-accessor proposal), so a `DOMException` has no `stack`.
+- **Known gaps:** code from `new Function` reports its file as `<input>` (SpiderMonkey: `page.html line N > Function`). `stack` stays an own data property of QuickJS's errors, as in V8; `Error.prototype.stack` is also an accessor, as in SpiderMonkey (Q29), so a `DOMException` has a `stack` (an empty string, as with SpiderMonkey). A structured clone of an error therefore has its stack as an own property, where SpiderMonkey keeps it in an internal slot.
 
 ## Microtasks
 
@@ -190,6 +190,7 @@ The cost is memory: values stay alive until the end of the task.
 | Q26 | `localeCompare` returns -1, 0 or 1, like other engines, instead of the difference of the first differing code points (without `Intl`; the ICU one already did) | small |
 | Q27 | `Error.isError` asks a host hook (`JS_SetIsErrorHook`) about objects that aren't errors, for DOM objects with [[ErrorData]] | small |
 | Q28 | `Array.fromAsync` (in all major browsers since 2024): an async function compiled on the first call in each realm and kept by its context, so realms that don't use it pay nothing. The operations a page could replace (calls, CreateDataPropertyOrThrow, IsConstructor, ToObject, ToLength, the iterator symbols, TypeError) are C helpers passed to it. Values of sync iterables are awaited as by CreateAsyncFromSyncIterator, including closing the iterator when one rejects, but with fewer microtask ticks | small |
+| Q29 | `Error.prototype.stack` accessor, as in SpiderMonkey: the getter returns the stack of the first error on the prototype chain, or `""` once it reaches `Error.prototype` (so a `DOMException`'s is `""`), and the setter defines an own data property. QuickJS's errors keep their own `stack` data property, which shadows it | small |
 
 ## Not supported
 

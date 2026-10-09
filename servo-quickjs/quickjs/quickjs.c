@@ -42152,8 +42152,65 @@ static JSValue js_error_toString(JSContext *ctx, JSValueConst this_val,
     return JS_ConcatString(ctx, name, msg);
 }
 
+/* Servo: Error.prototype.stack is an accessor, as in SpiderMonkey (the error stack accessor
+   proposal), for the objects without a stack of their own such as DOMExceptions. QuickJS's
+   errors keep theirs as an own data property, which shadows it (Q29). */
+static JSValue js_error_get_stack(JSContext *ctx, JSValueConst this_val)
+{
+    JSPropertyDescriptor desc;
+    JSValue obj;
+    int res;
+
+    if (!JS_IsObject(this_val))
+        return JS_ThrowTypeErrorNotAnObject(ctx);
+    /* like SpiderMonkey's FindErrorInstanceOrPrototype */
+    obj = JS_DupValue(ctx, this_val);
+    for(;;) {
+        if (JS_VALUE_GET_OBJ(obj)->class_id == JS_CLASS_ERROR) {
+            res = JS_GetOwnProperty(ctx, &desc, obj, JS_ATOM_stack);
+            JS_FreeValue(ctx, obj);
+            if (res < 0)
+                return JS_EXCEPTION;
+            if (res) {
+                JS_FreeValue(ctx, desc.getter);
+                JS_FreeValue(ctx, desc.setter);
+                if (!(desc.flags & JS_PROP_GETSET))
+                    return desc.value;
+                JS_FreeValue(ctx, desc.value);
+            }
+            return JS_AtomToString(ctx, JS_ATOM_empty_string);
+        }
+        if (js_same_value(ctx, obj, ctx->class_proto[JS_CLASS_ERROR])) {
+            JS_FreeValue(ctx, obj);
+            return JS_AtomToString(ctx, JS_ATOM_empty_string);
+        }
+        if (js_poll_interrupts(ctx)) {
+            JS_FreeValue(ctx, obj);
+            return JS_EXCEPTION;
+        }
+        obj = JS_GetPrototypeFree(ctx, obj);
+        if (JS_IsException(obj))
+            return JS_EXCEPTION;
+        if (!JS_IsObject(obj)) {
+            JS_FreeValue(ctx, obj);
+            return JS_ThrowTypeError(ctx, "not an Error");
+        }
+    }
+}
+
+static JSValue js_error_set_stack(JSContext *ctx, JSValueConst this_val, JSValueConst val)
+{
+    if (!JS_IsObject(this_val))
+        return JS_ThrowTypeErrorNotAnObject(ctx);
+    if (JS_DefinePropertyValue(ctx, this_val, JS_ATOM_stack, JS_DupValue(ctx, val),
+                               JS_PROP_C_W_E | JS_PROP_THROW) < 0)
+        return JS_EXCEPTION;
+    return JS_UNDEFINED;
+}
+
 static const JSCFunctionListEntry js_error_proto_funcs[] = {
     JS_CFUNC_DEF("toString", 0, js_error_toString ),
+    JS_CGETSET_DEF("stack", js_error_get_stack, js_error_set_stack ),
     JS_PROP_STRING_DEF("name", "Error", JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE ),
     JS_PROP_STRING_DEF("message", "", JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE ),
 };
