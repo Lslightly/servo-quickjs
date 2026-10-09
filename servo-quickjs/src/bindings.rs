@@ -1912,6 +1912,15 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn JS_GetScriptPrivateValue(ctx: *mut JSContext, script: JSValue) -> JSValue;
 }
+unsafe extern "C" {
+    pub fn JS_GetActiveScript(ctx: *mut JSContext) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetModuleScript(ctx: *mut JSContext, m: *mut JSModuleDef) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_GetScriptModule(script: JSValue) -> *mut JSModuleDef;
+}
 pub type JSImportMetaHook = ::std::option::Option<
     unsafe extern "C" fn(
         ctx: *mut JSContext,

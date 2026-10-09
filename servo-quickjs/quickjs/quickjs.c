@@ -63052,6 +63052,46 @@ JSValue JS_GetScriptPrivateValue(JSContext *ctx, JSValueConst script)
     return JS_DupValue(ctx, sm->private_value);
 }
 
+/* Servo: scripts as the host's referrers */
+
+JSValue JS_GetActiveScript(JSContext *ctx)
+{
+    JSStackFrame *sf;
+    JSObject *p;
+
+    for(sf = ctx->rt->current_stack_frame; sf != NULL; sf = sf->prev_frame) {
+        if (JS_VALUE_GET_TAG(sf->cur_func) != JS_TAG_OBJECT)
+            continue;
+        p = JS_VALUE_GET_OBJ(sf->cur_func);
+        if (js_class_has_bytecode(p->class_id))
+            return JS_DupValue(ctx, JS_MKPTR(JS_TAG_FUNCTION_BYTECODE,
+                                             p->u.func.function_bytecode));
+    }
+    return JS_UNDEFINED;
+}
+
+JSValue JS_GetModuleScript(JSContext *ctx, JSModuleDef *m)
+{
+    JSObject *p;
+
+    if (JS_VALUE_GET_TAG(m->func_obj) == JS_TAG_FUNCTION_BYTECODE)
+        return JS_DupValue(ctx, m->func_obj);
+    if (JS_VALUE_GET_TAG(m->func_obj) == JS_TAG_OBJECT) {
+        p = JS_VALUE_GET_OBJ(m->func_obj);
+        if (js_class_has_bytecode(p->class_id))
+            return JS_DupValue(ctx, JS_MKPTR(JS_TAG_FUNCTION_BYTECODE,
+                                             p->u.func.function_bytecode));
+    }
+    return JS_UNDEFINED;
+}
+
+JSModuleDef *JS_GetScriptModule(JSValueConst script)
+{
+    JSScriptOrModule *sm = js_script_record(script);
+
+    return sm ? sm->module : NULL;
+}
+
 /* Marks a settled promise as handled, telling the rejection tracker like
    adding a reaction would (without adding one). */
 void JS_MarkPromiseHandled(JSContext *ctx, JSValueConst promise)

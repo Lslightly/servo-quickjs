@@ -1169,6 +1169,13 @@ typedef void JSScriptPrivateFinalizer(JSRuntime *rt, JSValueConst val);
 void JS_SetScriptPrivateFinalizer(JSRuntime *rt, JSScriptPrivateFinalizer *finalizer);
 int JS_SetScriptPrivateValue(JSContext *ctx, JSValueConst script, JSValue val);
 JSValue JS_GetScriptPrivateValue(JSContext *ctx, JSValueConst script);
+/* Servo: scripts as the host's referrers. JS_GetActiveScript() returns the code
+   (JS_TAG_FUNCTION_BYTECODE) of the innermost scripted frame, or JS_UNDEFINED;
+   JS_GetModuleScript() the code of a JavaScript module, or JS_UNDEFINED;
+   JS_GetScriptModule() the module whose code 'script' is part of, or NULL. */
+JSValue JS_GetActiveScript(JSContext *ctx);
+JSValue JS_GetModuleScript(JSContext *ctx, JSModuleDef *m);
+JSModuleDef *JS_GetScriptModule(JSValueConst script);
 /* Servo: host hooks. The import.meta hook populates the new import.meta object of
    'm'. The dynamic import hook replaces the module loader for import(): 'm' is
    the module of the calling code, or NULL for script code, whose host-defined
