@@ -44361,12 +44361,22 @@ static JSValue js_iterator_constructor_getset(JSContext *ctx,
 {
     int ret;
 
-    if (argc > 0) { // if setter
-        if (!JS_IsObject(argv[0]))
+    /* Servo: the setter is a function of its own (magic = 1), and implements
+       SetterThatIgnoresPrototypeProperties (Q25) */
+    if (magic) {
+        if (!JS_IsObject(this_val))
             return JS_ThrowTypeErrorNotAnObject(ctx);
-        ret = JS_DefinePropertyValue(ctx, this_val, JS_ATOM_constructor,
-                                     JS_DupValue(ctx, argv[0]),
-                                     JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE);
+        if (js_same_value(ctx, this_val, ctx->class_proto[JS_CLASS_ITERATOR]))
+            return JS_ThrowTypeError(ctx, "Cannot assign to read only property");
+        ret = JS_GetOwnProperty(ctx, NULL, this_val, JS_ATOM_constructor);
+        if (ret < 0)
+            return JS_EXCEPTION;
+        if (ret)
+            ret = JS_SetProperty(ctx, this_val, JS_ATOM_constructor, JS_DupValue(ctx, argv[0]));
+        else
+            ret = JS_DefinePropertyValue(ctx, this_val, JS_ATOM_constructor,
+                                         JS_DupValue(ctx, argv[0]),
+                                         JS_PROP_C_W_E | JS_PROP_THROW);
         if (ret < 0)
             return JS_EXCEPTION;
         return JS_UNDEFINED;
@@ -57147,7 +57157,7 @@ static int JS_AddIntrinsicBasicObjects(JSContext *ctx)
 
 int JS_AddIntrinsicBaseObjects(JSContext *ctx)
 {
-    JSValue obj1, obj2;
+    JSValue obj1, obj2, obj3;
     JSCFunctionType ft;
 
     ctx->throw_type_error = JS_NewCFunction(ctx, js_throw_type_error, NULL, 0);
@@ -57208,15 +57218,24 @@ int JS_AddIntrinsicBaseObjects(JSContext *ctx)
         JS_FreeValue(ctx, obj2);
         return -1;
     }
-    if (JS_DefineProperty(ctx, ctx->class_proto[JS_CLASS_ITERATOR],
-                          JS_ATOM_constructor, JS_UNDEFINED,
-                          obj1, obj1,
-                          JS_PROP_HAS_GET | JS_PROP_HAS_SET | JS_PROP_CONFIGURABLE) < 0) {
+    obj3 = JS_NewCFunctionData(ctx, js_iterator_constructor_getset,
+                               1, 1, 1, (JSValueConst *)&obj2);
+    if (JS_IsException(obj3)) {
         JS_FreeValue(ctx, obj2);
         JS_FreeValue(ctx, obj1);
         return -1;
     }
+    if (JS_DefineProperty(ctx, ctx->class_proto[JS_CLASS_ITERATOR],
+                          JS_ATOM_constructor, JS_UNDEFINED,
+                          obj1, obj3,
+                          JS_PROP_HAS_GET | JS_PROP_HAS_SET | JS_PROP_CONFIGURABLE) < 0) {
+        JS_FreeValue(ctx, obj2);
+        JS_FreeValue(ctx, obj1);
+        JS_FreeValue(ctx, obj3);
+        return -1;
+    }
     JS_FreeValue(ctx, obj1);
+    JS_FreeValue(ctx, obj3);
     ctx->iterator_ctor = obj2;
     
     ctx->class_proto[JS_CLASS_ITERATOR_CONCAT] =

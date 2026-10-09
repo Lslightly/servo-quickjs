@@ -180,6 +180,7 @@ The cost is memory: values stay alive until the end of the task.
 | Q22 | HostGetCodeForEval: eval of an object asks the host for its code (`JS_SetCodeForEvalHook`), evaluates the result if it is a string, and passes the object to the Q5 check as the argument. `Function` passes its source text without QuickJS's surrounding parentheses to the Q5 check | small |
 | Q23 | `JS_IsCollectingCycles`: whether the cycle collector is freeing a garbage cycle, for `JS::RuntimeHeapState` | small |
 | Q24 | CreateDataProperty instead of Set where QuickJS used Set on arrays it creates: `new Array(a, b, …)` and JSON.stringify's property list. With a setter or a getter-only accessor on `Array.prototype[1]` they ran it or threw | small |
+| Q25 | `Iterator.prototype.constructor` has a setter of its own (QuickJS used the getter as the setter), which implements SetterThatIgnoresPrototypeProperties like the `@@toStringTag` one | small |
 
 ## Not supported
 
