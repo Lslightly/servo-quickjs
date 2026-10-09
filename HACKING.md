@@ -49,5 +49,15 @@ Design: `docs/design.md`. Read it first.
 ## Commits
 
 - Sign off every commit (`git commit -s`, [Developer Certificate of Origin](https://developercertificate.org/)).
-- Short subject (`mozjs: …` or `quickjs: …`) and a short body.
+- Short subject and a short body. The prefix names the part:
+  - `quickjs: … (Qn)` for one QuickJS patch: the C change, `quickjs.h`, the bindings and its row in the patch table;
+  - `mozjs: …` for the shim;
+  - `quickjs, mozjs: … (Qn)` for a small patch together with its use in the shim, and always when a patch changes a QuickJS API the shim already uses, so neither builds without the other.
+- Every commit builds (`cargo check -p mozjs --tests`) and is formatted.
 - Commits written with an AI agent carry an `AI-assisted:` trailer before the sign-off, e.g. `AI-assisted: Yes (agent session; written and tested by the agent)`.
+
+## Branches and versions
+
+- `main` is linear. A topic branch is rebased onto `main` and lands by fast-forward once CI passed on it (a pull request, or a manual run of the workflow).
+- `main` follows the `mozjs` version of servo-ohos's `ohos-main`. A version update is one `mozjs: port to mozjs <version>` commit, after the QuickJS patches it needs. Before it lands, tag the last commit for the old version `mozjs-<old version>`.
+- Fixes for an older version go on a branch `mozjs-<version>` made from its tag, only when someone needs them.

@@ -28,6 +28,8 @@ cargo build -p servoshell --features js-quickjs \
     --config 'patch.crates-io.mozjs.git="https://github.com/openharmony-rs/servo-quickjs"'
 ```
 
+`main` implements the `mozjs` version that [servo-ohos](https://github.com/openharmony-rs/servo-ohos)'s `ohos-main` pins. The last commit for an older version is tagged `mozjs-<version>` (e.g. `mozjs-0.23.1`); add `--config 'patch.crates-io.mozjs.tag="mozjs-0.23.1"'` to build a Servo that pins it.
+
 Use `patch.crates-io.mozjs.path="/path/to/servo-quickjs/mozjs"` for a local checkout. `mach` cannot pass `--config`; put the `[patch.crates-io]` entry in Servo's `.cargo/config.toml` instead.
 
 ## Differences from SpiderMonkey
