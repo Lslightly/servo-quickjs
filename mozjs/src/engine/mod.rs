@@ -27,6 +27,7 @@ mod error;
 mod eval;
 mod exception;
 mod intl;
+mod intrinsics;
 mod misc;
 mod module;
 mod object;
@@ -68,6 +69,8 @@ pub(crate) struct Cx {
     pub warning_reporter: root::JS::WarningReporter,
     /// Job queue, promise rejection tracking, interrupts and security callbacks.
     pub hooks: promise::RuntimeHooks,
+    /// The key object of `base_ctx` (counted), for intrinsics outside any realm.
+    pub base_key_object: q::JSValue,
 }
 
 /// What a SpiderMonkey `JS::Realm*` (and `JS::Compartment*`) points to. Owned by its QuickJS

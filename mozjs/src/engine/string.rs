@@ -1339,14 +1339,13 @@ unsafe fn parse_json(
     }
     let qctx = cx.qctx();
     let v = if q::JS_IsFunction(qctx, reviver) != 0 {
-        let global = q::JS_GetGlobalObject(qctx);
-        let json = q::JS_GetPropertyStr(qctx, global, c"JSON".as_ptr());
-        let parse = q::JS_GetPropertyStr(qctx, json, c"parse".as_ptr());
+        let parse = super::intrinsics::get(
+            cx,
+            super::intrinsics::Intrinsic::Global(c"JSON", Some(c"parse")),
+        );
         let mut args = [text, reviver];
-        let v = q::JS_Call(qctx, parse, json, 2, args.as_mut_ptr());
-        for v in [parse, json, global] {
-            q::JS_FreeValueRT(cx.rt, v);
-        }
+        let v = q::JS_Call(qctx, parse, q::JS_UNDEFINED, 2, args.as_mut_ptr());
+        q::JS_FreeValueRT(cx.rt, parse);
         v
     } else {
         let mut len = 0;

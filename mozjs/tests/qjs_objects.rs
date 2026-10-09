@@ -275,8 +275,10 @@ fn collections() {
         assert!(mozjs::jsapi::SetClear(cx.raw_cx(), set.handle().into()));
         assert_eq!(mozjs::jsapi::SetSize(cx.raw_cx(), set.handle().into()), 0);
 
+        // Servo's cross-origin property holder cache: realm key objects as keys.
         rooted!(&in(cx) let weak = NewWeakMapObject(cx));
-        rooted!(&in(cx) let weak_key = ObjectValue(JS_NewPlainObject(cx)));
+        assert!(mozjs::jsapi::IsWeakMapObject(weak.get()));
+        rooted!(&in(cx) let weak_key = ObjectValue(mozjs::rust::wrappers2::GetRealmKeyObject(cx)));
         assert!(SetWeakMapEntry(
             cx,
             weak.handle(),
@@ -290,8 +292,14 @@ fn collections() {
             out.handle_mut()
         ));
         assert_eq!(out.get().to_int32(), 42);
-        set_global(cx, global, c"weak", ObjectValue(weak.get()));
-        assert!(eval(cx, global, "weak instanceof WeakMap").to_boolean());
+        rooted!(&in(cx) let plain_key = ObjectValue(JS_NewPlainObject(cx)));
+        assert!(!GetWeakMapEntry(
+            cx,
+            weak.handle(),
+            plain_key.handle(),
+            out.handle_mut()
+        ));
+        mozjs::rust::wrappers2::JS_ClearPendingException(cx);
     });
 }
 

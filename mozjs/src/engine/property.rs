@@ -1064,11 +1064,10 @@ unsafe fn self_hosted(cx: &mut Cx, name: *const c_char) -> q::JSValue {
         b"ArrayForEach" => c"forEach",
         _ => panic!("unsupported self-hosted function {name:?}"),
     };
-    let qctx = cx.qctx();
-    let proto = q::JS_GetClassProto(qctx, 2 /* JS_CLASS_ARRAY */);
-    let f = q::JS_GetPropertyStr(qctx, proto, method.as_ptr());
-    q::JS_FreeValue(qctx, proto);
-    f
+    super::intrinsics::get(
+        cx,
+        super::intrinsics::Intrinsic::Method(super::intrinsics::CLASS_ARRAY, method),
+    )
 }
 
 pub(crate) unsafe fn JS_DefineFunctions(
@@ -1260,9 +1259,10 @@ pub(crate) unsafe fn JS_ValueToObject(
 ) -> bool {
     let cx = Cx::from_raw(cx);
     let qctx = cx.qctx();
-    let global = q::JS_GetGlobalObject(qctx);
-    let object_ctor = q::JS_GetPropertyStr(qctx, global, c"Object".as_ptr());
-    q::JS_FreeValue(qctx, global);
+    let object_ctor = super::intrinsics::get(
+        cx,
+        super::intrinsics::Intrinsic::Method(super::intrinsics::CLASS_OBJECT, c"constructor"),
+    );
     let v = (*v.ptr).to_qjs();
     if v.tag() == q::JS_TAG_NULL || v.tag() == q::JS_TAG_UNDEFINED {
         q::JS_FreeValue(qctx, object_ctor);

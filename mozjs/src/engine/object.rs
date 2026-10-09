@@ -21,6 +21,7 @@ use servo_quickjs as q;
 use super::class::{
     adopt_object, function_data, object_data, QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT,
 };
+use super::intrinsics::{self, Intrinsic};
 use super::property::{data_flags, well_known_symbol_atom, Atom};
 use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
@@ -1162,20 +1163,17 @@ pub(crate) unsafe fn Construct1(
 
 // Intrinsics of the current realm.
 
-/// `%Class.prototype%[name]` of the current realm (a new reference).
-unsafe fn intrinsic(cx: &mut Cx, class: q::JSClassID, name: &CStr) -> q::JSValue {
-    let qctx = cx.qctx();
-    let proto = q::JS_GetClassProto(qctx, class);
-    let v = q::JS_GetPropertyStr(qctx, proto, name.as_ptr());
-    q::JS_FreeValueRT(cx.rt, proto);
-    v
+/// `%Class.prototype%[name]` of the current realm as it was when the realm was created (a new
+/// reference); see `intrinsics.rs`.
+unsafe fn intrinsic(cx: &mut Cx, class: q::JSClassID, name: &'static CStr) -> q::JSValue {
+    intrinsics::get(cx, Intrinsic::Method(class, name))
 }
 
 /// Calls `%Class.prototype%[name]` on `this` (a new reference or `JS_EXCEPTION`).
 unsafe fn call_method(
     cx: &mut Cx,
     class: q::JSClassID,
-    name: &CStr,
+    name: &'static CStr,
     this: q::JSValue,
     args: &[q::JSValue],
 ) -> q::JSValue {
@@ -1193,15 +1191,13 @@ unsafe fn call_method(
 unsafe fn call_getter(
     cx: &mut Cx,
     class: q::JSClassID,
-    name: &CStr,
+    name: &'static CStr,
     this: q::JSValue,
 ) -> q::JSValue {
-    let qctx = cx.qctx();
-    let proto = q::JS_GetClassProto(qctx, class);
-    let atom = Atom::from_cstr(cx, name.as_ptr());
-    let v = q::JS_GetPropertyInternal(qctx, proto, atom.atom, this, 0);
-    q::JS_FreeValueRT(cx.rt, proto);
-    v
+    let f = intrinsics::get(cx, Intrinsic::Getter(class, name));
+    let r = q::JS_Call(cx.qctx(), f, this, 0, ptr::null_mut());
+    q::JS_FreeValueRT(cx.rt, f);
+    r
 }
 
 /// `new %Class%(...args)` (a new reference or `JS_EXCEPTION`).
@@ -1219,7 +1215,7 @@ unsafe fn construct_intrinsic(cx: &mut Cx, class: q::JSClassID, args: &[q::JSVal
 unsafe fn method_value(
     cx: *mut root::JSContext,
     class: q::JSClassID,
-    name: &CStr,
+    name: &'static CStr,
     obj: root::JS::HandleObject,
     args: &[q::JSValue],
     rval: root::JS::MutableHandleValue,
@@ -1232,7 +1228,7 @@ unsafe fn method_value(
 unsafe fn method_bool(
     cx: *mut root::JSContext,
     class: q::JSClassID,
-    name: &CStr,
+    name: &'static CStr,
     obj: root::JS::HandleObject,
     args: &[q::JSValue],
     rval: *mut bool,
@@ -1250,7 +1246,7 @@ unsafe fn method_bool(
 unsafe fn method_void(
     cx: *mut root::JSContext,
     class: q::JSClassID,
-    name: &CStr,
+    name: &'static CStr,
     obj: root::JS::HandleObject,
     args: &[q::JSValue],
 ) -> bool {
@@ -1473,20 +1469,29 @@ pub(crate) unsafe fn SetForEach(
     )
 }
 
+// Servo uses these only for the cross-origin property holder cache of a WindowProxy or Location
+// (`ensure_cross_origin_property_holder`): the map in the object's reserved slot, the key the
+// accessing realm's key object, the value a holder made in the accessing realm. A QuickJS WeakMap
+// keeps its values alive as long as the map, so the holder's realm would live as long as the
+// object, and its methods are script-replaceable. Instead the map is an id, and the holder is
+// kept by the accessing realm's key object: no script runs, and nothing the object keeps alive
+// refers to the accessing realm. A holder map's entries are freed with the accessing realms.
+
 pub(crate) unsafe fn NewWeakMapObject(cx: *mut root::JSContext) -> *mut root::JSObject {
-    new_intrinsic(cx, CLASS_WEAKMAP)
+    let cx = Cx::from_raw(cx);
+    let map = intrinsics::new_holder_map(cx);
+    adopt_object(cx, map)
 }
 
 pub(crate) unsafe fn IsWeakMapObject(obj: *mut root::JSObject) -> bool {
-    q::JS_GetClassID(obj_val(obj)) == CLASS_WEAKMAP
+    q::JS_GetClassID(obj_val(obj)) == CLASS_WEAKMAP || intrinsics::is_holder_map(obj_val(obj))
 }
 
-/// A unique object of the current realm, as a weak map key: its `Object.prototype`, which its
-/// context keeps alive and marks. The shim has no security wrappers that could cache it.
+/// The current realm's key object: private to the shim, kept alive by the realm's global.
 pub(crate) unsafe fn GetRealmKeyObject(cx: *mut root::JSContext) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
-    let proto = q::JS_GetClassProto(cx.qctx(), QJS_CLASS_OBJECT);
-    adopt_object(cx, proto)
+    let key = intrinsics::key_object(cx);
+    adopt_object(cx, q::JS_DupValueRT(cx.rt, key))
 }
 
 pub(crate) unsafe fn GetWeakMapEntry(
@@ -1495,14 +1500,17 @@ pub(crate) unsafe fn GetWeakMapEntry(
     key: root::JS::HandleValue,
     val: root::JS::MutableHandleValue,
 ) -> bool {
-    method_value(
-        cx,
-        CLASS_WEAKMAP,
-        c"get",
-        mapObj,
-        &[(*key.ptr).to_qjs()],
-        val,
-    )
+    let cx = Cx::from_raw(cx);
+    match intrinsics::holder(cx.rt, obj_val(*mapObj.ptr), (*key.ptr).to_qjs()) {
+        Some(v) => set_result(cx, v, val),
+        None => {
+            q::JS_ThrowTypeError(
+                cx.qctx(),
+                c"not a cross-origin property holder map".as_ptr(),
+            );
+            false
+        }
+    }
 }
 
 pub(crate) unsafe fn SetWeakMapEntry(
@@ -1511,13 +1519,20 @@ pub(crate) unsafe fn SetWeakMapEntry(
     key: root::JS::HandleValue,
     val: root::JS::HandleValue,
 ) -> bool {
-    method_void(
-        cx,
-        CLASS_WEAKMAP,
-        c"set",
-        mapObj,
-        &[(*key.ptr).to_qjs(), (*val.ptr).to_qjs()],
-    )
+    let cx = Cx::from_raw(cx);
+    if intrinsics::set_holder(
+        cx.rt,
+        obj_val(*mapObj.ptr),
+        (*key.ptr).to_qjs(),
+        (*val.ptr).to_qjs(),
+    ) {
+        return true;
+    }
+    q::JS_ThrowTypeError(
+        cx.qctx(),
+        c"not a cross-origin property holder map".as_ptr(),
+    );
+    false
 }
 
 // Date.

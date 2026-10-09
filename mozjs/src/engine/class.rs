@@ -53,7 +53,8 @@ unsafe fn reserved_slot_count(clasp: *const root::JSClass) -> usize {
     let mut count = ((flags >> root::JSCLASS_RESERVED_SLOTS_SHIFT)
         & root::JSCLASS_RESERVED_SLOTS_MASK) as usize;
     if flags & root::JSCLASS_IS_GLOBAL != 0 {
-        count += root::JSCLASS_GLOBAL_SLOT_COUNT as usize;
+        // The last one holds the realm's key object (`intrinsics.rs`).
+        count += root::JSCLASS_GLOBAL_SLOT_COUNT as usize + 1;
     }
     count
 }

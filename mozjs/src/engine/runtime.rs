@@ -30,6 +30,7 @@ pub(crate) unsafe fn JS_NewContext(
     super::verify::install(rt);
     q::JS_SetContextFinalizer(rt, Some(super::context_finalized));
     let base_ctx = q::JS_NewContext(rt);
+    let base_key_object = super::intrinsics::new_key_object(base_ctx);
     let cx = Box::into_raw(Box::new(Cx {
         rt,
         base_ctx,
@@ -38,6 +39,7 @@ pub(crate) unsafe fn JS_NewContext(
         atom_pool: Vec::new(),
         warning_reporter: None,
         hooks: Default::default(),
+        base_key_object,
     }));
     q::JS_SetRuntimeOpaque(rt, cx as *mut _);
     set_current(cx);
@@ -51,6 +53,7 @@ pub(crate) unsafe fn JS_DestroyContext(cx: *mut root::JSContext) {
     }
     super::free_microtasks(&mut cx);
     cx.drain_pool((0, 0));
+    q::JS_FreeValueRT(cx.rt, cx.base_key_object);
     q::JS_FreeContext(cx.base_ctx);
     // Frees every object and realm (realms with their contexts, patch Q15).
     q::JS_FreeRuntime(cx.rt);
