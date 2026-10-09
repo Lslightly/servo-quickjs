@@ -9,9 +9,9 @@
 //! the transfer map, then the value. A value is a tag byte and a payload. Objects get
 //! consecutive indices in the order their tags are written, transferred objects first; later
 //! occurrences are back-references. A host object is `T_HOST` followed by whatever the
-//! embedder's write callback writes; its first `JS_WriteUint32Pair` is the (tag, data) handed
-//! to the read callback. Transferred ArrayBuffers are copied into the transfer map and the
-//! source is detached, so the data is self-contained for every scope. Like SpiderMonkey,
+//! embedder's write callback writes; its first `JS_WriteUint32PairUnchecked` is the (tag, data)
+//! handed to the read callback. Transferred ArrayBuffers are copied into the transfer map and
+//! the source is detached, so the data is self-contained for every scope. Like SpiderMonkey,
 //! nested containers are handled with an explicit stack instead of recursion.
 //!
 //! A `JSStructuredCloneData` keeps a `Box<Vec<u8>>` in its first word (SpiderMonkey's buffer
@@ -1801,7 +1801,7 @@ pub(crate) unsafe fn JS_StructuredClone(
 
 // Callback API: writing.
 
-pub(crate) unsafe fn JS_WriteUint32Pair(
+pub(crate) unsafe fn JS_WriteUint32PairUnchecked(
     w: *mut root::JSStructuredCloneWriter,
     tag: u32,
     data: u32,

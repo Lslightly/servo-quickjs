@@ -4,8 +4,7 @@
 
 //! Promises, the job queue, the rejection tracker, interrupts and CSP checks on QuickJS.
 
-use std::cell::{Cell, RefCell};
-use std::collections::VecDeque;
+use std::cell::RefCell;
 use std::ffi::c_void;
 use std::ptr::{self, NonNull};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
@@ -16,10 +15,10 @@ use mozjs::conversions::jsstr_to_string;
 use mozjs::gc::StackGCVector;
 use mozjs::glue::{CreateJobQueue, DeleteJobQueue, JobQueueTraps};
 use mozjs::jsapi::{
-    self, CallArgs, CompilationType, Handle, HandleObject, HandleString, HandleValue,
-    HandleValueArray, Heap, JSObject, JSSecurityCallbacks, JSString, MutableHandleObject,
-    MutableHandleString, MutableHandleValue, OnNewGlobalHookOption, PromiseRejectionHandlingState,
-    PromiseState, PromiseUserInputEventHandlingState, RuntimeCode, Value,
+    self, CallArgs, CompilationType, Handle, HandleObject, HandleString, HandleValue, JSObject,
+    JSSecurityCallbacks, JSString, MutableHandleObject, MutableHandleString, MutableHandleValue,
+    OnNewGlobalHookOption, PromiseRejectionHandlingState, PromiseState,
+    PromiseUserInputEventHandlingState, RuntimeCode, Value,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -158,82 +157,47 @@ fn resolve_and_reject(cx: &mut JSContext, global: SafeHandleObject) {
     }
 }
 
-/// A job queue like Servo's microtask queue: jobs are function objects, run in order.
-#[derive(Default)]
-struct TestQueue {
-    jobs: RefCell<VecDeque<Box<Heap<*mut JSObject>>>>,
-    enqueued: Cell<usize>,
-    /// The user input state of the promise of each job, as Servo reads it.
-    states: RefCell<Vec<PromiseUserInputEventHandlingState>>,
-}
+// The user input state of the promise of each job run, as Servo reads it.
+thread_local!(static STATES: RefCell<Vec<PromiseUserInputEventHandlingState>> = const { RefCell::new(Vec::new()) });
 
 unsafe extern "C" fn get_host_defined_data(
-    _: *const c_void,
     _: *mut RawJSContext,
+    incumbent: MutableHandleObject,
     data: MutableHandleObject,
 ) -> bool {
+    incumbent.set(ptr::null_mut());
     data.set(ptr::null_mut());
     true
 }
 
-unsafe extern "C" fn enqueue_promise_job(
-    queue: *const c_void,
-    _: *mut RawJSContext,
-    promise: HandleObject,
-    job: HandleObject,
-    _allocation_site: HandleObject,
-    _host_defined_data: HandleObject,
-) -> bool {
-    let queue = &*(queue as *const TestQueue);
-    queue.states.borrow_mut().push(if promise.get().is_null() {
-        PromiseUserInputEventHandlingState::DontCare
-    } else {
-        jsapi::GetPromiseUserInputEventHandlingState(promise)
-    });
-    queue.jobs.borrow_mut().push_back(Heap::boxed(*job.ptr));
-    queue.enqueued.set(queue.enqueued.get() + 1);
-    true
-}
-
-unsafe extern "C" fn run_jobs(queue: *const c_void, cx: *mut RawJSContext) {
-    let queue = &*(queue as *const TestQueue);
-    loop {
-        let job = queue.jobs.borrow_mut().pop_front();
-        let Some(job) = job else { break };
-        let fun = ObjectValue(job.get());
-        let mut rval = UndefinedValue();
-        let args = HandleValueArray {
-            length_: 0,
-            elements_: ptr::null(),
-        };
-        assert!(jsapi::Call(
+/// Runs the microtask queue like Servo's checkpoint.
+unsafe extern "C" fn run_jobs(cx: *mut RawJSContext) {
+    while jsapi::HasAnyMicroTasks(cx) {
+        let mut task = UndefinedValue();
+        mozjs::glue::JS_DequeueNextMicroTask(
             cx,
-            handle(&UndefinedValue()),
-            handle(&fun),
-            &args,
-            MutableHandleValue::from_marked_location(&mut rval)
-        ));
+            MutableHandleValue::from_marked_location(&mut task),
+        );
+        assert!(jsapi::IsJSMicroTask(&task));
+        let task = jsapi::ToMaybeWrappedJSMicroTask(&task);
+        let promise = jsapi::MaybeGetPromiseFromJSMicroTask(task);
+        STATES.with(|s| {
+            s.borrow_mut().push(if promise.is_null() {
+                PromiseUserInputEventHandlingState::DontCare
+            } else {
+                jsapi::GetPromiseUserInputEventHandlingState(promise)
+            })
+        });
+        assert!(!jsapi::GetExecutionGlobalFromJSMicroTask(task).is_null());
+        assert!(jsapi::RunJSMicroTask(cx, handle(&task)));
     }
-}
-
-unsafe extern "C" fn empty(queue: *const c_void) -> bool {
-    (*(queue as *const TestQueue)).jobs.borrow().is_empty()
-}
-
-static INTERRUPT_QUEUES_DROPPED: AtomicBool = AtomicBool::new(false);
-
-unsafe extern "C" fn drop_interrupt_queues(_: *mut c_void) {
-    INTERRUPT_QUEUES_DROPPED.store(true, Ordering::SeqCst);
 }
 
 static TRAPS: JobQueueTraps = JobQueueTraps {
     getHostDefinedData: Some(get_host_defined_data),
-    enqueuePromiseJob: Some(enqueue_promise_job),
+    getHostDefinedGlobal: None,
     runJobs: Some(run_jobs),
-    empty: Some(empty),
-    pushNewInterruptQueue: None,
-    popInterruptQueue: None,
-    dropInterruptQueues: Some(drop_interrupt_queues),
+    traceNonGCThingMicroTask: None,
 };
 
 thread_local!(static FULFILLED: RefCell<Vec<i32>> = const { RefCell::new(Vec::new()) });
@@ -246,14 +210,14 @@ unsafe extern "C" fn on_fulfilled(_: *mut RawJSContext, argc: u32, vp: *mut Valu
 }
 
 fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
-    let queue = TestQueue::default();
     unsafe {
-        let job_queue = CreateJobQueue(
-            &TRAPS,
-            &queue as *const TestQueue as *const c_void,
-            ptr::null_mut(),
+        let job_queue = CreateJobQueue(&TRAPS);
+        jsapi::SetJobQueue(cx.raw_cx(), job_queue as *mut jsapi::JobQueue);
+        assert_eq!(
+            jsapi::GetJobQueue(cx.raw_cx()),
+            job_queue as *mut jsapi::JobQueue
         );
-        jsapi::SetJobQueue(cx.raw_cx(), job_queue);
+        let queued = |cx: &mut JSContext| jsapi::GetRegularMicroTaskCount(cx.raw_cx());
 
         assert!(eval_bool(
             cx,
@@ -267,9 +231,9 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
             log.join() === 'sync'
         "
         ));
-        assert_eq!(queue.jobs.borrow().len(), 3);
+        assert_eq!(queued(cx), 3);
         jsapi::RunJobs(cx.raw_cx());
-        assert!(queue.jobs.borrow().is_empty());
+        assert!(!jsapi::HasAnyMicroTasks(cx.raw_cx()));
         assert!(eval_bool(cx, global, "log.join() === 'sync,1,2,a,3'"));
 
         // A promise's user input state goes to the promises then() derives from it, and reaction
@@ -286,7 +250,7 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
             "interacted.then(() => 1).then(() => 2); (async () => { await interacted; })();",
         )
         .unwrap();
-        queue.states.borrow_mut().clear();
+        STATES.with(|s| s.borrow_mut().clear());
         assert!(jsapi::ResolvePromise(
             cx.raw_cx(),
             handle(&p),
@@ -294,7 +258,7 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
         ));
         jsapi::RunJobs(cx.raw_cx());
         use PromiseUserInputEventHandlingState::{DontCare, HadUserInteractionAtCreation as Had};
-        assert_eq!(*queue.states.borrow(), [Had, DontCare, Had]);
+        assert_eq!(STATES.with(|s| s.borrow().clone()), [Had, DontCare, Had]);
 
         // Arrays filled internally don't run inherited setters.
         assert!(eval_bool(
@@ -330,13 +294,13 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
             handle(&none)
         ));
         assert!(jsapi::GetPromiseIsHandled(handle(&p)));
-        let before = queue.enqueued.get();
+        let before = queued(cx);
         assert!(jsapi::ResolvePromise(
             cx.raw_cx(),
             handle(&p),
             handle(&Int32Value(9))
         ));
-        assert_eq!(queue.enqueued.get(), before + 1);
+        assert_eq!(queued(cx), before + 1);
         assert!(FULFILLED.with(|f| f.borrow().is_empty()));
         jsapi::RunJobs(cx.raw_cx());
         assert_eq!(FULFILLED.with(|f| f.borrow().clone()), vec![9]);
@@ -369,18 +333,40 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
             ("Promise.resolve(1).then(() => 1)", global.get()),
         ] {
             eval(cx, global, source).unwrap();
-            let job = queue.jobs.borrow().back().unwrap().get();
-            assert_eq!(jsapi::GetNonCCWObjectGlobal(job), realm, "{source}");
+            assert_eq!(queued(cx), 1);
+            let task = jsapi::PeekNextMicroTask(cx.raw_cx());
+            let task = jsapi::ToMaybeWrappedJSMicroTask(&task);
+            assert_eq!(
+                jsapi::GetExecutionGlobalFromJSMicroTask(task),
+                realm,
+                "{source}"
+            );
             jsapi::RunJobs(cx.raw_cx());
         }
 
-        // Jobs that were never run are released with the queue.
+        // The embedder's own tasks share the queue, in order.
+        let own = mozjs::jsval::PrivateValue(7 as *const c_void);
         eval(cx, global, "Promise.resolve().then(() => {})").unwrap();
-        assert_eq!(queue.jobs.borrow().len(), 1);
-        queue.jobs.borrow_mut().clear();
+        assert!(jsapi::EnqueueMicroTask(cx.raw_cx(), &own));
+        assert_eq!(queued(cx), 2);
+        let mut task = UndefinedValue();
+        mozjs::glue::JS_DequeueNextMicroTask(
+            cx.raw_cx(),
+            MutableHandleValue::from_marked_location(&mut task),
+        );
+        assert!(jsapi::IsJSMicroTask(&task));
+        mozjs::glue::JS_DequeueNextMicroTask(
+            cx.raw_cx(),
+            MutableHandleValue::from_marked_location(&mut task),
+        );
+        assert!(!jsapi::IsJSMicroTask(&task));
+        assert_eq!(task.to_private(), 7 as *const c_void);
+
+        // Jobs that were never run are released with the runtime.
+        eval(cx, global, "Promise.resolve().then(() => {})").unwrap();
+        assert_eq!(queued(cx), 1);
         jsapi::SetJobQueue(cx.raw_cx(), ptr::null_mut());
         DeleteJobQueue(job_queue);
-        assert!(INTERRUPT_QUEUES_DROPPED.load(Ordering::SeqCst));
 
         // Without a job queue, jobs use QuickJS's internal queue.
         assert!(eval_bool(

@@ -20,7 +20,7 @@ use mozjs::jsapi::{
     JSObject, JSString, JSStructuredCloneCallbacks, JSStructuredCloneReader,
     JSStructuredCloneWriter, JS_GetStringLength, JS_NewObject, JS_NewStringCopyZ, JS_NewUint8Array,
     JS_ReadBytes, JS_ReadDouble, JS_ReadString, JS_ReadTypedArray, JS_SetReservedSlot,
-    JS_WriteBytes, JS_WriteDouble, JS_WriteString, JS_WriteTypedArray, JS_WriteUint32Pair,
+    JS_WriteBytes, JS_WriteDouble, JS_WriteString, JS_WriteTypedArray, JS_WriteUint32PairUnchecked,
     MutableHandle, MutableHandleObject, OnNewGlobalHookOption, StructuredCloneScope,
     TransferableOwnership, JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT,
     JS_SCERR_DUP_TRANSFERABLE, JS_SCERR_NOT_CLONABLE, JS_SCERR_SHMEM_TRANSFERABLE,
@@ -229,7 +229,7 @@ unsafe extern "C" fn write_callback(
     log(format!("write {id}"));
     let s = JS_NewStringCopyZ(cx, c"host string".as_ptr());
     let typed = ObjectValue(JS_NewUint8Array(cx, 3));
-    JS_WriteUint32Pair(w, HOST_TAG, id as u32)
+    JS_WriteUint32PairUnchecked(w, HOST_TAG, id as u32)
         && JS_WriteBytes(w, b"payload!".as_ptr() as *const c_void, 8)
         && JS_WriteString(w, Handle::from_marked_location(&s))
         && JS_WriteDouble(w, 2.5)

@@ -2,17 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//! ES modules: compile, link, evaluate and the host hooks of SpiderMonkey's module API.
+//! ES modules: compile, load, link, evaluate and the host hooks of SpiderMonkey's module API.
 //!
-//! Servo loads module graphs itself: it compiles a module, lists its requests, fetches and
-//! compiles the requested modules, and links once the graph is complete. QuickJS modules are
-//! compiled without loading their requests (`JS_EVAL_FLAG_NO_RESOLVE`), and `JS_LinkModule`
-//! resolves each request through Servo's resolve hook (patch Q7).
+//! As in SpiderMonkey 153, `LoadRequestedModules` walks the module graph (ECMA-262's
+//! GraphLoadingState) and asks the embedder's load hook for every request that is not loaded
+//! yet; the embedder answers with `FinishLoadingImportedModule`, which records the result in the
+//! requesting module's [[LoadedModules]]. QuickJS modules are compiled without loading their
+//! requests (`JS_EVAL_FLAG_NO_RESOLVE`), and `JS_LinkModule` resolves each request from
+//! [[LoadedModules]] (patch Q7).
 //!
 //! A module record is an object of the `ModuleObject` class holding one reference to its
 //! `JSModuleDef`; QuickJS's context also keeps every module alive until the realm dies. The
-//! private value of a JavaScript module lives in the `JSModuleDef`, where the import.meta and
-//! import() hooks find it. Module requests are objects of the `ModuleRequest` class.
+//! private value of a JavaScript module lives in the `JSModuleDef`, where the import.meta hook
+//! and `JS_GetScriptPrivate` find it. Module requests are objects of the `ModuleRequest` class.
+//! The referrer of a request is a `JSScript`: the code of the module (patch Q31) or of the
+//! script calling import().
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -31,9 +35,9 @@ use crate::sys::jsval::JSVal;
 #[derive(Clone, Copy, PartialEq)]
 enum ModuleKind {
     JavaScript,
-    /// A synthetic module whose default export is the parsed JSON (kept in the `JSModuleDef`'s
-    /// private value until evaluation).
-    Json,
+    /// A synthetic module whose only export is `default` (JSON, CSS and text modules); the value
+    /// is kept in the `JSModuleDef`'s private value until evaluation.
+    Synthetic,
 }
 
 /// Opaque data of `ModuleObject` objects.
@@ -41,8 +45,15 @@ struct ModuleData {
     /// One reference (a `JS_TAG_MODULE` value).
     module: *mut q::JSModuleDef,
     kind: ModuleKind,
-    /// The `SetModulePrivate` value of JSON modules (counted).
+    /// The `SetModulePrivate` value of synthetic modules (counted).
     private: q::JSValue,
+    /// [[LoadedModules]]: the module record each request resolved to (counted), by index.
+    loaded: Vec<q::JSValue>,
+    /// The request objects of the module's requests (counted), by index, made on first use so
+    /// that the load hook sees the same request each time.
+    requests: Vec<q::JSValue>,
+    /// [[Status]] is no longer "new": a graph load that visited the module completed.
+    loaded_graph: bool,
 }
 
 /// Opaque data of `ModuleRequest` objects.
@@ -50,35 +61,89 @@ struct RequestData {
     /// A counted string.
     specifier: q::JSValue,
     module_type: root::JS::ModuleType,
+    /// The module record that has this request (counted), and the request's index there; none
+    /// for import().
+    referrer: q::JSValue,
+    index: usize,
 }
 
-static CLASSES: OnceLock<(q::JSClassID, q::JSClassID)> = OnceLock::new();
+/// Opaque data of `GraphLoadingState` objects (ECMA-262's GraphLoadingState Record).
+struct LoadState {
+    /// The promise of `LoadRequestedModules` (counted), or `JS_UNDEFINED` with callbacks.
+    promise: q::JSValue,
+    resolved: root::JS::LoadModuleResolvedCallback,
+    rejected: root::JS::LoadModuleRejectedCallback,
+    is_loading: bool,
+    pending: usize,
+    /// Counted module records.
+    visited: Vec<q::JSValue>,
+    /// Counted.
+    host_defined: q::JSValue,
+}
 
-/// The `ModuleObject` and `ModuleRequest` class ids, registered in `rt` on first use.
-unsafe fn classes(rt: *mut q::JSRuntime) -> (q::JSClassID, q::JSClassID) {
+#[derive(Clone, Copy)]
+struct ClassIds {
+    module: q::JSClassID,
+    request: q::JSClassID,
+    state: q::JSClassID,
+}
+
+static CLASSES: OnceLock<ClassIds> = OnceLock::new();
+
+thread_local! {
+    /// `JSModuleDef` -> its module record, for QuickJS's hooks (linking, import.meta).
+    static RECORDS: RefCell<HashMap<usize, *mut root::JSObject>> = RefCell::new(HashMap::new());
+}
+
+/// The module record of `m`, if it has one.
+fn record_of(m: *mut q::JSModuleDef) -> Option<*mut root::JSObject> {
+    RECORDS.with(|r| r.borrow().get(&(m as usize)).copied())
+}
+
+/// The module classes, registered in `rt` on first use.
+unsafe fn classes(rt: *mut q::JSRuntime) -> ClassIds {
     let ids = *CLASSES.get_or_init(|| {
-        let (mut module, mut request) = (0, 0);
+        let (mut module, mut request, mut state) = (0, 0, 0);
         q::JS_NewClassID(&mut module);
         q::JS_NewClassID(&mut request);
-        (module, request)
+        q::JS_NewClassID(&mut state);
+        ClassIds {
+            module,
+            request,
+            state,
+        }
     });
-    if q::JS_IsRegisteredClass(rt, ids.0) == 0 {
-        let module = q::JSClassDef {
-            class_name: c"ModuleObject".as_ptr(),
-            finalizer: Some(module_finalize),
-            gc_mark: Some(module_gc_mark),
-            call: None,
-            exotic: ptr::null_mut(),
-        };
-        assert_eq!(q::JS_NewClass(rt, ids.0, &module), 0);
-        let request = q::JSClassDef {
-            class_name: c"ModuleRequest".as_ptr(),
-            finalizer: Some(request_finalize),
-            gc_mark: None,
-            call: None,
-            exotic: ptr::null_mut(),
-        };
-        assert_eq!(q::JS_NewClass(rt, ids.1, &request), 0);
+    if q::JS_IsRegisteredClass(rt, ids.module) == 0 {
+        let defs = [
+            (
+                ids.module,
+                c"ModuleObject",
+                module_finalize as _,
+                module_gc_mark as _,
+            ),
+            (
+                ids.request,
+                c"ModuleRequest",
+                request_finalize as _,
+                request_gc_mark as _,
+            ),
+            (
+                ids.state,
+                c"GraphLoadingState",
+                state_finalize as _,
+                state_gc_mark as _,
+            ),
+        ];
+        for (id, name, finalizer, gc_mark) in defs {
+            let def = q::JSClassDef {
+                class_name: name.as_ptr(),
+                finalizer: Some(finalizer),
+                gc_mark: Some(gc_mark),
+                call: None,
+                exotic: ptr::null_mut(),
+            };
+            assert_eq!(q::JS_NewClass(rt, id, &def), 0);
+        }
     }
     ids
 }
@@ -87,10 +152,7 @@ fn module_val(m: *mut q::JSModuleDef) -> q::JSValue {
     q::JSValue::mkptr(q::JS_TAG_MODULE, m as *mut c_void)
 }
 
-unsafe fn opaque_of<T>(
-    v: q::JSValue,
-    class: fn((q::JSClassID, q::JSClassID)) -> q::JSClassID,
-) -> *mut T {
+unsafe fn opaque_of<T>(v: q::JSValue, class: fn(ClassIds) -> q::JSClassID) -> *mut T {
     match CLASSES.get() {
         Some(ids) => q::JS_GetOpaque(v, class(*ids)) as *mut T,
         None => ptr::null_mut(),
@@ -98,38 +160,91 @@ unsafe fn opaque_of<T>(
 }
 
 unsafe fn module_data<'a>(obj: *mut root::JSObject) -> Option<&'a mut ModuleData> {
-    opaque_of::<ModuleData>(obj_val(obj), |ids| ids.0).as_mut()
+    opaque_of::<ModuleData>(obj_val(obj), |ids| ids.module).as_mut()
 }
 
 unsafe fn request_data<'a>(obj: *mut root::JSObject) -> Option<&'a mut RequestData> {
-    opaque_of::<RequestData>(obj_val(obj), |ids| ids.1).as_mut()
+    opaque_of::<RequestData>(obj_val(obj), |ids| ids.request).as_mut()
+}
+
+unsafe fn state_data(v: q::JSValue) -> *mut LoadState {
+    if v.tag() != q::JS_TAG_OBJECT {
+        return ptr::null_mut();
+    }
+    opaque_of::<LoadState>(v, |ids| ids.state)
 }
 
 unsafe fn module_of(obj: *mut root::JSObject) -> &'static mut ModuleData {
     module_data(obj).expect("not a module record")
 }
 
+unsafe fn mark_all<'a>(
+    rt: *mut q::JSRuntime,
+    values: impl IntoIterator<Item = &'a q::JSValue>,
+    mark: q::JS_MarkFunc,
+) {
+    for v in values {
+        if v.has_ref_count() {
+            q::JS_MarkValue(rt, *v, mark);
+        }
+    }
+}
+
+unsafe fn free_all<'a>(rt: *mut q::JSRuntime, values: impl IntoIterator<Item = &'a q::JSValue>) {
+    for v in values {
+        q::JS_FreeValueRT(rt, *v);
+    }
+}
+
 unsafe extern "C" fn module_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
-    let data = opaque_of::<ModuleData>(val, |ids| ids.0);
+    let data = opaque_of::<ModuleData>(val, |ids| ids.module);
     if !data.is_null() {
         let data = Box::from_raw(data);
+        RECORDS.with(|r| r.borrow_mut().remove(&(data.module as usize)));
         q::JS_FreeValueRT(rt, module_val(data.module));
         q::JS_FreeValueRT(rt, data.private);
+        free_all(rt, data.loaded.iter().chain(&data.requests));
     }
 }
 
 unsafe extern "C" fn module_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
-    let data = opaque_of::<ModuleData>(val, |ids| ids.0);
+    let data = opaque_of::<ModuleData>(val, |ids| ids.module);
     if let Some(data) = data.as_ref() {
         q::JS_MarkValue(rt, module_val(data.module), mark);
-        q::JS_MarkValue(rt, data.private, mark);
+        mark_all(rt, [&data.private], mark);
+        mark_all(rt, data.loaded.iter().chain(&data.requests), mark);
     }
 }
 
 unsafe extern "C" fn request_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
-    let data = opaque_of::<RequestData>(val, |ids| ids.1);
+    let data = opaque_of::<RequestData>(val, |ids| ids.request);
     if !data.is_null() {
-        q::JS_FreeValueRT(rt, Box::from_raw(data).specifier);
+        let data = Box::from_raw(data);
+        free_all(rt, [&data.specifier, &data.referrer]);
+    }
+}
+
+unsafe extern "C" fn request_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
+    let data = opaque_of::<RequestData>(val, |ids| ids.request);
+    if let Some(data) = data.as_ref() {
+        mark_all(rt, [&data.referrer], mark);
+    }
+}
+
+unsafe extern "C" fn state_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
+    let data = opaque_of::<LoadState>(val, |ids| ids.state);
+    if !data.is_null() {
+        let data = Box::from_raw(data);
+        free_all(rt, [&data.promise, &data.host_defined]);
+        free_all(rt, &data.visited);
+    }
+}
+
+unsafe extern "C" fn state_gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
+    let data = opaque_of::<LoadState>(val, |ids| ids.state);
+    if let Some(data) = data.as_ref() {
+        mark_all(rt, [&data.promise, &data.host_defined], mark);
+        mark_all(rt, &data.visited, mark);
     }
 }
 
@@ -139,36 +254,51 @@ unsafe fn new_module_object(
     module: q::JSValue,
     kind: ModuleKind,
 ) -> *mut root::JSObject {
-    let (class, _) = classes(cx.rt);
+    let class = classes(cx.rt).module;
     let obj = q::JS_NewObjectProtoClass(cx.qctx(), q::JS_NULL, class);
     if obj.tag() == q::JS_TAG_EXCEPTION {
         q::JS_FreeValueRT(cx.rt, module);
         return ptr::null_mut();
     }
-    let data = Box::new(ModuleData {
-        module: module.ptr() as *mut q::JSModuleDef,
+    let m = module.ptr() as *mut q::JSModuleDef;
+    let count = if kind == ModuleKind::JavaScript {
+        q::JS_GetModuleRequestCount(m) as usize
+    } else {
+        0
+    };
+    let data = Box::into_raw(Box::new(ModuleData {
+        module: m,
         kind,
         private: q::JS_UNDEFINED,
-    });
-    q::JS_SetOpaque(obj, Box::into_raw(data) as *mut c_void);
+        loaded: vec![q::JS_UNDEFINED; count],
+        requests: vec![q::JS_UNDEFINED; count],
+        loaded_graph: false,
+    }));
+    RECORDS.with(|r| r.borrow_mut().insert(m as usize, val_obj(obj)));
+    q::JS_SetOpaque(obj, data as *mut c_void);
     adopt_object(cx, obj)
 }
 
-/// A new module request object (a new reference) taking over `specifier`.
+/// A new module request object (a new reference) taking over `specifier` and `referrer`.
 unsafe fn new_module_request(
     cx: &mut Cx,
     specifier: q::JSValue,
     module_type: root::JS::ModuleType,
+    referrer: q::JSValue,
+    index: usize,
 ) -> q::JSValue {
-    let (_, class) = classes(cx.rt);
+    let class = classes(cx.rt).request;
     let obj = q::JS_NewObjectProtoClass(cx.qctx(), q::JS_NULL, class);
     if obj.tag() == q::JS_TAG_EXCEPTION {
         q::JS_FreeValueRT(cx.rt, specifier);
+        q::JS_FreeValueRT(cx.rt, referrer);
         return obj;
     }
     let data = Box::new(RequestData {
         specifier,
         module_type,
+        referrer,
+        index,
     });
     q::JS_SetOpaque(obj, Box::into_raw(data) as *mut c_void);
     obj
@@ -258,13 +388,14 @@ unsafe fn module_type_of(ctx: *mut q::JSContext, attributes: q::JSValue) -> root
         q::JS_TAG_UNDEFINED => root::JS::ModuleType::JavaScript,
         q::JS_TAG_STRING => {
             let s = q::JS_ToCString(ctx, value);
-            let json = !s.is_null() && CStr::from_ptr(s) == c"json";
+            let module_type = match (!s.is_null()).then(|| CStr::from_ptr(s).to_bytes()) {
+                Some(b"json") => root::JS::ModuleType::JSON,
+                Some(b"css") => root::JS::ModuleType::CSS,
+                Some(b"text") => root::JS::ModuleType::Text,
+                _ => root::JS::ModuleType::Unknown,
+            };
             q::JS_FreeCString(ctx, s);
-            if json {
-                root::JS::ModuleType::JSON
-            } else {
-                root::JS::ModuleType::Unknown
-            }
+            module_type
         }
         _ => root::JS::ModuleType::Unknown,
     };
@@ -276,26 +407,39 @@ unsafe fn module_type_of(ctx: *mut q::JSContext, attributes: q::JSValue) -> root
     module_type
 }
 
-/// The module request for request `idx` of `m` (a new reference), or `JS_EXCEPTION`.
-unsafe fn requested_module(
+/// The request object for request `idx` of `module` (borrowed: the record keeps it), or null
+/// with an exception.
+unsafe fn module_request(
     cx: &mut Cx,
-    ctx: *mut q::JSContext,
-    m: *mut q::JSModuleDef,
-    idx: c_int,
-) -> q::JSValue {
-    let atom = q::JS_GetModuleRequestSpecifier(ctx, m, idx);
+    module: *mut root::JSObject,
+    idx: usize,
+) -> *mut root::JSObject {
+    let data = module_of(module);
+    if data.requests[idx].tag() == q::JS_TAG_OBJECT {
+        return val_obj(data.requests[idx]);
+    }
+    let ctx = cx.qctx();
+    let m = data.module;
+    let atom = q::JS_GetModuleRequestSpecifier(ctx, m, idx as c_int);
     if atom == q::JS_ATOM_NULL {
-        return q::JS_ThrowRangeError(ctx, c"invalid module request index".as_ptr());
+        q::JS_ThrowRangeError(ctx, c"invalid module request index".as_ptr());
+        return ptr::null_mut();
     }
     let specifier = q::JS_AtomToString(ctx, atom);
     q::JS_FreeAtom(ctx, atom);
     if specifier.tag() == q::JS_TAG_EXCEPTION {
-        return specifier;
+        return ptr::null_mut();
     }
-    let attributes = q::JS_GetModuleRequestAttributes(ctx, m, idx);
+    let attributes = q::JS_GetModuleRequestAttributes(ctx, m, idx as c_int);
     let module_type = module_type_of(ctx, attributes);
     q::JS_FreeValue(ctx, attributes);
-    new_module_request(cx, specifier, module_type)
+    let referrer = q::JS_DupValueRT(cx.rt, obj_val(module));
+    let request = new_module_request(cx, specifier, module_type, referrer, idx);
+    if request.tag() == q::JS_TAG_EXCEPTION {
+        return ptr::null_mut();
+    }
+    module_of(module).requests[idx] = request;
+    val_obj(request)
 }
 
 // Compilation.
@@ -315,17 +459,32 @@ unsafe fn compile_module(cx: &mut Cx, filename: &CStr, src: &[u8]) -> *mut root:
     new_module_object(cx, module, ModuleKind::JavaScript)
 }
 
-unsafe extern "C" fn json_module_init(ctx: *mut q::JSContext, m: *mut q::JSModuleDef) -> c_int {
+unsafe extern "C" fn synthetic_module_init(
+    ctx: *mut q::JSContext,
+    m: *mut q::JSModuleDef,
+) -> c_int {
     let value = q::JS_GetModulePrivateValue(ctx, m);
     q::JS_SetModulePrivateValue(ctx, m, q::JS_UNDEFINED);
     q::JS_SetModuleExport(ctx, m, c"default".as_ptr(), value)
 }
 
+/// A synthetic module whose default export is `value` (consumed).
+unsafe fn synthetic_module(cx: &mut Cx, name: &CStr, value: q::JSValue) -> *mut root::JSObject {
+    let qctx = cx.qctx();
+    let m = q::JS_NewCModule(qctx, name.as_ptr(), Some(synthetic_module_init));
+    if m.is_null() || q::JS_AddModuleExport(qctx, m, c"default".as_ptr()) < 0 {
+        q::JS_FreeValue(qctx, value);
+        return ptr::null_mut();
+    }
+    q::JS_SetModulePrivateValue(qctx, m, value);
+    let module = q::JS_DupValue(qctx, module_val(m));
+    new_module_object(cx, module, ModuleKind::Synthetic)
+}
+
 /// A synthetic module whose default export is the JSON value of `src` (NUL-terminated).
 unsafe fn compile_json_module(cx: &mut Cx, filename: &CStr, src: &[u8]) -> *mut root::JSObject {
-    let qctx = cx.qctx();
     let value = q::JS_ParseJSON(
-        qctx,
+        cx.qctx(),
         src.as_ptr() as *const c_char,
         src.len() - 1,
         filename.as_ptr(),
@@ -333,14 +492,16 @@ unsafe fn compile_json_module(cx: &mut Cx, filename: &CStr, src: &[u8]) -> *mut 
     if value.tag() == q::JS_TAG_EXCEPTION {
         return ptr::null_mut();
     }
-    let m = q::JS_NewCModule(qctx, filename.as_ptr(), Some(json_module_init));
-    if m.is_null() || q::JS_AddModuleExport(qctx, m, c"default".as_ptr()) < 0 {
-        q::JS_FreeValue(qctx, value);
-        return ptr::null_mut();
-    }
-    q::JS_SetModulePrivateValue(qctx, m, value);
-    let module = q::JS_DupValue(qctx, module_val(m));
-    new_module_object(cx, module, ModuleKind::Json)
+    synthetic_module(cx, filename, value)
+}
+
+pub(crate) unsafe fn CreateDefaultExportSyntheticModule(
+    cx: *mut root::JSContext,
+    defaultExport: root::JS::Handle<root::JS::Value>,
+) -> *mut root::JSObject {
+    let cx = Cx::from_raw(cx);
+    let value = q::JS_DupValueRT(cx.rt, (*defaultExport.ptr).to_qjs());
+    synthetic_module(cx, c"<synthetic>", value)
 }
 
 pub(crate) unsafe fn CompileModule1(
@@ -405,7 +566,7 @@ pub(crate) unsafe fn SetModulePrivate(module: *mut root::JSObject, value: *const
         ModuleKind::JavaScript => {
             q::JS_SetModulePrivateValue(cx.base_ctx, data.module, value);
         }
-        ModuleKind::Json => {
+        ModuleKind::Synthetic => {
             let old = std::mem::replace(&mut data.private, value);
             q::JS_FreeValueRT(cx.rt, old);
         }
@@ -420,49 +581,25 @@ pub(crate) unsafe fn JS_GetModulePrivate(
     let data = module_of(module);
     let value = match data.kind {
         ModuleKind::JavaScript => q::JS_GetModulePrivateValue(cx.base_ctx, data.module),
-        ModuleKind::Json => q::JS_DupValueRT(cx.rt, data.private),
+        ModuleKind::Synthetic => q::JS_DupValueRT(cx.rt, data.private),
     };
     *dest.ptr = cx.adopt(value);
 }
 
-pub(crate) unsafe fn GetRequestedModulesCount(
-    cx: *mut root::JSContext,
+pub(crate) unsafe fn GetModuleScript(
     moduleRecord: root::JS::Handle<*mut root::JSObject>,
-) -> u32 {
-    let _ = cx;
-    q::JS_GetModuleRequestCount(module_of(*moduleRecord.ptr).module) as u32
-}
-
-pub(crate) unsafe fn GetRequestedModuleSpecifier(
-    cx: *mut root::JSContext,
-    moduleRecord: root::JS::Handle<*mut root::JSObject>,
-    index: u32,
-) -> *mut root::JSString {
-    let cx = Cx::from_raw(cx);
-    let qctx = cx.qctx();
-    let m = module_of(*moduleRecord.ptr).module;
-    let attributes = q::JS_GetModuleRequestAttributes(qctx, m, index as c_int);
-    let supported = check_attributes(qctx, attributes, false);
-    let module_type = module_type_of(qctx, attributes);
-    q::JS_FreeValue(qctx, attributes);
-    if !supported {
+) -> *mut root::JSScript {
+    let cx = super::current();
+    let data = module_of(*moduleRecord.ptr);
+    if data.kind != ModuleKind::JavaScript {
         return ptr::null_mut();
     }
-    if module_type == root::JS::ModuleType::Unknown {
-        q::JS_ThrowTypeError(qctx, c"invalid module type".as_ptr());
+    let script = q::JS_GetModuleScript(cx.base_ctx, data.module);
+    if script.tag() != q::JS_TAG_FUNCTION_BYTECODE {
         return ptr::null_mut();
     }
-    let atom = q::JS_GetModuleRequestSpecifier(qctx, m, index as c_int);
-    if atom == q::JS_ATOM_NULL {
-        q::JS_ThrowRangeError(qctx, c"invalid module request index".as_ptr());
-        return ptr::null_mut();
-    }
-    let specifier = q::JS_AtomToString(qctx, atom);
-    q::JS_FreeAtom(qctx, atom);
-    if specifier.tag() == q::JS_TAG_EXCEPTION {
-        return ptr::null_mut();
-    }
-    cx.adopt(specifier).to_string()
+    cx.adopt(script);
+    script.ptr() as *mut root::JSScript
 }
 
 pub(crate) unsafe fn GetRequestedModuleType(
@@ -479,20 +616,6 @@ pub(crate) unsafe fn GetRequestedModuleType(
 }
 
 // Module requests.
-
-pub(crate) unsafe fn CreateModuleRequest(
-    cx: *mut root::JSContext,
-    specifierArg: root::JS::Handle<*mut root::JSString>,
-    moduleType: root::JS::ModuleType,
-) -> *mut root::JSObject {
-    let cx = Cx::from_raw(cx);
-    let specifier = q::JS_DupValueRT(
-        cx.rt,
-        q::JSValue::mkptr(q::JS_TAG_STRING, *specifierArg.ptr as *mut c_void),
-    );
-    let request = new_module_request(cx, specifier, moduleType);
-    adopt_object(cx, request)
-}
 
 pub(crate) unsafe fn GetModuleRequestSpecifier(
     cx: *mut root::JSContext,
@@ -513,9 +636,317 @@ pub(crate) unsafe fn GetModuleRequestType(
         .module_type
 }
 
+pub(crate) unsafe fn ModuleRequestIsSourcePhase(
+    cx: *mut root::JSContext,
+    moduleRequestArg: root::JS::Handle<*mut root::JSObject>,
+) -> bool {
+    let _ = (cx, moduleRequestArg);
+    false
+}
+
+// Loading (ECMA-262 LoadRequestedModules and FinishLoadingImportedModule).
+
+unsafe fn new_load_state(
+    cx: &mut Cx,
+    promise: q::JSValue,
+    resolved: root::JS::LoadModuleResolvedCallback,
+    rejected: root::JS::LoadModuleRejectedCallback,
+    host_defined: root::JS::Handle<root::JS::Value>,
+) -> q::JSValue {
+    let class = classes(cx.rt).state;
+    let obj = q::JS_NewObjectProtoClass(cx.qctx(), q::JS_NULL, class);
+    if obj.tag() == q::JS_TAG_EXCEPTION {
+        q::JS_FreeValueRT(cx.rt, promise);
+        return obj;
+    }
+    let data = Box::new(LoadState {
+        promise,
+        resolved,
+        rejected,
+        is_loading: true,
+        pending: 1,
+        visited: Vec::new(),
+        host_defined: q::JS_DupValueRT(cx.rt, (*host_defined.ptr).to_qjs()),
+    });
+    q::JS_SetOpaque(obj, Box::into_raw(data) as *mut c_void);
+    obj
+}
+
+/// Settles the load of `state` (borrowed).
+unsafe fn settle_load(cx: &mut Cx, state: q::JSValue, error: Option<q::JSValue>) -> bool {
+    let data = &*state_data(state);
+    if data.promise.tag() == q::JS_TAG_OBJECT {
+        let value = error.unwrap_or(q::JS_UNDEFINED);
+        return q::JS_SettlePromise(cx.qctx(), data.promise, value, error.is_some() as c_int) >= 0;
+    }
+    let host_defined = JSVal::from_qjs(data.host_defined);
+    match error {
+        None => data.resolved.unwrap()(cx.as_raw(), handle(&host_defined)),
+        Some(error) => {
+            let error = JSVal::from_qjs(error);
+            data.rejected.unwrap()(cx.as_raw(), handle(&host_defined), handle(&error))
+        }
+    }
+}
+
+/// HostLoadImportedModule: asks the embedder's load hook for `request`; the load fails with the
+/// hook's exception if it returns false.
+unsafe fn host_load_imported_module(
+    cx: &mut Cx,
+    referrer: *mut root::JSScript,
+    request: *mut root::JSObject,
+    host_defined: JSVal,
+    payload: JSVal,
+) -> bool {
+    let ok = match hooks(cx.rt).load {
+        Some(hook) => hook(
+            cx.as_raw(),
+            handle(&referrer),
+            handle(&request),
+            handle(&host_defined),
+            handle(&payload),
+            0,
+            root::JS::ColumnNumberOneOrigin { _base: 1 },
+        ),
+        None => {
+            q::JS_ThrowTypeError(cx.qctx(), c"Module load hook not set".as_ptr());
+            false
+        }
+    };
+    if ok {
+        return true;
+    }
+    let raw = cx.as_raw();
+    if q::JS_HasException(cx.qctx()) != 0 {
+        FinishLoadingImportedModuleFailedWithPendingException(raw, handle(&payload))
+    } else {
+        let undefined = JSVal::from_qjs(q::JS_UNDEFINED);
+        FinishLoadingImportedModuleFailed(raw, handle(&payload), handle(&undefined))
+    }
+}
+
+/// Fails the load of `state` with the pending exception.
+unsafe fn fail_with_pending_exception(cx: &mut Cx, state: q::JSValue) -> bool {
+    let error = cx.adopt(q::JS_GetException(cx.qctx()));
+    continue_module_loading(cx, state, ptr::null_mut(), Some(error.to_qjs()))
+}
+
+/// InnerModuleLoading(state, module): `state` and `module` are borrowed.
+unsafe fn inner_module_loading(
+    cx: &mut Cx,
+    state: q::JSValue,
+    module: *mut root::JSObject,
+) -> bool {
+    let data = module_of(module);
+    let visited = (*state_data(state))
+        .visited
+        .iter()
+        .any(|v| val_obj(*v) == module);
+    if data.kind == ModuleKind::JavaScript && !data.loaded_graph && !visited {
+        (*state_data(state))
+            .visited
+            .push(q::JS_DupValueRT(cx.rt, obj_val(module)));
+        let count = data.requests.len();
+        (*state_data(state)).pending += count;
+        let referrer = GetModuleScript(handle(&module));
+        for idx in 0..count {
+            let qctx = cx.qctx();
+            let m = module_of(module).module;
+            let attributes = q::JS_GetModuleRequestAttributes(qctx, m, idx as c_int);
+            let supported = check_attributes(qctx, attributes, false);
+            q::JS_FreeValue(qctx, attributes);
+            let loaded = module_of(module).loaded[idx];
+            let ok = if !supported {
+                fail_with_pending_exception(cx, state)
+            } else if loaded.tag() == q::JS_TAG_OBJECT {
+                inner_module_loading(cx, state, val_obj(loaded))
+            } else {
+                let request = module_request(cx, module, idx);
+                if request.is_null() {
+                    fail_with_pending_exception(cx, state)
+                } else {
+                    let host_defined = JSVal::from_qjs((*state_data(state)).host_defined);
+                    host_load_imported_module(
+                        cx,
+                        referrer,
+                        request,
+                        host_defined,
+                        JSVal::from_qjs(state),
+                    )
+                }
+            };
+            if !ok {
+                return false;
+            }
+            if !(*state_data(state)).is_loading {
+                return true;
+            }
+        }
+    }
+    let data = &mut *state_data(state);
+    debug_assert!(data.pending >= 1);
+    data.pending -= 1;
+    if data.pending == 0 {
+        data.is_loading = false;
+        for v in &data.visited {
+            module_of(val_obj(*v)).loaded_graph = true;
+        }
+        return settle_load(cx, state, None);
+    }
+    true
+}
+
+/// ContinueModuleLoading(state, moduleCompletion): `module` is the loaded module, or null for
+/// the failure `error`.
+unsafe fn continue_module_loading(
+    cx: &mut Cx,
+    state: q::JSValue,
+    module: *mut root::JSObject,
+    error: Option<q::JSValue>,
+) -> bool {
+    if !(*state_data(state)).is_loading {
+        return true;
+    }
+    if !module.is_null() {
+        return inner_module_loading(cx, state, module);
+    }
+    (*state_data(state)).is_loading = false;
+    settle_load(cx, state, Some(error.unwrap_or(q::JS_UNDEFINED)))
+}
+
+/// LoadRequestedModules with the state's promise or callbacks set by the caller.
+unsafe fn load_requested_modules(
+    cx: &mut Cx,
+    module: *mut root::JSObject,
+    state: q::JSValue,
+) -> bool {
+    if state.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    let state = cx.adopt(state).to_qjs();
+    if module_of(module).kind != ModuleKind::JavaScript {
+        (*state_data(state)).is_loading = false;
+        return settle_load(cx, state, None);
+    }
+    if !inner_module_loading(cx, state, module) {
+        (*state_data(state)).is_loading = false;
+        return false;
+    }
+    true
+}
+
+pub(crate) unsafe fn LoadRequestedModules(
+    cx: *mut root::JSContext,
+    module: root::JS::Handle<*mut root::JSObject>,
+    hostDefined: root::JS::Handle<root::JS::Value>,
+    resolved: root::JS::LoadModuleResolvedCallback,
+    rejected: root::JS::LoadModuleRejectedCallback,
+) -> bool {
+    let cx = Cx::from_raw(cx);
+    let state = new_load_state(cx, q::JS_UNDEFINED, resolved, rejected, hostDefined);
+    load_requested_modules(cx, *module.ptr, state)
+}
+
+pub(crate) unsafe fn LoadRequestedModules1(
+    cx: *mut root::JSContext,
+    module: root::JS::Handle<*mut root::JSObject>,
+    hostDefined: root::JS::Handle<root::JS::Value>,
+    promiseOut: root::JS::MutableHandle<*mut root::JSObject>,
+) -> bool {
+    let cx = Cx::from_raw(cx);
+    let mut funcs = [q::JS_UNDEFINED; 2];
+    let promise = q::JS_NewPromiseCapability(cx.qctx(), funcs.as_mut_ptr());
+    free_all(cx.rt, &funcs);
+    if promise.tag() == q::JS_TAG_EXCEPTION {
+        return false;
+    }
+    *promiseOut.ptr = cx.retain(JSVal::from_qjs(promise)).to_object();
+    let state = new_load_state(cx, promise, None, None, hostDefined);
+    load_requested_modules(cx, *module.ptr, state)
+}
+
+/// Records `result` in the referrer's [[LoadedModules]] (requests of import() have none).
+unsafe fn record_loaded_module(
+    cx: &mut Cx,
+    request: *mut root::JSObject,
+    result: *mut root::JSObject,
+) {
+    let request = request_data(request).expect("not a module request");
+    if request.referrer.tag() != q::JS_TAG_OBJECT {
+        return;
+    }
+    let loaded = &mut module_of(val_obj(request.referrer)).loaded[request.index];
+    if loaded.tag() == q::JS_TAG_OBJECT {
+        debug_assert!(val_obj(*loaded) == result);
+        return;
+    }
+    *loaded = q::JS_DupValueRT(cx.rt, obj_val(result));
+}
+
+pub(crate) unsafe fn FinishLoadingImportedModule(
+    cx: *mut root::JSContext,
+    referrer: root::JS::Handle<*mut root::JSScript>,
+    moduleRequest: root::JS::Handle<*mut root::JSObject>,
+    payload: root::JS::Handle<root::JS::Value>,
+    result: root::JS::Handle<*mut root::JSObject>,
+    usePromise: bool,
+) -> bool {
+    let _ = (referrer, usePromise);
+    let cx = Cx::from_raw(cx);
+    record_loaded_module(cx, *moduleRequest.ptr, *result.ptr);
+    let payload = (*payload.ptr).to_qjs();
+    if state_data(payload).is_null() {
+        // ContinueDynamicImport: Servo uses FinishLoadingDynamicImportedModule instead.
+        q::JS_ThrowInternalError(
+            cx.qctx(),
+            c"FinishLoadingImportedModule for import() is not implemented".as_ptr(),
+        );
+        return false;
+    }
+    continue_module_loading(cx, payload, *result.ptr, None)
+}
+
+pub(crate) unsafe fn FinishLoadingDynamicImportedModule(
+    cx: *mut root::JSContext,
+    referrer: root::JS::Handle<*mut root::JSScript>,
+    moduleRequest: root::JS::Handle<*mut root::JSObject>,
+    payload: root::JS::Handle<root::JS::Value>,
+    result: root::JS::Handle<*mut root::JSObject>,
+) -> bool {
+    let _ = (referrer, payload);
+    record_loaded_module(Cx::from_raw(cx), *moduleRequest.ptr, *result.ptr);
+    true
+}
+
+pub(crate) unsafe fn FinishLoadingImportedModuleFailed(
+    cx: *mut root::JSContext,
+    payloadArg: root::JS::Handle<root::JS::Value>,
+    error: root::JS::Handle<root::JS::Value>,
+) -> bool {
+    let cx = Cx::from_raw(cx);
+    let payload = (*payloadArg.ptr).to_qjs();
+    let error = (*error.ptr).to_qjs();
+    if !state_data(payload).is_null() {
+        return continue_module_loading(cx, payload, ptr::null_mut(), Some(error));
+    }
+    // ContinueDynamicImport: rejects the promise of import().
+    q::JS_SettlePromise(cx.qctx(), payload, error, 1) >= 0
+}
+
+pub(crate) unsafe fn FinishLoadingImportedModuleFailedWithPendingException(
+    cx: *mut root::JSContext,
+    payload: root::JS::Handle<root::JS::Value>,
+) -> bool {
+    let error = {
+        let cx = Cx::from_raw(cx);
+        cx.adopt(q::JS_GetException(cx.qctx()))
+    };
+    FinishLoadingImportedModuleFailed(cx, payload, handle(&error))
+}
+
 // Link and evaluate.
 
-/// `JSModuleResolveFunc` for `JS_LinkModule`: Servo's HostResolveImportedModule.
+/// `JSModuleResolveFunc` for `JS_LinkModule`: the module that request `idx` of `m` loaded.
 unsafe extern "C" fn resolve_imported_module(
     ctx: *mut q::JSContext,
     m: *mut q::JSModuleDef,
@@ -523,26 +954,12 @@ unsafe extern "C" fn resolve_imported_module(
     opaque: *mut c_void,
 ) -> *mut q::JSModuleDef {
     let _ = opaque;
-    let cx = super::current();
-    let Some(hook) = hooks(cx.rt).resolve else {
-        q::JS_ThrowTypeError(ctx, c"no module resolve hook".as_ptr());
-        return ptr::null_mut();
-    };
-    let request = requested_module(cx, ctx, m, idx);
-    if request.tag() == q::JS_TAG_EXCEPTION {
-        return ptr::null_mut();
-    }
-    let request = cx.adopt(request).to_object();
-    let private = cx.adopt(module_private(ctx, m));
-    let result = in_realm_of(cx, ctx, |raw| hook(raw, handle(&private), handle(&request)));
-    if result.is_null() {
-        ensure_exception(ctx);
-        return ptr::null_mut();
-    }
-    match module_data(result) {
-        Some(data) => data.module,
-        None => {
-            q::JS_ThrowTypeError(ctx, c"module resolve hook returned a non-module".as_ptr());
+    let loaded =
+        record_of(m).and_then(|record| module_of(record).loaded.get(idx as usize).copied());
+    match loaded {
+        Some(loaded) if loaded.tag() == q::JS_TAG_OBJECT => module_of(val_obj(loaded)).module,
+        _ => {
+            q::JS_ThrowTypeError(ctx, c"module request was not loaded".as_ptr());
             ptr::null_mut()
         }
     }
@@ -635,9 +1052,8 @@ pub(crate) unsafe fn GetModuleNamespace(
 #[derive(Clone, Copy, Default)]
 struct Hooks {
     preparer: crate::sys::glue::InvokeScriptPreparerHook,
-    resolve: root::JS::ModuleResolveHook,
+    load: root::JS::ModuleLoadHook,
     metadata: root::JS::ModuleMetadataHook,
-    dynamic_import: root::JS::ModuleDynamicImportHook,
     add_ref: root::JS::ScriptPrivateReferenceHook,
     release: root::JS::ScriptPrivateReferenceHook,
 }
@@ -706,15 +1122,17 @@ unsafe extern "C" fn report_rejected_module(
     true
 }
 
-pub(crate) unsafe fn SetModuleResolveHook(
-    rt: *mut root::JSRuntime,
-    func: root::JS::ModuleResolveHook,
-) {
-    update_hooks(rt, |h| h.resolve = func);
+pub(crate) unsafe fn SetModuleLoadHook(rt: *mut root::JSRuntime, func: root::JS::ModuleLoadHook) {
+    update_hooks(rt, |h| h.load = func);
+    q::JS_SetDynamicImportHook(
+        rt as *mut q::JSRuntime,
+        func.map(|_| dynamic_import_hook as _),
+        ptr::null_mut(),
+    );
 }
 
-pub(crate) unsafe fn GetModuleResolveHook(rt: *mut root::JSRuntime) -> root::JS::ModuleResolveHook {
-    hooks(rt as *mut q::JSRuntime).resolve
+pub(crate) unsafe fn GetModuleLoadHook(rt: *mut root::JSRuntime) -> root::JS::ModuleLoadHook {
+    hooks(rt as *mut q::JSRuntime).load
 }
 
 pub(crate) unsafe fn SetModuleMetadataHook(
@@ -733,24 +1151,6 @@ pub(crate) unsafe fn GetModuleMetadataHook(
     rt: *mut root::JSRuntime,
 ) -> root::JS::ModuleMetadataHook {
     hooks(rt as *mut q::JSRuntime).metadata
-}
-
-pub(crate) unsafe fn SetModuleDynamicImportHook(
-    rt: *mut root::JSRuntime,
-    func: root::JS::ModuleDynamicImportHook,
-) {
-    update_hooks(rt, |h| h.dynamic_import = func);
-    q::JS_SetDynamicImportHook(
-        rt as *mut q::JSRuntime,
-        func.map(|_| dynamic_import_hook as _),
-        ptr::null_mut(),
-    );
-}
-
-pub(crate) unsafe fn GetModuleDynamicImportHook(
-    rt: *mut root::JSRuntime,
-) -> root::JS::ModuleDynamicImportHook {
-    hooks(rt as *mut q::JSRuntime).dynamic_import
 }
 
 pub(crate) unsafe fn SetScriptPrivateReferenceHooks(
@@ -793,9 +1193,20 @@ unsafe extern "C" fn import_meta_hook(
     let Some(hook) = hooks(cx.rt).metadata else {
         return 0;
     };
-    let private = cx.adopt(module_private(ctx, m));
+    // The record may be gone while code of the module still runs: make another one.
+    let record = match record_of(m) {
+        Some(record) => record,
+        None => new_module_object(
+            cx,
+            q::JS_DupValue(ctx, module_val(m)),
+            ModuleKind::JavaScript,
+        ),
+    };
+    if record.is_null() {
+        return -1;
+    }
     let meta = val_obj(meta);
-    if in_realm_of(cx, ctx, |raw| hook(raw, handle(&private), handle(&meta))) {
+    if in_realm_of(cx, ctx, |raw| hook(raw, handle(&record), handle(&meta))) {
         0
     } else {
         ensure_exception(ctx);
@@ -827,7 +1238,8 @@ pub(crate) unsafe fn script_or_module_private(
     cx.adopt(module_private(ctx, m))
 }
 
-/// `JSDynamicImportHook`: Servo's HostImportModuleDynamically, which settles `promise`.
+/// `JSDynamicImportHook`: import() loads through the load hook (HostLoadImportedModule) with the
+/// import() promise as payload; the embedder settles it.
 unsafe extern "C" fn dynamic_import_hook(
     ctx: *mut q::JSContext,
     m: *mut q::JSModuleDef,
@@ -837,38 +1249,29 @@ unsafe extern "C" fn dynamic_import_hook(
     promise: q::JSValue,
     opaque: *mut c_void,
 ) -> c_int {
-    let _ = opaque;
+    let _ = (m, script_private, opaque);
     let cx = super::current();
-    let hooks = hooks(cx.rt);
-    let Some(hook) = hooks.dynamic_import else {
-        q::JS_ThrowTypeError(ctx, c"no dynamic import hook".as_ptr());
-        return -1;
-    };
     if !check_attributes(ctx, attributes, true) {
         return -1;
     }
     let module_type = module_type_of(ctx, attributes);
-    let request = new_module_request(cx, q::JS_DupValue(ctx, specifier), module_type);
+    let specifier = q::JS_DupValue(ctx, specifier);
+    let request = new_module_request(cx, specifier, module_type, q::JS_UNDEFINED, 0);
     if request.tag() == q::JS_TAG_EXCEPTION {
         return -1;
     }
     let request = cx.adopt(request).to_object();
-    let private = script_or_module_private(cx, ctx, m, script_private);
-    let promise = val_obj(promise);
-    let counted = !private.is_undefined();
-    if counted {
-        if let Some(add_ref) = hooks.add_ref {
-            add_ref(&private);
-        }
-    }
+    let script = cx.adopt(q::JS_GetActiveScript(ctx));
+    let script = if script.to_qjs().tag() == q::JS_TAG_FUNCTION_BYTECODE {
+        script.to_qjs().ptr() as *mut root::JSScript
+    } else {
+        ptr::null_mut()
+    };
+    let undefined = JSVal::from_qjs(q::JS_UNDEFINED);
+    let payload = JSVal::from_qjs(promise);
     let ok = in_realm_of(cx, ctx, |raw| {
-        hook(raw, handle(&private), handle(&request), handle(&promise))
+        host_load_imported_module(Cx::from_raw(raw), script, request, undefined, payload)
     });
-    if counted {
-        if let Some(release) = hooks.release {
-            release(&private);
-        }
-    }
     if ok {
         0
     } else {

@@ -189,7 +189,8 @@ fn unreachable_globals_are_freed() {
         JS_InitDestroyPrincipalsCallback(cx.raw_cx(), Some(destroy_principals));
         let callbacks = JSPrincipalsCallbacks {
             write: None,
-            isSystemOrAddonPrincipal: None,
+            isSystemPrincipal: None,
+            isAddonPrincipal: None,
         };
         let baseline = realm_count();
         for _ in 0..GLOBALS {

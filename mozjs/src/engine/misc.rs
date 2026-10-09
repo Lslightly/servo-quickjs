@@ -196,14 +196,6 @@ pub(crate) unsafe fn SetGCSliceCallback(
     None
 }
 
-pub(crate) unsafe fn SetDoCycleCollectionCallback(
-    cx: *mut root::JSContext,
-    callback: root::JS::DoCycleCollectionCallback,
-) -> root::JS::DoCycleCollectionCallback {
-    let _ = (cx, callback);
-    None
-}
-
 pub(crate) unsafe fn SetCreateGCSliceBudgetCallback(
     cx: *mut root::JSContext,
     cb: root::JS::CreateSliceBudgetCallback,
@@ -262,28 +254,12 @@ pub(crate) unsafe fn JS_AddWeakPointerCompartmentCallback(
     true
 }
 
-pub(crate) unsafe fn JS_SetGrayGCRootsTracer(
-    cx: *mut root::JSContext,
-    traceOp: root::JSGrayRootsTracer,
-    data: *mut c_void,
-) {
-    let _ = (cx, traceOp, data);
-}
-
 pub(crate) unsafe fn JS_RemoveExtraGCRootsTracer(
     cx: *mut root::JSContext,
     traceOp: root::JSTraceDataOp,
     data: *mut c_void,
 ) {
     let _ = (cx, traceOp, data);
-}
-
-pub(crate) unsafe fn JS_SetObjectsTenuredCallback(
-    cx: *mut root::JSContext,
-    cb: root::JSObjectsTenuredCallback,
-    data: *mut c_void,
-) {
-    let _ = (cx, cb, data);
 }
 
 pub(crate) unsafe fn JS_SetSizeOfIncludingThisCompartmentCallback(
@@ -448,21 +424,14 @@ pub(crate) unsafe fn InitConsumeStreamCallback(
     let _ = (cx, consume, report);
 }
 
-pub(crate) unsafe fn InitDispatchsToEventLoop(
-    cx: *mut root::JSContext,
-    callback: root::JS::DispatchToEventLoopCallback,
-    delayedCallback: root::JS::DelayedDispatchToEventLoopCallback,
-    closure: *mut c_void,
-) {
-    let _ = (cx, callback, delayedCallback, closure);
-}
-
 pub(crate) unsafe fn SetUpEventLoopDispatch(
     cx: *mut root::JSContext,
     callback: crate::sys::glue::RustDispatchToEventLoopCallback,
+    startedCallback: root::JS::AsyncTaskStartedCallback,
+    finishedCallback: root::JS::AsyncTaskFinishedCallback,
     closure: *mut c_void,
 ) {
-    let _ = (cx, callback, closure);
+    let _ = (cx, callback, startedCallback, finishedCallback, closure);
 }
 
 pub(crate) unsafe fn ShutdownAsyncTasks(cx: *mut root::JSContext) {

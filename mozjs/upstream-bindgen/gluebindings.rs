@@ -25,7 +25,31 @@ pub mod root {
                 use self::super::super::super::super::root;
             }
         }
-        pub mod __exception_ptr {
+        pub mod ranges {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+            pub mod __detail {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
+            pub mod __cust_imove {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
+            pub mod __cust_access {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
+        }
+        pub mod __cmp_cat {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod __cmp_cust {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod numbers {
             #[allow(unused_imports)]
             use self::super::super::super::root;
         }
@@ -33,13 +57,41 @@ pub mod root {
             #[allow(unused_imports)]
             use self::super::super::super::root;
         }
+        pub mod __exception_ptr {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
         pub mod __adl_only {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod __atomic_impl {
             #[allow(unused_imports)]
             use self::super::super::super::root;
         }
         pub mod placeholders {
             #[allow(unused_imports)]
             use self::super::super::super::root;
+        }
+        pub mod __parse_int {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod __select_int {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod filesystem {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod chrono {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+            pub mod __detail {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
         }
     }
     pub mod __gnu_cxx {
@@ -55,10 +107,6 @@ pub mod root {
         use self::super::super::root;
         pub(crate) use crate::jsapi::mozilla::*;
         pub mod detail {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-        pub mod tl {
             #[allow(unused_imports)]
             use self::super::super::super::root;
         }
@@ -99,6 +147,35 @@ pub mod root {
         #[allow(unused_imports)]
         use self::super::super::root;
     }
+    pub mod js {
+        #[allow(unused_imports)]
+        use self::super::super::root;
+        pub(crate) use crate::jsapi::js::*;
+        pub mod detail {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod jit {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod oom {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod gc {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+            pub mod detail {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
+        }
+        pub mod frontend {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+    }
     pub mod __pstl {
         #[allow(unused_imports)]
         use self::super::super::root;
@@ -114,55 +191,6 @@ pub mod root {
     pub mod __cxxabiv1 {
         #[allow(unused_imports)]
         use self::super::super::root;
-    }
-    pub mod double_conversion {
-        #[allow(unused_imports)]
-        use self::super::super::root;
-    }
-    pub mod fmt {
-        #[allow(unused_imports)]
-        use self::super::super::root;
-        pub mod detail {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-            pub mod adl {
-                #[allow(unused_imports)]
-                use self::super::super::super::super::root;
-            }
-            pub mod dragonbox {
-                #[allow(unused_imports)]
-                use self::super::super::super::super::root;
-            }
-        }
-    }
-    pub mod js {
-        #[allow(unused_imports)]
-        use self::super::super::root;
-        pub(crate) use crate::jsapi::js::*;
-        pub mod detail {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-        pub mod gc {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-            pub mod detail {
-                #[allow(unused_imports)]
-                use self::super::super::super::super::root;
-            }
-        }
-        pub mod jit {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-        pub mod oom {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-        pub mod frontend {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
     }
     pub mod JS {
         #[allow(unused_imports)]
@@ -185,6 +213,26 @@ pub mod root {
             use self::super::super::super::root;
         }
     }
+    pub mod double_conversion {
+        #[allow(unused_imports)]
+        use self::super::super::root;
+    }
+    pub mod fmt {
+        #[allow(unused_imports)]
+        use self::super::super::root;
+        pub mod detail {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+            pub mod adl {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
+            pub mod dragonbox {
+                #[allow(unused_imports)]
+                use self::super::super::super::super::root;
+            }
+        }
+    }
     pub mod IPC {
         #[allow(unused_imports)]
         use self::super::super::root;
@@ -201,59 +249,34 @@ pub mod root {
     pub struct JobQueueTraps {
         pub getHostDefinedData: ::std::option::Option<
             unsafe extern "C" fn(
-                queue: *const ::std::os::raw::c_void,
+                cx: *mut root::JSContext,
+                incumbentGlobal: root::JS::MutableHandle<*mut root::JSObject>,
+                optionalHostDefinedData: root::JS::MutableHandle<*mut root::JSObject>,
+            ) -> bool,
+        >,
+        pub getHostDefinedGlobal: ::std::option::Option<
+            unsafe extern "C" fn(
                 cx: *mut root::JSContext,
                 data: root::JS::MutableHandle<*mut root::JSObject>,
             ) -> bool,
         >,
-        pub enqueuePromiseJob: ::std::option::Option<
-            unsafe extern "C" fn(
-                queue: *const ::std::os::raw::c_void,
-                cx: *mut root::JSContext,
-                promise: root::JS::HandleObject,
-                job: root::JS::HandleObject,
-                allocationSite: root::JS::HandleObject,
-                hostDefinedData: root::JS::HandleObject,
-            ) -> bool,
-        >,
-        pub runJobs: ::std::option::Option<
-            unsafe extern "C" fn(queue: *const ::std::os::raw::c_void, cx: *mut root::JSContext),
-        >,
-        pub empty: ::std::option::Option<
-            unsafe extern "C" fn(queue: *const ::std::os::raw::c_void) -> bool,
-        >,
-        pub pushNewInterruptQueue: ::std::option::Option<
-            unsafe extern "C" fn(
-                aInterruptQueues: *mut ::std::os::raw::c_void,
-            ) -> *const ::std::os::raw::c_void,
-        >,
-        pub popInterruptQueue: ::std::option::Option<
-            unsafe extern "C" fn(
-                aInterruptQueues: *mut ::std::os::raw::c_void,
-            ) -> *const ::std::os::raw::c_void,
-        >,
-        pub dropInterruptQueues: ::std::option::Option<
-            unsafe extern "C" fn(aInterruptQueues: *mut ::std::os::raw::c_void),
+        pub runJobs: ::std::option::Option<unsafe extern "C" fn(cx: *mut root::JSContext)>,
+        pub traceNonGCThingMicroTask: ::std::option::Option<
+            unsafe extern "C" fn(trc: *mut root::JSTracer, valuePtr: *mut root::JS::Value),
         >,
     }
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of JobQueueTraps"][::std::mem::size_of::<JobQueueTraps>() - 56usize];
+        ["Size of JobQueueTraps"][::std::mem::size_of::<JobQueueTraps>() - 32usize];
         ["Alignment of JobQueueTraps"][::std::mem::align_of::<JobQueueTraps>() - 8usize];
         ["Offset of field: JobQueueTraps::getHostDefinedData"]
             [::std::mem::offset_of!(JobQueueTraps, getHostDefinedData) - 0usize];
-        ["Offset of field: JobQueueTraps::enqueuePromiseJob"]
-            [::std::mem::offset_of!(JobQueueTraps, enqueuePromiseJob) - 8usize];
+        ["Offset of field: JobQueueTraps::getHostDefinedGlobal"]
+            [::std::mem::offset_of!(JobQueueTraps, getHostDefinedGlobal) - 8usize];
         ["Offset of field: JobQueueTraps::runJobs"]
             [::std::mem::offset_of!(JobQueueTraps, runJobs) - 16usize];
-        ["Offset of field: JobQueueTraps::empty"]
-            [::std::mem::offset_of!(JobQueueTraps, empty) - 24usize];
-        ["Offset of field: JobQueueTraps::pushNewInterruptQueue"]
-            [::std::mem::offset_of!(JobQueueTraps, pushNewInterruptQueue) - 32usize];
-        ["Offset of field: JobQueueTraps::popInterruptQueue"]
-            [::std::mem::offset_of!(JobQueueTraps, popInterruptQueue) - 40usize];
-        ["Offset of field: JobQueueTraps::dropInterruptQueues"]
-            [::std::mem::offset_of!(JobQueueTraps, dropInterruptQueues) - 48usize];
+        ["Offset of field: JobQueueTraps::traceNonGCThingMicroTask"]
+            [::std::mem::offset_of!(JobQueueTraps, traceNonGCThingMicroTask) - 24usize];
     };
     #[repr(C)]
     pub struct RustJobQueue__bindgen_vtable(::std::os::raw::c_void);
@@ -261,47 +284,41 @@ pub mod root {
     pub struct RustJobQueue {
         pub vtable_: *const RustJobQueue__bindgen_vtable,
         pub mTraps: root::JobQueueTraps,
-        pub mQueue: *const ::std::os::raw::c_void,
-        pub mInterruptQueues: *mut ::std::os::raw::c_void,
+        pub draining: bool,
     }
     #[repr(C)]
     pub struct RustJobQueue_SavedQueue__bindgen_vtable(::std::os::raw::c_void);
     #[repr(C)]
     pub struct RustJobQueue_SavedQueue {
         pub vtable_: *const RustJobQueue_SavedQueue__bindgen_vtable,
-        pub mTraps: root::JobQueueTraps,
-        pub mInterruptQueues: *mut ::std::os::raw::c_void,
-        pub mCurrentQueue: *mut *const ::std::os::raw::c_void,
-        pub mNewQueue: *const ::std::os::raw::c_void,
-        pub mSavedQueue: *const ::std::os::raw::c_void,
+        pub cx: *mut root::JSContext,
+        pub mSavedMicroTaskQueue: u64,
+        pub mQueue: *mut root::RustJobQueue,
+        pub draining: bool,
     }
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
         ["Size of RustJobQueue_SavedQueue"]
-            [::std::mem::size_of::<RustJobQueue_SavedQueue>() - 96usize];
+            [::std::mem::size_of::<RustJobQueue_SavedQueue>() - 40usize];
         ["Alignment of RustJobQueue_SavedQueue"]
             [::std::mem::align_of::<RustJobQueue_SavedQueue>() - 8usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mTraps"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mTraps) - 8usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mInterruptQueues"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mInterruptQueues) - 64usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mCurrentQueue"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mCurrentQueue) - 72usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mNewQueue"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mNewQueue) - 80usize];
-        ["Offset of field: RustJobQueue_SavedQueue::mSavedQueue"]
-            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mSavedQueue) - 88usize];
+        ["Offset of field: RustJobQueue_SavedQueue::cx"]
+            [::std::mem::offset_of!(RustJobQueue_SavedQueue, cx) - 8usize];
+        ["Offset of field: RustJobQueue_SavedQueue::mSavedMicroTaskQueue"]
+            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mSavedMicroTaskQueue) - 16usize];
+        ["Offset of field: RustJobQueue_SavedQueue::mQueue"]
+            [::std::mem::offset_of!(RustJobQueue_SavedQueue, mQueue) - 24usize];
+        ["Offset of field: RustJobQueue_SavedQueue::draining"]
+            [::std::mem::offset_of!(RustJobQueue_SavedQueue, draining) - 32usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of RustJobQueue"][::std::mem::size_of::<RustJobQueue>() - 80usize];
+        ["Size of RustJobQueue"][::std::mem::size_of::<RustJobQueue>() - 48usize];
         ["Alignment of RustJobQueue"][::std::mem::align_of::<RustJobQueue>() - 8usize];
         ["Offset of field: RustJobQueue::mTraps"]
             [::std::mem::offset_of!(RustJobQueue, mTraps) - 8usize];
-        ["Offset of field: RustJobQueue::mQueue"]
-            [::std::mem::offset_of!(RustJobQueue, mQueue) - 64usize];
-        ["Offset of field: RustJobQueue::mInterruptQueues"]
-            [::std::mem::offset_of!(RustJobQueue, mInterruptQueues) - 72usize];
+        ["Offset of field: RustJobQueue::draining"]
+            [::std::mem::offset_of!(RustJobQueue, draining) - 40usize];
     };
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
@@ -734,18 +751,22 @@ pub mod root {
                 writer: *mut root::JSStructuredCloneWriter,
             ) -> bool,
         >,
-        pub isSystemOrAddonPrincipal:
+        pub isSystemPrincipal:
+            ::std::option::Option<unsafe extern "C" fn(arg1: *mut root::JSPrincipals) -> bool>,
+        pub isAddonPrincipal:
             ::std::option::Option<unsafe extern "C" fn(arg1: *mut root::JSPrincipals) -> bool>,
     }
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of JSPrincipalsCallbacks"][::std::mem::size_of::<JSPrincipalsCallbacks>() - 16usize];
+        ["Size of JSPrincipalsCallbacks"][::std::mem::size_of::<JSPrincipalsCallbacks>() - 24usize];
         ["Alignment of JSPrincipalsCallbacks"]
             [::std::mem::align_of::<JSPrincipalsCallbacks>() - 8usize];
         ["Offset of field: JSPrincipalsCallbacks::write"]
             [::std::mem::offset_of!(JSPrincipalsCallbacks, write) - 0usize];
-        ["Offset of field: JSPrincipalsCallbacks::isSystemOrAddonPrincipal"]
-            [::std::mem::offset_of!(JSPrincipalsCallbacks, isSystemOrAddonPrincipal) - 8usize];
+        ["Offset of field: JSPrincipalsCallbacks::isSystemPrincipal"]
+            [::std::mem::offset_of!(JSPrincipalsCallbacks, isSystemPrincipal) - 8usize];
+        ["Offset of field: JSPrincipalsCallbacks::isAddonPrincipal"]
+            [::std::mem::offset_of!(JSPrincipalsCallbacks, isAddonPrincipal) - 16usize];
     };
     #[repr(C)]
     pub struct RustJSPrincipals__bindgen_vtable(::std::os::raw::c_void);
@@ -758,12 +779,12 @@ pub mod root {
     }
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of RustJSPrincipals"][::std::mem::size_of::<RustJSPrincipals>() - 40usize];
+        ["Size of RustJSPrincipals"][::std::mem::size_of::<RustJSPrincipals>() - 48usize];
         ["Alignment of RustJSPrincipals"][::std::mem::align_of::<RustJSPrincipals>() - 8usize];
         ["Offset of field: RustJSPrincipals::callbacks"]
             [::std::mem::offset_of!(RustJSPrincipals, callbacks) - 16usize];
         ["Offset of field: RustJSPrincipals::privateData"]
-            [::std::mem::offset_of!(RustJSPrincipals, privateData) - 32usize];
+            [::std::mem::offset_of!(RustJSPrincipals, privateData) - 40usize];
     };
     extern "C" {
         #[link_name = "\u{1}_Z19ShouldMeasureObjectP8JSObjectPP11nsISupports"]
@@ -1234,6 +1255,12 @@ pub mod root {
         ) -> bool;
     }
     extern "C" {
+        pub fn JS_DequeueNextMicroTask(
+            cx: *mut root::JSContext,
+            task: root::JS::MutableHandle<root::JS::GenericMicroTask>,
+        );
+    }
+    extern "C" {
         pub fn JS_GetPromiseResult(
             promise: root::JS::HandleObject,
             dest: root::JS::MutableHandleValue,
@@ -1241,12 +1268,6 @@ pub mod root {
     }
     extern "C" {
         pub fn JS_GetScriptPrivate(script: *mut root::JSScript, dest: root::JS::MutableHandleValue);
-    }
-    extern "C" {
-        pub fn JS_MaybeGetScriptPrivate(
-            obj: *mut root::JSObject,
-            dest: root::JS::MutableHandleValue,
-        );
     }
     extern "C" {
         pub fn JS_GetModulePrivate(module: *mut root::JSObject, dest: root::JS::MutableHandleValue);
@@ -1287,14 +1308,10 @@ pub mod root {
         pub fn JS_ForgetStringLinearness(str_: *mut root::JSLinearString) -> *mut root::JSString;
     }
     extern "C" {
-        pub fn CreateJobQueue(
-            aTraps: *const root::JobQueueTraps,
-            aQueue: *const ::std::os::raw::c_void,
-            aInterruptQueues: *mut ::std::os::raw::c_void,
-        ) -> *mut root::JS::JobQueue;
+        pub fn CreateJobQueue(aTraps: *const root::JobQueueTraps) -> *mut root::RustJobQueue;
     }
     extern "C" {
-        pub fn DeleteJobQueue(queue: *mut root::JS::JobQueue);
+        pub fn DeleteJobQueue(queue: *mut root::RustJobQueue);
     }
     extern "C" {
         pub fn CreateJSExternalStringCallbacks(
@@ -1350,6 +1367,8 @@ pub mod root {
         pub fn SetUpEventLoopDispatch(
             cx: *mut root::JSContext,
             callback: root::RustDispatchToEventLoopCallback,
+            startedCallback: root::JS::AsyncTaskStartedCallback,
+            finishedCallback: root::JS::AsyncTaskFinishedCallback,
             closure: *mut ::std::os::raw::c_void,
         );
     }

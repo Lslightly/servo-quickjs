@@ -21,9 +21,9 @@ use mozjs::jsapi::{
     CloneDataPolicy, GCReason, Handle, HandleObject as RawHandleObject, JSClass,
     JSContext as RawJSContext, JSObject, JSString, JSStructuredCloneCallbacks,
     JSStructuredCloneReader, JSStructuredCloneWriter, JS_NewObject, JS_NewStringCopyZ,
-    JS_ReadString, JS_ReadUint32Pair, JS_SetReservedSlot, JS_WriteString, JS_WriteUint32Pair,
-    MutableHandle, OnNewGlobalHookOption, StructuredCloneScope, JSCLASS_RESERVED_SLOTS_MASK,
-    JSCLASS_RESERVED_SLOTS_SHIFT, JS_STRUCTURED_CLONE_VERSION,
+    JS_ReadString, JS_ReadUint32Pair, JS_SetReservedSlot, JS_WriteString,
+    JS_WriteUint32PairUnchecked, MutableHandle, OnNewGlobalHookOption, StructuredCloneScope,
+    JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT, JS_STRUCTURED_CLONE_VERSION,
 };
 use mozjs::jsval::{JSVal, ObjectValue, StringValue, UndefinedValue};
 use mozjs::qjs;
@@ -207,7 +207,7 @@ unsafe extern "C" fn write_host(
         JS_NewStringCopyZ(cx, c"host".as_ptr())
     };
     !s.is_null()
-        && JS_WriteUint32Pair(w, HOST_TAG, 7)
+        && JS_WriteUint32PairUnchecked(w, HOST_TAG, 7)
         && JS_WriteString(w, Handle::from_marked_location(&s))
 }
 

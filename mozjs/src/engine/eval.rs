@@ -351,5 +351,12 @@ pub(crate) unsafe fn JS_GetScriptPrivate(
 ) {
     let cx = super::current();
     let script = q::JSValue::mkptr(q::JS_TAG_FUNCTION_BYTECODE, script as *mut c_void);
-    *dest.ptr = cx.adopt(q::JS_GetScriptPrivateValue(cx.base_ctx, script));
+    // As in SpiderMonkey, a module's code has the module's private value (patch Q31).
+    let module = q::JS_GetScriptModule(script);
+    let private = if module.is_null() {
+        q::JS_GetScriptPrivateValue(cx.base_ctx, script)
+    } else {
+        q::JS_GetModulePrivateValue(cx.base_ctx, module)
+    };
+    *dest.ptr = cx.adopt(private);
 }

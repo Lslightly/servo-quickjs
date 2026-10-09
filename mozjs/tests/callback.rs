@@ -66,10 +66,7 @@ unsafe extern "C" fn puts(context: *mut RawJSContext, argc: u32, vp: *mut Value)
     let args = CallArgs::from_vp(vp, argc);
 
     if args.argc_ != 1 {
-        mozjs::error::throw_internal_error_safe(
-            &mut context,
-            c"puts() requires exactly 1 argument",
-        );
+        mozjs::error::throw_internal_error(&mut context, c"puts() requires exactly 1 argument");
         return false;
     }
 

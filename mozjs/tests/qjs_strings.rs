@@ -113,13 +113,13 @@ unsafe fn latin1_and_two_byte(cx: &mut JSContext, global: HandleObject) {
 
     // Rust strings are created from UTF-8; non-Latin-1 text becomes two-byte.
     rooted!(&in(cx) let mut v = UndefinedValue());
-    "1 € ☃".safe_to_jsval(cx, v.handle_mut());
+    "1 € ☃".to_jsval(cx, v.handle_mut());
     let wide = v.get().to_string();
     assert!(!JS_DeprecatedStringHasLatin1Chars(wide));
     assert_eq!(units(cx, wide), "1 € ☃".encode_utf16().collect::<Vec<_>>());
     assert_eq!(to_rust(cx, wide), "1 € ☃");
 
-    "café".safe_to_jsval(cx, v.handle_mut());
+    "café".to_jsval(cx, v.handle_mut());
     assert!(JS_DeprecatedStringHasLatin1Chars(v.get().to_string()));
     assert_eq!(to_rust(cx, v.get().to_string()), "café");
 

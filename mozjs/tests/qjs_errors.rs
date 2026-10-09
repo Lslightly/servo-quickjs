@@ -19,7 +19,7 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    describe_scripted_caller_safe, error_info_from_exception_stack_safe, evaluate_script,
+    describe_scripted_caller, error_info_from_exception_stack, evaluate_script,
     CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, RealmOptions, Runtime,
     SIMPLE_GLOBAL_CLASS,
 };
@@ -73,7 +73,7 @@ fn thrown(
     assert!(eval_in(cx, global, file, source).is_err());
     assert!(unsafe { jsapi::JS_IsExceptionPending(cx.raw_cx()) });
     rooted!(&in(cx) let mut exception = UndefinedValue());
-    let info = error_info_from_exception_stack_safe(cx, exception.handle_mut()).unwrap();
+    let info = error_info_from_exception_stack(cx, exception.handle_mut()).unwrap();
     assert!(!unsafe { jsapi::JS_IsExceptionPending(cx.raw_cx()) });
     info
 }
@@ -135,17 +135,28 @@ fn reports(cx: &mut JSContext, global: SafeHandleObject) {
         let error = eval_in(cx, global, c"report.js", "\n\n  new RangeError('bad')")
             .unwrap()
             .to_object();
-        let report = jsapi::JS_ErrorFromException(cx.raw_cx(), handle(&error));
-        assert!(!report.is_null());
-        let report = &(*report)._base;
-        assert_eq!(CStr::from_ptr(report.message_.data_), c"bad");
-        assert_eq!(CStr::from_ptr(report.filename.data_), c"report.js");
-        assert_eq!((report.lineno, report.column._base), (3, 17));
+        mozjs::rust::borrowed_error_report(cx, |cx, report| {
+            assert!(jsapi::JS_ErrorFromException(
+                cx.raw_cx_no_gc(),
+                handle(&error),
+                report
+            ));
+            let report = &(*report.report_)._base;
+            assert_eq!(CStr::from_ptr(report.message_.data_), c"bad");
+            assert_eq!(CStr::from_ptr(report.filename.data_), c"report.js");
+            assert_eq!((report.lineno, report.column._base), (3, 17));
+        });
 
         let plain = eval_in(cx, global, c"report.js", "({ message: 'no' })")
             .unwrap()
             .to_object();
-        assert!(jsapi::JS_ErrorFromException(cx.raw_cx(), handle(&plain)).is_null());
+        mozjs::rust::borrowed_error_report(cx, |cx, report| {
+            assert!(!jsapi::JS_ErrorFromException(
+                cx.raw_cx_no_gc(),
+                handle(&plain),
+                report
+            ));
+        });
     }
 }
 
@@ -165,7 +176,7 @@ thread_local! {
 }
 
 fn record_caller(cx: &mut JSContext) {
-    let caller = describe_scripted_caller_safe(cx)
+    let caller = describe_scripted_caller(cx)
         .ok()
         .map(|c| (c.filename, c.line, c.col));
     let global = unsafe { jsapi::GetScriptedCallerGlobal(cx.raw_cx()) };
@@ -447,6 +458,7 @@ unsafe extern "C" fn instance_class_is_error(clasp: *const jsapi::JSClass) -> bo
 static DOM_CALLBACKS: jsapi::DOMCallbacks = jsapi::DOMCallbacks {
     instanceClassMatchesProto: None,
     instanceClassIsError: Some(instance_class_is_error),
+    extractExceptionInfo: None,
 };
 
 /// `Error.isError` asks the embedder about DOM objects, which may have [[ErrorData]].

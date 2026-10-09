@@ -209,6 +209,51 @@ pub mod root {
         #[repr(C)]
         #[repr(align(1))]
         #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct nothrow_t {
+            pub _bindgen_opaque_blob: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of nothrow_t"][::std::mem::size_of::<nothrow_t>() - 1usize];
+            ["Alignment of nothrow_t"][::std::mem::align_of::<nothrow_t>() - 1usize];
+        };
+        pub mod __detail {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        pub mod ranges {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct tuple {
+            pub _address: u8,
+        }
+        pub type tuple__Inherited = u8;
+        pub type tuple__TCC = u8;
+        pub type tuple__ImplicitDefaultCtor = u8;
+        pub type tuple__ExplicitDefaultCtor = u8;
+        pub type tuple__ImplicitCtor = u8;
+        pub type tuple__ExplicitCtor = u8;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct tuple__UseOtherCtor {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct allocator {
+            pub _address: u8,
+        }
+        pub type allocator_value_type = u8;
+        pub type allocator_size_type = u64;
+        pub type allocator_difference_type = u64;
+        pub type allocator_propagate_on_container_move_assignment = u8;
+        pub type allocator_is_always_equal = u8;
+        #[repr(C)]
+        #[repr(align(1))]
+        #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct input_iterator_tag {
             pub _bindgen_opaque_blob: u8,
         }
@@ -264,83 +309,11 @@ pub mod root {
         pub type reverse_iterator___traits_type = u8;
         pub type reverse_iterator_iterator_type = u8;
         pub type reverse_iterator_pointer = u8;
+        pub type reverse_iterator_iterator_concept = u8;
+        pub type reverse_iterator_iterator_category = u8;
+        pub type reverse_iterator_value_type = u8;
         pub type reverse_iterator_difference_type = u8;
         pub type reverse_iterator_reference = u8;
-        pub mod __detail {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-        #[repr(C)]
-        #[repr(align(1))]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct nothrow_t {
-            pub _bindgen_opaque_blob: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of nothrow_t"][::std::mem::size_of::<nothrow_t>() - 1usize];
-            ["Alignment of nothrow_t"][::std::mem::align_of::<nothrow_t>() - 1usize];
-        };
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct allocator {
-            pub _address: u8,
-        }
-        pub type allocator_value_type = u8;
-        pub type allocator_size_type = u64;
-        pub type allocator_difference_type = u64;
-        pub type allocator_pointer = u8;
-        pub type allocator_const_pointer = u8;
-        pub type allocator_reference = u8;
-        pub type allocator_const_reference = u8;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct allocator_rebind {
-            pub _address: u8,
-        }
-        pub type allocator_rebind_other = u8;
-        pub type allocator_propagate_on_container_move_assignment = u8;
-        pub type allocator_is_always_equal = u8;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct tuple {
-            pub _address: u8,
-        }
-        pub type tuple__Inherited = u8;
-        pub type tuple__TCC = u8;
-        pub type tuple__ImplicitDefaultCtor = u8;
-        pub type tuple__ExplicitDefaultCtor = u8;
-        pub type tuple__ImplicitCtor = u8;
-        pub type tuple__ExplicitCtor = u8;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct tuple__UseOtherCtor {
-            pub _address: u8,
-        }
-        pub type string = root::__BindgenOpaqueArray<u64, 4usize>;
-        pub type ostream = root::__BindgenOpaqueArray<u64, 34usize>;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct numeric_limits {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct basic_string_view {
-            pub _address: u8,
-        }
-        pub type basic_string_view_traits_type = u8;
-        pub type basic_string_view_value_type = u8;
-        pub type basic_string_view_pointer = u8;
-        pub type basic_string_view_const_pointer = u8;
-        pub type basic_string_view_reference = u8;
-        pub type basic_string_view_const_reference = u8;
-        pub type basic_string_view_const_iterator = u8;
-        pub type basic_string_view_iterator = u8;
-        pub type basic_string_view_const_reverse_iterator = u8;
-        pub type basic_string_view_reverse_iterator = u8;
-        pub type basic_string_view_size_type = u64;
-        pub type basic_string_view_difference_type = u64;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct vector {
@@ -384,12 +357,55 @@ pub mod root {
         pub type array_reverse_iterator = u8;
         pub type array_const_reverse_iterator = u8;
         pub type array__AT_Type = u8;
+        pub type string = root::__BindgenOpaqueArray<u64, 4usize>;
+        pub type ostream = root::__BindgenOpaqueArray<u64, 34usize>;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct basic_string_view {
+            pub _address: u8,
+        }
+        pub type basic_string_view_traits_type = u8;
+        pub type basic_string_view_value_type = u8;
+        pub type basic_string_view_pointer = u8;
+        pub type basic_string_view_const_pointer = u8;
+        pub type basic_string_view_reference = u8;
+        pub type basic_string_view_const_reference = u8;
+        pub type basic_string_view_const_iterator = u8;
+        pub type basic_string_view_iterator = u8;
+        pub type basic_string_view_const_reverse_iterator = u8;
+        pub type basic_string_view_reverse_iterator = u8;
+        pub type basic_string_view_size_type = u64;
+        pub type basic_string_view_difference_type = u64;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct numeric_limits {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct default_delete {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct unique_ptr {
+            pub _address: u8,
+        }
+        pub type unique_ptr__DeleterConstraint = u8;
+        pub type unique_ptr_pointer = u8;
+        pub type unique_ptr_element_type = u8;
+        pub type unique_ptr_deleter_type = u8;
+        pub type unique_ptr___safe_conversion_up = u8;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct atomic {
             pub _address: u8,
         }
         pub type atomic_value_type = u8;
+        pub mod chrono {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
     }
     pub mod __gnu_cxx {
         #[allow(unused_imports)]
@@ -397,8 +413,142 @@ pub mod root {
     }
     pub type __off_t = ::std::os::raw::c_long;
     pub type __off64_t = ::std::os::raw::c_long;
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct __pthread_internal_list {
+        pub __prev: *mut root::__pthread_internal_list,
+        pub __next: *mut root::__pthread_internal_list,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of __pthread_internal_list"]
+            [::std::mem::size_of::<__pthread_internal_list>() - 16usize];
+        ["Alignment of __pthread_internal_list"]
+            [::std::mem::align_of::<__pthread_internal_list>() - 8usize];
+        ["Offset of field: __pthread_internal_list::__prev"]
+            [::std::mem::offset_of!(__pthread_internal_list, __prev) - 0usize];
+        ["Offset of field: __pthread_internal_list::__next"]
+            [::std::mem::offset_of!(__pthread_internal_list, __next) - 8usize];
+    };
+    pub type __pthread_list_t = root::__pthread_internal_list;
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct __pthread_mutex_s {
+        pub __lock: ::std::os::raw::c_int,
+        pub __count: ::std::os::raw::c_uint,
+        pub __owner: ::std::os::raw::c_int,
+        pub __nusers: ::std::os::raw::c_uint,
+        pub __kind: ::std::os::raw::c_int,
+        pub __spins: ::std::os::raw::c_short,
+        pub __elision: ::std::os::raw::c_short,
+        pub __list: root::__pthread_list_t,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of __pthread_mutex_s"][::std::mem::size_of::<__pthread_mutex_s>() - 40usize];
+        ["Alignment of __pthread_mutex_s"][::std::mem::align_of::<__pthread_mutex_s>() - 8usize];
+        ["Offset of field: __pthread_mutex_s::__lock"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __lock) - 0usize];
+        ["Offset of field: __pthread_mutex_s::__count"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __count) - 4usize];
+        ["Offset of field: __pthread_mutex_s::__owner"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __owner) - 8usize];
+        ["Offset of field: __pthread_mutex_s::__nusers"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __nusers) - 12usize];
+        ["Offset of field: __pthread_mutex_s::__kind"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __kind) - 16usize];
+        ["Offset of field: __pthread_mutex_s::__spins"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __spins) - 20usize];
+        ["Offset of field: __pthread_mutex_s::__elision"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __elision) - 22usize];
+        ["Offset of field: __pthread_mutex_s::__list"]
+            [::std::mem::offset_of!(__pthread_mutex_s, __list) - 24usize];
+    };
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct __pthread_rwlock_arch_t {
+        pub __readers: ::std::os::raw::c_uint,
+        pub __writers: ::std::os::raw::c_uint,
+        pub __wrphase_futex: ::std::os::raw::c_uint,
+        pub __writers_futex: ::std::os::raw::c_uint,
+        pub __pad3: ::std::os::raw::c_uint,
+        pub __pad4: ::std::os::raw::c_uint,
+        pub __cur_writer: ::std::os::raw::c_int,
+        pub __shared: ::std::os::raw::c_int,
+        pub __rwelision: ::std::os::raw::c_schar,
+        pub __pad1: [::std::os::raw::c_uchar; 7usize],
+        pub __pad2: ::std::os::raw::c_ulong,
+        pub __flags: ::std::os::raw::c_uint,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of __pthread_rwlock_arch_t"]
+            [::std::mem::size_of::<__pthread_rwlock_arch_t>() - 56usize];
+        ["Alignment of __pthread_rwlock_arch_t"]
+            [::std::mem::align_of::<__pthread_rwlock_arch_t>() - 8usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__readers"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __readers) - 0usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__writers"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __writers) - 4usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__wrphase_futex"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __wrphase_futex) - 8usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__writers_futex"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __writers_futex) - 12usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__pad3"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad3) - 16usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__pad4"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad4) - 20usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__cur_writer"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __cur_writer) - 24usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__shared"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __shared) - 28usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__rwelision"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __rwelision) - 32usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__pad1"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad1) - 33usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__pad2"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad2) - 40usize];
+        ["Offset of field: __pthread_rwlock_arch_t::__flags"]
+            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __flags) - 48usize];
+    };
+    #[repr(C)]
+    #[derive(Copy, Clone)]
+    pub union pthread_mutex_t {
+        pub __data: root::__pthread_mutex_s,
+        pub __size: [::std::os::raw::c_char; 40usize],
+        pub __align: ::std::os::raw::c_long,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of pthread_mutex_t"][::std::mem::size_of::<pthread_mutex_t>() - 40usize];
+        ["Alignment of pthread_mutex_t"][::std::mem::align_of::<pthread_mutex_t>() - 8usize];
+        ["Offset of field: pthread_mutex_t::__data"]
+            [::std::mem::offset_of!(pthread_mutex_t, __data) - 0usize];
+        ["Offset of field: pthread_mutex_t::__size"]
+            [::std::mem::offset_of!(pthread_mutex_t, __size) - 0usize];
+        ["Offset of field: pthread_mutex_t::__align"]
+            [::std::mem::offset_of!(pthread_mutex_t, __align) - 0usize];
+    };
+    #[repr(C)]
+    #[derive(Copy, Clone)]
+    pub union pthread_rwlock_t {
+        pub __data: root::__pthread_rwlock_arch_t,
+        pub __size: [::std::os::raw::c_char; 56usize],
+        pub __align: ::std::os::raw::c_long,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of pthread_rwlock_t"][::std::mem::size_of::<pthread_rwlock_t>() - 56usize];
+        ["Alignment of pthread_rwlock_t"][::std::mem::align_of::<pthread_rwlock_t>() - 8usize];
+        ["Offset of field: pthread_rwlock_t::__data"]
+            [::std::mem::offset_of!(pthread_rwlock_t, __data) - 0usize];
+        ["Offset of field: pthread_rwlock_t::__size"]
+            [::std::mem::offset_of!(pthread_rwlock_t, __size) - 0usize];
+        ["Offset of field: pthread_rwlock_t::__align"]
+            [::std::mem::offset_of!(pthread_rwlock_t, __align) - 0usize];
+    };
+    pub type __gnuc_va_list = root::__builtin_va_list;
     pub type uint_fast8_t = ::std::os::raw::c_uchar;
-    pub type va_list = root::__builtin_va_list;
     #[repr(C)]
     #[derive(Debug, Copy, Clone)]
     pub struct _IO_marker {
@@ -506,71 +656,7 @@ pub mod root {
         ["Offset of field: _IO_FILE::_unused2"]
             [::std::mem::offset_of!(_IO_FILE, _unused2) - 196usize];
     };
-    #[repr(C)]
-    #[derive(Debug, Copy, Clone, PartialEq)]
-    pub struct __pthread_rwlock_arch_t {
-        pub __readers: ::std::os::raw::c_uint,
-        pub __writers: ::std::os::raw::c_uint,
-        pub __wrphase_futex: ::std::os::raw::c_uint,
-        pub __writers_futex: ::std::os::raw::c_uint,
-        pub __pad3: ::std::os::raw::c_uint,
-        pub __pad4: ::std::os::raw::c_uint,
-        pub __cur_writer: ::std::os::raw::c_int,
-        pub __shared: ::std::os::raw::c_int,
-        pub __rwelision: ::std::os::raw::c_schar,
-        pub __pad1: [::std::os::raw::c_uchar; 7usize],
-        pub __pad2: ::std::os::raw::c_ulong,
-        pub __flags: ::std::os::raw::c_uint,
-    }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of __pthread_rwlock_arch_t"]
-            [::std::mem::size_of::<__pthread_rwlock_arch_t>() - 56usize];
-        ["Alignment of __pthread_rwlock_arch_t"]
-            [::std::mem::align_of::<__pthread_rwlock_arch_t>() - 8usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__readers"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __readers) - 0usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__writers"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __writers) - 4usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__wrphase_futex"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __wrphase_futex) - 8usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__writers_futex"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __writers_futex) - 12usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad3"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad3) - 16usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad4"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad4) - 20usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__cur_writer"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __cur_writer) - 24usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__shared"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __shared) - 28usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__rwelision"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __rwelision) - 32usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad1"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad1) - 33usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__pad2"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __pad2) - 40usize];
-        ["Offset of field: __pthread_rwlock_arch_t::__flags"]
-            [::std::mem::offset_of!(__pthread_rwlock_arch_t, __flags) - 48usize];
-    };
-    #[repr(C)]
-    #[derive(Copy, Clone)]
-    pub union pthread_rwlock_t {
-        pub __data: root::__pthread_rwlock_arch_t,
-        pub __size: [::std::os::raw::c_char; 56usize],
-        pub __align: ::std::os::raw::c_long,
-    }
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of pthread_rwlock_t"][::std::mem::size_of::<pthread_rwlock_t>() - 56usize];
-        ["Alignment of pthread_rwlock_t"][::std::mem::align_of::<pthread_rwlock_t>() - 8usize];
-        ["Offset of field: pthread_rwlock_t::__data"]
-            [::std::mem::offset_of!(pthread_rwlock_t, __data) - 0usize];
-        ["Offset of field: pthread_rwlock_t::__size"]
-            [::std::mem::offset_of!(pthread_rwlock_t, __size) - 0usize];
-        ["Offset of field: pthread_rwlock_t::__align"]
-            [::std::mem::offset_of!(pthread_rwlock_t, __align) - 0usize];
-    };
+    pub type va_list = root::__gnuc_va_list;
     pub mod mozilla {
         #[allow(unused_imports)]
         use self::super::super::root;
@@ -583,72 +669,17 @@ pub mod root {
                 pub _address: u8,
             }
             pub type AssertionConditionType_ValueT = u8;
-            #[repr(u32)]
-            #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-            pub enum StorageType {
-                AsBase = 0,
-                AsMember = 1,
-            }
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct HasPointerTypeHelper {
-                pub _address: u8,
-            }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of HasPointerTypeHelper"]
-                    [::std::mem::size_of::<HasPointerTypeHelper>() - 1usize];
-                ["Alignment of HasPointerTypeHelper"]
-                    [::std::mem::align_of::<HasPointerTypeHelper>() - 1usize];
-            };
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct HasPointerType {
-                pub _address: u8,
-            }
-            pub type PointerTypeImpl_Type = root::__BindgenOpaqueArray<u8, 0usize>;
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct PointerType {
-                pub _address: u8,
-            }
-            pub type PointerType_Type = u8;
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct UniqueSelector {
-                pub _address: u8,
-            }
-            #[doc = " UniquePtr is a smart pointer that wholly owns a resource.  Ownership may be\n transferred out of a UniquePtr through explicit action, but otherwise the\n resource is destroyed when the UniquePtr is destroyed.\n\n UniquePtr is similar to C++98's std::auto_ptr, but it improves upon auto_ptr\n in one crucial way: it's impossible to copy a UniquePtr.  Copying an auto_ptr\n obviously *can't* copy ownership of its singly-owned resource.  So what\n happens if you try to copy one?  Bizarrely, ownership is implicitly\n *transferred*, preserving single ownership but breaking code that assumes a\n copy of an object is identical to the original.  (This is why auto_ptr is\n prohibited in STL containers.)\n\n UniquePtr solves this problem by being *movable* rather than copyable.\n Instead of passing a |UniquePtr u| directly to the constructor or assignment\n operator, you pass |Move(u)|.  In doing so you indicate that you're *moving*\n ownership out of |u|, into the target of the construction/assignment.  After\n the transfer completes, |u| contains |nullptr| and may be safely destroyed.\n This preserves single ownership but also allows UniquePtr to be moved by\n algorithms that have been made move-safe.  (Note: if |u| is instead a\n temporary expression, don't use |Move()|: just pass the expression, because\n it's already move-ready.  For more information see Move.h.)\n\n UniquePtr is also better than std::auto_ptr in that the deletion operation is\n customizable.  An optional second template parameter specifies a class that\n (through its operator()(T*)) implements the desired deletion policy.  If no\n policy is specified, mozilla::DefaultDelete<T> is used -- which will either\n |delete| or |delete[]| the resource, depending whether the resource is an\n array.  Custom deletion policies ideally should be empty classes (no member\n fields, no member fields in base classes, no virtual methods/inheritance),\n because then UniquePtr can be just as efficient as a raw pointer.\n\n Use of UniquePtr proceeds like so:\n\n   UniquePtr<int> g1; // initializes to nullptr\n   g1.reset(new int); // switch resources using reset()\n   g1 = nullptr; // clears g1, deletes the int\n\n   UniquePtr<int> g2(new int); // owns that int\n   int* p = g2.release(); // g2 leaks its int -- still requires deletion\n   delete p; // now freed\n\n   struct S { int x; S(int x) : x(x) {} };\n   UniquePtr<S> g3, g4(new S(5));\n   g3 = std::move(g4); // g3 owns the S, g4 cleared\n   S* p = g3.get(); // g3 still owns |p|\n   assert(g3->x == 5); // operator-> works (if .get() != nullptr)\n   assert((*g3).x == 5); // also operator* (again, if not cleared)\n   std::swap(g3, g4); // g4 now owns the S, g3 cleared\n   g3.swap(g4);  // g3 now owns the S, g4 cleared\n   UniquePtr<S> g5(std::move(g3)); // g5 owns the S, g3 cleared\n   g5.reset(); // deletes the S, g5 cleared\n\n   struct FreePolicy { void operator()(void* p) { free(p); } };\n   UniquePtr<int, FreePolicy> g6(static_cast<int*>(malloc(sizeof(int))));\n   int* ptr = g6.get();\n   g6 = nullptr; // calls free(ptr)\n\n Now, carefully note a few things you *can't* do:\n\n   UniquePtr<int> b1;\n   b1 = new int; // BAD: can only assign another UniquePtr\n   int* ptr = b1; // BAD: no auto-conversion to pointer, use get()\n\n   UniquePtr<int> b2(b1); // BAD: can't copy a UniquePtr\n   UniquePtr<int> b3 = b1; // BAD: can't copy-assign a UniquePtr\n\n (Note that changing a UniquePtr to store a direct |new| expression is\n permitted, but usually you should use MakeUnique, defined at the end of this\n header.)\n\n A few miscellaneous notes:\n\n UniquePtr, when not instantiated for an array type, can be move-constructed\n and move-assigned, not only from itself but from \"derived\" UniquePtr<U, E>\n instantiations where U converts to T and E converts to D.  If you want to use\n this, you're going to have to specify a deletion policy for both UniquePtr\n instantations, and T pretty much has to have a virtual destructor.  In other\n words, this doesn't work:\n\n   struct Base { virtual ~Base() {} };\n   struct Derived : Base {};\n\n   UniquePtr<Base> b1;\n   // BAD: DefaultDelete<Base> and DefaultDelete<Derived> don't interconvert\n   UniquePtr<Derived> d1(std::move(b));\n\n   UniquePtr<Base> b2;\n   UniquePtr<Derived, DefaultDelete<Base>> d2(std::move(b2)); // okay\n\n UniquePtr is specialized for array types.  Specializing with an array type\n creates a smart-pointer version of that array -- not a pointer to such an\n array.\n\n   UniquePtr<int[]> arr(new int[5]);\n   arr[0] = 4;\n\n What else is different?  Deletion of course uses |delete[]|.  An operator[]\n is provided.  Functionality that doesn't make sense for arrays is removed.\n The constructors and mutating methods only accept array pointers (not T*, U*\n that converts to T*, or UniquePtr<U[]> or UniquePtr<U>) or |nullptr|.\n\n It's perfectly okay for a function to return a UniquePtr. This transfers\n the UniquePtr's sole ownership of the data, to the fresh UniquePtr created\n in the calling function, that will then solely own that data. Such functions\n can return a local variable UniquePtr, |nullptr|, |UniquePtr(ptr)| where\n |ptr| is a |T*|, or a UniquePtr |Move()|'d from elsewhere.\n\n UniquePtr will commonly be a member of a class, with lifetime equivalent to\n that of that class.  If you want to expose the related resource, you could\n expose a raw pointer via |get()|, but ownership of a raw pointer is\n inherently unclear.  So it's better to expose a |const UniquePtr&| instead.\n This prohibits mutation but still allows use of |get()| when needed (but\n operator-> is preferred).  Of course, you can only use this smart pointer as\n long as the enclosing class instance remains live -- no different than if you\n exposed the |get()| raw pointer.\n\n To pass a UniquePtr-managed resource as a pointer, use a |const UniquePtr&|\n argument.  To specify an inout parameter (where the method may or may not\n take ownership of the resource, or reset it), or to specify an out parameter\n (where simply returning a |UniquePtr| isn't possible), use a |UniquePtr&|\n argument.  To unconditionally transfer ownership of a UniquePtr\n into a method, use a |UniquePtr| argument.  To conditionally transfer\n ownership of a resource into a method, should the method want it, use a\n |UniquePtr&&| argument."]
-            pub type UniqueSelector_SingleObject = u8;
-            #[repr(C)]
-            #[derive(Debug, PartialEq)]
-            pub struct TempPtrToSetterT<T, UniquePtrT> {
-                pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
-                pub _phantom_1: ::std::marker::PhantomData<::std::cell::UnsafeCell<UniquePtrT>>,
-                pub mDest: *mut UniquePtrT,
-                pub mNewVal: *mut T,
-            }
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct AllocPolicyBasedFreePolicy {
+            pub struct MaybePoisoner {
                 pub _address: u8,
             }
             #[repr(C)]
-            #[derive(Debug, PartialEq)]
-            pub struct SprintfAppend {
-                pub _base: root::mozilla::PrintfTarget,
-                pub mBuf: *mut ::std::os::raw::c_char,
-                pub mBufLen: usize,
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct IsMaybeImpl {
+                pub _base: root::std::false_type,
             }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of SprintfAppend"][::std::mem::size_of::<SprintfAppend>() - 32usize];
-                ["Alignment of SprintfAppend"][::std::mem::align_of::<SprintfAppend>() - 8usize];
-                ["Offset of field: SprintfAppend::mBuf"]
-                    [::std::mem::offset_of!(SprintfAppend, mBuf) - 16usize];
-                ["Offset of field: SprintfAppend::mBufLen"]
-                    [::std::mem::offset_of!(SprintfAppend, mBufLen) - 24usize];
-            };
+            pub type IsMaybe = root::mozilla::detail::IsMaybeImpl;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct LazyAssertedCastT<From> {
@@ -657,70 +688,9 @@ pub mod root {
             }
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct AllowDeprecatedAbsFixed {
-                pub _base: root::std::false_type,
-            }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbsFixed_open0_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbsFixed_open0_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbsFixed_open0_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbsFixed_open0_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbsFixed>()
-                        - 1usize];
-            };
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct AllowDeprecatedAbs {
-                pub _base: root::mozilla::detail::AllowDeprecatedAbsFixed,
-            }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbs_open0_int_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbs_open0_int_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: AllowDeprecatedAbs_open0_long_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-                ["Align of template specialization: AllowDeprecatedAbs_open0_long_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::AllowDeprecatedAbs>() - 1usize];
-            };
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct AbsReturnType {
                 pub _address: u8,
             }
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct FloatingPointTrait {
-                pub _address: u8,
-            }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: FloatingPointTrait_open0_float_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-                ["Align of template specialization: FloatingPointTrait_open0_float_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: FloatingPointTrait_open0_double_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-                ["Align of template specialization: FloatingPointTrait_open0_double_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::FloatingPointTrait>() - 1usize];
-            };
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct FuzzyEqualsEpsilon {
@@ -739,43 +709,6 @@ pub mod root {
                     [::std::mem::size_of::<root::mozilla::detail::FuzzyEqualsEpsilon>() - 1usize];
                 ["Align of template specialization: FuzzyEqualsEpsilon_open0_double_close0"]
                     [::std::mem::align_of::<root::mozilla::detail::FuzzyEqualsEpsilon>() - 1usize];
-            };
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct MaybePoisoner {
-                pub _address: u8,
-            }
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct IsMaybeImpl {
-                pub _base: root::std::false_type,
-            }
-            pub type IsMaybe = root::mozilla::detail::IsMaybeImpl;
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct AlignedChecker {
-                pub _address: u8,
-            }
-            pub type supports_os<T> = T;
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct MakeUnsignedChar {
-                pub _address: u8,
-            }
-            pub type MakeUnsignedChar_Type = u8;
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: MakeUnsignedChar_open0_char16_t_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-                ["Align of template specialization: MakeUnsignedChar_open0_char16_t_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of template specialization: MakeUnsignedChar_open0_char32_t_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
-                ["Align of template specialization: MakeUnsignedChar_open0_char32_t_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
             };
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
@@ -801,6 +734,8 @@ pub mod root {
                 pub _address: u8,
             }
             pub type WrappingMultiplyHelper_UnsignedT = u8;
+            pub type type_pack_element_type = u8;
+            pub type Nth = u8;
             #[doc = " SelectVariantTypeHelper is used in the implementation of SelectVariantType."]
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
@@ -844,7 +779,10 @@ pub mod root {
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ResultImplementationNullIsOkBase {
-                pub mValue: root::mozilla::CompactPair,
+                pub mValue: root::mozilla::CompactPair<
+                    root::mozilla::detail::AlignedStorageOrEmpty,
+                    root::mozilla::detail::ResultImplementationNullIsOkBase_ErrorStorageType,
+                >,
             }
             pub type ResultImplementationNullIsOkBase_ErrorStorageType =
                 root::mozilla::detail::UnusedZero;
@@ -935,6 +873,20 @@ pub mod root {
                 ["Align of template specialization: HasFreeLSB_open0_OOM_close0"]
                     [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
             };
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct UniqueSelector {
+                pub _address: u8,
+            }
+            pub type UniqueSelector_SingleObject = root::mozilla::UniquePtr;
+            #[repr(C)]
+            #[derive(Debug, PartialEq)]
+            pub struct TempPtrToSetterT<T, UniquePtrT> {
+                pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
+                pub _phantom_1: ::std::marker::PhantomData<::std::cell::UnsafeCell<UniquePtrT>>,
+                pub mDest: *mut UniquePtrT,
+                pub mNewVal: *mut T,
+            }
             pub type IntrinsicBase_ValueType = u8;
             pub type IntrinsicBase_OrderedOp = u8;
             pub type IntrinsicMemoryOps_Base = u8;
@@ -949,6 +901,11 @@ pub mod root {
             pub type AtomicBase_Intrinsics = u8;
             pub type AtomicBase_ValueType = root::mozilla::detail::AtomicBase_Intrinsics;
             pub type AtomicBaseIncDec_Base = u8;
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct supports_os {
+                pub _base: root::std::false_type,
+            }
             #[doc = " LinkedList supports refcounted elements using this adapter class. Clients\n using LinkedList<RefPtr<T>> will get a data structure that holds a strong\n reference to T as long as T is in the list."]
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
@@ -1009,16 +966,6 @@ pub mod root {
             pub struct HashTable_ModIterator {
                 pub _address: u8,
             }
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct HashTable_Range {
-                pub _address: u8,
-            }
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct HashTable_Enum {
-                pub _address: u8,
-            }
             impl root::mozilla::detail::HashTable_FailureBehavior {
                 pub const ReportFailure: root::mozilla::detail::HashTable_FailureBehavior =
                     HashTable_FailureBehavior::DontReportFailure;
@@ -1059,6 +1006,32 @@ pub mod root {
             #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
             pub enum HashTable_RebuildStatus {
                 NotOverloaded = 0,
+            }
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct AllocPolicyBasedFreePolicy {
+                pub _address: u8,
+            }
+            #[repr(C)]
+            #[derive(Debug, PartialEq)]
+            pub struct SprintfAppend {
+                pub _base: root::mozilla::PrintfTarget,
+                pub mBuf: *mut ::std::os::raw::c_char,
+                pub mBufLen: usize,
+            }
+            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+            const _: () = {
+                ["Size of SprintfAppend"][::std::mem::size_of::<SprintfAppend>() - 32usize];
+                ["Alignment of SprintfAppend"][::std::mem::align_of::<SprintfAppend>() - 8usize];
+                ["Offset of field: SprintfAppend::mBuf"]
+                    [::std::mem::offset_of!(SprintfAppend, mBuf) - 16usize];
+                ["Offset of field: SprintfAppend::mBufLen"]
+                    [::std::mem::offset_of!(SprintfAppend, mBufLen) - 24usize];
+            };
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct AlignedChecker {
+                pub _address: u8,
             }
             #[repr(C)]
             #[derive(Debug, Copy, Clone)]
@@ -1112,37 +1085,51 @@ pub mod root {
             pub struct FreePolicy {
                 pub _address: u8,
             }
+            pub type FileHandleType = ::std::os::raw::c_int;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct HasReceiverTypeHelper {
-                pub _address: u8,
+            pub struct FileHandleHelper {
+                pub mHandle: root::mozilla::detail::FileHandleType,
             }
+            pub const FileHandleHelper_kInvalidHandle: root::mozilla::detail::FileHandleType = -1;
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
-                ["Size of HasReceiverTypeHelper"]
-                    [::std::mem::size_of::<HasReceiverTypeHelper>() - 1usize];
-                ["Alignment of HasReceiverTypeHelper"]
-                    [::std::mem::align_of::<HasReceiverTypeHelper>() - 1usize];
+                ["Size of FileHandleHelper"][::std::mem::size_of::<FileHandleHelper>() - 4usize];
+                ["Alignment of FileHandleHelper"]
+                    [::std::mem::align_of::<FileHandleHelper>() - 4usize];
+                ["Offset of field: FileHandleHelper::mHandle"]
+                    [::std::mem::offset_of!(FileHandleHelper, mHandle) - 0usize];
             };
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct HasReceiverType {
+            pub struct FileHandleDeleter {
                 pub _address: u8,
             }
-            pub type ReceiverTypeImpl_Type = root::__BindgenOpaqueArray<u8, 0usize>;
+            pub type FileHandleDeleter_pointer = root::mozilla::detail::FileHandleHelper;
+            pub type FileHandleDeleter_receiver = root::mozilla::detail::FileHandleType;
+            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+            const _: () = {
+                ["Size of FileHandleDeleter"][::std::mem::size_of::<FileHandleDeleter>() - 1usize];
+                ["Alignment of FileHandleDeleter"]
+                    [::std::mem::align_of::<FileHandleDeleter>() - 1usize];
+            };
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct PointerType {
+                pub _address: u8,
+            }
+            pub type PointerType_type<T> = *mut T;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ReceiverType {
                 pub _address: u8,
             }
-            pub type ReceiverType_Type = u8;
             #[repr(C)]
             #[derive(Debug, PartialEq)]
             pub struct UniquePtrGetterTransfers {
                 pub mPtr: *mut root::mozilla::detail::UniquePtrGetterTransfers_Ptr,
                 pub mReceiver: root::mozilla::detail::UniquePtrGetterTransfers_Receiver,
             }
-            #[doc = " UniquePtr is a smart pointer that wholly owns a resource.  Ownership may be\n transferred out of a UniquePtr through explicit action, but otherwise the\n resource is destroyed when the UniquePtr is destroyed.\n\n UniquePtr is similar to C++98's std::auto_ptr, but it improves upon auto_ptr\n in one crucial way: it's impossible to copy a UniquePtr.  Copying an auto_ptr\n obviously *can't* copy ownership of its singly-owned resource.  So what\n happens if you try to copy one?  Bizarrely, ownership is implicitly\n *transferred*, preserving single ownership but breaking code that assumes a\n copy of an object is identical to the original.  (This is why auto_ptr is\n prohibited in STL containers.)\n\n UniquePtr solves this problem by being *movable* rather than copyable.\n Instead of passing a |UniquePtr u| directly to the constructor or assignment\n operator, you pass |Move(u)|.  In doing so you indicate that you're *moving*\n ownership out of |u|, into the target of the construction/assignment.  After\n the transfer completes, |u| contains |nullptr| and may be safely destroyed.\n This preserves single ownership but also allows UniquePtr to be moved by\n algorithms that have been made move-safe.  (Note: if |u| is instead a\n temporary expression, don't use |Move()|: just pass the expression, because\n it's already move-ready.  For more information see Move.h.)\n\n UniquePtr is also better than std::auto_ptr in that the deletion operation is\n customizable.  An optional second template parameter specifies a class that\n (through its operator()(T*)) implements the desired deletion policy.  If no\n policy is specified, mozilla::DefaultDelete<T> is used -- which will either\n |delete| or |delete[]| the resource, depending whether the resource is an\n array.  Custom deletion policies ideally should be empty classes (no member\n fields, no member fields in base classes, no virtual methods/inheritance),\n because then UniquePtr can be just as efficient as a raw pointer.\n\n Use of UniquePtr proceeds like so:\n\n   UniquePtr<int> g1; // initializes to nullptr\n   g1.reset(new int); // switch resources using reset()\n   g1 = nullptr; // clears g1, deletes the int\n\n   UniquePtr<int> g2(new int); // owns that int\n   int* p = g2.release(); // g2 leaks its int -- still requires deletion\n   delete p; // now freed\n\n   struct S { int x; S(int x) : x(x) {} };\n   UniquePtr<S> g3, g4(new S(5));\n   g3 = std::move(g4); // g3 owns the S, g4 cleared\n   S* p = g3.get(); // g3 still owns |p|\n   assert(g3->x == 5); // operator-> works (if .get() != nullptr)\n   assert((*g3).x == 5); // also operator* (again, if not cleared)\n   std::swap(g3, g4); // g4 now owns the S, g3 cleared\n   g3.swap(g4);  // g3 now owns the S, g4 cleared\n   UniquePtr<S> g5(std::move(g3)); // g5 owns the S, g3 cleared\n   g5.reset(); // deletes the S, g5 cleared\n\n   struct FreePolicy { void operator()(void* p) { free(p); } };\n   UniquePtr<int, FreePolicy> g6(static_cast<int*>(malloc(sizeof(int))));\n   int* ptr = g6.get();\n   g6 = nullptr; // calls free(ptr)\n\n Now, carefully note a few things you *can't* do:\n\n   UniquePtr<int> b1;\n   b1 = new int; // BAD: can only assign another UniquePtr\n   int* ptr = b1; // BAD: no auto-conversion to pointer, use get()\n\n   UniquePtr<int> b2(b1); // BAD: can't copy a UniquePtr\n   UniquePtr<int> b3 = b1; // BAD: can't copy-assign a UniquePtr\n\n (Note that changing a UniquePtr to store a direct |new| expression is\n permitted, but usually you should use MakeUnique, defined at the end of this\n header.)\n\n A few miscellaneous notes:\n\n UniquePtr, when not instantiated for an array type, can be move-constructed\n and move-assigned, not only from itself but from \"derived\" UniquePtr<U, E>\n instantiations where U converts to T and E converts to D.  If you want to use\n this, you're going to have to specify a deletion policy for both UniquePtr\n instantations, and T pretty much has to have a virtual destructor.  In other\n words, this doesn't work:\n\n   struct Base { virtual ~Base() {} };\n   struct Derived : Base {};\n\n   UniquePtr<Base> b1;\n   // BAD: DefaultDelete<Base> and DefaultDelete<Derived> don't interconvert\n   UniquePtr<Derived> d1(std::move(b));\n\n   UniquePtr<Base> b2;\n   UniquePtr<Derived, DefaultDelete<Base>> d2(std::move(b2)); // okay\n\n UniquePtr is specialized for array types.  Specializing with an array type\n creates a smart-pointer version of that array -- not a pointer to such an\n array.\n\n   UniquePtr<int[]> arr(new int[5]);\n   arr[0] = 4;\n\n What else is different?  Deletion of course uses |delete[]|.  An operator[]\n is provided.  Functionality that doesn't make sense for arrays is removed.\n The constructors and mutating methods only accept array pointers (not T*, U*\n that converts to T*, or UniquePtr<U[]> or UniquePtr<U>) or |nullptr|.\n\n It's perfectly okay for a function to return a UniquePtr. This transfers\n the UniquePtr's sole ownership of the data, to the fresh UniquePtr created\n in the calling function, that will then solely own that data. Such functions\n can return a local variable UniquePtr, |nullptr|, |UniquePtr(ptr)| where\n |ptr| is a |T*|, or a UniquePtr |Move()|'d from elsewhere.\n\n UniquePtr will commonly be a member of a class, with lifetime equivalent to\n that of that class.  If you want to expose the related resource, you could\n expose a raw pointer via |get()|, but ownership of a raw pointer is\n inherently unclear.  So it's better to expose a |const UniquePtr&| instead.\n This prohibits mutation but still allows use of |get()| when needed (but\n operator-> is preferred).  Of course, you can only use this smart pointer as\n long as the enclosing class instance remains live -- no different than if you\n exposed the |get()| raw pointer.\n\n To pass a UniquePtr-managed resource as a pointer, use a |const UniquePtr&|\n argument.  To specify an inout parameter (where the method may or may not\n take ownership of the resource, or reset it), or to specify an out parameter\n (where simply returning a |UniquePtr| isn't possible), use a |UniquePtr&|\n argument.  To unconditionally transfer ownership of a UniquePtr\n into a method, use a |UniquePtr| argument.  To conditionally transfer\n ownership of a resource into a method, should the method want it, use a\n |UniquePtr&&| argument."]
             pub type UniquePtrGetterTransfers_Ptr = u8;
             pub type UniquePtrGetterTransfers_Receiver = root::mozilla::detail::ReceiverType;
             #[repr(C)]
@@ -1151,21 +1138,15 @@ pub mod root {
                 _unused: [u8; 0],
             }
             #[repr(C)]
-            #[derive(Debug, PartialEq)]
             pub struct MutexImpl {
-                pub platformData_: [*mut ::std::os::raw::c_void; 5usize],
-            }
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone)]
-            pub struct MutexImpl_PlatformData {
-                _unused: [u8; 0],
+                pub mMutex: root::pthread_mutex_t,
             }
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
                 ["Size of MutexImpl"][::std::mem::size_of::<MutexImpl>() - 40usize];
                 ["Alignment of MutexImpl"][::std::mem::align_of::<MutexImpl>() - 8usize];
-                ["Offset of field: MutexImpl::platformData_"]
-                    [::std::mem::offset_of!(MutexImpl, platformData_) - 0usize];
+                ["Offset of field: MutexImpl::mMutex"]
+                    [::std::mem::offset_of!(MutexImpl, mMutex) - 0usize];
             };
             #[repr(C)]
             pub struct RWLockImpl {
@@ -1178,17 +1159,7 @@ pub mod root {
                 ["Offset of field: RWLockImpl::mRWLock"]
                     [::std::mem::offset_of!(RWLockImpl, mRWLock) - 0usize];
             };
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct UnsupportedType {
-                pub _address: u8,
-            }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of UnsupportedType"][::std::mem::size_of::<UnsupportedType>() - 1usize];
-                ["Alignment of UnsupportedType"]
-                    [::std::mem::align_of::<UnsupportedType>() - 1usize];
-            };
+            pub type PayloadFieldsTuple<T> = T;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct IsSupportedPass2 {
@@ -1257,13 +1228,6 @@ pub mod root {
             };
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
-                ["Size of template specialization: IsSupportedPass2_open0_char_close0"]
-                    [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-                ["Align of template specialization: IsSupportedPass2_open0_char_close0"]
-                    [::std::mem::align_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
-            };
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
                 ["Size of template specialization: IsSupportedPass2_open0_signed_char_close0"]
                     [::std::mem::size_of::<root::mozilla::detail::IsSupportedPass2>() - 1usize];
                 ["Align of template specialization: IsSupportedPass2_open0_signed_char_close0"]
@@ -1329,7 +1293,6 @@ pub mod root {
                 ["Size of template specialization: IsSupportedPass2_open0_unsigned_long_long_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: detail :: IsSupportedPass2 > () - 1usize] ;
                 ["Align of template specialization: IsSupportedPass2_open0_unsigned_long_long_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: detail :: IsSupportedPass2 > () - 1usize] ;
             };
-            pub type TwiceBiggerType_Type = u8;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct CastToCheckedIntImpl {
@@ -1351,137 +1314,26 @@ pub mod root {
                 ["Align of template specialization: HasFreeLSB_open0_ptr_JSObject_close0"]
                     [::std::mem::align_of::<root::mozilla::detail::HasFreeLSB>() - 1usize];
             };
-        }
-        pub mod tl {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static Min_value: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static Max_value: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static FloorLog2_value: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static CeilingLog2_value: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static RoundUpPow2_value: usize;
-            }
-            #[doc = " Compute the number of bits in the given unsigned type."]
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct BitSize {
+            pub struct MakeUnsignedChar {
                 pub _address: u8,
             }
-            extern "C" {
-                #[link_name = "\u{1}checkPrecondition"]
-                pub static NBitMask_checkPrecondition: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static NBitMask_value: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}value"]
-                pub static MulOverflowMask_value: usize;
-            }
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct MallocAllocPolicy {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of MallocAllocPolicy"][::std::mem::size_of::<MallocAllocPolicy>() - 1usize];
-            ["Alignment of MallocAllocPolicy"]
-                [::std::mem::align_of::<MallocAllocPolicy>() - 1usize];
-        };
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct NeverAllocPolicy {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of NeverAllocPolicy"][::std::mem::size_of::<NeverAllocPolicy>() - 1usize];
-            ["Alignment of NeverAllocPolicy"][::std::mem::align_of::<NeverAllocPolicy>() - 1usize];
-        };
-        #[doc = " CompactPair is the logical concatenation of an instance of A with an instance\n B. Space is conserved when possible.  Neither A nor B may be a final class.\n\n In general if space conservation is not critical is preferred to use\n std::pair.\n\n It's typically clearer to have individual A and B member fields.  Except if\n you want the space-conserving qualities of CompactPair, you're probably\n better off not using this!\n\n No guarantees are provided about the memory layout of A and B, the order of\n initialization or destruction of A and B, and so on.  (This is approximately\n required to optimize space usage.)  The first/second names are merely\n conceptual!"]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct CompactPair {
-            pub _address: u8,
-        }
-        pub type CompactPair_Base = u8;
-        #[doc = " UniquePtr is a smart pointer that wholly owns a resource.  Ownership may be\n transferred out of a UniquePtr through explicit action, but otherwise the\n resource is destroyed when the UniquePtr is destroyed.\n\n UniquePtr is similar to C++98's std::auto_ptr, but it improves upon auto_ptr\n in one crucial way: it's impossible to copy a UniquePtr.  Copying an auto_ptr\n obviously *can't* copy ownership of its singly-owned resource.  So what\n happens if you try to copy one?  Bizarrely, ownership is implicitly\n *transferred*, preserving single ownership but breaking code that assumes a\n copy of an object is identical to the original.  (This is why auto_ptr is\n prohibited in STL containers.)\n\n UniquePtr solves this problem by being *movable* rather than copyable.\n Instead of passing a |UniquePtr u| directly to the constructor or assignment\n operator, you pass |Move(u)|.  In doing so you indicate that you're *moving*\n ownership out of |u|, into the target of the construction/assignment.  After\n the transfer completes, |u| contains |nullptr| and may be safely destroyed.\n This preserves single ownership but also allows UniquePtr to be moved by\n algorithms that have been made move-safe.  (Note: if |u| is instead a\n temporary expression, don't use |Move()|: just pass the expression, because\n it's already move-ready.  For more information see Move.h.)\n\n UniquePtr is also better than std::auto_ptr in that the deletion operation is\n customizable.  An optional second template parameter specifies a class that\n (through its operator()(T*)) implements the desired deletion policy.  If no\n policy is specified, mozilla::DefaultDelete<T> is used -- which will either\n |delete| or |delete[]| the resource, depending whether the resource is an\n array.  Custom deletion policies ideally should be empty classes (no member\n fields, no member fields in base classes, no virtual methods/inheritance),\n because then UniquePtr can be just as efficient as a raw pointer.\n\n Use of UniquePtr proceeds like so:\n\n   UniquePtr<int> g1; // initializes to nullptr\n   g1.reset(new int); // switch resources using reset()\n   g1 = nullptr; // clears g1, deletes the int\n\n   UniquePtr<int> g2(new int); // owns that int\n   int* p = g2.release(); // g2 leaks its int -- still requires deletion\n   delete p; // now freed\n\n   struct S { int x; S(int x) : x(x) {} };\n   UniquePtr<S> g3, g4(new S(5));\n   g3 = std::move(g4); // g3 owns the S, g4 cleared\n   S* p = g3.get(); // g3 still owns |p|\n   assert(g3->x == 5); // operator-> works (if .get() != nullptr)\n   assert((*g3).x == 5); // also operator* (again, if not cleared)\n   std::swap(g3, g4); // g4 now owns the S, g3 cleared\n   g3.swap(g4);  // g3 now owns the S, g4 cleared\n   UniquePtr<S> g5(std::move(g3)); // g5 owns the S, g3 cleared\n   g5.reset(); // deletes the S, g5 cleared\n\n   struct FreePolicy { void operator()(void* p) { free(p); } };\n   UniquePtr<int, FreePolicy> g6(static_cast<int*>(malloc(sizeof(int))));\n   int* ptr = g6.get();\n   g6 = nullptr; // calls free(ptr)\n\n Now, carefully note a few things you *can't* do:\n\n   UniquePtr<int> b1;\n   b1 = new int; // BAD: can only assign another UniquePtr\n   int* ptr = b1; // BAD: no auto-conversion to pointer, use get()\n\n   UniquePtr<int> b2(b1); // BAD: can't copy a UniquePtr\n   UniquePtr<int> b3 = b1; // BAD: can't copy-assign a UniquePtr\n\n (Note that changing a UniquePtr to store a direct |new| expression is\n permitted, but usually you should use MakeUnique, defined at the end of this\n header.)\n\n A few miscellaneous notes:\n\n UniquePtr, when not instantiated for an array type, can be move-constructed\n and move-assigned, not only from itself but from \"derived\" UniquePtr<U, E>\n instantiations where U converts to T and E converts to D.  If you want to use\n this, you're going to have to specify a deletion policy for both UniquePtr\n instantations, and T pretty much has to have a virtual destructor.  In other\n words, this doesn't work:\n\n   struct Base { virtual ~Base() {} };\n   struct Derived : Base {};\n\n   UniquePtr<Base> b1;\n   // BAD: DefaultDelete<Base> and DefaultDelete<Derived> don't interconvert\n   UniquePtr<Derived> d1(std::move(b));\n\n   UniquePtr<Base> b2;\n   UniquePtr<Derived, DefaultDelete<Base>> d2(std::move(b2)); // okay\n\n UniquePtr is specialized for array types.  Specializing with an array type\n creates a smart-pointer version of that array -- not a pointer to such an\n array.\n\n   UniquePtr<int[]> arr(new int[5]);\n   arr[0] = 4;\n\n What else is different?  Deletion of course uses |delete[]|.  An operator[]\n is provided.  Functionality that doesn't make sense for arrays is removed.\n The constructors and mutating methods only accept array pointers (not T*, U*\n that converts to T*, or UniquePtr<U[]> or UniquePtr<U>) or |nullptr|.\n\n It's perfectly okay for a function to return a UniquePtr. This transfers\n the UniquePtr's sole ownership of the data, to the fresh UniquePtr created\n in the calling function, that will then solely own that data. Such functions\n can return a local variable UniquePtr, |nullptr|, |UniquePtr(ptr)| where\n |ptr| is a |T*|, or a UniquePtr |Move()|'d from elsewhere.\n\n UniquePtr will commonly be a member of a class, with lifetime equivalent to\n that of that class.  If you want to expose the related resource, you could\n expose a raw pointer via |get()|, but ownership of a raw pointer is\n inherently unclear.  So it's better to expose a |const UniquePtr&| instead.\n This prohibits mutation but still allows use of |get()| when needed (but\n operator-> is preferred).  Of course, you can only use this smart pointer as\n long as the enclosing class instance remains live -- no different than if you\n exposed the |get()| raw pointer.\n\n To pass a UniquePtr-managed resource as a pointer, use a |const UniquePtr&|\n argument.  To specify an inout parameter (where the method may or may not\n take ownership of the resource, or reset it), or to specify an out parameter\n (where simply returning a |UniquePtr| isn't possible), use a |UniquePtr&|\n argument.  To unconditionally transfer ownership of a UniquePtr\n into a method, use a |UniquePtr| argument.  To conditionally transfer\n ownership of a resource into a method, should the method want it, use a\n |UniquePtr&&| argument."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct UniquePtr {
-            pub _address: u8,
-        }
-        pub type UniquePtr_ElementType = u8;
-        pub type UniquePtr_DeleterType = u8;
-        pub type UniquePtr_Pointer = u8;
-        #[doc = " A default deletion policy using plain old operator delete.\n\n Note that this type can be specialized, but authors should beware of the risk\n that the specialization may at some point cease to match (either because it\n gets moved to a different compilation unit or the signature changes). If the\n non-specialized (|delete|-based) version compiles for that type but does the\n wrong thing, bad things could happen.\n\n This is a non-issue for types which are always incomplete (i.e. opaque handle\n types), since |delete|-ing such a type will always trigger a compilation\n error."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct DefaultDelete {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        pub struct PrintfTarget__bindgen_vtable(::std::os::raw::c_void);
-        #[repr(C)]
-        #[derive(Debug, PartialEq)]
-        pub struct PrintfTarget {
-            pub vtable_: *const PrintfTarget__bindgen_vtable,
-            pub mEmitted: usize,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of PrintfTarget"][::std::mem::size_of::<PrintfTarget>() - 16usize];
-            ["Alignment of PrintfTarget"][::std::mem::align_of::<PrintfTarget>() - 8usize];
-            ["Offset of field: PrintfTarget::mEmitted"]
-                [::std::mem::offset_of!(PrintfTarget, mEmitted) - 8usize];
-        };
-        pub type SmprintfPolicyPointer = u8;
-        pub type SmprintfPointer = u8;
-        #[repr(C)]
-        #[derive(Debug, PartialEq)]
-        pub struct SprintfState<AllocPolicy> {
-            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<AllocPolicy>>,
-            pub _base: root::mozilla::PrintfTarget,
-            pub _base_1: AllocPolicy,
-            pub mMaxlen: usize,
-            pub mBase: *mut ::std::os::raw::c_char,
-            pub mCur: *mut ::std::os::raw::c_char,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct FloatingPoint {
-            pub _address: u8,
-        }
-        pub type FloatingPoint_Base = root::mozilla::detail::FloatingPointTrait;
-        #[doc = " An unsigned integral type suitable for accessing the bitwise representation\n of T."]
-        pub type FloatingPoint_Bits = root::mozilla::FloatingPoint_Base;
-        pub type InfinityBits_Traits = root::mozilla::FloatingPoint;
-        pub type SpecificNaNBits_Traits = root::mozilla::FloatingPoint;
-        #[repr(C)]
-        pub struct AlignedStorage2 {
-            pub u: root::mozilla::AlignedStorage2_U,
-        }
-        #[repr(C)]
-        pub union AlignedStorage2_U {
-            pub mBytes: *mut ::std::os::raw::c_char,
-            pub mDummy: u64,
+            pub type MakeUnsignedChar_Type = u8;
+            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+            const _: () = {
+                ["Size of template specialization: MakeUnsignedChar_open0_char16_t_close0"]
+                    [::std::mem::size_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
+                ["Align of template specialization: MakeUnsignedChar_open0_char16_t_close0"]
+                    [::std::mem::align_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
+            };
+            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+            const _: () = {
+                ["Size of template specialization: MakeUnsignedChar_open0_char32_t_close0"]
+                    [::std::mem::size_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
+                ["Align of template specialization: MakeUnsignedChar_open0_char32_t_close0"]
+                    [::std::mem::align_of::<root::mozilla::detail::MakeUnsignedChar>() - 1usize];
+            };
         }
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -1536,13 +1388,265 @@ pub mod root {
             pub _address: u8,
         }
         pub type Maybe_ValueType = u8;
-        pub type MallocSizeOf =
-            ::std::option::Option<unsafe extern "C" fn(p: *const ::std::os::raw::c_void) -> usize>;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct RangedPtr<T> {
-            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
-            pub mPtr: *mut T,
+        pub struct Maybe_Iterator {
+            pub _address: u8,
+        }
+        pub type Maybe_Iterator_iterator_type = u8;
+        pub type Maybe_Iterator_value_type = u8;
+        pub type Maybe_Iterator_difference_type = u64;
+        pub type Maybe_Iterator_reference = u8;
+        pub type Maybe_Iterator_pointer = u8;
+        pub type Maybe_Iterator_iterator_category = u8;
+        pub type Maybe_iterator = u8;
+        pub type Maybe_const_iterator = u8;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct FloatingPointTrait {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of template specialization: FloatingPointTrait_open0_float_close0"]
+                [::std::mem::size_of::<root::mozilla::FloatingPointTrait>() - 1usize];
+            ["Align of template specialization: FloatingPointTrait_open0_float_close0"]
+                [::std::mem::align_of::<root::mozilla::FloatingPointTrait>() - 1usize];
+        };
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of template specialization: FloatingPointTrait_open0_double_close0"]
+                [::std::mem::size_of::<root::mozilla::FloatingPointTrait>() - 1usize];
+            ["Align of template specialization: FloatingPointTrait_open0_double_close0"]
+                [::std::mem::align_of::<root::mozilla::FloatingPointTrait>() - 1usize];
+        };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct FloatingPoint {
+            pub _address: u8,
+        }
+        pub type FloatingPoint_Base = root::mozilla::FloatingPointTrait;
+        #[doc = " An unsigned integral type suitable for accessing the bitwise representation\n of T."]
+        pub type FloatingPoint_Bits = root::mozilla::FloatingPoint_Base;
+        pub type InfinityBits_Traits = root::mozilla::FloatingPoint;
+        pub type SpecificNaNBits_Traits = root::mozilla::FloatingPoint;
+        pub type SpecificFloatingPointBits_Traits = root::mozilla::FloatingPoint;
+        pub type TimeStampValue = u64;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone)]
+        pub struct TimeStampTests {
+            _unused: [u8; 0],
+        }
+        #[doc = " Platform-specific implementation details of BaseTimeDuration."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct BaseTimeDurationPlatformUtils {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of BaseTimeDurationPlatformUtils"]
+                [::std::mem::size_of::<BaseTimeDurationPlatformUtils>() - 1usize];
+            ["Alignment of BaseTimeDurationPlatformUtils"]
+                [::std::mem::align_of::<BaseTimeDurationPlatformUtils>() - 1usize];
+        };
+        #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a system-dependent unit.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct BaseTimeDuration {
+            pub mValue: i64,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone)]
+        pub struct BaseTimeDuration__SomethingVeryRandomHere {
+            _unused: [u8; 0],
+        }
+        #[doc = " Perform arithmetic operations on the value of a BaseTimeDuration without\n doing strict checks on the range of values."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct TimeDurationValueCalculator {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of TimeDurationValueCalculator"]
+                [::std::mem::size_of::<TimeDurationValueCalculator>() - 1usize];
+            ["Alignment of TimeDurationValueCalculator"]
+                [::std::mem::align_of::<TimeDurationValueCalculator>() - 1usize];
+        };
+        #[doc = " Specialization of BaseTimeDuration that uses TimeDurationValueCalculator for\n arithmetic on the mValue member.\n\n Use this class for time durations that are *not* expected to hold values of\n Forever (or the negative equivalent) or when such time duration are *not*\n expected to be used in arithmetic operations."]
+        pub type TimeDuration = root::mozilla::BaseTimeDuration;
+        #[doc = " Instances of this class represent moments in time, or a special\n \"null\" moment. We do not use the non-monotonic system clock or\n local time, since they can be reset, causing apparent backward\n travel in time, which can confuse algorithms. Instead we measure\n elapsed time according to the system.  This time can never go\n backwards (i.e. it never wraps around, at least not in less than\n five million years of system elapsed time). It might not advance\n while the system is sleeping. If TimeStamp::SetNow() is not called\n at all for hours or days, we might not notice the passage of some\n of that time.\n\n We deliberately do not expose a way to convert TimeStamps to some\n particular unit. All you can do is compute a difference between two\n TimeStamps to get a TimeDuration. You can also add a TimeDuration\n to a TimeStamp to get a new TimeStamp. You can't do something\n meaningless like add two TimeStamps.\n\n Internally this is implemented as a wrapper around high-resolution,\n monotonic, platform-dependent system clocks.\n\n This class is similar to C++11's time_point, however it is\n explicitly nullable and provides an IsNull() method. time_point\n is initialized to the clock's epoch and provides a\n time_since_epoch() method that functions similiarly. i.e.\n t.IsNull() is equivalent to t.time_since_epoch() ==\n decltype(t)::duration::zero();\n\n Note that, since TimeStamp objects are small, prefer to pass them by value\n unless there is a specific reason not to do so."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct TimeStamp {
+            #[doc = " When built with PRIntervalTime, a value of 0 means this instance\n is \"null\". Otherwise, the low 32 bits represent a PRIntervalTime,\n and the high 32 bits represent a counter of the number of\n rollovers of PRIntervalTime that we've seen. This counter starts\n at 1 to avoid a real time colliding with the \"null\" value.\n\n PR_INTERVAL_MAX is set at 100,000 ticks per second. So the minimum\n time to wrap around is about 2^64/100000 seconds, i.e. about\n 5,849,424 years.\n\n When using a system clock, a value is system dependent."]
+            pub mValue: root::mozilla::TimeStampValue,
+        }
+        #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a system-dependent unit.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
+        pub type TimeStamp_DurationType = root::mozilla::TimeDuration;
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of TimeStamp"][::std::mem::size_of::<TimeStamp>() - 8usize];
+            ["Alignment of TimeStamp"][::std::mem::align_of::<TimeStamp>() - 8usize];
+            ["Offset of field: TimeStamp::mValue"]
+                [::std::mem::offset_of!(TimeStamp, mValue) - 0usize];
+        };
+        pub type HashNumber = u32;
+        #[doc = " A pseudorandom function mapping 32-bit integers to 32-bit integers.\n\n This is for when you're feeding private data (like pointer values or credit\n card numbers) to a non-crypto hash function (like HashBytes) and then using\n the hash code for something that untrusted parties could observe (like a JS\n Map). Plug in a HashCodeScrambler before that last step to avoid leaking the\n private data.\n\n By itself, this does not prevent hash-flooding DoS attacks, because an\n attacker can still generate many values with exactly equal hash codes by\n attacking the non-crypto hash function alone. Equal hash codes will, of\n course, still be equal however much you scramble them.\n\n The algorithm is SipHash-1-3. See <https://131002.net/siphash/>."]
+        #[repr(C)]
+        #[repr(align(8))]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct HashCodeScrambler {
+            pub _bindgen_opaque_blob: [u64; 2usize],
+        }
+        #[repr(C)]
+        #[repr(align(8))]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct HashCodeScrambler_SipHasher {
+            pub _bindgen_opaque_blob: [u64; 4usize],
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of HashCodeScrambler_SipHasher"]
+                [::std::mem::size_of::<HashCodeScrambler_SipHasher>() - 32usize];
+            ["Alignment of HashCodeScrambler_SipHasher"]
+                [::std::mem::align_of::<HashCodeScrambler_SipHasher>() - 8usize];
+        };
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of HashCodeScrambler"][::std::mem::size_of::<HashCodeScrambler>() - 16usize];
+            ["Alignment of HashCodeScrambler"]
+                [::std::mem::align_of::<HashCodeScrambler>() - 8usize];
+        };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct VariantType {
+            pub _address: u8,
+        }
+        pub type VariantType_Type<T> = T;
+        extern "C" {
+            #[link_name = "\u{1}index"]
+            pub static VariantIndex_index: usize;
+        }
+        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n Since C++17, std::variant exists. `mozilla::Variant` differs conceptually\n from it by (a.) having a richer `.match` API (compared to `std::visit`) and\n (b.) having a different assignment semantic. Assigning to an `std::variant`\n assigns to the underlying value, while assigning to a `mozilla::Variant`\n deletes the previous value then move-constructs a new value. This makes it\n possible to store *and* update const values.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct Variant {
+            pub _address: u8,
+        }
+        pub type Variant_Tag = root::mozilla::detail::VariantTag;
+        pub type Variant_Impl = u8;
+        #[doc = " CompactPair is the logical concatenation of an instance of A with an instance\n B. Space is conserved when possible.\n\n In general if space conservation is not critical is preferred to use\n std::pair.\n"]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct CompactPair<A, B> {
+            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<A>>,
+            pub _phantom_1: ::std::marker::PhantomData<::std::cell::UnsafeCell<B>>,
+            pub mFirst: A,
+            pub mSecond: B,
+        }
+        #[doc = " Empty struct, indicating success for operations that have no return value.\n For example, if you declare another empty struct `struct OutOfMemory {};`,\n then `Result<Ok, OutOfMemory>` represents either success or OOM."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct Ok {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of Ok"][::std::mem::size_of::<Ok>() - 1usize];
+            ["Alignment of Ok"][::std::mem::align_of::<Ok>() - 1usize];
+        };
+        #[doc = " A tag used to differentiate between GenericErrorResult created by the Err\n function (completely new error) and GenericErrorResult created by the\n Result::propagateErr function (propagated error). This can be used to track\n error propagation and eventually produce error stacks for logging/debugging\n purposes."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct ErrorPropagationTag {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of ErrorPropagationTag"][::std::mem::size_of::<ErrorPropagationTag>() - 1usize];
+            ["Alignment of ErrorPropagationTag"]
+                [::std::mem::align_of::<ErrorPropagationTag>() - 1usize];
+        };
+        #[doc = " Result<V, E> represents the outcome of an operation that can either succeed\n or fail. It contains either a success value of type V or an error value of\n type E.\n\n All Result methods are const, so results are basically immutable.\n This is just like Variant<V, E> but with a slightly different API, and the\n following cases are optimized so Result can be stored more efficiently:\n\n - If both the success and error types do not use their least significant bit,\n are trivially copyable and destructible, Result<V, E> is guaranteed to be as\n large as the larger type. This is determined via the HasFreeLSB trait. By\n default, empty classes (in particular Ok) and aligned pointer types are\n assumed to have a free LSB, but you can specialize this trait for other\n types. If the success type is empty, the representation is guaranteed to be\n all zero bits on success. Do not change this representation! There is JIT\n code that depends on it. (Implementation note: The lowest bit is used as a\n tag bit: 0 to indicate the Result's bits are a success value, 1 to indicate\n the Result's bits (with the 1 masked out) encode an error value)\n\n - Else, if the error type can't have a all-zero bits representation and is\n not larger than a pointer, a CompactPair is used to represent this rather\n than a Variant. This has shown to be better optimizable, and the template\n code is much simpler than that of Variant, so it should also compile faster.\n Whether an error type can't be all-zero bits, is determined via the\n UnusedZero trait. MFBT doesn't declare any public type UnusedZero, but\n nsresult is declared UnusedZero in XPCOM.\n\n The purpose of Result is to reduce the screwups caused by using `false` or\n `nullptr` to indicate errors.\n What screwups? See <https://bugzilla.mozilla.org/show_bug.cgi?id=912928> for\n a partial list.\n\n Result<const V, E> or Result<V, const E> are not meaningful. The success or\n error values in a Result instance are non-modifiable in-place anyway. This\n guarantee must also be maintained when evolving Result. They can be\n unwrap()ped, but this loses const qualification. However, Result<const V, E>\n or Result<V, const E> may be misleading and prevent movability. Just use\n Result<V, E>. (Result<const V*, E> may make sense though, just Result<const\n V* const, E> is not possible.)"]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct Result {
+            pub mImpl: root::mozilla::Result_Impl,
+        }
+        pub type Result_Impl = root::mozilla::detail::SelectResultImpl;
+        pub type Result_ok_type<V> = V;
+        pub type Result_err_type<E> = E;
+        #[doc = " A type that auto-converts to an error Result. This is like a Result without\n a success type. It's the best return type for functions that always return\n an error--functions designed to build and populate error objects. It's also\n useful in error-handling macros; see MOZ_TRY for an example."]
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct GenericErrorResult<E> {
+            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<E>>,
+            pub mErrorValue: E,
+        }
+        pub type DefaultDelete = u8;
+        pub type UniquePtr = u8;
+        pub type MallocSizeOf =
+            ::std::option::Option<unsafe extern "C" fn(p: *const ::std::os::raw::c_void) -> usize>;
+        #[repr(u8)]
+        #[doc = " An enum of memory ordering possibilities for atomics.\n\n Memory ordering is the observable state of distinct values in memory.\n (It's a separate concept from atomicity, which concerns whether an\n operation can ever be observed in an intermediate state.  Don't\n conflate the two!)  Given a sequence of operations in source code on\n memory, it is *not* always the case that, at all times and on all\n cores, those operations will appear to have occurred in that exact\n sequence.  First, the compiler might reorder that sequence, if it\n thinks another ordering will be more efficient.  Second, the CPU may\n not expose so consistent a view of memory.  CPUs will often perform\n their own instruction reordering, above and beyond that performed by\n the compiler.  And each core has its own memory caches, and accesses\n (reads and writes both) to \"memory\" may only resolve to out-of-date\n cache entries -- not to the \"most recently\" performed operation in\n some global sense.  Any access to a value that may be used by\n multiple threads, potentially across multiple cores, must therefore\n have a memory ordering imposed on it, for all code on all\n threads/cores to have a sufficiently coherent worldview.\n\n http://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync and\n http://en.cppreference.com/w/cpp/atomic/memory_order go into more\n detail on all this, including examples of how each mode works.\n\n Note that for simplicity and practicality, not all of the modes in\n C++11 are supported.  The missing C++11 modes are either subsumed by\n the modes we provide below, or not relevant for the CPUs we support\n in Gecko.  These three modes are confusing enough as it is!"]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum MemoryOrdering {
+            Relaxed = 0,
+            ReleaseAcquire = 1,
+            SequentiallyConsistent = 2,
+        }
+        #[doc = " DebugOnly contains a value of type T, but only in debug builds.  In release\n builds, it does not contain a value.  This helper is intended to be used with\n MOZ_ASSERT()-style macros, allowing one to write:\n\n   DebugOnly<bool> check = func();\n   MOZ_ASSERT(check);\n\n more concisely than declaring |check| conditional on #ifdef DEBUG.\n\n DebugOnly instances can only be coerced to T in debug builds.  In release\n builds they don't have a value, so type coercion is not well defined.\n\n NOTE: DebugOnly instances still take up one byte of space, plus padding, even\n in optimized, non-DEBUG builds (see bug 1253094 comment 37 for more info).\n For this reason the class is MOZ_STACK_CLASS to prevent consumers using\n DebugOnly for struct/class members and unwittingly inflating the size of\n their objects in release builds."]
+        #[repr(C)]
+        #[derive(Debug, PartialEq)]
+        pub struct DebugOnly {
+            pub _address: u8,
+        }
+        pub type Array_ElementType<T> = T;
+        pub type Array_iterator<T> = *mut T;
+        pub type Array_const_iterator<T> = *const T;
+        pub type Array_reverse_iterator = u8;
+        pub type Array_const_reverse_iterator = u8;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct EnumTypeFitsWithin {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MinContiguousEnumValue {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MaxContiguousEnumValue {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MaxEnumValue {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct ContiguousEnumValues {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct ContiguousEnumSize {
+            pub _address: u8,
+        }
+        pub type EnumeratedArray_ArrayType = u8;
+        pub type EnumeratedArray_iterator = root::mozilla::EnumeratedArray_ArrayType;
+        pub type EnumeratedArray_const_iterator = root::mozilla::EnumeratedArray_ArrayType;
+        pub type EnumeratedArray_reverse_iterator = root::mozilla::EnumeratedArray_ArrayType;
+        pub type EnumeratedArray_const_reverse_iterator = root::mozilla::EnumeratedArray_ArrayType;
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone)]
+        pub struct unused_t {
+            _unused: [u8; 0],
         }
         pub mod span_details {
             #[allow(unused_imports)]
@@ -1629,231 +1733,6 @@ pub mod root {
             pub _address: u8,
         }
         #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct AlignmentFinder {
-            pub _address: u8,
-        }
-        pub type TimeStampValue = u64;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone)]
-        pub struct TimeStampTests {
-            _unused: [u8; 0],
-        }
-        #[doc = " Platform-specific implementation details of BaseTimeDuration."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct BaseTimeDurationPlatformUtils {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of BaseTimeDurationPlatformUtils"]
-                [::std::mem::size_of::<BaseTimeDurationPlatformUtils>() - 1usize];
-            ["Alignment of BaseTimeDurationPlatformUtils"]
-                [::std::mem::align_of::<BaseTimeDurationPlatformUtils>() - 1usize];
-        };
-        #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a int64_t in units of\n PR_TicksPerSecond() when building with NSPR interval timers, or a\n system-dependent unit when building with system clocks.  The\n system-dependent unit must be constant, otherwise the semantics of\n this class would be broken.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct BaseTimeDuration {
-            pub mValue: i64,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone)]
-        pub struct BaseTimeDuration__SomethingVeryRandomHere {
-            _unused: [u8; 0],
-        }
-        #[doc = " Perform arithmetic operations on the value of a BaseTimeDuration without\n doing strict checks on the range of values."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct TimeDurationValueCalculator {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TimeDurationValueCalculator"]
-                [::std::mem::size_of::<TimeDurationValueCalculator>() - 1usize];
-            ["Alignment of TimeDurationValueCalculator"]
-                [::std::mem::align_of::<TimeDurationValueCalculator>() - 1usize];
-        };
-        #[doc = " Specialization of BaseTimeDuration that uses TimeDurationValueCalculator for\n arithmetic on the mValue member.\n\n Use this class for time durations that are *not* expected to hold values of\n Forever (or the negative equivalent) or when such time duration are *not*\n expected to be used in arithmetic operations."]
-        pub type TimeDuration = root::mozilla::BaseTimeDuration;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct TimeStamp {
-            #[doc = " When built with PRIntervalTime, a value of 0 means this instance\n is \"null\". Otherwise, the low 32 bits represent a PRIntervalTime,\n and the high 32 bits represent a counter of the number of\n rollovers of PRIntervalTime that we've seen. This counter starts\n at 1 to avoid a real time colliding with the \"null\" value.\n\n PR_INTERVAL_MAX is set at 100,000 ticks per second. So the minimum\n time to wrap around is about 2^64/100000 seconds, i.e. about\n 5,849,424 years.\n\n When using a system clock, a value is system dependent."]
-            pub mValue: root::mozilla::TimeStampValue,
-        }
-        #[doc = " Instances of this class represent the length of an interval of time.\n Negative durations are allowed, meaning the end is before the start.\n\n Internally the duration is stored as a int64_t in units of\n PR_TicksPerSecond() when building with NSPR interval timers, or a\n system-dependent unit when building with system clocks.  The\n system-dependent unit must be constant, otherwise the semantics of\n this class would be broken.\n\n The ValueCalculator template parameter determines how arithmetic\n operations are performed on the integer count of ticks (mValue)."]
-        pub type TimeStamp_DurationType = root::mozilla::TimeDuration;
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of TimeStamp"][::std::mem::size_of::<TimeStamp>() - 8usize];
-            ["Alignment of TimeStamp"][::std::mem::align_of::<TimeStamp>() - 8usize];
-            ["Offset of field: TimeStamp::mValue"]
-                [::std::mem::offset_of!(TimeStamp, mValue) - 0usize];
-        };
-        #[doc = " A code unit within a UTF-8 encoded string.  (A code unit is the smallest\n unit within the Unicode encoding of a string.  For UTF-8 this is an 8-bit\n number; for UTF-16 it would be a 16-bit number.)\n\n This is *not* the same as a single code point: in UTF-8, non-ASCII code\n points are constituted by multiple code units."]
-        #[repr(C)]
-        #[derive(Copy, Clone)]
-        pub union Utf8Unit {
-            pub mValue: ::std::os::raw::c_char,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Utf8Unit"][::std::mem::size_of::<Utf8Unit>() - 1usize];
-            ["Alignment of Utf8Unit"][::std::mem::align_of::<Utf8Unit>() - 1usize];
-            ["Offset of field: Utf8Unit::mValue"]
-                [::std::mem::offset_of!(Utf8Unit, mValue) - 0usize];
-        };
-        pub type HashNumber = u32;
-        #[doc = " A pseudorandom function mapping 32-bit integers to 32-bit integers.\n\n This is for when you're feeding private data (like pointer values or credit\n card numbers) to a non-crypto hash function (like HashBytes) and then using\n the hash code for something that untrusted parties could observe (like a JS\n Map). Plug in a HashCodeScrambler before that last step to avoid leaking the\n private data.\n\n By itself, this does not prevent hash-flooding DoS attacks, because an\n attacker can still generate many values with exactly equal hash codes by\n attacking the non-crypto hash function alone. Equal hash codes will, of\n course, still be equal however much you scramble them.\n\n The algorithm is SipHash-1-3. See <https://131002.net/siphash/>."]
-        #[repr(C)]
-        #[repr(align(8))]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct HashCodeScrambler {
-            pub _bindgen_opaque_blob: [u64; 2usize],
-        }
-        #[repr(C)]
-        #[repr(align(8))]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct HashCodeScrambler_SipHasher {
-            pub _bindgen_opaque_blob: [u64; 4usize],
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HashCodeScrambler_SipHasher"]
-                [::std::mem::size_of::<HashCodeScrambler_SipHasher>() - 32usize];
-            ["Alignment of HashCodeScrambler_SipHasher"]
-                [::std::mem::align_of::<HashCodeScrambler_SipHasher>() - 8usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of HashCodeScrambler"][::std::mem::size_of::<HashCodeScrambler>() - 16usize];
-            ["Alignment of HashCodeScrambler"]
-                [::std::mem::align_of::<HashCodeScrambler>() - 8usize];
-        };
-        pub mod ipc {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct IPDLParamTraits {
-                pub _address: u8,
-            }
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct VariantType {
-            pub _address: u8,
-        }
-        pub type VariantType_Type<T> = T;
-        extern "C" {
-            #[link_name = "\u{1}index"]
-            pub static VariantIndex_index: usize;
-        }
-        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct Variant {
-            pub _address: u8,
-        }
-        pub type Variant_Tag = root::mozilla::detail::VariantTag;
-        pub type Variant_Impl = u8;
-        #[doc = " Empty struct, indicating success for operations that have no return value.\n For example, if you declare another empty struct `struct OutOfMemory {};`,\n then `Result<Ok, OutOfMemory>` represents either success or OOM."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct Ok {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of Ok"][::std::mem::size_of::<Ok>() - 1usize];
-            ["Alignment of Ok"][::std::mem::align_of::<Ok>() - 1usize];
-        };
-        #[doc = " A tag used to differentiate between GenericErrorResult created by the Err\n function (completely new error) and GenericErrorResult created by the\n Result::propagateErr function (propagated error). This can be used to track\n error propagation and eventually produce error stacks for logging/debugging\n purposes."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct ErrorPropagationTag {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ErrorPropagationTag"][::std::mem::size_of::<ErrorPropagationTag>() - 1usize];
-            ["Alignment of ErrorPropagationTag"]
-                [::std::mem::align_of::<ErrorPropagationTag>() - 1usize];
-        };
-        #[doc = " Result<V, E> represents the outcome of an operation that can either succeed\n or fail. It contains either a success value of type V or an error value of\n type E.\n\n All Result methods are const, so results are basically immutable.\n This is just like Variant<V, E> but with a slightly different API, and the\n following cases are optimized so Result can be stored more efficiently:\n\n - If both the success and error types do not use their least significant bit,\n are trivially copyable and destructible, Result<V, E> is guaranteed to be as\n large as the larger type. This is determined via the HasFreeLSB trait. By\n default, empty classes (in particular Ok) and aligned pointer types are\n assumed to have a free LSB, but you can specialize this trait for other\n types. If the success type is empty, the representation is guaranteed to be\n all zero bits on success. Do not change this representation! There is JIT\n code that depends on it. (Implementation note: The lowest bit is used as a\n tag bit: 0 to indicate the Result's bits are a success value, 1 to indicate\n the Result's bits (with the 1 masked out) encode an error value)\n\n - Else, if the error type can't have a all-zero bits representation and is\n not larger than a pointer, a CompactPair is used to represent this rather\n than a Variant. This has shown to be better optimizable, and the template\n code is much simpler than that of Variant, so it should also compile faster.\n Whether an error type can't be all-zero bits, is determined via the\n UnusedZero trait. MFBT doesn't declare any public type UnusedZero, but\n nsresult is declared UnusedZero in XPCOM.\n\n The purpose of Result is to reduce the screwups caused by using `false` or\n `nullptr` to indicate errors.\n What screwups? See <https://bugzilla.mozilla.org/show_bug.cgi?id=912928> for\n a partial list.\n\n Result<const V, E> or Result<V, const E> are not meaningful. The success or\n error values in a Result instance are non-modifiable in-place anyway. This\n guarantee must also be maintained when evolving Result. They can be\n unwrap()ped, but this loses const qualification. However, Result<const V, E>\n or Result<V, const E> may be misleading and prevent movability. Just use\n Result<V, E>. (Result<const V*, E> may make sense though, just Result<const\n V* const, E> is not possible.)"]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct Result {
-            pub mImpl: root::mozilla::Result_Impl,
-        }
-        pub type Result_Impl = root::mozilla::detail::SelectResultImpl;
-        pub type Result_ok_type<V> = V;
-        pub type Result_err_type<E> = E;
-        #[doc = " A type that auto-converts to an error Result. This is like a Result without\n a success type. It's the best return type for functions that always return\n an error--functions designed to build and populate error objects. It's also\n useful in error-handling macros; see MOZ_TRY for an example."]
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct GenericErrorResult<E> {
-            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<E>>,
-            pub mErrorValue: E,
-        }
-        #[repr(u8)]
-        #[doc = " An enum of memory ordering possibilities for atomics.\n\n Memory ordering is the observable state of distinct values in memory.\n (It's a separate concept from atomicity, which concerns whether an\n operation can ever be observed in an intermediate state.  Don't\n conflate the two!)  Given a sequence of operations in source code on\n memory, it is *not* always the case that, at all times and on all\n cores, those operations will appear to have occurred in that exact\n sequence.  First, the compiler might reorder that sequence, if it\n thinks another ordering will be more efficient.  Second, the CPU may\n not expose so consistent a view of memory.  CPUs will often perform\n their own instruction reordering, above and beyond that performed by\n the compiler.  And each core has its own memory caches, and accesses\n (reads and writes both) to \"memory\" may only resolve to out-of-date\n cache entries -- not to the \"most recently\" performed operation in\n some global sense.  Any access to a value that may be used by\n multiple threads, potentially across multiple cores, must therefore\n have a memory ordering imposed on it, for all code on all\n threads/cores to have a sufficiently coherent worldview.\n\n http://gcc.gnu.org/wiki/Atomic/GCCMM/AtomicSync and\n http://en.cppreference.com/w/cpp/atomic/memory_order go into more\n detail on all this, including examples of how each mode works.\n\n Note that for simplicity and practicality, not all of the modes in\n C++11 are supported.  The missing C++11 modes are either subsumed by\n the modes we provide below, or not relevant for the CPUs we support\n in Gecko.  These three modes are confusing enough as it is!"]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum MemoryOrdering {
-            Relaxed = 0,
-            ReleaseAcquire = 1,
-            SequentiallyConsistent = 2,
-        }
-        #[doc = " DebugOnly contains a value of type T, but only in debug builds.  In release\n builds, it does not contain a value.  This helper is intended to be used with\n MOZ_ASSERT()-style macros, allowing one to write:\n\n   DebugOnly<bool> check = func();\n   MOZ_ASSERT(check);\n\n more concisely than declaring |check| conditional on #ifdef DEBUG.\n\n DebugOnly instances can only be coerced to T in debug builds.  In release\n builds they don't have a value, so type coercion is not well defined.\n\n NOTE: DebugOnly instances still take up one byte of space, plus padding, even\n in optimized, non-DEBUG builds (see bug 1253094 comment 37 for more info).\n For this reason the class is MOZ_STACK_CLASS to prevent consumers using\n DebugOnly for struct/class members and unwittingly inflating the size of\n their objects in release builds."]
-        #[repr(C)]
-        #[derive(Debug, PartialEq)]
-        pub struct DebugOnly {
-            pub _address: u8,
-        }
-        pub type Array_ElementType<T> = T;
-        pub type Array_iterator<T> = *mut T;
-        pub type Array_const_iterator<T> = *const T;
-        pub type Array_reverse_iterator = u8;
-        pub type Array_const_reverse_iterator = u8;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct EnumTypeFitsWithin {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct MinContiguousEnumValue {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct MaxContiguousEnumValue {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct MaxEnumValue {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct ContiguousEnumValues {
-            pub _address: u8,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct ContiguousEnumSize {
-            pub _address: u8,
-        }
-        pub type EnumeratedArray_ArrayType = u8;
-        pub type EnumeratedArray_iterator = root::mozilla::EnumeratedArray_ArrayType;
-        pub type EnumeratedArray_const_iterator = root::mozilla::EnumeratedArray_ArrayType;
-        pub type EnumeratedArray_reverse_iterator = root::mozilla::EnumeratedArray_ArrayType;
-        pub type EnumeratedArray_const_reverse_iterator = root::mozilla::EnumeratedArray_ArrayType;
-        #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct LinkedListElement {
             pub mNext: *mut root::mozilla::LinkedListElement,
@@ -1878,7 +1757,7 @@ pub mod root {
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct LinkedList {
-            pub sentinel: root::mozilla::LinkedListElement,
+            pub mSentinel: root::mozilla::LinkedListElement,
         }
         #[doc = " LinkedList supports refcounted elements using this adapter class. Clients\n using LinkedList<RefPtr<T>> will get a data structure that holds a strong\n reference to T as long as T is in the list."]
         pub type LinkedList_Traits = root::mozilla::detail::LinkedListElementTraits;
@@ -1888,21 +1767,18 @@ pub mod root {
         pub type LinkedList_ConstClientType = root::mozilla::LinkedList_Traits;
         pub type LinkedList_ElementType = *mut root::mozilla::LinkedListElement;
         pub type LinkedList_ConstElementType = *const root::mozilla::LinkedListElement;
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct LinkedList_Iterator<Type> {
-            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<Type>>,
-            pub mCurrent: Type,
-        }
-        pub type LinkedList_Iterator_iterator_category = root::std::forward_iterator_tag;
-        pub type LinkedList_Iterator_value_type<T> = T;
-        pub type LinkedList_Iterator_difference_type = isize;
-        pub type LinkedList_Iterator_pointer<T> = *mut T;
-        pub type LinkedList_Iterator_reference<T> = *mut T;
-        pub type LinkedList_const_iterator =
-            root::mozilla::LinkedList_Iterator<root::mozilla::LinkedList_ConstRawType>;
-        pub type LinkedList_iterator =
-            root::mozilla::LinkedList_Iterator<root::mozilla::LinkedList_RawType>;
+        pub type LinkedList_iterator = u8;
+        pub type LinkedList_const_iterator = u8;
+        pub type LinkedList_reverse_iterator = u8;
+        pub type LinkedList_const_reverse_iterator = u8;
+        pub type LinkedList_IteratorImpl_elem_type = root::std::conditional_t;
+        pub type LinkedList_IteratorImpl_iterator_category = root::std::forward_iterator_tag;
+        pub type LinkedList_IteratorImpl_value_type = root::std::conditional_t;
+        pub type LinkedList_IteratorImpl_difference_type = isize;
+        pub type LinkedList_IteratorImpl_pointer =
+            *mut root::mozilla::LinkedList_IteratorImpl_value_type;
+        pub type LinkedList_IteratorImpl_reference =
+            *mut root::mozilla::LinkedList_IteratorImpl_value_type;
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct AutoCleanLinkedList {
@@ -1918,6 +1794,27 @@ pub mod root {
             pub mBitSet: *mut u8,
             pub mPos: usize,
         }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MallocAllocPolicy {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of MallocAllocPolicy"][::std::mem::size_of::<MallocAllocPolicy>() - 1usize];
+            ["Alignment of MallocAllocPolicy"]
+                [::std::mem::align_of::<MallocAllocPolicy>() - 1usize];
+        };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct NeverAllocPolicy {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of NeverAllocPolicy"][::std::mem::size_of::<NeverAllocPolicy>() - 1usize];
+            ["Alignment of NeverAllocPolicy"][::std::mem::align_of::<NeverAllocPolicy>() - 1usize];
+        };
         #[doc = " Opaque<T> is a replacement for integral T in cases where only comparisons\n must be supported, and it's desirable to prevent accidental dependency on\n exact values."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -1957,8 +1854,6 @@ pub mod root {
         pub type HashMap_AddPtr = u8;
         pub type HashMap_Iterator = u8;
         pub type HashMap_ModIterator = u8;
-        pub type HashMap_Range = u8;
-        pub type HashMap_Enum = u8;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct HashSet {
@@ -1978,8 +1873,6 @@ pub mod root {
         pub type HashSet_AddPtr = u8;
         pub type HashSet_Iterator = u8;
         pub type HashSet_ModIterator = u8;
-        pub type HashSet_Range = u8;
-        pub type HashSet_Enum = u8;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct PointerHasher {
@@ -2078,6 +1971,33 @@ pub mod root {
             ["Offset of field: FailureLatchSource::mReason"]
                 [::std::mem::offset_of!(FailureLatchSource, mReason) - 16usize];
         };
+        #[repr(C)]
+        pub struct PrintfTarget__bindgen_vtable(::std::os::raw::c_void);
+        #[repr(C)]
+        #[derive(Debug, PartialEq)]
+        pub struct PrintfTarget {
+            pub vtable_: *const PrintfTarget__bindgen_vtable,
+            pub mEmitted: usize,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of PrintfTarget"][::std::mem::size_of::<PrintfTarget>() - 16usize];
+            ["Alignment of PrintfTarget"][::std::mem::align_of::<PrintfTarget>() - 8usize];
+            ["Offset of field: PrintfTarget::mEmitted"]
+                [::std::mem::offset_of!(PrintfTarget, mEmitted) - 8usize];
+        };
+        pub type SmprintfPolicyPointer = root::mozilla::UniquePtr;
+        pub type SmprintfPointer = u8;
+        #[repr(C)]
+        #[derive(Debug, PartialEq)]
+        pub struct SprintfState<AllocPolicy> {
+            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<AllocPolicy>>,
+            pub _base: root::mozilla::PrintfTarget,
+            pub _base_1: AllocPolicy,
+            pub mMaxlen: usize,
+            pub mBase: *mut ::std::os::raw::c_char,
+            pub mCur: *mut ::std::os::raw::c_char,
+        }
         pub type Vector_Impl = u8;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -2407,7 +2327,8 @@ pub mod root {
             ["Offset of field: ProgressLogger_IndexAndProgressLoggerRange::mLocationOrNullEmptyToIgnoreAtEdges"] [:: std :: mem :: offset_of ! (ProgressLogger_IndexAndProgressLoggerRange , mLocationOrNullEmptyToIgnoreAtEdges) - 24usize] ;
         };
         pub type fallible_t = root::std::nothrow_t;
-        pub type UniqueFreePtr = u8;
+        pub type UniqueFreePtr = root::mozilla::UniquePtr;
+        pub type UniqueFileHandle = u32;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ULEB128Reader<T> {
@@ -2429,16 +2350,6 @@ pub mod root {
                 [::std::mem::align_of::<ProfileBufferBlockIndex>() - 8usize];
             ["Offset of field: ProfileBufferBlockIndex::mBlockIndex"]
                 [::std::mem::offset_of!(ProfileBufferBlockIndex, mBlockIndex) - 0usize];
-        };
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct unused_t {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of unused_t"][::std::mem::size_of::<unused_t>() - 1usize];
-            ["Alignment of unused_t"][::std::mem::align_of::<unused_t>() - 1usize];
         };
         #[repr(C)]
         #[derive(Debug, PartialEq)]
@@ -2692,7 +2603,7 @@ pub mod root {
             };
             impl root::mozilla::baseprofiler::ProfilingCategoryPair {
                 pub const LAST: root::mozilla::baseprofiler::ProfilingCategoryPair =
-                    ProfilingCategoryPair::TELEMETRY;
+                    ProfilingCategoryPair::LOGS;
             }
             #[repr(u32)]
             #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -2745,30 +2656,36 @@ pub mod root {
                 GRAPHICS_Rasterization = 45,
                 GRAPHICS_FlushingAsyncPaints = 46,
                 GRAPHICS_ImageDecoding = 47,
-                DOM = 48,
-                JAVA_ANDROID = 49,
-                JAVA_ANDROIDX = 50,
-                JAVA_LANGUAGE = 51,
-                JAVA_MOZILLA = 52,
-                JAVA_KOTLIN = 53,
-                JAVA_BLOCKED = 54,
-                MAILNEWS = 55,
-                IPC = 56,
-                MEDIA = 57,
-                MEDIA_CUBEB = 58,
-                MEDIA_PLAYBACK = 59,
-                MEDIA_RT = 60,
-                A11Y = 61,
-                PROFILER = 62,
-                TIMER = 63,
-                REMOTE_PROTOCOL = 64,
-                SANDBOX = 65,
-                TELEMETRY = 66,
-                COUNT = 67,
+                GRAPHICS_WebGPU = 48,
+                GRAPHICS_VSync = 49,
+                DOM = 50,
+                JAVA_ANDROID = 51,
+                JAVA_ANDROIDX = 52,
+                JAVA_LANGUAGE = 53,
+                JAVA_MOZILLA = 54,
+                JAVA_KOTLIN = 55,
+                JAVA_BLOCKED = 56,
+                MAILNEWS = 57,
+                IPC = 58,
+                MEDIA = 59,
+                MEDIA_CUBEB = 60,
+                MEDIA_PLAYBACK = 61,
+                MEDIA_RT = 62,
+                A11Y = 63,
+                PROFILER = 64,
+                TIMER = 65,
+                REMOTE_PROTOCOL = 66,
+                SANDBOX = 67,
+                TELEMETRY = 68,
+                ML = 69,
+                ML_INFERENCE = 70,
+                ML_SETUP = 71,
+                LOGS = 72,
+                COUNT = 73,
             }
             impl root::mozilla::baseprofiler::ProfilingCategory {
                 pub const LAST: root::mozilla::baseprofiler::ProfilingCategory =
-                    ProfilingCategory::TELEMETRY;
+                    ProfilingCategory::LOGS;
             }
             #[repr(u32)]
             #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -2797,7 +2714,9 @@ pub mod root {
                 REMOTE_PROTOCOL = 21,
                 SANDBOX = 22,
                 TELEMETRY = 23,
-                COUNT = 24,
+                ML = 24,
+                LOGS = 25,
+                COUNT = 26,
             }
             #[repr(C)]
             #[derive(Debug, PartialEq)]
@@ -2845,7 +2764,6 @@ pub mod root {
                 pub type ProcessIdType = ::std::os::raw::c_int;
                 pub type ThreadIdType = ::std::os::raw::c_long;
                 #[repr(C)]
-                #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerMutex {
                     pub _base: root::mozilla::detail::MutexImpl,
                     pub mOwningThreadId: u64,
@@ -2877,7 +2795,6 @@ pub mod root {
                         [::std::mem::offset_of!(BaseProfilerAutoLock, mMutex) - 0usize];
                 };
                 #[repr(C)]
-                #[derive(Debug, PartialEq)]
                 pub struct BaseProfilerMaybeMutex {
                     pub _base: root::mozilla::detail::MutexImpl,
                     pub mMaybeMutex: root::__BindgenOpaqueArray<u64, 8usize>,
@@ -3192,7 +3109,6 @@ pub mod root {
             }
         }
         #[repr(C)]
-        #[derive(Debug, PartialEq)]
         pub struct ProfileChunkedBuffer {
             pub mMutex: root::mozilla::baseprofiler::detail::BaseProfilerMaybeMutex,
             pub mChunkManager: *mut root::mozilla::ProfileBufferChunkManager,
@@ -3293,7 +3209,6 @@ pub mod root {
                 [::std::mem::offset_of!(ProfileChunkedBuffer_Reader, mChunks1) - 16usize];
         };
         #[repr(C)]
-        #[derive(Debug, PartialEq)]
         pub struct ProfileChunkedBuffer_RequestedChunkRefCountedHolder {
             pub mRequestMutex: root::mozilla::baseprofiler::detail::BaseProfilerMutex,
             pub mRefCount: ::std::os::raw::c_int,
@@ -3371,8 +3286,8 @@ pub mod root {
         };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
+            ["Size of template specialization: ProfileBufferEntryWriter_Serializer_open0_unique_ptr_open1_ProfileChunkedBuffer_default_delete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
+            ["Align of template specialization: ProfileBufferEntryWriter_Serializer_open0_unique_ptr_open1_ProfileChunkedBuffer_default_delete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryWriter_Serializer > () - 1usize] ;
         };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
@@ -3381,8 +3296,8 @@ pub mod root {
         };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of template specialization: ProfileBufferEntryReader_Deserializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
-            ["Align of template specialization: ProfileBufferEntryReader_Deserializer_open0_UniquePtr_open1_ProfileChunkedBuffer_DefaultDelete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
+            ["Size of template specialization: ProfileBufferEntryReader_Deserializer_open0_unique_ptr_open1_ProfileChunkedBuffer_default_delete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
+            ["Align of template specialization: ProfileBufferEntryReader_Deserializer_open0_unique_ptr_open1_ProfileChunkedBuffer_default_delete_open2_ProfileChunkedBuffer_close2_close1_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: ProfileBufferEntryReader_Deserializer > () - 1usize] ;
         };
         impl root::mozilla::ProfilerStringView_Ownership {
             pub const Reference: root::mozilla::ProfilerStringView_Ownership =
@@ -3507,20 +3422,27 @@ pub mod root {
             pub mTooltipLabel: root::std::string,
             pub mTableLabel: root::std::string,
             pub mIsStackBased: bool,
+            pub mColorField: root::std::string,
             pub mData: root::mozilla::MarkerSchema_DataRowVector,
             pub mGraphs: root::__BindgenOpaqueArray<u64, 3usize>,
         }
         #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum MarkerSchema_InputType {
-            Uint64 = 0,
-            Uint32 = 1,
-            Uint8 = 2,
-            Boolean = 3,
-            CString = 4,
-            String = 5,
-            TimeStamp = 6,
-            TimeDuration = 7,
+            Undefined = 0,
+            Uint64 = 1,
+            Uint32 = 2,
+            Uint8 = 3,
+            Int64 = 4,
+            Int32 = 5,
+            Int8 = 6,
+            Double = 7,
+            Boolean = 8,
+            CString = 9,
+            String = 10,
+            TimeStamp = 11,
+            TimeDuration = 12,
+            Flow = 13,
         }
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -3580,7 +3502,7 @@ pub mod root {
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum MarkerSchema_PayloadFlags {
             None = 0,
-            Searchable = 1,
+            Hidden = 1,
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -3610,12 +3532,6 @@ pub mod root {
         };
         #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum MarkerSchema_Searchable {
-            NotSearchable = 0,
-            Searchable = 1,
-        }
-        #[repr(i32)]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum MarkerSchema_GraphType {
             Line = 0,
             Bar = 1,
@@ -3641,12 +3557,12 @@ pub mod root {
             pub mKey: root::std::string,
             pub mLabel: root::__BindgenOpaqueArray<u64, 5usize>,
             pub mFormat: root::mozilla::MarkerSchema_Format,
-            pub mSearchable: root::__BindgenOpaqueArray<u32, 2usize>,
+            pub mPayloadFlags: root::mozilla::MarkerSchema_PayloadFlags,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of MarkerSchema_DynamicData"]
-                [::std::mem::size_of::<MarkerSchema_DynamicData>() - 88usize];
+                [::std::mem::size_of::<MarkerSchema_DynamicData>() - 80usize];
             ["Alignment of MarkerSchema_DynamicData"]
                 [::std::mem::align_of::<MarkerSchema_DynamicData>() - 8usize];
             ["Offset of field: MarkerSchema_DynamicData::mKey"]
@@ -3655,8 +3571,8 @@ pub mod root {
                 [::std::mem::offset_of!(MarkerSchema_DynamicData, mLabel) - 32usize];
             ["Offset of field: MarkerSchema_DynamicData::mFormat"]
                 [::std::mem::offset_of!(MarkerSchema_DynamicData, mFormat) - 72usize];
-            ["Offset of field: MarkerSchema_DynamicData::mSearchable"]
-                [::std::mem::offset_of!(MarkerSchema_DynamicData, mSearchable) - 76usize];
+            ["Offset of field: MarkerSchema_DynamicData::mPayloadFlags"]
+                [::std::mem::offset_of!(MarkerSchema_DynamicData, mPayloadFlags) - 76usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -3675,8 +3591,8 @@ pub mod root {
             ["Offset of field: MarkerSchema_StaticData::mValue"]
                 [::std::mem::offset_of!(MarkerSchema_StaticData, mValue) - 32usize];
         };
-        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
-        pub type MarkerSchema_DataRow = root::__BindgenOpaqueArray<u64, 12usize>;
+        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n Since C++17, std::variant exists. `mozilla::Variant` differs conceptually\n from it by (a.) having a richer `.match` API (compared to `std::visit`) and\n (b.) having a different assignment semantic. Assigning to an `std::variant`\n assigns to the underlying value, while assigning to a `mozilla::Variant`\n deletes the previous value then move-constructs a new value. This makes it\n possible to store *and* update const values.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
+        pub type MarkerSchema_DataRow = root::__BindgenOpaqueArray<u64, 11usize>;
         pub type MarkerSchema_DataRowVector = root::__BindgenOpaqueArray<u64, 3usize>;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -3700,7 +3616,7 @@ pub mod root {
         };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of MarkerSchema"][::std::mem::size_of::<MarkerSchema>() - 176usize];
+            ["Size of MarkerSchema"][::std::mem::size_of::<MarkerSchema>() - 208usize];
             ["Alignment of MarkerSchema"][::std::mem::align_of::<MarkerSchema>() - 8usize];
             ["Offset of field: MarkerSchema::mLocations"]
                 [::std::mem::offset_of!(MarkerSchema, mLocations) - 0usize];
@@ -3712,15 +3628,33 @@ pub mod root {
                 [::std::mem::offset_of!(MarkerSchema, mTableLabel) - 88usize];
             ["Offset of field: MarkerSchema::mIsStackBased"]
                 [::std::mem::offset_of!(MarkerSchema, mIsStackBased) - 120usize];
+            ["Offset of field: MarkerSchema::mColorField"]
+                [::std::mem::offset_of!(MarkerSchema, mColorField) - 128usize];
             ["Offset of field: MarkerSchema::mData"]
-                [::std::mem::offset_of!(MarkerSchema, mData) - 128usize];
+                [::std::mem::offset_of!(MarkerSchema, mData) - 160usize];
             ["Offset of field: MarkerSchema::mGraphs"]
-                [::std::mem::offset_of!(MarkerSchema, mGraphs) - 152usize];
+                [::std::mem::offset_of!(MarkerSchema, mGraphs) - 184usize];
         };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MarkerHasPayloadFields {
+            pub _base: root::std::false_type,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MarkerHasTranslator {
+            pub _base: root::std::false_type,
+        }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BaseMarkerType {
             pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct RangedPtr<T> {
+            pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
+            pub mPtr: *mut T,
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -3744,11 +3678,6 @@ pub mod root {
             pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<Serialized>>,
             pub mSet: *const root::mozilla::EnumSet<Serialized>,
             pub mPos: usize,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct PositionOfSignBit {
-            pub _address: u8,
         }
         #[doc = " @class CheckedInt\n @brief Integer wrapper class checking for integer overflow and other errors\n @param T the integer type to wrap. Can be any type among the following:\n            - any basic integer type such as |int|\n            - any stdint type such as |int8_t|\n\n This class implements guarded integer arithmetic. Do a computation, check\n that isValid() returns true, you then have a guarantee that no problem, such\n as integer overflow, happened during this computation, and you can call\n value() to get the plain integer value.\n\n The arithmetic operators in this class are guaranteed not to raise a signal\n (e.g. in case of a division by zero).\n\n For example, suppose that you want to implement a function that computes\n (aX+aY)/aZ, that doesn't crash if aZ==0, and that reports on error (divide by\n zero or integer overflow). You could code it as follows:\n@code\nbool computeXPlusYOverZ(int aX, int aY, int aZ, int* aResult)\n{\nCheckedInt<int> checkedResult = (CheckedInt<int>(aX) + aY) / aZ;\nif (checkedResult.isValid()) {\naResult = checkedResult.value();\nreturn true;\n} else {\nreturn false;\n}\n}\n@endcode\n\n Implicit conversion from plain integers to checked integers is allowed. The\n plain integer is checked to be in range before being casted to the\n destination type. This means that the following lines all compile, and the\n resulting CheckedInts are correctly detected as valid or invalid:\n @code\n// 1 is of type int, is found to be in range for uint8_t, x is valid\nCheckedInt<uint8_t> x(1);\n// -1 is of type int, is found not to be in range for uint8_t, x is invalid\nCheckedInt<uint8_t> x(-1);\n// -1 is of type int, is found to be in range for int8_t, x is valid\nCheckedInt<int8_t> x(-1);\n// 1000 is of type int16_t, is found not to be in range for int8_t,\n// x is invalid\nCheckedInt<int8_t> x(int16_t(1000));\n// 3123456789 is of type uint32_t, is found not to be in range for int32_t,\n// x is invalid\nCheckedInt<int32_t> x(uint32_t(3123456789));\n @endcode\n Implicit conversion from\n checked integers to plain integers is not allowed. As shown in the\n above example, to get the value of a checked integer as a normal integer,\n call value().\n\n Arithmetic operations between checked and plain integers is allowed; the\n result type is the type of the checked integer.\n\n Checked integers of different types cannot be used in the same arithmetic\n expression.\n\n There are convenience typedefs for all stdint types, of the following form\n (these are just 2 examples):\n@code\ntypedef CheckedInt<int32_t> CheckedInt32;\ntypedef CheckedInt<uint16_t> CheckedUint16;\n@endcode"]
         #[repr(C)]
@@ -3803,18 +3732,24 @@ pub mod root {
             pub mDataEnd: *mut ::std::os::raw::c_char,
             pub mAbsoluteOffset: usize,
         }
+        #[doc = " A code unit within a UTF-8 encoded string.  (A code unit is the smallest\n unit within the Unicode encoding of a string.  For UTF-8 this is an 8-bit\n number; for UTF-16 it would be a 16-bit number.)\n\n This is *not* the same as a single code point: in UTF-8, non-ASCII code\n points are constituted by multiple code units."]
+        #[repr(C)]
+        #[derive(Copy, Clone)]
+        pub union Utf8Unit {
+            pub mValue: ::std::os::raw::c_char,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of Utf8Unit"][::std::mem::size_of::<Utf8Unit>() - 1usize];
+            ["Alignment of Utf8Unit"][::std::mem::align_of::<Utf8Unit>() - 1usize];
+            ["Offset of field: Utf8Unit::mValue"]
+                [::std::mem::offset_of!(Utf8Unit, mValue) - 0usize];
+        };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of template specialization: RefPtrTraits_open0_InitialStencilAndDelazifications_close0"] [:: std :: mem :: size_of :: < root :: mozilla :: RefPtrTraits > () - 1usize] ;
             ["Align of template specialization: RefPtrTraits_open0_InitialStencilAndDelazifications_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: RefPtrTraits > () - 1usize] ;
         };
-    }
-    #[doc = " already_AddRefed cooperates with reference counting smart pointers to enable\n you to assign in a pointer _without_ |AddRef|ing it.  You might want to use\n this as a return type from a function that returns an already |AddRef|ed\n pointer.  Or, you might want to use this as a parameter type in a function\n that wants to force a transfer-of-ownership from a RefPtr in the caller (for\n example, if the function expects callers to pass in a newly-created object,\n which the function then takes ownership of).\n\n TODO Move already_AddRefed to namespace mozilla.  This has not yet been done\n because of the sheer number of usages of already_AddRefed.\n\n When should you use already_AddRefed<>?\n * Ensure a consumer takes ownership of a reference\n * Pass ownership without calling AddRef/Release (sometimes required in\n   off-main-thread code)\n * The ref pointer type you're using doesn't support move construction\n\n Otherwise, use std::move(RefPtr/nsCOMPtr/etc)."]
-    #[repr(C)]
-    #[derive(Debug, PartialEq)]
-    pub struct already_AddRefed<T> {
-        pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
-        pub mRawPtr: *mut T,
     }
     pub mod __pstl {
         #[allow(unused_imports)]
@@ -3823,37 +3758,6 @@ pub mod root {
             #[allow(unused_imports)]
             use self::super::super::super::root;
         }
-    }
-    pub mod fmt {
-        #[allow(unused_imports)]
-        use self::super::super::root;
-        pub mod detail {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-    }
-    #[repr(C)]
-    #[derive(Debug, Copy, Clone)]
-    pub struct nsISupports {
-        _unused: [u8; 0],
-    }
-    #[repr(C)]
-    #[derive(Debug, PartialEq)]
-    pub struct RefPtr<T> {
-        pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
-        pub mRawPtr: *mut T,
-    }
-    pub type RefPtr_element_type<T> = T;
-    #[repr(C)]
-    #[derive(Debug, Copy, Clone, PartialEq)]
-    pub struct RefPtr_Proxy {
-        pub _address: u8,
-    }
-    pub type RefPtr_Proxy_member_function = u8;
-    #[repr(C)]
-    #[derive(Debug, Copy, Clone, PartialEq)]
-    pub struct RefPtr_ConstRemovingRefPtrTraits {
-        pub _address: u8,
     }
     pub mod js {
         #[allow(unused_imports)]
@@ -3893,14 +3797,98 @@ pub mod root {
         pub struct Scope {
             _unused: [u8; 0],
         }
-        pub mod gc {
+        pub mod jit {
             #[allow(unused_imports)]
             use self::super::super::super::root;
             #[repr(C)]
             #[derive(Debug, Copy, Clone)]
-            pub struct SmallBuffer {
+            pub struct JitCode {
                 _unused: [u8; 0],
             }
+            #[repr(u16)]
+            #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+            pub enum InlinableNative {
+                __bindgen_cannot_repr_c_on_empty_enum = 0,
+            }
+            #[repr(u16)]
+            #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+            pub enum TrampolineNative {
+                __bindgen_cannot_repr_c_on_empty_enum = 0,
+            }
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js29CurrentThreadCanAccessRuntimeEPK9JSRuntime"]
+            pub fn CurrentThreadCanAccessRuntime(rt: *const root::JSRuntime) -> bool;
+        }
+        #[repr(u32)]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum ThreadType {
+            THREAD_TYPE_NONE = 0,
+            THREAD_TYPE_MAIN = 1,
+            THREAD_TYPE_WASM_COMPILE_TIER1 = 2,
+            THREAD_TYPE_WASM_COMPILE_TIER2 = 3,
+            THREAD_TYPE_BASELINE = 4,
+            THREAD_TYPE_ION = 5,
+            THREAD_TYPE_COMPRESS = 6,
+            THREAD_TYPE_GCPARALLEL = 7,
+            THREAD_TYPE_PROMISE_TASK = 8,
+            THREAD_TYPE_ION_FREE = 9,
+            THREAD_TYPE_WASM_GENERATOR_COMPLETE_TIER2 = 10,
+            THREAD_TYPE_WASM_COMPILE_PARTIAL_TIER2 = 11,
+            THREAD_TYPE_WORKER = 12,
+            THREAD_TYPE_DELAZIFY = 13,
+            THREAD_TYPE_DELAZIFY_FREE = 14,
+            THREAD_TYPE_MAX = 15,
+        }
+        pub mod oom {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct AutoEnterOOMUnsafeRegion {
+            pub _address: u8,
+        }
+        pub type AutoEnterOOMUnsafeRegion_AnnotateOOMAllocationSizeCallback =
+            ::std::option::Option<unsafe extern "C" fn(arg1: usize)>;
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js24AutoEnterOOMUnsafeRegion23annotateOOMSizeCallbackE"]
+            pub static mut AutoEnterOOMUnsafeRegion_annotateOOMSizeCallback: u64;
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of AutoEnterOOMUnsafeRegion"]
+                [::std::mem::size_of::<AutoEnterOOMUnsafeRegion>() - 1usize];
+            ["Alignment of AutoEnterOOMUnsafeRegion"]
+                [::std::mem::align_of::<AutoEnterOOMUnsafeRegion>() - 1usize];
+        };
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js19InitMallocAllocatorEv"]
+            pub fn InitMallocAllocator();
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js23ShutDownMallocAllocatorEv"]
+            pub fn ShutDownMallocAllocator();
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js34AssertJSStringBufferInCorrectArenaEPKv"]
+            pub fn AssertJSStringBufferInCorrectArena(ptr: *const ::std::os::raw::c_void);
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone)]
+        pub struct FrontendContext {
+            _unused: [u8; 0],
+        }
+        #[repr(i32)]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum AllocFunction {
+            Malloc = 0,
+            Calloc = 1,
+            Realloc = 2,
+        }
+        pub mod gc {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
             #[repr(C)]
             #[derive(Debug, Copy, Clone)]
             pub struct Cell {
@@ -3931,7 +3919,7 @@ pub mod root {
             pub enum ChunkKind {
                 Invalid = 0,
                 TenuredArenas = 1,
-                MediumBuffers = 2,
+                Buffers = 2,
                 NurseryToSpace = 3,
                 NurseryFromSpace = 4,
             }
@@ -3964,10 +3952,11 @@ pub mod root {
                 pub numArenasFree: u32,
                 pub numArenasFreeCommitted: u32,
                 pub isCurrentChunk: bool,
+                pub zone: *mut root::JS::Zone,
             }
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
-                ["Size of ArenaChunkInfo"][::std::mem::size_of::<ArenaChunkInfo>() - 32usize];
+                ["Size of ArenaChunkInfo"][::std::mem::size_of::<ArenaChunkInfo>() - 40usize];
                 ["Alignment of ArenaChunkInfo"][::std::mem::align_of::<ArenaChunkInfo>() - 8usize];
                 ["Offset of field: ArenaChunkInfo::next"]
                     [::std::mem::offset_of!(ArenaChunkInfo, next) - 0usize];
@@ -3979,9 +3968,27 @@ pub mod root {
                     [::std::mem::offset_of!(ArenaChunkInfo, numArenasFreeCommitted) - 20usize];
                 ["Offset of field: ArenaChunkInfo::isCurrentChunk"]
                     [::std::mem::offset_of!(ArenaChunkInfo, isCurrentChunk) - 24usize];
+                ["Offset of field: ArenaChunkInfo::zone"]
+                    [::std::mem::offset_of!(ArenaChunkInfo, zone) - 32usize];
             };
             #[doc = " Atomic<T> implementation for integral types.\n\n In addition to atomic store and load operations, compound assignment and\n increment/decrement operators are implemented which perform the\n corresponding read-modify-write operation atomically.  Finally, an atomic\n swap method is provided."]
-            pub type MarkBitmapWord = u64;
+            pub type AtomicBitmapWord = u64;
+            extern "C" {
+                #[link_name = "\u{1}BitCount"]
+                pub static AtomicBitmap_BitCount: usize;
+            }
+            #[doc = " Atomic<T> implementation for integral types.\n\n In addition to atomic store and load operations, compound assignment and\n increment/decrement operators are implemented which perform the\n corresponding read-modify-write operation atomically.  Finally, an atomic\n swap method is provided."]
+            pub type AtomicBitmap_Word = root::js::gc::AtomicBitmapWord;
+            pub const AtomicBitmap_BitsPerWord: usize = 64;
+            extern "C" {
+                #[link_name = "\u{1}WordCount"]
+                pub static AtomicBitmap_WordCount: usize;
+            }
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone)]
+            pub struct AtomicBitmap_Iter {
+                _unused: [u8; 0],
+            }
             #[repr(u32)]
             #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
             pub enum ColorBit {
@@ -3994,23 +4001,20 @@ pub mod root {
                 Gray = 1,
                 Black = 2,
             }
-            extern "C" {
-                #[link_name = "\u{1}ByteCount"]
-                pub static MarkBitmap_ByteCount: usize;
+            #[repr(C)]
+            #[repr(align(64))]
+            pub struct ChunkMarkBitmap {
+                pub _base: root::__BindgenOpaqueArray<u64, 2016usize>,
             }
-            extern "C" {
-                #[link_name = "\u{1}WordCount"]
-                pub static MarkBitmap_WordCount: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}FirstThingAdjustmentBits"]
-                pub static MarkBitmap_FirstThingAdjustmentBits: usize;
-            }
-            extern "C" {
-                #[link_name = "\u{1}FirstThingAdjustmentWords"]
-                pub static MarkBitmap_FirstThingAdjustmentWords: usize;
-            }
-            pub type ChunkMarkBitmap = root::__BindgenOpaqueArray<u8, 16128usize>;
+            pub type ChunkMarkBitmap_Bitmap = root::__BindgenOpaqueArray<u64, 2016usize>;
+            pub const ChunkMarkBitmap_FirstThingAdjustmentBits: usize = 2048;
+            pub const ChunkMarkBitmap_FirstThingAdjustmentWords: usize = 32;
+            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+            const _: () = {
+                ["Size of ChunkMarkBitmap"][::std::mem::size_of::<ChunkMarkBitmap>() - 16128usize];
+                ["Alignment of ChunkMarkBitmap"]
+                    [::std::mem::align_of::<ChunkMarkBitmap>() - 64usize];
+            };
             #[doc = " An object like std::bitset but which provides access to the underlying\n storage.\n\n The type |StorageType| must be an unsigned integer or a mozilla::Atomic\n wrapping an unsigned integer. Use of atomic types makes word access atomic,\n but does not make operations that operate on the whole bitset atomic.\n\n The limited API is due to expedience only; feel free to flesh out any\n std::bitset-like members."]
             pub type ChunkPageBitmap = root::__BindgenOpaqueArray<u32, 8usize>;
             #[doc = " An object like std::bitset but which provides access to the underlying\n storage.\n\n The type |StorageType| must be an unsigned integer or a mozilla::Atomic\n wrapping an unsigned integer. Use of atomic types makes word access atomic,\n but does not make operations that operate on the whole bitset atomic.\n\n The limited API is due to expedience only; feel free to flesh out any\n std::bitset-like members."]
@@ -4020,7 +4024,6 @@ pub mod root {
             pub struct ArenaChunkBase {
                 pub _base: root::js::gc::ChunkBase,
                 pub info: root::js::gc::ArenaChunkInfo,
-                pub __bindgen_padding_0: u64,
                 pub markBits: root::js::gc::ChunkMarkBitmap,
                 pub freeCommittedArenas: root::js::gc::ChunkArenaBitmap,
                 pub decommittedPages: root::js::gc::ChunkPageBitmap,
@@ -4195,107 +4198,6 @@ pub mod root {
             };
             pub type SharedMemoryMap = u8;
         }
-        pub mod jit {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone)]
-            pub struct JitCode {
-                _unused: [u8; 0],
-            }
-            #[repr(u16)]
-            #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-            pub enum InlinableNative {
-                __bindgen_cannot_repr_c_on_empty_enum = 0,
-            }
-            #[repr(u16)]
-            #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-            pub enum TrampolineNative {
-                __bindgen_cannot_repr_c_on_empty_enum = 0,
-            }
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js29CurrentThreadCanAccessRuntimeEPK9JSRuntime"]
-            pub fn CurrentThreadCanAccessRuntime(rt: *const root::JSRuntime) -> bool;
-        }
-        #[repr(u32)]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum ThreadType {
-            THREAD_TYPE_NONE = 0,
-            THREAD_TYPE_MAIN = 1,
-            THREAD_TYPE_WASM_COMPILE_TIER1 = 2,
-            THREAD_TYPE_WASM_COMPILE_TIER2 = 3,
-            THREAD_TYPE_BASELINE = 4,
-            THREAD_TYPE_ION = 5,
-            THREAD_TYPE_COMPRESS = 6,
-            THREAD_TYPE_GCPARALLEL = 7,
-            THREAD_TYPE_PROMISE_TASK = 8,
-            THREAD_TYPE_ION_FREE = 9,
-            THREAD_TYPE_WASM_GENERATOR_COMPLETE_TIER2 = 10,
-            THREAD_TYPE_WASM_COMPILE_PARTIAL_TIER2 = 11,
-            THREAD_TYPE_WORKER = 12,
-            THREAD_TYPE_DELAZIFY = 13,
-            THREAD_TYPE_DELAZIFY_FREE = 14,
-            THREAD_TYPE_MAX = 15,
-        }
-        pub mod oom {
-            #[allow(unused_imports)]
-            use self::super::super::super::root;
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct AutoEnterOOMUnsafeRegion {
-            pub _address: u8,
-        }
-        pub type AutoEnterOOMUnsafeRegion_AnnotateOOMAllocationSizeCallback =
-            ::std::option::Option<unsafe extern "C" fn(arg1: usize)>;
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js24AutoEnterOOMUnsafeRegion23annotateOOMSizeCallbackE"]
-            pub static mut AutoEnterOOMUnsafeRegion_annotateOOMSizeCallback: u64;
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AutoEnterOOMUnsafeRegion"]
-                [::std::mem::size_of::<AutoEnterOOMUnsafeRegion>() - 1usize];
-            ["Alignment of AutoEnterOOMUnsafeRegion"]
-                [::std::mem::align_of::<AutoEnterOOMUnsafeRegion>() - 1usize];
-        };
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js19InitMallocAllocatorEv"]
-            pub fn InitMallocAllocator();
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js23ShutDownMallocAllocatorEv"]
-            pub fn ShutDownMallocAllocator();
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js34AssertJSStringBufferInCorrectArenaEPKv"]
-            pub fn AssertJSStringBufferInCorrectArena(ptr: *const ::std::os::raw::c_void);
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone)]
-        pub struct FrontendContext {
-            _unused: [u8; 0],
-        }
-        #[repr(i32)]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum AllocFunction {
-            Malloc = 0,
-            Calloc = 1,
-            Realloc = 2,
-        }
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct ArenaAllocPolicyBase {
-            pub _address: u8,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ArenaAllocPolicyBase"]
-                [::std::mem::size_of::<ArenaAllocPolicyBase>() - 1usize];
-            ["Alignment of ArenaAllocPolicyBase"]
-                [::std::mem::align_of::<ArenaAllocPolicyBase>() - 1usize];
-        };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct AllocPolicyBase {
@@ -4305,6 +4207,30 @@ pub mod root {
         const _: () = {
             ["Size of AllocPolicyBase"][::std::mem::size_of::<AllocPolicyBase>() - 1usize];
             ["Alignment of AllocPolicyBase"][::std::mem::align_of::<AllocPolicyBase>() - 1usize];
+        };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MallocArenaAllocPolicyBase {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of MallocArenaAllocPolicyBase"]
+                [::std::mem::size_of::<MallocArenaAllocPolicyBase>() - 1usize];
+            ["Alignment of MallocArenaAllocPolicyBase"]
+                [::std::mem::align_of::<MallocArenaAllocPolicyBase>() - 1usize];
+        };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct MallocAllocPolicyBase {
+            pub _address: u8,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of MallocAllocPolicyBase"]
+                [::std::mem::size_of::<MallocAllocPolicyBase>() - 1usize];
+            ["Alignment of MallocAllocPolicyBase"]
+                [::std::mem::align_of::<MallocAllocPolicyBase>() - 1usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -4431,22 +4357,36 @@ pub mod root {
             pub fn EnableContextProfilingStack(cx: *mut root::JSContext, enabled: bool);
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2js35RegisterContextProfilingEventMarkerEP9JSContextPFvN7mozilla14MarkerCategoryEPKcS5_EPFvS3_S5_NS2_9TimeStampES5_E"]
-            pub fn RegisterContextProfilingEventMarker(
+            #[link_name = "\u{1}_ZN2js30RegisterContextProfilerMarkersEP9JSContextPFvN7mozilla14MarkerCategoryEPKcS5_EPFvS3_S5_NS2_9TimeStampES5_EPFvS3_S5_mESC_"]
+            pub fn RegisterContextProfilerMarkers(
                 cx: *mut root::JSContext,
-                mark: ::std::option::Option<
+                eventMarker: ::std::option::Option<
                     unsafe extern "C" fn(
                         arg1: root::mozilla::MarkerCategory,
                         arg2: *const ::std::os::raw::c_char,
                         arg3: *const ::std::os::raw::c_char,
                     ),
                 >,
-                interval: ::std::option::Option<
+                intervalMarker: ::std::option::Option<
                     unsafe extern "C" fn(
                         arg1: root::mozilla::MarkerCategory,
                         arg2: *const ::std::os::raw::c_char,
                         arg3: root::mozilla::TimeStamp,
                         arg4: *const ::std::os::raw::c_char,
+                    ),
+                >,
+                flowMarker: ::std::option::Option<
+                    unsafe extern "C" fn(
+                        arg1: root::mozilla::MarkerCategory,
+                        arg2: *const ::std::os::raw::c_char,
+                        arg3: u64,
+                    ),
+                >,
+                terminatingFlowMarker: ::std::option::Option<
+                    unsafe extern "C" fn(
+                        arg1: root::mozilla::MarkerCategory,
+                        arg2: *const ::std::os::raw::c_char,
+                        arg3: u64,
                     ),
                 >,
             );
@@ -4491,7 +4431,6 @@ pub mod root {
             pub struct UniqueSelector {
                 pub _address: u8,
             }
-            #[doc = " UniquePtr is a smart pointer that wholly owns a resource.  Ownership may be\n transferred out of a UniquePtr through explicit action, but otherwise the\n resource is destroyed when the UniquePtr is destroyed.\n\n UniquePtr is similar to C++98's std::auto_ptr, but it improves upon auto_ptr\n in one crucial way: it's impossible to copy a UniquePtr.  Copying an auto_ptr\n obviously *can't* copy ownership of its singly-owned resource.  So what\n happens if you try to copy one?  Bizarrely, ownership is implicitly\n *transferred*, preserving single ownership but breaking code that assumes a\n copy of an object is identical to the original.  (This is why auto_ptr is\n prohibited in STL containers.)\n\n UniquePtr solves this problem by being *movable* rather than copyable.\n Instead of passing a |UniquePtr u| directly to the constructor or assignment\n operator, you pass |Move(u)|.  In doing so you indicate that you're *moving*\n ownership out of |u|, into the target of the construction/assignment.  After\n the transfer completes, |u| contains |nullptr| and may be safely destroyed.\n This preserves single ownership but also allows UniquePtr to be moved by\n algorithms that have been made move-safe.  (Note: if |u| is instead a\n temporary expression, don't use |Move()|: just pass the expression, because\n it's already move-ready.  For more information see Move.h.)\n\n UniquePtr is also better than std::auto_ptr in that the deletion operation is\n customizable.  An optional second template parameter specifies a class that\n (through its operator()(T*)) implements the desired deletion policy.  If no\n policy is specified, mozilla::DefaultDelete<T> is used -- which will either\n |delete| or |delete[]| the resource, depending whether the resource is an\n array.  Custom deletion policies ideally should be empty classes (no member\n fields, no member fields in base classes, no virtual methods/inheritance),\n because then UniquePtr can be just as efficient as a raw pointer.\n\n Use of UniquePtr proceeds like so:\n\n   UniquePtr<int> g1; // initializes to nullptr\n   g1.reset(new int); // switch resources using reset()\n   g1 = nullptr; // clears g1, deletes the int\n\n   UniquePtr<int> g2(new int); // owns that int\n   int* p = g2.release(); // g2 leaks its int -- still requires deletion\n   delete p; // now freed\n\n   struct S { int x; S(int x) : x(x) {} };\n   UniquePtr<S> g3, g4(new S(5));\n   g3 = std::move(g4); // g3 owns the S, g4 cleared\n   S* p = g3.get(); // g3 still owns |p|\n   assert(g3->x == 5); // operator-> works (if .get() != nullptr)\n   assert((*g3).x == 5); // also operator* (again, if not cleared)\n   std::swap(g3, g4); // g4 now owns the S, g3 cleared\n   g3.swap(g4);  // g3 now owns the S, g4 cleared\n   UniquePtr<S> g5(std::move(g3)); // g5 owns the S, g3 cleared\n   g5.reset(); // deletes the S, g5 cleared\n\n   struct FreePolicy { void operator()(void* p) { free(p); } };\n   UniquePtr<int, FreePolicy> g6(static_cast<int*>(malloc(sizeof(int))));\n   int* ptr = g6.get();\n   g6 = nullptr; // calls free(ptr)\n\n Now, carefully note a few things you *can't* do:\n\n   UniquePtr<int> b1;\n   b1 = new int; // BAD: can only assign another UniquePtr\n   int* ptr = b1; // BAD: no auto-conversion to pointer, use get()\n\n   UniquePtr<int> b2(b1); // BAD: can't copy a UniquePtr\n   UniquePtr<int> b3 = b1; // BAD: can't copy-assign a UniquePtr\n\n (Note that changing a UniquePtr to store a direct |new| expression is\n permitted, but usually you should use MakeUnique, defined at the end of this\n header.)\n\n A few miscellaneous notes:\n\n UniquePtr, when not instantiated for an array type, can be move-constructed\n and move-assigned, not only from itself but from \"derived\" UniquePtr<U, E>\n instantiations where U converts to T and E converts to D.  If you want to use\n this, you're going to have to specify a deletion policy for both UniquePtr\n instantations, and T pretty much has to have a virtual destructor.  In other\n words, this doesn't work:\n\n   struct Base { virtual ~Base() {} };\n   struct Derived : Base {};\n\n   UniquePtr<Base> b1;\n   // BAD: DefaultDelete<Base> and DefaultDelete<Derived> don't interconvert\n   UniquePtr<Derived> d1(std::move(b));\n\n   UniquePtr<Base> b2;\n   UniquePtr<Derived, DefaultDelete<Base>> d2(std::move(b2)); // okay\n\n UniquePtr is specialized for array types.  Specializing with an array type\n creates a smart-pointer version of that array -- not a pointer to such an\n array.\n\n   UniquePtr<int[]> arr(new int[5]);\n   arr[0] = 4;\n\n What else is different?  Deletion of course uses |delete[]|.  An operator[]\n is provided.  Functionality that doesn't make sense for arrays is removed.\n The constructors and mutating methods only accept array pointers (not T*, U*\n that converts to T*, or UniquePtr<U[]> or UniquePtr<U>) or |nullptr|.\n\n It's perfectly okay for a function to return a UniquePtr. This transfers\n the UniquePtr's sole ownership of the data, to the fresh UniquePtr created\n in the calling function, that will then solely own that data. Such functions\n can return a local variable UniquePtr, |nullptr|, |UniquePtr(ptr)| where\n |ptr| is a |T*|, or a UniquePtr |Move()|'d from elsewhere.\n\n UniquePtr will commonly be a member of a class, with lifetime equivalent to\n that of that class.  If you want to expose the related resource, you could\n expose a raw pointer via |get()|, but ownership of a raw pointer is\n inherently unclear.  So it's better to expose a |const UniquePtr&| instead.\n This prohibits mutation but still allows use of |get()| when needed (but\n operator-> is preferred).  Of course, you can only use this smart pointer as\n long as the enclosing class instance remains live -- no different than if you\n exposed the |get()| raw pointer.\n\n To pass a UniquePtr-managed resource as a pointer, use a |const UniquePtr&|\n argument.  To specify an inout parameter (where the method may or may not\n take ownership of the resource, or reset it), or to specify an out parameter\n (where simply returning a |UniquePtr| isn't possible), use a |UniquePtr&|\n argument.  To unconditionally transfer ownership of a UniquePtr\n into a method, use a |UniquePtr| argument.  To conditionally transfer\n ownership of a resource into a method, should the method want it, use a\n |UniquePtr&&| argument."]
             pub type UniqueSelector_SingleObject = u8;
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
@@ -4512,52 +4451,35 @@ pub mod root {
             };
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
-            pub struct ProxyReservedSlots {
-                pub slots: [root::JS::Value; 1usize],
-            }
-            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-            const _: () = {
-                ["Size of ProxyReservedSlots"]
-                    [::std::mem::size_of::<ProxyReservedSlots>() - 8usize];
-                ["Alignment of ProxyReservedSlots"]
-                    [::std::mem::align_of::<ProxyReservedSlots>() - 8usize];
-                ["Offset of field: ProxyReservedSlots::slots"]
-                    [::std::mem::offset_of!(ProxyReservedSlots, slots) - 0usize];
-            };
-            #[repr(C)]
-            #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ProxyValueArray {
-                pub expandoSlot: root::JS::Value,
                 pub privateSlot: root::JS::Value,
-                pub reservedSlots: root::js::detail::ProxyReservedSlots,
+                pub reservedSlots: [root::JS::Value; 1usize],
             }
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
-                ["Size of ProxyValueArray"][::std::mem::size_of::<ProxyValueArray>() - 24usize];
+                ["Size of ProxyValueArray"][::std::mem::size_of::<ProxyValueArray>() - 16usize];
                 ["Alignment of ProxyValueArray"]
                     [::std::mem::align_of::<ProxyValueArray>() - 8usize];
-                ["Offset of field: ProxyValueArray::expandoSlot"]
-                    [::std::mem::offset_of!(ProxyValueArray, expandoSlot) - 0usize];
                 ["Offset of field: ProxyValueArray::privateSlot"]
-                    [::std::mem::offset_of!(ProxyValueArray, privateSlot) - 8usize];
+                    [::std::mem::offset_of!(ProxyValueArray, privateSlot) - 0usize];
                 ["Offset of field: ProxyValueArray::reservedSlots"]
-                    [::std::mem::offset_of!(ProxyValueArray, reservedSlots) - 16usize];
+                    [::std::mem::offset_of!(ProxyValueArray, reservedSlots) - 8usize];
             };
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct ProxyDataLayout {
-                pub reservedSlots: *mut root::js::detail::ProxyReservedSlots,
                 pub handler: *const root::js::BaseProxyHandler,
+                pub expando: *mut root::JSObject,
             }
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
                 ["Size of ProxyDataLayout"][::std::mem::size_of::<ProxyDataLayout>() - 16usize];
                 ["Alignment of ProxyDataLayout"]
                     [::std::mem::align_of::<ProxyDataLayout>() - 8usize];
-                ["Offset of field: ProxyDataLayout::reservedSlots"]
-                    [::std::mem::offset_of!(ProxyDataLayout, reservedSlots) - 0usize];
                 ["Offset of field: ProxyDataLayout::handler"]
-                    [::std::mem::offset_of!(ProxyDataLayout, handler) - 8usize];
+                    [::std::mem::offset_of!(ProxyDataLayout, handler) - 0usize];
+                ["Offset of field: ProxyDataLayout::expando"]
+                    [::std::mem::offset_of!(ProxyDataLayout, expando) - 8usize];
             };
             extern "C" {
                 #[link_name = "\u{1}_ZN2js6detail15SetValueInProxyEPN2JS5ValueERKS2_"]
@@ -4830,7 +4752,7 @@ pub mod root {
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2js26ReportBadValueTypeAndCrashERKN2JS5ValueE"]
-            pub fn ReportBadValueTypeAndCrash(val: *const root::JS::Value) -> !;
+            pub fn ReportBadValueTypeAndCrash(val: *const root::JS::Value);
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2js15TraceValueArrayEP8JSTracermPN2JS5ValueE"]
@@ -5084,6 +5006,11 @@ pub mod root {
         extern "C" {
             #[link_name = "\u{1}_ZN2js16AssertHeapIsIdleEv"]
             pub fn AssertHeapIsIdle();
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone)]
+        pub struct GCMarker {
+            _unused: [u8; 0],
         }
         pub mod gcstats {
             #[allow(unused_imports)]
@@ -5423,13 +5350,6 @@ pub mod root {
             pub fn NukeNonCCWProxy(cx: *mut root::JSContext, proxy: root::JS::HandleObject);
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2js34NukeRemovedCrossCompartmentWrapperEP9JSContextP8JSObject"]
-            pub fn NukeRemovedCrossCompartmentWrapper(
-                cx: *mut root::JSContext,
-                wrapper: *mut root::JSObject,
-            );
-        }
-        extern "C" {
             #[doc = " Get the first SavedFrame object in this SavedFrame stack whose principals are\n subsumed by the given |principals|. If there is no such frame, return\n nullptr.\n\n Do NOT pass a non-SavedFrame object here."]
             #[link_name = "\u{1}_ZN2js26GetFirstSubsumedSavedFrameEP9JSContextP12JSPrincipalsN2JS6HandleIP8JSObjectEENS4_20SavedFrameSelfHostedE"]
             pub fn GetFirstSubsumedSavedFrame(
@@ -5462,6 +5382,11 @@ pub mod root {
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct BufferIterator {
             pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone)]
+        pub struct CompartmentFilter {
+            _unused: [u8; 0],
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -5624,37 +5549,6 @@ pub mod root {
             pub fn ReportAccessDenied(cx: *mut root::JSContext);
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2js27NukeCrossCompartmentWrapperEP9JSContextP8JSObject"]
-            pub fn NukeCrossCompartmentWrapper(
-                cx: *mut root::JSContext,
-                wrapper: *mut root::JSObject,
-            );
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js35NukeCrossCompartmentWrapperIfExistsEP9JSContextPN2JS11CompartmentEP8JSObject"]
-            pub fn NukeCrossCompartmentWrapperIfExists(
-                cx: *mut root::JSContext,
-                source: *mut root::JS::Compartment,
-                target: *mut root::JSObject,
-            );
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js12RemapWrapperEP9JSContextP8JSObjectS3_"]
-            pub fn RemapWrapper(
-                cx: *mut root::JSContext,
-                wobj: *mut root::JSObject,
-                newTarget: *mut root::JSObject,
-            );
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js16RemapDeadWrapperEP9JSContextN2JS6HandleIP8JSObjectEES6_"]
-            pub fn RemapDeadWrapper(
-                cx: *mut root::JSContext,
-                wobj: root::JS::HandleObject,
-                newTarget: root::JS::HandleObject,
-            );
-        }
-        extern "C" {
             #[link_name = "\u{1}_ZN2js25RemapAllWrappersForObjectEP9JSContextN2JS6HandleIP8JSObjectEES6_"]
             pub fn RemapAllWrappersForObject(
                 cx: *mut root::JSContext,
@@ -5767,11 +5661,6 @@ pub mod root {
             pub fn ToWindowIfWindowProxy(obj: *mut root::JSObject) -> *mut root::JSObject;
         }
         extern "C" {
-            #[doc = " Get the script private value associated with an object, if any.\n\n The private value is set with SetScriptPrivate() or SetModulePrivate() and is\n internally stored on the relevant ScriptSourceObject.\n\n This is used by the cycle collector to trace through\n ScriptSourceObjects. This allows private values to contain an nsISupports\n pointer and hence support references to cycle collected C++ objects."]
-            #[link_name = "\u{1}_ZN2js21MaybeGetScriptPrivateEP8JSObject"]
-            pub fn MaybeGetScriptPrivate(object: *mut root::JSObject) -> root::JS::Value;
-        }
-        extern "C" {
             #[link_name = "\u{1}_ZN2js17IsArgumentsObjectEN2JS6HandleIP8JSObjectEE"]
             pub fn IsArgumentsObject(obj: root::JS::HandleObject) -> bool;
         }
@@ -5791,11 +5680,6 @@ pub mod root {
             #[doc = " Use the runtime's internal handling of job queues for Promise jobs.\n\n Most embeddings, notably web browsers, will have their own task scheduling\n systems and need to integrate handling of Promise jobs into that, so they\n will want to manage job queues themselves. For basic embeddings such as the\n JS shell that don't have an event loop of their own, it's easier to have\n SpiderMonkey handle job queues internally.\n\n Note that the embedding still has to trigger processing of job queues at\n right time(s), such as after evaluation of a script has run to completion."]
             #[link_name = "\u{1}_ZN2js20UseInternalJobQueuesEP9JSContext"]
             pub fn UseInternalJobQueues(cx: *mut root::JSContext) -> bool;
-        }
-        extern "C" {
-            #[doc = " Enqueue |job| on the internal job queue.\n\n This is useful in tests for creating situations where a call occurs with no\n other JavaScript on the stack."]
-            #[link_name = "\u{1}_ZN2js10EnqueueJobEP9JSContextN2JS6HandleIP8JSObjectEE"]
-            pub fn EnqueueJob(cx: *mut root::JSContext, job: root::JS::HandleObject) -> bool;
         }
         extern "C" {
             #[doc = " Instruct the runtime to stop draining the internal job queue.\n\n Useful if the embedding is in the process of quitting in reaction to a\n builtin being called, or if it wants to resume executing jobs later on."]
@@ -5832,56 +5716,9 @@ pub mod root {
             #[link_name = "\u{1}_ZN2js12IsSystemZoneEPN2JS4ZoneE"]
             pub fn IsSystemZone(zone: *mut root::JS::Zone) -> bool;
         }
-        #[repr(C)]
-        pub struct WeakMapTracer__bindgen_vtable(::std::os::raw::c_void);
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct WeakMapTracer {
-            pub vtable_: *const WeakMapTracer__bindgen_vtable,
-            pub runtime: *mut root::JSRuntime,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of WeakMapTracer"][::std::mem::size_of::<WeakMapTracer>() - 16usize];
-            ["Alignment of WeakMapTracer"][::std::mem::align_of::<WeakMapTracer>() - 8usize];
-            ["Offset of field: WeakMapTracer::runtime"]
-                [::std::mem::offset_of!(WeakMapTracer, runtime) - 8usize];
-        };
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js13TraceWeakMapsEPNS_13WeakMapTracerE"]
-            pub fn TraceWeakMaps(trc: *mut root::js::WeakMapTracer);
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js18AreGCGrayBitsValidEP9JSRuntime"]
-            pub fn AreGCGrayBitsValid(rt: *mut root::JSRuntime) -> bool;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js21ZoneGlobalsAreAllGrayEPN2JS4ZoneE"]
-            pub fn ZoneGlobalsAreAllGray(zone: *mut root::JS::Zone) -> bool;
-        }
         extern "C" {
             #[link_name = "\u{1}_ZN2js37IsCompartmentZoneSweepingOrCompactingEPN2JS11CompartmentE"]
             pub fn IsCompartmentZoneSweepingOrCompacting(comp: *mut root::JS::Compartment) -> bool;
-        }
-        pub type IterateGCThingCallback = ::std::option::Option<
-            unsafe extern "C" fn(
-                arg1: *mut ::std::os::raw::c_void,
-                arg2: root::JS::GCCellPtr,
-                arg3: *const root::JS::AutoRequireNoGC,
-            ),
-        >;
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js23TraceGrayWrapperTargetsEP8JSTracerPN2JS4ZoneE"]
-            pub fn TraceGrayWrapperTargets(trc: *mut root::JSTracer, zone: *mut root::JS::Zone);
-        }
-        extern "C" {
-            #[doc = " Invoke cellCallback on every gray JSObject in the given zone."]
-            #[link_name = "\u{1}_ZN2js18IterateGrayObjectsEPN2JS4ZoneEPFvPvNS0_9GCCellPtrERKNS0_15AutoRequireNoGCEES3_"]
-            pub fn IterateGrayObjects(
-                zone: *mut root::JS::Zone,
-                cellCallback: root::js::IterateGCThingCallback,
-                data: *mut ::std::os::raw::c_void,
-            );
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2js17GetAnyRealmInZoneEPN2JS4ZoneE"]
@@ -5916,6 +5753,12 @@ pub mod root {
         extern "C" {
             #[link_name = "\u{1}_ZN2js16IsFunctionObjectEP8JSObject"]
             pub fn IsFunctionObject(obj: *mut root::JSObject) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js22MaybeGetModuleFilenameEP8JSObject"]
+            pub fn MaybeGetModuleFilename(
+                obj: *mut root::JSObject,
+            ) -> *const ::std::os::raw::c_char;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2js34UninlinedIsCrossCompartmentWrapperEPK8JSObject"]
@@ -6025,6 +5868,23 @@ pub mod root {
             ) -> bool;
         }
         extern "C" {
+            #[doc = " Direct embedder access for retrieving a copy of all entries in a Set or Map\n object."]
+            #[link_name = "\u{1}_ZN2js16GetSetObjectKeysEP9JSContextN2JS6HandleIP8JSObjectEENS2_13MutableHandleINS2_8GCVectorINS2_5ValueELm0ENS_15TempAllocPolicyEEEEE"]
+            pub fn GetSetObjectKeys(
+                cx: *mut root::JSContext,
+                obj: root::JS::HandleObject,
+                keys: u8,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2js36GetMapObjectKeysAndValuesInterleavedEP9JSContextN2JS6HandleIP8JSObjectEENS2_13MutableHandleINS2_8GCVectorINS2_5ValueELm0ENS_15TempAllocPolicyEEEEE"]
+            pub fn GetMapObjectKeysAndValuesInterleaved(
+                cx: *mut root::JSContext,
+                obj: root::JS::HandleObject,
+                entries: u8,
+            ) -> bool;
+        }
+        extern "C" {
             #[doc = " Determine whether the given string is an array index in the sense of\n <https://tc39.github.io/ecma262/#array-index>.\n\n If it isn't, returns false.\n\n If it is, returns true and outputs the index in *indexp."]
             #[link_name = "\u{1}_ZN2js18StringIsArrayIndexEPK14JSLinearStringPj"]
             pub fn StringIsArrayIndex(str_: *const root::JSLinearString, indexp: *mut u32) -> bool;
@@ -6043,6 +5903,10 @@ pub mod root {
             );
         }
         extern "C" {
+            #[link_name = "\u{1}_ZN2js33CommitPendingWrapperPreservationsEP9JSContext"]
+            pub fn CommitPendingWrapperPreservations(cx: *mut root::JSContext);
+        }
+        extern "C" {
             #[link_name = "\u{1}_ZN2js28IsObjectInContextCompartmentEP8JSObjectPK9JSContext"]
             pub fn IsObjectInContextCompartment(
                 obj: *mut root::JSObject,
@@ -6054,20 +5918,34 @@ pub mod root {
         >;
         pub type DOMInstanceClassIsError =
             ::std::option::Option<unsafe extern "C" fn(arg1: *const root::JSClass) -> bool>;
+        pub type DOMExtractExceptionInfo = ::std::option::Option<
+            unsafe extern "C" fn(
+                arg1: *mut root::JSContext,
+                arg2: root::JS::HandleObject,
+                arg3: *mut bool,
+                arg4: root::JS::MutableHandle<*mut root::JSString>,
+                arg5: *mut u32,
+                arg6: *mut u32,
+                arg7: root::JS::MutableHandle<*mut root::JSString>,
+            ) -> bool,
+        >;
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct JSDOMCallbacks {
             pub instanceClassMatchesProto: root::js::DOMInstanceClassHasProtoAtDepth,
             pub instanceClassIsError: root::js::DOMInstanceClassIsError,
+            pub extractExceptionInfo: root::js::DOMExtractExceptionInfo,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of JSDOMCallbacks"][::std::mem::size_of::<JSDOMCallbacks>() - 16usize];
+            ["Size of JSDOMCallbacks"][::std::mem::size_of::<JSDOMCallbacks>() - 24usize];
             ["Alignment of JSDOMCallbacks"][::std::mem::align_of::<JSDOMCallbacks>() - 8usize];
             ["Offset of field: JSDOMCallbacks::instanceClassMatchesProto"]
                 [::std::mem::offset_of!(JSDOMCallbacks, instanceClassMatchesProto) - 0usize];
             ["Offset of field: JSDOMCallbacks::instanceClassIsError"]
                 [::std::mem::offset_of!(JSDOMCallbacks, instanceClassIsError) - 8usize];
+            ["Offset of field: JSDOMCallbacks::extractExceptionInfo"]
+                [::std::mem::offset_of!(JSDOMCallbacks, extractExceptionInfo) - 16usize];
         };
         pub type DOMCallbacks = root::js::JSDOMCallbacks;
         extern "C" {
@@ -6092,76 +5970,6 @@ pub mod root {
                 cx: *mut root::JSContext,
                 exnType: i16,
             ) -> *mut root::JSLinearString;
-        }
-        #[repr(u32)]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum NukeReferencesToWindow {
-            NukeWindowReferences = 0,
-            DontNukeWindowReferences = 1,
-        }
-        #[repr(u32)]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum NukeReferencesFromTarget {
-            NukeAllReferences = 0,
-            NukeIncomingReferences = 1,
-        }
-        #[repr(C)]
-        pub struct CompartmentFilter__bindgen_vtable(::std::os::raw::c_void);
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct CompartmentFilter {
-            pub vtable_: *const CompartmentFilter__bindgen_vtable,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of CompartmentFilter"][::std::mem::size_of::<CompartmentFilter>() - 8usize];
-            ["Alignment of CompartmentFilter"]
-                [::std::mem::align_of::<CompartmentFilter>() - 8usize];
-        };
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct AllCompartments {
-            pub _base: root::js::CompartmentFilter,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of AllCompartments"][::std::mem::size_of::<AllCompartments>() - 8usize];
-            ["Alignment of AllCompartments"][::std::mem::align_of::<AllCompartments>() - 8usize];
-        };
-        #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
-        pub struct SingleCompartment {
-            pub _base: root::js::CompartmentFilter,
-            pub ours: *mut root::JS::Compartment,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of SingleCompartment"][::std::mem::size_of::<SingleCompartment>() - 16usize];
-            ["Alignment of SingleCompartment"]
-                [::std::mem::align_of::<SingleCompartment>() - 8usize];
-            ["Offset of field: SingleCompartment::ours"]
-                [::std::mem::offset_of!(SingleCompartment, ours) - 8usize];
-        };
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js28NukeCrossCompartmentWrappersEP9JSContextRKNS_17CompartmentFilterEPN2JS5RealmENS_22NukeReferencesToWindowENS_24NukeReferencesFromTargetE"]
-            pub fn NukeCrossCompartmentWrappers(
-                cx: *mut root::JSContext,
-                sourceFilter: *const root::js::CompartmentFilter,
-                target: *mut root::JS::Realm,
-                nukeReferencesToWindow: root::js::NukeReferencesToWindow,
-                nukeReferencesFromTarget: root::js::NukeReferencesFromTarget,
-            ) -> bool;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js15AllowNewWrapperEPN2JS11CompartmentEP8JSObject"]
-            pub fn AllowNewWrapper(
-                target: *mut root::JS::Compartment,
-                obj: *mut root::JSObject,
-            ) -> bool;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2js16NukedObjectRealmEP8JSObject"]
-            pub fn NukedObjectRealm(obj: *mut root::JSObject) -> bool;
         }
         extern "C" {
             #[doc = " Detect whether the internal date value is NaN."]
@@ -6311,7 +6119,22 @@ pub mod root {
         extern "C" {
             #[doc = " This function reports memory used by a zone in bytes, this includes:\n  * The size of this JS GC zone.\n  * Malloc memory referred to from this zone.\n  * JIT memory for this zone.\n\n Note that malloc memory referred to from this zone can include\n SharedArrayBuffers which may also be referred to from other zones. Adding the\n memory usage of multiple zones may lead to an over-estimate."]
             #[link_name = "\u{1}_ZN2js21GetMemoryUsageForZoneEPN2JS4ZoneE"]
-            pub fn GetMemoryUsageForZone(zone: *mut root::JS::Zone) -> u64;
+            pub fn GetMemoryUsageForZone(zone: *mut root::JS::Zone) -> usize;
+        }
+        extern "C" {
+            #[doc = " This function reports the amount of GC heap memory referred to from this\n zone.\n"]
+            #[link_name = "\u{1}_ZN2js20GetGCHeapSizeForZoneEPN2JS4ZoneE"]
+            pub fn GetGCHeapSizeForZone(zone: *mut root::JS::Zone) -> usize;
+        }
+        extern "C" {
+            #[doc = " This function reports the size of all malloc memory referred to from this\n zone.\n\n Note that malloc memory referred to from this zone can include\n SharedArrayBuffers which may also be referred to from other zones. Adding the\n memory usage of multiple zones may lead to an over-estimate."]
+            #[link_name = "\u{1}_ZN2js24GetMallocHeapSizeForZoneEPN2JS4ZoneE"]
+            pub fn GetMallocHeapSizeForZone(zone: *mut root::JS::Zone) -> usize;
+        }
+        extern "C" {
+            #[doc = " This function reports the amount of JIT memory used by this zone.\n"]
+            #[link_name = "\u{1}_ZN2js21GetJITHeapSizeForZoneEPN2JS4ZoneE"]
+            pub fn GetJITHeapSizeForZone(zone: *mut root::JS::Zone) -> usize;
         }
         #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -6325,7 +6148,6 @@ pub mod root {
             ) -> *const root::js::gc::SharedMemoryMap;
         }
         extern "C" {
-            #[doc = " This function only reports GC heap memory,\n and not malloc allocated memory associated with GC things.\n It reports the total of all memory for the whole Runtime."]
             #[link_name = "\u{1}_ZN2js14GetGCHeapUsageEP9JSContext"]
             pub fn GetGCHeapUsage(cx: *mut root::JSContext) -> u64;
         }
@@ -6495,17 +6317,16 @@ pub mod root {
             Object = 0,
             BigInt = 1,
             String = 2,
-            Symbol = 3,
-            Shape = 4,
-            BaseShape = 5,
+            GetterSetter = 3,
+            Symbol = 4,
+            Shape = 5,
             Null = 6,
-            JitCode = 7,
-            Script = 8,
-            Scope = 9,
-            RegExpShared = 10,
-            GetterSetter = 11,
+            BaseShape = 7,
+            JitCode = 8,
+            Script = 9,
+            Scope = 10,
+            RegExpShared = 11,
             PropMap = 12,
-            SmallBuffer = 13,
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -6603,13 +6424,6 @@ pub mod root {
         };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of template specialization: IsBaseTraceType_open0_SmallBuffer_close0"]
-                [::std::mem::size_of::<root::JS::IsBaseTraceType>() - 1usize];
-            ["Align of template specialization: IsBaseTraceType_open0_SmallBuffer_close0"]
-                [::std::mem::align_of::<root::JS::IsBaseTraceType>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
             ["Size of template specialization: MapTypeToTraceKind_open0_BaseShape_close0"]
                 [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
             ["Align of template specialization: MapTypeToTraceKind_open0_BaseShape_close0"]
@@ -6694,13 +6508,6 @@ pub mod root {
         };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of template specialization: MapTypeToTraceKind_open0_SmallBuffer_close0"]
-                [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-            ["Align of template specialization: MapTypeToTraceKind_open0_SmallBuffer_close0"]
-                [::std::mem::align_of::<root::JS::MapTypeToTraceKind>() - 1usize];
-        };
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
             ["Size of template specialization: MapTypeToTraceKind_open0_JSLinearString_close0"]
                 [::std::mem::size_of::<root::JS::MapTypeToTraceKind>() - 1usize];
             ["Align of template specialization: MapTypeToTraceKind_open0_JSLinearString_close0"]
@@ -6735,11 +6542,10 @@ pub mod root {
             RegExpShared = 9,
             GetterSetter = 10,
             PropMap = 11,
-            SmallBuffer = 12,
-            Id = 13,
-            Value = 14,
-            Traceable = 15,
-            Limit = 16,
+            Id = 12,
+            Value = 13,
+            Traceable = 14,
+            Limit = 15,
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -6807,6 +6613,11 @@ pub mod root {
                 pub _base: root::std::false_type,
             }
             pub type RootedTraits = root::std::conditional_t;
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct IndexOfType {
+                pub _address: u8,
+            }
             extern "C" {
                 #[link_name = "\u{1}_ZN2JS6detail11ComputeThisEP9JSContextPNS_5ValueENS_13MutableHandleIP8JSObjectEE"]
                 pub fn ComputeThis(
@@ -6914,14 +6725,6 @@ pub mod root {
                 ) -> *const ::std::os::raw::c_char;
             }
             extern "C" {
-                #[link_name = "\u{1}_ZN2JS6detail26SetReservedSlotWithBarrierEP8JSObjectmRKNS_5ValueE"]
-                pub fn SetReservedSlotWithBarrier(
-                    obj: *mut root::JSObject,
-                    slot: usize,
-                    value: *const root::JS::Value,
-                );
-            }
-            extern "C" {
                 #[link_name = "\u{1}_ZN2JS6detail19CallMethodIfWrappedEP9JSContextPFbNS_6HandleINS_5ValueEEEEPFbS2_RKNS_8CallArgsEESA_"]
                 pub fn CallMethodIfWrapped(
                     cx: *mut root::JSContext,
@@ -6929,6 +6732,14 @@ pub mod root {
                     impl_: root::JS::NativeImpl,
                     args: *const root::JS::CallArgs,
                 ) -> bool;
+            }
+            extern "C" {
+                #[link_name = "\u{1}_ZN2JS6detail38SetNativeObjectReservedSlotWithBarrierEP8JSObjectmRKNS_5ValueE"]
+                pub fn SetNativeObjectReservedSlotWithBarrier(
+                    obj: *mut root::JSObject,
+                    slot: usize,
+                    value: *const root::JS::Value,
+                );
             }
             extern "C" {
                 #[link_name = "\u{1}_ZN2JS6detail19ReportSourceTooLongEP9JSContext"]
@@ -7009,7 +6820,7 @@ pub mod root {
             pub struct Zone {
                 pub runtime_: *mut root::JSRuntime,
                 pub barrierTracer_: *mut root::JSTracer,
-                pub needsIncrementalBarrier_: root::JS::shadow::Zone_BarrierState,
+                pub needsMarkingBarrier_: root::JS::shadow::Zone_BarrierState,
                 pub gcState_: root::JS::shadow::Zone_GCState,
                 pub kind_: root::JS::shadow::Zone_Kind,
             }
@@ -7025,6 +6836,12 @@ pub mod root {
                 Compact = 6,
                 VerifyPreBarriers = 7,
                 Limit = 8,
+            }
+            #[repr(u32)]
+            #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+            pub enum Zone_BarrierFlags {
+                Incremental = 1,
+                Concurrent = 2,
             }
             #[doc = " Atomic<T> implementation for integral types.\n\n In addition to atomic store and load operations, compound assignment and\n increment/decrement operators are implemented which perform the\n corresponding read-modify-write operation atomically.  Finally, an atomic\n swap method is provided."]
             pub type Zone_BarrierState = u32;
@@ -7043,8 +6860,8 @@ pub mod root {
                     [::std::mem::offset_of!(Zone, runtime_) - 0usize];
                 ["Offset of field: Zone::barrierTracer_"]
                     [::std::mem::offset_of!(Zone, barrierTracer_) - 8usize];
-                ["Offset of field: Zone::needsIncrementalBarrier_"]
-                    [::std::mem::offset_of!(Zone, needsIncrementalBarrier_) - 16usize];
+                ["Offset of field: Zone::needsMarkingBarrier_"]
+                    [::std::mem::offset_of!(Zone, needsMarkingBarrier_) - 16usize];
                 ["Offset of field: Zone::gcState_"]
                     [::std::mem::offset_of!(Zone, gcState_) - 20usize];
                 ["Offset of field: Zone::kind_"][::std::mem::offset_of!(Zone, kind_) - 24usize];
@@ -7102,27 +6919,40 @@ pub mod root {
                 ["Offset of field: Shape::immutableFlags"]
                     [::std::mem::offset_of!(Shape, immutableFlags) - 8usize];
             };
-            #[doc = " This layout is shared by all native objects. For non-native objects, the\n shape may always be accessed safely, and other members may be as well,\n depending on the object's specific layout."]
+            #[doc = " Layout shared by all JSObjects."]
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Object {
                 pub shape: *mut root::JS::shadow::Shape,
-                pub slots: *mut root::JS::Value,
-                pub _1: *mut ::std::os::raw::c_void,
             }
             pub const Object_MAX_FIXED_SLOTS: usize = 16;
             #[allow(clippy::unnecessary_operation, clippy::identity_op)]
             const _: () = {
-                ["Size of Object"][::std::mem::size_of::<Object>() - 24usize];
+                ["Size of Object"][::std::mem::size_of::<Object>() - 8usize];
                 ["Alignment of Object"][::std::mem::align_of::<Object>() - 8usize];
                 ["Offset of field: Object::shape"][::std::mem::offset_of!(Object, shape) - 0usize];
-                ["Offset of field: Object::slots"][::std::mem::offset_of!(Object, slots) - 8usize];
-                ["Offset of field: Object::_1"][::std::mem::offset_of!(Object, _1) - 16usize];
+            };
+            #[doc = " Layout for all NativeObjects."]
+            #[repr(C)]
+            #[derive(Debug, Copy, Clone, PartialEq)]
+            pub struct NativeObject {
+                pub _base: root::JS::shadow::Object,
+                pub slots: *mut root::JS::Value,
+                pub _1: *mut ::std::os::raw::c_void,
+            }
+            #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+            const _: () = {
+                ["Size of NativeObject"][::std::mem::size_of::<NativeObject>() - 24usize];
+                ["Alignment of NativeObject"][::std::mem::align_of::<NativeObject>() - 8usize];
+                ["Offset of field: NativeObject::slots"]
+                    [::std::mem::offset_of!(NativeObject, slots) - 8usize];
+                ["Offset of field: NativeObject::_1"]
+                    [::std::mem::offset_of!(NativeObject, _1) - 16usize];
             };
             #[repr(C)]
             #[derive(Debug, Copy, Clone, PartialEq)]
             pub struct Function {
-                pub _base: root::JS::shadow::Object,
+                pub _base: root::JS::shadow::NativeObject,
             }
             pub const Function_FlagsAndArgCountSlot: root::JS::shadow::Function__bindgen_ty_1 =
                 Function__bindgen_ty_1::FlagsAndArgCountSlot;
@@ -7224,7 +7054,7 @@ pub mod root {
             #[link_name = "\u{1}_ZN2JS15GCTraceKindSizeENS_9TraceKindE"]
             pub fn GCTraceKindSize(kind: root::JS::TraceKind) -> usize;
         }
-        #[repr(i32)]
+        #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum TracerKind {
             Marking = 0,
@@ -7240,7 +7070,7 @@ pub mod root {
             CompartmentCheck = 10,
             HeapCheck = 11,
         }
-        #[repr(i32)]
+        #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum WeakMapTraceAction {
             #[doc = " Do not trace into weak map keys or values during traversal. Users must\n handle weak maps manually."]
@@ -7252,7 +7082,7 @@ pub mod root {
             #[doc = " Trace through to all keys and values, irrespective of whether the keys\n are live or not. Used for non-marking tracers."]
             TraceKeysAndValues = 3,
         }
-        #[repr(i32)]
+        #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum WeakEdgeTraceAction {
             Skip = 0,
@@ -7266,12 +7096,12 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of TraceOptions"][::std::mem::size_of::<TraceOptions>() - 8usize];
-            ["Alignment of TraceOptions"][::std::mem::align_of::<TraceOptions>() - 4usize];
+            ["Size of TraceOptions"][::std::mem::size_of::<TraceOptions>() - 2usize];
+            ["Alignment of TraceOptions"][::std::mem::align_of::<TraceOptions>() - 1usize];
             ["Offset of field: TraceOptions::weakMapAction"]
                 [::std::mem::offset_of!(TraceOptions, weakMapAction) - 0usize];
             ["Offset of field: TraceOptions::weakEdgeAction"]
-                [::std::mem::offset_of!(TraceOptions, weakEdgeAction) - 4usize];
+                [::std::mem::offset_of!(TraceOptions, weakEdgeAction) - 1usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -7313,7 +7143,7 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of CallbackTracer"][::std::mem::size_of::<CallbackTracer>() - 48usize];
+            ["Size of CallbackTracer"][::std::mem::size_of::<CallbackTracer>() - 40usize];
             ["Alignment of CallbackTracer"][::std::mem::align_of::<CallbackTracer>() - 8usize];
         };
         #[repr(C)]
@@ -7468,6 +7298,11 @@ pub mod root {
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct GCPolicyBase {
+            pub _address: u8,
+        }
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct StructGCPolicy {
             pub _address: u8,
         }
@@ -7481,6 +7316,13 @@ pub mod root {
         pub struct IgnoreGCPolicy {
             pub _address: u8,
         }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of template specialization: GCPolicy_open0_unsigned_char_close0"]
+                [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
+            ["Align of template specialization: GCPolicy_open0_unsigned_char_close0"]
+                [::std::mem::align_of::<root::JS::GCPolicy>() - 1usize];
+        };
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of template specialization: GCPolicy_open0_unsigned_int_close0"]
@@ -7626,6 +7468,11 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
+            ["Size of template specialization: GCPolicy_open0__bindgen_ty_id_152552_open1_array0_char_FreePolicy_close1_close0"] [:: std :: mem :: size_of :: < root :: JS :: GCPolicy > () - 1usize] ;
+            ["Align of template specialization: GCPolicy_open0__bindgen_ty_id_152552_open1_array0_char_FreePolicy_close1_close0"] [:: std :: mem :: align_of :: < root :: JS :: GCPolicy > () - 1usize] ;
+        };
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
             ["Size of template specialization: GCPolicy_open0_Nothing_close0"]
                 [::std::mem::size_of::<root::JS::GCPolicy>() - 1usize];
             ["Align of template specialization: GCPolicy_open0_Nothing_close0"]
@@ -7642,7 +7489,7 @@ pub mod root {
         pub type NativeStackBase = usize;
         pub type NativeStackLimit = usize;
         impl root::JS::ProfilingCategoryPair {
-            pub const LAST: root::JS::ProfilingCategoryPair = ProfilingCategoryPair::TELEMETRY;
+            pub const LAST: root::JS::ProfilingCategoryPair = ProfilingCategoryPair::LOGS;
         }
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -7695,29 +7542,35 @@ pub mod root {
             GRAPHICS_Rasterization = 45,
             GRAPHICS_FlushingAsyncPaints = 46,
             GRAPHICS_ImageDecoding = 47,
-            DOM = 48,
-            JAVA_ANDROID = 49,
-            JAVA_ANDROIDX = 50,
-            JAVA_LANGUAGE = 51,
-            JAVA_MOZILLA = 52,
-            JAVA_KOTLIN = 53,
-            JAVA_BLOCKED = 54,
-            MAILNEWS = 55,
-            IPC = 56,
-            MEDIA = 57,
-            MEDIA_CUBEB = 58,
-            MEDIA_PLAYBACK = 59,
-            MEDIA_RT = 60,
-            A11Y = 61,
-            PROFILER = 62,
-            TIMER = 63,
-            REMOTE_PROTOCOL = 64,
-            SANDBOX = 65,
-            TELEMETRY = 66,
-            COUNT = 67,
+            GRAPHICS_WebGPU = 48,
+            GRAPHICS_VSync = 49,
+            DOM = 50,
+            JAVA_ANDROID = 51,
+            JAVA_ANDROIDX = 52,
+            JAVA_LANGUAGE = 53,
+            JAVA_MOZILLA = 54,
+            JAVA_KOTLIN = 55,
+            JAVA_BLOCKED = 56,
+            MAILNEWS = 57,
+            IPC = 58,
+            MEDIA = 59,
+            MEDIA_CUBEB = 60,
+            MEDIA_PLAYBACK = 61,
+            MEDIA_RT = 62,
+            A11Y = 63,
+            PROFILER = 64,
+            TIMER = 65,
+            REMOTE_PROTOCOL = 66,
+            SANDBOX = 67,
+            TELEMETRY = 68,
+            ML = 69,
+            ML_INFERENCE = 70,
+            ML_SETUP = 71,
+            LOGS = 72,
+            COUNT = 73,
         }
         impl root::JS::ProfilingCategory {
-            pub const LAST: root::JS::ProfilingCategory = ProfilingCategory::TELEMETRY;
+            pub const LAST: root::JS::ProfilingCategory = ProfilingCategory::LOGS;
         }
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -7746,7 +7599,9 @@ pub mod root {
             REMOTE_PROTOCOL = 21,
             SANDBOX = 22,
             TELEMETRY = 23,
-            COUNT = 24,
+            ML = 24,
+            LOGS = 25,
+            COUNT = 26,
         }
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -7802,6 +7657,10 @@ pub mod root {
         extern "C" {
             #[link_name = "\u{1}_ZN2JS20GetObjectRealmOrNullEP8JSObject"]
             pub fn GetObjectRealmOrNull(obj: *mut root::JSObject) -> *mut root::JS::Realm;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS25HasRealmInitializedGlobalEPNS_5RealmE"]
+            pub fn HasRealmInitializedGlobal(realm: *mut root::JS::Realm) -> bool;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS15GetRealmPrivateEPNS_5RealmE"]
@@ -8015,7 +7874,7 @@ pub mod root {
             Limit = 3,
         }
         #[doc = " EnumeratedArray is a fixed-size array container for use when an\n array is indexed by a specific enum class.\n\n This provides type safety by guarding at compile time against accidentally\n indexing such arrays with unrelated values. This also removes the need\n for manual casting when using a typed enum value to index arrays.\n\n Aside from the typing of indices, EnumeratedArray is similar to Array.\n\n Example:\n\n   enum class AnimalSpecies {\n     Cow,\n     Sheep,\n     Count\n   };\n\n   EnumeratedArray<AnimalSpecies, int, AnimalSpecies::Count> headCount;\n\n   headCount[AnimalSpecies::Cow] = 17;\n   headCount[AnimalSpecies::Sheep] = 30;\n\n If the enum class has contiguous values and provides a specialization of\n mozilla::MaxContiguousEnumValue then the size will be calculated as the max\n value + 1."]
-        pub type RootedListHeads = root::__BindgenOpaqueArray<u64, 16usize>;
+        pub type RootedListHeads = root::__BindgenOpaqueArray<u64, 15usize>;
         #[doc = " EnumeratedArray is a fixed-size array container for use when an\n array is indexed by a specific enum class.\n\n This provides type safety by guarding at compile time against accidentally\n indexing such arrays with unrelated values. This also removes the need\n for manual casting when using a typed enum value to index arrays.\n\n Aside from the typing of indices, EnumeratedArray is similar to Array.\n\n Example:\n\n   enum class AnimalSpecies {\n     Cow,\n     Sheep,\n     Count\n   };\n\n   EnumeratedArray<AnimalSpecies, int, AnimalSpecies::Count> headCount;\n\n   headCount[AnimalSpecies::Cow] = 17;\n   headCount[AnimalSpecies::Sheep] = 30;\n\n If the enum class has contiguous values and provides a specialization of\n mozilla::MaxContiguousEnumValue then the size will be calculated as the max\n value + 1."]
         pub type AutoRooterListHeads = root::__BindgenOpaqueArray<u64, 3usize>;
         #[repr(C)]
@@ -8031,22 +7890,22 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of RootingContext"][::std::mem::size_of::<RootingContext>() - 216usize];
+            ["Size of RootingContext"][::std::mem::size_of::<RootingContext>() - 208usize];
             ["Alignment of RootingContext"][::std::mem::align_of::<RootingContext>() - 8usize];
             ["Offset of field: RootingContext::stackRoots_"]
                 [::std::mem::offset_of!(RootingContext, stackRoots_) - 0usize];
             ["Offset of field: RootingContext::autoGCRooters_"]
-                [::std::mem::offset_of!(RootingContext, autoGCRooters_) - 128usize];
+                [::std::mem::offset_of!(RootingContext, autoGCRooters_) - 120usize];
             ["Offset of field: RootingContext::geckoProfiler_"]
-                [::std::mem::offset_of!(RootingContext, geckoProfiler_) - 152usize];
+                [::std::mem::offset_of!(RootingContext, geckoProfiler_) - 144usize];
             ["Offset of field: RootingContext::nursery_"]
-                [::std::mem::offset_of!(RootingContext, nursery_) - 168usize];
+                [::std::mem::offset_of!(RootingContext, nursery_) - 160usize];
             ["Offset of field: RootingContext::zone_"]
-                [::std::mem::offset_of!(RootingContext, zone_) - 176usize];
+                [::std::mem::offset_of!(RootingContext, zone_) - 168usize];
             ["Offset of field: RootingContext::realm_"]
-                [::std::mem::offset_of!(RootingContext, realm_) - 184usize];
+                [::std::mem::offset_of!(RootingContext, realm_) - 176usize];
             ["Offset of field: RootingContext::nativeStackLimit"]
-                [::std::mem::offset_of!(RootingContext, nativeStackLimit) - 192usize];
+                [::std::mem::offset_of!(RootingContext, nativeStackLimit) - 184usize];
         };
         #[repr(C)]
         #[derive(Debug, PartialEq)]
@@ -8082,6 +7941,7 @@ pub mod root {
             ["Alignment of CustomAutoRooter"][::std::mem::align_of::<CustomAutoRooter>() - 8usize];
         };
         pub type Rooted_ElementType<T> = T;
+        pub type RootedTuple_Tuple = u8;
         pub type RootedField_ElementType<T> = T;
         pub type RootedField_WrapperT = u8;
         extern "C" {
@@ -8122,7 +7982,7 @@ pub mod root {
             BigInt = 9,
             Object = 12,
         }
-        #[doc = " [SMDOC] JS::Value type\n\n JS::Value is the interface for a single JavaScript Engine value.  A few\n general notes on JS::Value:\n\n - JS::Value has setX() and isX() members for X in\n\n     { Int32, Double, String, Symbol, BigInt, Boolean, Undefined, Null,\n       Object, Magic }\n\n   JS::Value also contains toX() for each of the non-singleton types.\n\n - Magic is a singleton type whose payload contains either a JSWhyMagic\n   \"reason\" for the magic value or a uint32_t value. By providing JSWhyMagic\n   values when creating and checking for magic values, it is possible to\n   assert, at runtime, that only magic values with the expected reason flow\n   through a particular value. For example, if cx->exception has a magic\n   value, the reason must be JS_GENERATOR_CLOSING.\n\n - The JS::Value operations are preferred.  The JSVAL_* operations remain for\n   compatibility; they may be removed at some point.  These operations mostly\n   provide similar functionality.  But there are a few key differences.  One\n   is that JS::Value gives null a separate type.\n   Also, to help prevent mistakenly boxing a nullable JSObject* as an object,\n   Value::setObject takes a JSObject&. (Conversely, Value::toObject returns a\n   JSObject&.)  A convenience member Value::setObjectOrNull is provided.\n\n - Note that JS::Value is 8 bytes on 32 and 64-bit architectures. Thus, on\n   32-bit user code should avoid copying jsval/JS::Value as much as possible,\n   preferring to pass by const Value&.\n\n Spectre mitigations\n ===================\n To mitigate Spectre attacks, we do the following:\n\n - On 64-bit platforms, when unboxing a Value, we XOR the bits with the\n   expected type tag (instead of masking the payload bits). This guarantees\n   that toString, toObject, toSymbol will return an invalid pointer (because\n   some high bits will be set) when called on a Value with a different type\n   tag.\n\n - On 32-bit platforms,when unboxing an object/string/symbol Value, we use a\n   conditional move (not speculated) to zero the payload register if the type\n   doesn't match."]
+        #[doc = " [SMDOC] JS::Value type\n\n JS::Value is the interface for a single JavaScript Engine value.  A few\n general notes on JS::Value:\n\n - JS::Value has setX() and isX() members for X in\n\n     { Int32, Double, String, Symbol, BigInt, Boolean, Undefined, Null,\n       Object, Magic }\n\n   JS::Value also contains toX() for each of the non-singleton types.\n\n - Magic is a singleton type whose payload contains either a JSWhyMagic\n   \"reason\" for the magic value or a uint32_t value. By providing JSWhyMagic\n   values when creating and checking for magic values, it is possible to\n   assert, at runtime, that only magic values with the expected reason flow\n   through a particular value. For example, if cx->exception has a magic\n   value, the reason must be JS_GENERATOR_CLOSING.\n\n - To help prevent mistakenly boxing a nullable JSObject* as an object,\n   Value::setObject takes a JSObject&. (Conversely, Value::toObject returns a\n   JSObject&.)  A convenience member Value::setObjectOrNull is provided.\n\n - Note that JS::Value is 8 bytes on 32 and 64-bit architectures. Because most\n   of our users are now on 64-bit platforms, code should prefer passing\n   JS::Value by value instead of |const Value&|.\n\n Spectre mitigations\n ===================\n To mitigate Spectre attacks, we do the following:\n\n - On 64-bit platforms, when unboxing a Value, we XOR the bits with the\n   expected type tag (instead of masking the payload bits). This guarantees\n   that toString, toObject, toSymbol will return an invalid pointer (because\n   some high bits will be set) when called on a Value with a different type\n   tag.\n\n - On 32-bit platforms,when unboxing an object/string/symbol Value, we use a\n   conditional move (not speculated) to zero the payload register if the type\n   doesn't match."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct Value {
@@ -8618,6 +8478,252 @@ pub mod root {
             ["Offset of field: TaggedColumnNumberOneOrigin::value_"]
                 [::std::mem::offset_of!(TaggedColumnNumberOneOrigin, value_) - 0usize];
         };
+        #[repr(C)]
+        #[derive(Debug, Copy, Clone, PartialEq)]
+        pub struct Prefs {
+            pub _address: u8,
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs19atomics_wait_async_E"]
+            pub static mut Prefs_atomics_wait_async_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs15dom_alloc_site_E"]
+            pub static mut Prefs_dom_alloc_site_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs17ducktyped_errors_E"]
+            pub static mut Prefs_ducktyped_errors_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs27experimental_atomics_pause_E"]
+            pub static mut Prefs_experimental_atomics_pause_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs37experimental_capture_oom_stack_trace_E"]
+            pub static mut Prefs_experimental_capture_oom_stack_trace_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs39experimental_error_capture_stack_trace_E"]
+            pub static mut Prefs_experimental_error_capture_stack_trace_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs27experimental_error_iserror_E"]
+            pub static mut Prefs_experimental_error_iserror_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs37experimental_error_stack_trace_limit_E"]
+            pub static mut Prefs_experimental_error_stack_trace_limit_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs42experimental_explicit_resource_management_E"]
+            pub static mut Prefs_experimental_explicit_resource_management_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs25experimental_import_text_E"]
+            pub static mut Prefs_experimental_import_text_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs30experimental_intl_locale_info_E"]
+            pub static mut Prefs_experimental_intl_locale_info_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs33experimental_iterator_sequencing_E"]
+            pub static mut Prefs_experimental_iterator_sequencing_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs29experimental_joint_iteration_E"]
+            pub static mut Prefs_experimental_joint_iteration_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs27experimental_legacy_regexp_E"]
+            pub static mut Prefs_experimental_legacy_regexp_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs31experimental_self_hosted_cache_E"]
+            pub static mut Prefs_experimental_self_hosted_cache_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs34experimental_source_phase_imports_E"]
+            pub static mut Prefs_experimental_source_phase_imports_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs56experimental_source_phase_imports_test262_module_source_E"]
+            pub static mut Prefs_experimental_source_phase_imports_test262_module_source_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs37experimental_symbols_as_weakmap_keys_E"]
+            pub static mut Prefs_experimental_symbols_as_weakmap_keys_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs22experimental_temporal_E"]
+            pub static mut Prefs_experimental_temporal_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs41experimental_weakrefs_expose_cleanupSome_E"]
+            pub static mut Prefs_experimental_weakrefs_expose_cleanupSome_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs13ion_regalloc_E"]
+            pub static mut Prefs_ion_regalloc_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs26objectfuse_for_all_protos_E"]
+            pub static mut Prefs_objectfuse_for_all_protos_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs22objectfuse_for_global_E"]
+            pub static mut Prefs_objectfuse_for_global_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs39objectfuse_for_js_builtin_ctors_protos_E"]
+            pub static mut Prefs_objectfuse_for_js_builtin_ctors_protos_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs27property_error_message_fix_E"]
+            pub static mut Prefs_property_error_message_fix_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs23site_based_pretenuring_E"]
+            pub static mut Prefs_site_based_pretenuring_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs26tests_fuzzing_unsafe_pref_E"]
+            pub static mut Prefs_tests_fuzzing_unsafe_pref_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs18tests_uint32_pref_E"]
+            pub static mut Prefs_tests_uint32_pref_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs27use_fdlibm_for_sin_cos_tan_E"]
+            pub static mut Prefs_use_fdlibm_for_sin_cos_tan_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs23warn_asmjs_deprecation_E"]
+            pub static mut Prefs_warn_asmjs_deprecation_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs20wasm_branch_hinting_E"]
+            pub static mut Prefs_wasm_branch_hinting_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs23wasm_call_ref_inlining_E"]
+            pub static mut Prefs_wasm_call_ref_inlining_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs31wasm_call_ref_inlining_percent_E"]
+            pub static mut Prefs_wasm_call_ref_inlining_percent_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs21wasm_compact_imports_E"]
+            pub static mut Prefs_wasm_compact_imports_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs16wasm_components_E"]
+            pub static mut Prefs_wasm_components_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs31wasm_cont_stack_arena_capacity_E"]
+            pub static mut Prefs_wasm_cont_stack_arena_capacity_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs21wasm_cont_stack_size_E"]
+            pub static mut Prefs_wasm_cont_stack_size_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs23wasm_custom_page_sizes_E"]
+            pub static mut Prefs_wasm_custom_page_sizes_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs21wasm_direct_inlining_E"]
+            pub static mut Prefs_wasm_direct_inlining_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs25wasm_disable_huge_memory_E"]
+            pub static mut Prefs_wasm_disable_huge_memory_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs33wasm_exception_force_stack_trace_E"]
+            pub static mut Prefs_wasm_exception_force_stack_trace_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs20wasm_inlining_level_E"]
+            pub static mut Prefs_wasm_inlining_level_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs28wasm_js_promise_integration_E"]
+            pub static mut Prefs_wasm_js_promise_integration_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs18wasm_lazy_tiering_E"]
+            pub static mut Prefs_wasm_lazy_tiering_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs24wasm_lazy_tiering_level_E"]
+            pub static mut Prefs_wasm_lazy_tiering_level_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs30wasm_lazy_tiering_synchronous_E"]
+            pub static mut Prefs_wasm_lazy_tiering_synchronous_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs20wasm_memory_control_E"]
+            pub static mut Prefs_wasm_memory_control_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs22wasm_memory_debugging_E"]
+            pub static mut Prefs_wasm_memory_debugging_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs17wasm_moz_intgemm_E"]
+            pub static mut Prefs_wasm_moz_intgemm_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs18wasm_relaxed_simd_E"]
+            pub static mut Prefs_wasm_relaxed_simd_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs14wasm_simd_avx_E"]
+            pub static mut Prefs_wasm_simd_avx_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs21wasm_stack_switching_E"]
+            pub static mut Prefs_wasm_stack_switching_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs24wasm_test_serialization_E"]
+            pub static mut Prefs_wasm_test_serialization_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs15wasm_trace_api_E"]
+            pub static mut Prefs_wasm_trace_api_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs19wasm_unroll_factor_E"]
+            pub static mut Prefs_wasm_unroll_factor_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs18wasm_unroll_loops_E"]
+            pub static mut Prefs_wasm_unroll_loops_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs21wasm_wide_arithmetic_E"]
+            pub static mut Prefs_wasm_wide_arithmetic_: u32;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs12fuzzingSafe_E"]
+            pub static mut Prefs_fuzzingSafe_: bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS5Prefs32reportIgnoredFuzzingUnsafePrefs_E"]
+            pub static mut Prefs_reportIgnoredFuzzingUnsafePrefs_: bool;
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of Prefs"][::std::mem::size_of::<Prefs>() - 1usize];
+            ["Alignment of Prefs"][::std::mem::align_of::<Prefs>() - 1usize];
+        };
         pub type FrontendContext = root::js::FrontendContext;
         #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -8637,6 +8743,13 @@ pub mod root {
             ConcurrentLargeFirst = 3,
             ParseEverythingEagerly = 4,
         }
+        #[repr(u8)]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum EagerBaselineOption {
+            None = 0,
+            JitHints = 1,
+            Aggressive = 2,
+        }
         #[repr(C, packed)]
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct PrefableCompileOptions {
@@ -8655,47 +8768,14 @@ pub mod root {
         };
         impl PrefableCompileOptions {
             #[inline]
-            pub fn importAttributes_(&self) -> bool {
-                unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
-            }
-            #[inline]
-            pub fn set_importAttributes_(&mut self, val: bool) {
-                unsafe {
-                    let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(0usize, 1u8, val as u64)
-                }
-            }
-            #[inline]
-            pub unsafe fn importAttributes__raw(this: *const Self) -> bool {
-                unsafe {
-                    ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
-                        ::std::ptr::addr_of!((*this)._bitfield_1),
-                        0usize,
-                        1u8,
-                    ) as u8)
-                }
-            }
-            #[inline]
-            pub unsafe fn set_importAttributes__raw(this: *mut Self, val: bool) {
-                unsafe {
-                    let val: u8 = ::std::mem::transmute(val);
-                    <root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
-                        ::std::ptr::addr_of_mut!((*this)._bitfield_1),
-                        0usize,
-                        1u8,
-                        val as u64,
-                    )
-                }
-            }
-            #[inline]
             pub fn sourcePragmas_(&self) -> bool {
-                unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
             }
             #[inline]
             pub fn set_sourcePragmas_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(1usize, 1u8, val as u64)
+                    self._bitfield_1.set(0usize, 1u8, val as u64)
                 }
             }
             #[inline]
@@ -8703,7 +8783,7 @@ pub mod root {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
-                        1usize,
+                        0usize,
                         1u8,
                     ) as u8)
                 }
@@ -8714,6 +8794,39 @@ pub mod root {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
                         ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                        0usize,
+                        1u8,
+                        val as u64,
+                    )
+                }
+            }
+            #[inline]
+            pub fn explicitResourceManagement_(&self) -> bool {
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
+            }
+            #[inline]
+            pub fn set_explicitResourceManagement_(&mut self, val: bool) {
+                unsafe {
+                    let val: u8 = ::std::mem::transmute(val);
+                    self._bitfield_1.set(1usize, 1u8, val as u64)
+                }
+            }
+            #[inline]
+            pub unsafe fn explicitResourceManagement__raw(this: *const Self) -> bool {
+                unsafe {
+                    ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                        ::std::ptr::addr_of!((*this)._bitfield_1),
+                        1usize,
+                        1u8,
+                    ) as u8)
+                }
+            }
+            #[inline]
+            pub unsafe fn set_explicitResourceManagement__raw(this: *mut Self, val: bool) {
+                unsafe {
+                    let val: u8 = ::std::mem::transmute(val);
+                    <root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                        ::std::ptr::addr_of_mut!((*this)._bitfield_1),
                         1usize,
                         1u8,
                         val as u64,
@@ -8721,18 +8834,18 @@ pub mod root {
                 }
             }
             #[inline]
-            pub fn throwOnAsmJSValidationFailure_(&self) -> bool {
+            pub fn sourcePhaseImports_(&self) -> bool {
                 unsafe { ::std::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u8) }
             }
             #[inline]
-            pub fn set_throwOnAsmJSValidationFailure_(&mut self, val: bool) {
+            pub fn set_sourcePhaseImports_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
                     self._bitfield_1.set(2usize, 1u8, val as u64)
                 }
             }
             #[inline]
-            pub unsafe fn throwOnAsmJSValidationFailure__raw(this: *const Self) -> bool {
+            pub unsafe fn sourcePhaseImports__raw(this: *const Self) -> bool {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
@@ -8742,7 +8855,7 @@ pub mod root {
                 }
             }
             #[inline]
-            pub unsafe fn set_throwOnAsmJSValidationFailure__raw(this: *mut Self, val: bool) {
+            pub unsafe fn set_sourcePhaseImports__raw(this: *mut Self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
@@ -8754,22 +8867,62 @@ pub mod root {
                 }
             }
             #[inline]
+            pub fn throwOnAsmJSValidationFailure_(&self) -> bool {
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u8) }
+            }
+            #[inline]
+            pub fn set_throwOnAsmJSValidationFailure_(&mut self, val: bool) {
+                unsafe {
+                    let val: u8 = ::std::mem::transmute(val);
+                    self._bitfield_1.set(3usize, 1u8, val as u64)
+                }
+            }
+            #[inline]
+            pub unsafe fn throwOnAsmJSValidationFailure__raw(this: *const Self) -> bool {
+                unsafe {
+                    ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_get(
+                        ::std::ptr::addr_of!((*this)._bitfield_1),
+                        3usize,
+                        1u8,
+                    ) as u8)
+                }
+            }
+            #[inline]
+            pub unsafe fn set_throwOnAsmJSValidationFailure__raw(this: *mut Self, val: bool) {
+                unsafe {
+                    let val: u8 = ::std::mem::transmute(val);
+                    <root::__BindgenBitfieldUnit<[u8; 1usize]>>::raw_set(
+                        ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                        3usize,
+                        1u8,
+                        val as u64,
+                    )
+                }
+            }
+            #[inline]
             pub fn new_bitfield_1(
-                importAttributes_: bool,
                 sourcePragmas_: bool,
+                explicitResourceManagement_: bool,
+                sourcePhaseImports_: bool,
                 throwOnAsmJSValidationFailure_: bool,
             ) -> root::__BindgenBitfieldUnit<[u8; 1usize]> {
                 let mut __bindgen_bitfield_unit: root::__BindgenBitfieldUnit<[u8; 1usize]> =
                     Default::default();
                 __bindgen_bitfield_unit.set(0usize, 1u8, {
-                    let importAttributes_: u8 = unsafe { ::std::mem::transmute(importAttributes_) };
-                    importAttributes_ as u64
-                });
-                __bindgen_bitfield_unit.set(1usize, 1u8, {
                     let sourcePragmas_: u8 = unsafe { ::std::mem::transmute(sourcePragmas_) };
                     sourcePragmas_ as u64
                 });
+                __bindgen_bitfield_unit.set(1usize, 1u8, {
+                    let explicitResourceManagement_: u8 =
+                        unsafe { ::std::mem::transmute(explicitResourceManagement_) };
+                    explicitResourceManagement_ as u64
+                });
                 __bindgen_bitfield_unit.set(2usize, 1u8, {
+                    let sourcePhaseImports_: u8 =
+                        unsafe { ::std::mem::transmute(sourcePhaseImports_) };
+                    sourcePhaseImports_ as u64
+                });
+                __bindgen_bitfield_unit.set(3usize, 1u8, {
                     let throwOnAsmJSValidationFailure_: u8 =
                         unsafe { ::std::mem::transmute(throwOnAsmJSValidationFailure_) };
                     throwOnAsmJSValidationFailure_ as u64
@@ -8792,6 +8945,7 @@ pub mod root {
             pub hideScriptFromDebugger_: bool,
             pub deferDebugMetadata_: bool,
             pub eagerDelazificationStrategy_: root::JS::DelazificationOption,
+            pub eagerBaselineStrategy_: root::JS::EagerBaselineOption,
             pub selfHostingMode: bool,
             pub discardSource: bool,
             pub sourceIsLazy: bool,
@@ -8810,7 +8964,7 @@ pub mod root {
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of TransitiveCompileOptions"]
-                [::std::mem::size_of::<TransitiveCompileOptions>() - 58usize];
+                [::std::mem::size_of::<TransitiveCompileOptions>() - 59usize];
             ["Alignment of TransitiveCompileOptions"]
                 [::std::mem::align_of::<TransitiveCompileOptions>() - 1usize];
             ["Offset of field: TransitiveCompileOptions::filename_"]
@@ -8840,32 +8994,36 @@ pub mod root {
                 eagerDelazificationStrategy_
             )
                 - 30usize];
+            ["Offset of field: TransitiveCompileOptions::eagerBaselineStrategy_"][::std::mem::offset_of!(
+                TransitiveCompileOptions,
+                eagerBaselineStrategy_
+            ) - 31usize];
             ["Offset of field: TransitiveCompileOptions::selfHostingMode"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, selfHostingMode) - 31usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, selfHostingMode) - 32usize];
             ["Offset of field: TransitiveCompileOptions::discardSource"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, discardSource) - 32usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, discardSource) - 33usize];
             ["Offset of field: TransitiveCompileOptions::sourceIsLazy"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, sourceIsLazy) - 33usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, sourceIsLazy) - 34usize];
             ["Offset of field: TransitiveCompileOptions::allowHTMLComments"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, allowHTMLComments) - 34usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, allowHTMLComments) - 35usize];
             ["Offset of field: TransitiveCompileOptions::nonSyntacticScope"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, nonSyntacticScope) - 35usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, nonSyntacticScope) - 36usize];
             ["Offset of field: TransitiveCompileOptions::topLevelAwait"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, topLevelAwait) - 36usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, topLevelAwait) - 37usize];
             ["Offset of field: TransitiveCompileOptions::borrowBuffer"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, borrowBuffer) - 37usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, borrowBuffer) - 38usize];
             ["Offset of field: TransitiveCompileOptions::usePinnedBytecode"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, usePinnedBytecode) - 38usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, usePinnedBytecode) - 39usize];
             ["Offset of field: TransitiveCompileOptions::prefableOptions_"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, prefableOptions_) - 39usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, prefableOptions_) - 40usize];
             ["Offset of field: TransitiveCompileOptions::introductionType"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introductionType) - 41usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, introductionType) - 42usize];
             ["Offset of field: TransitiveCompileOptions::introductionLineno"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introductionLineno) - 49usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, introductionLineno) - 50usize];
             ["Offset of field: TransitiveCompileOptions::introductionOffset"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, introductionOffset) - 53usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, introductionOffset) - 54usize];
             ["Offset of field: TransitiveCompileOptions::hasIntroductionInfo"]
-                [::std::mem::offset_of!(TransitiveCompileOptions, hasIntroductionInfo) - 57usize];
+                [::std::mem::offset_of!(TransitiveCompileOptions, hasIntroductionInfo) - 58usize];
         };
         #[doc = " The class representing a full set of compile options.\n\n Use this in code that only needs to access compilation options created\n elsewhere, like the compiler.  Don't instantiate this class (the constructor\n is protected anyway); instead, create instances only of the derived classes:\n CompileOptions and OwningCompileOptions."]
         #[repr(C, packed)]
@@ -8881,19 +9039,19 @@ pub mod root {
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of ReadOnlyCompileOptions"]
-                [::std::mem::size_of::<ReadOnlyCompileOptions>() - 72usize];
+                [::std::mem::size_of::<ReadOnlyCompileOptions>() - 73usize];
             ["Alignment of ReadOnlyCompileOptions"]
                 [::std::mem::align_of::<ReadOnlyCompileOptions>() - 1usize];
             ["Offset of field: ReadOnlyCompileOptions::lineno"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, lineno) - 58usize];
+                [::std::mem::offset_of!(ReadOnlyCompileOptions, lineno) - 59usize];
             ["Offset of field: ReadOnlyCompileOptions::column"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, column) - 62usize];
+                [::std::mem::offset_of!(ReadOnlyCompileOptions, column) - 63usize];
             ["Offset of field: ReadOnlyCompileOptions::scriptSourceOffset"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, scriptSourceOffset) - 66usize];
+                [::std::mem::offset_of!(ReadOnlyCompileOptions, scriptSourceOffset) - 67usize];
             ["Offset of field: ReadOnlyCompileOptions::isRunOnce"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, isRunOnce) - 70usize];
+                [::std::mem::offset_of!(ReadOnlyCompileOptions, isRunOnce) - 71usize];
             ["Offset of field: ReadOnlyCompileOptions::noScriptRval"]
-                [::std::mem::offset_of!(ReadOnlyCompileOptions, noScriptRval) - 71usize];
+                [::std::mem::offset_of!(ReadOnlyCompileOptions, noScriptRval) - 72usize];
         };
         #[doc = " Compilation options, with dynamic lifetime. An instance of this type\n makes a copy of / holds / roots all dynamically allocated resources\n (principals; elements; strings) that it refers to. Its destructor frees\n / drops / unroots them. This is heavier than CompileOptions, below, but\n unlike CompileOptions, it can outlive any given stack frame.\n\n Note that this *roots* any JS values it refers to - they're live\n unconditionally. Thus, instances of this type can't be owned, directly\n or indirectly, by a JavaScript object: if any value that this roots ever\n comes to refer to the object that owns this, then the whole cycle, and\n anything else it entrains, will never be freed."]
         #[repr(C)]
@@ -8916,7 +9074,7 @@ pub mod root {
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of OwningCompileOptions"]
-                [::std::mem::size_of::<OwningCompileOptions>() - 72usize];
+                [::std::mem::size_of::<OwningCompileOptions>() - 73usize];
             ["Alignment of OwningCompileOptions"]
                 [::std::mem::align_of::<OwningCompileOptions>() - 1usize];
         };
@@ -8928,7 +9086,7 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of CompileOptions"][::std::mem::size_of::<CompileOptions>() - 72usize];
+            ["Size of CompileOptions"][::std::mem::size_of::<CompileOptions>() - 73usize];
             ["Alignment of CompileOptions"][::std::mem::align_of::<CompileOptions>() - 1usize];
         };
         #[doc = " Subset of CompileOptions fields used while instantiating Stencils."]
@@ -8939,10 +9097,11 @@ pub mod root {
             pub hideScriptFromDebugger: bool,
             pub deferDebugMetadata: bool,
             pub eagerDelazificationStrategy_: root::JS::DelazificationOption,
+            pub eagerBaselineStrategy_: root::JS::EagerBaselineOption,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of InstantiateOptions"][::std::mem::size_of::<InstantiateOptions>() - 4usize];
+            ["Size of InstantiateOptions"][::std::mem::size_of::<InstantiateOptions>() - 5usize];
             ["Alignment of InstantiateOptions"]
                 [::std::mem::align_of::<InstantiateOptions>() - 1usize];
             ["Offset of field: InstantiateOptions::skipFilenameValidation"]
@@ -8953,6 +9112,8 @@ pub mod root {
                 [::std::mem::offset_of!(InstantiateOptions, deferDebugMetadata) - 2usize];
             ["Offset of field: InstantiateOptions::eagerDelazificationStrategy_"]
                 [::std::mem::offset_of!(InstantiateOptions, eagerDelazificationStrategy_) - 3usize];
+            ["Offset of field: InstantiateOptions::eagerBaselineStrategy_"]
+                [::std::mem::offset_of!(InstantiateOptions, eagerBaselineStrategy_) - 4usize];
         };
         #[doc = " Subset of CompileOptions fields used while decoding Stencils."]
         #[repr(C)]
@@ -9098,8 +9259,10 @@ pub mod root {
             pub interrupted: bool,
             pub idle: bool,
             pub extended: bool,
+            pub keepGoing: bool,
         }
-        pub type SliceBudget_InterruptRequestFlag = u8;
+        #[doc = " Atomic<T> implementation for boolean types.\n\n The atomic store and load operations and the atomic swap method is provided.\n\n Note:\n\n - sizeof(Atomic<bool>) != sizeof(bool) for some implementations of\n   bool and/or some implementations of std::atomic. This is allowed in\n   [atomic.types.generic]p9.\n\n - It's not obvious whether the 8-bit atomic functions on Windows are always\n   inlined or not. If they are not inlined, the corresponding functions in the\n   runtime library are not available on Windows XP. This is why we implement\n   Atomic<bool> with an underlying type of uint32_t."]
+        pub type SliceBudget_InterruptRequestFlag = u32;
         pub const SliceBudget_UnlimitedCounter: i64 = 9223372036854775807;
         pub const SliceBudget_StepsPerExpensiveCheck: i64 = 1000;
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -9118,6 +9281,8 @@ pub mod root {
                 [::std::mem::offset_of!(SliceBudget, idle) - 41usize];
             ["Offset of field: SliceBudget::extended"]
                 [::std::mem::offset_of!(SliceBudget, extended) - 42usize];
+            ["Offset of field: SliceBudget::keepGoing"]
+                [::std::mem::offset_of!(SliceBudget, keepGoing) - 43usize];
         };
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -9156,6 +9321,7 @@ pub mod root {
             RESET = 9,
             OUT_OF_NURSERY = 10,
             EVICT_NURSERY = 11,
+            FULL_CELL_PTR_GETTER_SETTER_BUFFER = 12,
             SHARED_MEMORY_LIMIT = 13,
             EAGER_NURSERY_COLLECTION = 14,
             BG_TASK_FINISHED = 15,
@@ -9174,7 +9340,7 @@ pub mod root {
             FULL_CELL_PTR_STR_BUFFER = 28,
             TOO_MUCH_JIT_CODE = 29,
             FULL_CELL_PTR_BIGINT_BUFFER = 30,
-            NURSERY_TRAILERS = 31,
+            UNUSED4 = 31,
             NURSERY_MALLOC_BUFFERS = 32,
             COMPONENT_UTILS = 34,
             MEM_PRESSURE = 35,
@@ -9465,16 +9631,6 @@ pub mod root {
                 data: *mut ::std::os::raw::c_void,
             );
         }
-        pub type DoCycleCollectionCallback =
-            ::std::option::Option<unsafe extern "C" fn(cx: *mut root::JSContext)>;
-        extern "C" {
-            #[doc = " The purge gray callback is called after any COMPARTMENT_REVIVED GC in which\n the majority of compartments have been marked gray."]
-            #[link_name = "\u{1}_ZN2JS28SetDoCycleCollectionCallbackEP9JSContextPFvS1_E"]
-            pub fn SetDoCycleCollectionCallback(
-                cx: *mut root::JSContext,
-                callback: root::JS::DoCycleCollectionCallback,
-            ) -> root::JS::DoCycleCollectionCallback;
-        }
         pub type CreateSliceBudgetCallback = ::std::option::Option<
             unsafe extern "C" fn(reason: root::JS::GCReason, millis: i64) -> root::JS::SliceBudget,
         >;
@@ -9635,66 +9791,27 @@ pub mod root {
             #[link_name = "\u{1}_ZN2JS11IsAtomsZoneEPNS_4ZoneE"]
             pub fn IsAtomsZone(zone: *mut root::JS::Zone) -> bool;
         }
-        #[repr(C)]
-        pub struct ErrorReportBuilder {
-            pub reportp: *mut root::JSErrorReport,
-            pub ownedReport: root::JSErrorReport,
-            pub exnObject: root::JS::RootedObject,
-            pub filename: root::JS::UniqueChars,
-            pub toStringResult_: root::JS::ConstUTF8CharsZ,
-            pub toStringResultBytesStorage: root::JS::UniqueChars,
-        }
-        #[repr(u32)]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum ErrorReportBuilder_SniffingBehavior {
-            WithSideEffects = 0,
-            NoSideEffects = 1,
-        }
-        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-        const _: () = {
-            ["Size of ErrorReportBuilder"][::std::mem::size_of::<ErrorReportBuilder>() - 144usize];
-            ["Alignment of ErrorReportBuilder"]
-                [::std::mem::align_of::<ErrorReportBuilder>() - 8usize];
-            ["Offset of field: ErrorReportBuilder::reportp"]
-                [::std::mem::offset_of!(ErrorReportBuilder, reportp) - 0usize];
-            ["Offset of field: ErrorReportBuilder::ownedReport"]
-                [::std::mem::offset_of!(ErrorReportBuilder, ownedReport) - 8usize];
-            ["Offset of field: ErrorReportBuilder::exnObject"]
-                [::std::mem::offset_of!(ErrorReportBuilder, exnObject) - 96usize];
-            ["Offset of field: ErrorReportBuilder::filename"]
-                [::std::mem::offset_of!(ErrorReportBuilder, filename) - 120usize];
-            ["Offset of field: ErrorReportBuilder::toStringResult_"]
-                [::std::mem::offset_of!(ErrorReportBuilder, toStringResult_) - 128usize];
-            ["Offset of field: ErrorReportBuilder::toStringResultBytesStorage"]
-                [::std::mem::offset_of!(ErrorReportBuilder, toStringResultBytesStorage) - 136usize];
-        };
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS10PrintErrorEP8_IO_FILEP13JSErrorReportb"]
-            pub fn PrintError(
-                file: *mut root::FILE,
-                report: *mut root::JSErrorReport,
-                reportWarnings: bool,
-            );
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS10PrintErrorEP8_IO_FILERKNS_18ErrorReportBuilderEb"]
-            pub fn PrintError1(
-                file: *mut root::FILE,
-                builder: *const root::JS::ErrorReportBuilder,
-                reportWarnings: bool,
-            );
-        }
-        extern "C" {
-            #[doc = " An uncatchable exception is used to terminate execution by returning false\n or nullptr without reporting a pending exception on the context. These\n exceptions are called \"uncatchable\" because try-catch can't be used to catch\n them.\n\n This is mainly used to terminate JS execution from the interrupt handler.\n\n If the context has a pending exception, this function will clear it. Also, in\n debug builds, it sets a flag on the context to improve exception handling\n assertions in the engine."]
-            #[link_name = "\u{1}_ZN2JS26ReportUncatchableExceptionEP9JSContext"]
-            pub fn ReportUncatchableException(cx: *mut root::JSContext);
-        }
         #[repr(u8)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum ExceptionStackBehavior {
             DoNotCapture = 0,
             Capture = 1,
         }
+        #[repr(C)]
+        pub struct BorrowedErrorReport {
+            pub owner_: root::JS::Rooted<*mut root::JSObject>,
+            pub report_: *mut root::JSErrorReport,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of BorrowedErrorReport"][::std::mem::size_of::<BorrowedErrorReport>() - 32usize];
+            ["Alignment of BorrowedErrorReport"]
+                [::std::mem::align_of::<BorrowedErrorReport>() - 8usize];
+            ["Offset of field: BorrowedErrorReport::owner_"]
+                [::std::mem::offset_of!(BorrowedErrorReport, owner_) - 0usize];
+            ["Offset of field: BorrowedErrorReport::report_"]
+                [::std::mem::offset_of!(BorrowedErrorReport, report_) - 24usize];
+        };
         #[repr(i32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
         pub enum ExceptionStatus {
@@ -9767,6 +9884,60 @@ pub mod root {
             #[link_name = "\u{1}_ZN2JS20ExceptionStackOrNullENS_6HandleIP8JSObjectEE"]
             pub fn ExceptionStackOrNull(obj: root::JS::HandleObject) -> *mut root::JSObject;
         }
+        #[repr(C)]
+        pub struct ErrorReportBuilder {
+            pub reportp: *mut root::JSErrorReport,
+            pub ownedReport: root::JSErrorReport,
+            pub borrowedReport: root::JS::BorrowedErrorReport,
+            pub filename: root::JS::UniqueChars,
+            pub toStringResult_: root::JS::ConstUTF8CharsZ,
+            pub toStringResultBytesStorage: root::JS::UniqueChars,
+        }
+        #[repr(u32)]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum ErrorReportBuilder_SniffingBehavior {
+            WithSideEffects = 0,
+            NoSideEffects = 1,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of ErrorReportBuilder"][::std::mem::size_of::<ErrorReportBuilder>() - 152usize];
+            ["Alignment of ErrorReportBuilder"]
+                [::std::mem::align_of::<ErrorReportBuilder>() - 8usize];
+            ["Offset of field: ErrorReportBuilder::reportp"]
+                [::std::mem::offset_of!(ErrorReportBuilder, reportp) - 0usize];
+            ["Offset of field: ErrorReportBuilder::ownedReport"]
+                [::std::mem::offset_of!(ErrorReportBuilder, ownedReport) - 8usize];
+            ["Offset of field: ErrorReportBuilder::borrowedReport"]
+                [::std::mem::offset_of!(ErrorReportBuilder, borrowedReport) - 96usize];
+            ["Offset of field: ErrorReportBuilder::filename"]
+                [::std::mem::offset_of!(ErrorReportBuilder, filename) - 128usize];
+            ["Offset of field: ErrorReportBuilder::toStringResult_"]
+                [::std::mem::offset_of!(ErrorReportBuilder, toStringResult_) - 136usize];
+            ["Offset of field: ErrorReportBuilder::toStringResultBytesStorage"]
+                [::std::mem::offset_of!(ErrorReportBuilder, toStringResultBytesStorage) - 144usize];
+        };
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS10PrintErrorEP8_IO_FILEP13JSErrorReportb"]
+            pub fn PrintError(
+                file: *mut root::FILE,
+                report: *mut root::JSErrorReport,
+                reportWarnings: bool,
+            );
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS10PrintErrorEP8_IO_FILERKNS_18ErrorReportBuilderEb"]
+            pub fn PrintError1(
+                file: *mut root::FILE,
+                builder: *const root::JS::ErrorReportBuilder,
+                reportWarnings: bool,
+            );
+        }
+        extern "C" {
+            #[doc = " An uncatchable exception is used to terminate execution by returning false\n or nullptr without reporting a pending exception on the context. These\n exceptions are called \"uncatchable\" because try-catch can't be used to catch\n them.\n\n This is mainly used to terminate JS execution from the interrupt handler.\n\n If the context has a pending exception, this function will clear it. Also, in\n debug builds, it sets a flag on the context to improve exception handling\n assertions in the engine."]
+            #[link_name = "\u{1}_ZN2JS26ReportUncatchableExceptionEP9JSContext"]
+            pub fn ReportUncatchableException(cx: *mut root::JSContext);
+        }
         extern "C" {
             #[doc = " Get the current realm's global. Returns nullptr if no realm has been\n entered."]
             #[link_name = "\u{1}_ZN2JS19CurrentGlobalOrNullEP9JSContext"]
@@ -9822,6 +9993,16 @@ pub mod root {
                 obj: root::JS::HandleObject,
                 key: root::JS::HandleValue,
                 val: root::JS::HandleValue,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS14MapGetOrInsertEP9JSContextNS_6HandleIP8JSObjectEENS2_INS_5ValueEEES7_NS_13MutableHandleIS6_EE"]
+            pub fn MapGetOrInsert(
+                cx: *mut root::JSContext,
+                obj: root::JS::HandleObject,
+                key: root::JS::HandleValue,
+                val: root::JS::HandleValue,
+                rval: root::JS::MutableHandleValue,
             ) -> bool;
         }
         extern "C" {
@@ -10505,7 +10686,9 @@ pub mod root {
             unscopables = 10,
             asyncIterator = 11,
             matchAll = 12,
-            Limit = 13,
+            dispose = 13,
+            asyncDispose = 14,
+            Limit = 15,
             WellKnownAPILimit = 2147483648,
             PrivateNameSymbol = 4294967293,
             InSymbolRegistry = 4294967294,
@@ -10592,14 +10775,27 @@ pub mod root {
             ["Offset of field: LocaleString::chars_"]
                 [::std::mem::offset_of!(LocaleString, chars_) - 8usize];
         };
+        #[repr(C)]
+        #[derive(Debug, PartialEq)]
+        pub struct TimeZoneString {
+            pub _base: root::js::RefCounted,
+            pub chars_: *const ::std::os::raw::c_char,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of TimeZoneString"][::std::mem::size_of::<TimeZoneString>() - 16usize];
+            ["Alignment of TimeZoneString"][::std::mem::align_of::<TimeZoneString>() - 8usize];
+            ["Offset of field: TimeZoneString::chars_"]
+                [::std::mem::offset_of!(TimeZoneString, chars_) - 8usize];
+        };
         #[doc = " RealmCreationOptions specifies options relevant to creating a new realm, that\n are either immutable characteristics of that realm or that are discarded\n after the realm has been created.\n\n Access to these options on an existing realm is read-only: if you need\n particular selections, you must make them before you create the realm."]
         #[repr(C)]
+        #[derive(Copy, Clone)]
         pub struct RealmCreationOptions {
             pub traceGlobal_: root::JSTraceOp,
             pub compSpec_: root::JS::CompartmentSpecifier,
             pub __bindgen_anon_1: root::JS::RealmCreationOptions__bindgen_ty_1,
             pub profilerRealmID_: u64,
-            pub locale_: root::RefPtr<root::JS::LocaleString>,
             pub invisibleToDebugger_: bool,
             pub preserveJitCode_: bool,
             pub sharedMemoryAndAtomics_: bool,
@@ -10608,7 +10804,6 @@ pub mod root {
             pub toSource_: bool,
             pub secureContext_: bool,
             pub freezeBuiltins_: bool,
-            pub forceUTC_: bool,
             pub alwaysUseFdlibm_: bool,
         }
         #[repr(C)]
@@ -10631,7 +10826,7 @@ pub mod root {
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of RealmCreationOptions"]
-                [::std::mem::size_of::<RealmCreationOptions>() - 56usize];
+                [::std::mem::size_of::<RealmCreationOptions>() - 48usize];
             ["Alignment of RealmCreationOptions"]
                 [::std::mem::align_of::<RealmCreationOptions>() - 8usize];
             ["Offset of field: RealmCreationOptions::traceGlobal_"]
@@ -10640,31 +10835,27 @@ pub mod root {
                 [::std::mem::offset_of!(RealmCreationOptions, compSpec_) - 8usize];
             ["Offset of field: RealmCreationOptions::profilerRealmID_"]
                 [::std::mem::offset_of!(RealmCreationOptions, profilerRealmID_) - 24usize];
-            ["Offset of field: RealmCreationOptions::locale_"]
-                [::std::mem::offset_of!(RealmCreationOptions, locale_) - 32usize];
             ["Offset of field: RealmCreationOptions::invisibleToDebugger_"]
-                [::std::mem::offset_of!(RealmCreationOptions, invisibleToDebugger_) - 40usize];
+                [::std::mem::offset_of!(RealmCreationOptions, invisibleToDebugger_) - 32usize];
             ["Offset of field: RealmCreationOptions::preserveJitCode_"]
-                [::std::mem::offset_of!(RealmCreationOptions, preserveJitCode_) - 41usize];
+                [::std::mem::offset_of!(RealmCreationOptions, preserveJitCode_) - 33usize];
             ["Offset of field: RealmCreationOptions::sharedMemoryAndAtomics_"]
-                [::std::mem::offset_of!(RealmCreationOptions, sharedMemoryAndAtomics_) - 42usize];
+                [::std::mem::offset_of!(RealmCreationOptions, sharedMemoryAndAtomics_) - 34usize];
             ["Offset of field: RealmCreationOptions::defineSharedArrayBufferConstructor_"][::std::mem::offset_of!(
                 RealmCreationOptions,
                 defineSharedArrayBufferConstructor_
             )
-                - 43usize];
+                - 35usize];
             ["Offset of field: RealmCreationOptions::coopAndCoep_"]
-                [::std::mem::offset_of!(RealmCreationOptions, coopAndCoep_) - 44usize];
+                [::std::mem::offset_of!(RealmCreationOptions, coopAndCoep_) - 36usize];
             ["Offset of field: RealmCreationOptions::toSource_"]
-                [::std::mem::offset_of!(RealmCreationOptions, toSource_) - 45usize];
+                [::std::mem::offset_of!(RealmCreationOptions, toSource_) - 37usize];
             ["Offset of field: RealmCreationOptions::secureContext_"]
-                [::std::mem::offset_of!(RealmCreationOptions, secureContext_) - 46usize];
+                [::std::mem::offset_of!(RealmCreationOptions, secureContext_) - 38usize];
             ["Offset of field: RealmCreationOptions::freezeBuiltins_"]
-                [::std::mem::offset_of!(RealmCreationOptions, freezeBuiltins_) - 47usize];
-            ["Offset of field: RealmCreationOptions::forceUTC_"]
-                [::std::mem::offset_of!(RealmCreationOptions, forceUTC_) - 48usize];
+                [::std::mem::offset_of!(RealmCreationOptions, freezeBuiltins_) - 39usize];
             ["Offset of field: RealmCreationOptions::alwaysUseFdlibm_"]
-                [::std::mem::offset_of!(RealmCreationOptions, alwaysUseFdlibm_) - 49usize];
+                [::std::mem::offset_of!(RealmCreationOptions, alwaysUseFdlibm_) - 40usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -10681,8 +10872,10 @@ pub mod root {
         };
         #[doc = " RealmBehaviors specifies behaviors of a realm that can be changed after the\n realm's been created."]
         #[repr(C)]
-        #[derive(Debug, Copy, Clone, PartialEq)]
+        #[derive(Debug, PartialEq)]
         pub struct RealmBehaviors {
+            pub localeOverride_: root::RefPtr<root::JS::LocaleString>,
+            pub timeZoneOverride_: root::RefPtr<root::JS::TimeZoneString>,
             pub rtpCallerType: root::__BindgenOpaqueArray<u8, 2usize>,
             pub discardSource_: bool,
             pub clampAndJitterTime_: bool,
@@ -10690,16 +10883,20 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of RealmBehaviors"][::std::mem::size_of::<RealmBehaviors>() - 5usize];
-            ["Alignment of RealmBehaviors"][::std::mem::align_of::<RealmBehaviors>() - 1usize];
+            ["Size of RealmBehaviors"][::std::mem::size_of::<RealmBehaviors>() - 24usize];
+            ["Alignment of RealmBehaviors"][::std::mem::align_of::<RealmBehaviors>() - 8usize];
+            ["Offset of field: RealmBehaviors::localeOverride_"]
+                [::std::mem::offset_of!(RealmBehaviors, localeOverride_) - 0usize];
+            ["Offset of field: RealmBehaviors::timeZoneOverride_"]
+                [::std::mem::offset_of!(RealmBehaviors, timeZoneOverride_) - 8usize];
             ["Offset of field: RealmBehaviors::rtpCallerType"]
-                [::std::mem::offset_of!(RealmBehaviors, rtpCallerType) - 0usize];
+                [::std::mem::offset_of!(RealmBehaviors, rtpCallerType) - 16usize];
             ["Offset of field: RealmBehaviors::discardSource_"]
-                [::std::mem::offset_of!(RealmBehaviors, discardSource_) - 2usize];
+                [::std::mem::offset_of!(RealmBehaviors, discardSource_) - 18usize];
             ["Offset of field: RealmBehaviors::clampAndJitterTime_"]
-                [::std::mem::offset_of!(RealmBehaviors, clampAndJitterTime_) - 3usize];
+                [::std::mem::offset_of!(RealmBehaviors, clampAndJitterTime_) - 19usize];
             ["Offset of field: RealmBehaviors::isNonLive_"]
-                [::std::mem::offset_of!(RealmBehaviors, isNonLive_) - 4usize];
+                [::std::mem::offset_of!(RealmBehaviors, isNonLive_) - 20usize];
         };
         #[doc = " RealmOptions specifies realm characteristics: both those that can't be\n changed on a realm once it's been created (RealmCreationOptions), and those\n that can be changed on an existing realm (RealmBehaviors)."]
         #[repr(C)]
@@ -10709,12 +10906,12 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of RealmOptions"][::std::mem::size_of::<RealmOptions>() - 64usize];
+            ["Size of RealmOptions"][::std::mem::size_of::<RealmOptions>() - 72usize];
             ["Alignment of RealmOptions"][::std::mem::align_of::<RealmOptions>() - 8usize];
             ["Offset of field: RealmOptions::creationOptions_"]
                 [::std::mem::offset_of!(RealmOptions, creationOptions_) - 0usize];
             ["Offset of field: RealmOptions::behaviors_"]
-                [::std::mem::offset_of!(RealmOptions, behaviors_) - 56usize];
+                [::std::mem::offset_of!(RealmOptions, behaviors_) - 48usize];
         };
         extern "C" {
             #[link_name = "\u{1}_ZN2JS23RealmCreationOptionsRefEPNS_5RealmE"]
@@ -10737,6 +10934,20 @@ pub mod root {
         extern "C" {
             #[link_name = "\u{1}_ZN2JS17RealmBehaviorsRefEP9JSContext"]
             pub fn RealmBehaviorsRef1(cx: *mut root::JSContext) -> *const root::JS::RealmBehaviors;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS22SetRealmLocaleOverrideEPNS_5RealmEPKc"]
+            pub fn SetRealmLocaleOverride(
+                realm: *mut root::JS::Realm,
+                locale: *const ::std::os::raw::c_char,
+            );
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS24SetRealmTimezoneOverrideEPNS_5RealmEPKc"]
+            pub fn SetRealmTimezoneOverride(
+                realm: *mut root::JS::Realm,
+                timezone: *const ::std::os::raw::c_char,
+            );
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS15SetRealmNonLiveEPNS_5RealmE"]
@@ -10810,7 +11021,7 @@ pub mod root {
             ["Offset of field: FirstSubsumedFrame::ignoreSelfHosted"]
                 [::std::mem::offset_of!(FirstSubsumedFrame, ignoreSelfHosted) - 16usize];
         };
-        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
+        #[doc = " # mozilla::Variant\n\n A variant / tagged union / heterogenous disjoint union / sum-type template\n class. Similar in concept to (but not derived from) `boost::variant`.\n\n Sometimes, you may wish to use a C union with non-POD types. However, this is\n forbidden in C++ because it is not clear which type in the union should have\n its constructor and destructor run on creation and deletion\n respectively. This is the problem that `mozilla::Variant` solves.\n\n Since C++17, std::variant exists. `mozilla::Variant` differs conceptually\n from it by (a.) having a richer `.match` API (compared to `std::visit`) and\n (b.) having a different assignment semantic. Assigning to an `std::variant`\n assigns to the underlying value, while assigning to a `mozilla::Variant`\n deletes the previous value then move-constructs a new value. This makes it\n possible to store *and* update const values.\n\n ## Usage\n\n A `mozilla::Variant` instance is constructed (via move or copy) from one of\n its variant types (ignoring const and references). It does *not* support\n construction from subclasses of variant types or types that coerce to one of\n the variant types.\n\n     Variant<char, uint32_t> v1('a');\n     Variant<UniquePtr<A>, B, C> v2(MakeUnique<A>());\n     Variant<bool, char> v3(VariantType<char>, 0); // disambiguation needed\n     Variant<int, int> v4(VariantIndex<1>, 0); // 2nd int\n\n Because specifying the full type of a Variant value is often verbose,\n there are two easier ways to construct values:\n\n A. AsVariant() can be used to construct a Variant value using type inference\n in contexts such as expressions or when returning values from functions.\n Because AsVariant() must copy or move the value into a temporary and this\n cannot necessarily be elided by the compiler, it's mostly appropriate only\n for use with primitive or very small types.\n\n     Variant<char, uint32_t> Foo() { return AsVariant('x'); }\n     // ...\n     Variant<char, uint32_t> v1 = Foo();  // v1 holds char('x').\n\n B. Brace-construction with VariantType or VariantIndex; this also allows\n in-place construction with any number of arguments.\n\n     struct AB { AB(int, int){...} };\n     static Variant<AB, bool> foo()\n     {\n       return {VariantIndex<0>{}, 1, 2};\n     }\n     // ...\n     Variant<AB, bool> v0 = Foo();  // v0 holds AB(1,2).\n\n All access to the contained value goes through type-safe accessors.\n Either the stored type, or the type index may be provided.\n\n     void\n     Foo(Variant<A, B, C> v)\n     {\n       if (v.is<A>()) {\n         A& ref = v.as<A>();\n         ...\n       } else (v.is<1>()) { // Instead of v.is<B>.\n         ...\n       } else {\n         ...\n       }\n     }\n\n In some situation, a Variant may be constructed from templated types, in\n which case it is possible that the same type could be given multiple times by\n an external developer. Or seemingly-different types could be aliases.\n In this case, repeated types can only be accessed through their index, to\n prevent ambiguous access by type.\n\n    // Bad!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(int(0)) {} // Error '0' by default\n      ResultOrError(const T& r) : m(r) {}\n      bool IsResult() const { return m.is<T>(); }\n      bool IsError() const { return m.is<int>(); }\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // Fail!\n    // In Variant<int, int>, which 'int' are we refering to, from inside\n    // ResultOrError functions?\n\n    // Good!\n    template <typename T>\n    struct ResultOrError\n    {\n      Variant<T, int> m;\n      ResultOrError() : m(VariantIndex<1>{}, 0) {} // Error '0' by default\n      ResultOrError(const T& r) : m(VariantIndex<0>{}, r) {}\n      bool IsResult() const { return m.is<0>(); } // 0 -> T\n      bool IsError() const { return m.is<1>(); } // 1 -> int\n    };\n    // Now instantiante with the result being an int too:\n    ResultOrError<int> myResult(123); // It now works!\n\n Attempting to use the contained value as type `T1` when the `Variant`\n instance contains a value of type `T2` causes an assertion failure.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<B>(); // <--- Assertion failure!\n\n Trying to use a `Variant<Ts...>` instance as some type `U` that is not a\n member of the set of `Ts...` is a compiler error.\n\n     A a;\n     Variant<A, B, C> v(a);\n     v.as<SomeRandomType>(); // <--- Compiler error!\n\n Additionally, you can turn a `Variant` that `is<T>` into a `T` by moving it\n out of the containing `Variant` instance with the `extract<T>` method:\n\n     Variant<UniquePtr<A>, B, C> v(MakeUnique<A>());\n     auto ptr = v.extract<UniquePtr<A>>();\n\n Finally, you can exhaustively match on the contained variant and branch into\n different code paths depending on which type is contained. This is preferred\n to manually checking every variant type T with is<T>() because it provides\n compile-time checking that you handled every type, rather than runtime\n assertion failures.\n\n     // Bad!\n     char* foo(Variant<A, B, C, D>& v) {\n       if (v.is<A>()) {\n         return ...;\n       } else if (v.is<B>()) {\n         return ...;\n       } else {\n         return doSomething(v.as<C>()); // Forgot about case D!\n       }\n     }\n\n     // Instead, a single function object (that can deal with all possible\n     // options) may be provided:\n     struct FooMatcher\n     {\n       // The return type of all matchers must be identical.\n       char* operator()(A& a) { ... }\n       char* operator()(B& b) { ... }\n       char* operator()(C& c) { ... }\n       char* operator()(D& d) { ... } // Compile-time error to forget D!\n     }\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match(FooMatcher());\n     }\n\n     // In some situations, a single generic lambda may also be appropriate:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto&) {...});\n     }\n\n     // Alternatively, multiple function objects may be provided, each one\n     // corresponding to an option, in the same order:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](A&) { ... },\n                      [](B&) { ... },\n                      [](C&) { ... },\n                      [](D&) { ... });\n     }\n\n     // In rare cases, the index of the currently-active alternative is\n     // needed, it may be obtained by adding a first parameter in the matcner\n     // callback, which will receive the index in its most compact type (just\n     // use `size_t` if the exact type is not important), e.g.:\n     char* foo(Variant<A, B, C, D>& v) {\n       return v.match([](auto aIndex, auto& aAlternative) {...});\n       // --OR--\n       return v.match([](size_t aIndex, auto& aAlternative) {...});\n     }\n\n ## Examples\n\n A tree is either an empty leaf, or a node with a value and two children:\n\n     struct Leaf { };\n\n     template<typename T>\n     struct Node\n     {\n       T value;\n       Tree<T>* left;\n       Tree<T>* right;\n     };\n\n     template<typename T>\n     using Tree = Variant<Leaf, Node<T>>;\n\n A copy-on-write string is either a non-owning reference to some existing\n string, or an owning reference to our copy:\n\n     class CopyOnWriteString\n     {\n       Variant<const char*, UniquePtr<char[]>> string;\n\n       ...\n     };\n\n Because Variant must be aligned suitable to hold any value stored within it,\n and because |alignas| requirements don't affect platform ABI with respect to\n how parameters are laid out in memory, Variant can't be used as the type of a\n function parameter.  Pass Variant to functions by pointer or reference\n instead."]
         pub type StackCapture = root::__BindgenOpaqueArray<u64, 4usize>;
         extern "C" {
             #[doc = " Capture the current call stack as a chain of SavedFrame JSObjects, and set\n |stackp| to the SavedFrame for the youngest stack frame, or nullptr if there\n are no JS frames on the stack.\n\n The |capture| parameter describes the portion of the JS stack to capture:\n\n   * |JS::AllFrames|: Capture all frames on the stack.\n\n   * |JS::MaxFrames|: Capture no more than |JS::MaxFrames::maxFrames| from the\n      stack.\n\n   * |JS::FirstSubsumedFrame|: Capture the first frame whose principals are\n     subsumed by |JS::FirstSubsumedFrame::principals|. By default, do not\n     consider self-hosted frames; this can be controlled via the\n     |JS::FirstSubsumedFrame::ignoreSelfHosted| flag. Do not capture any async\n     stack."]
@@ -10949,28 +11160,20 @@ pub mod root {
         pub struct JSTimers {
             pub executionTime: root::mozilla::TimeDuration,
             pub delazificationTime: root::mozilla::TimeDuration,
-            pub xdrEncodingTime: root::mozilla::TimeDuration,
-            pub gcTime: root::mozilla::TimeDuration,
-            pub protectTime: root::mozilla::TimeDuration,
-            pub baselineCompileTime: root::mozilla::TimeDuration,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of JSTimers"][::std::mem::size_of::<JSTimers>() - 48usize];
+            ["Size of JSTimers"][::std::mem::size_of::<JSTimers>() - 16usize];
             ["Alignment of JSTimers"][::std::mem::align_of::<JSTimers>() - 8usize];
             ["Offset of field: JSTimers::executionTime"]
                 [::std::mem::offset_of!(JSTimers, executionTime) - 0usize];
             ["Offset of field: JSTimers::delazificationTime"]
                 [::std::mem::offset_of!(JSTimers, delazificationTime) - 8usize];
-            ["Offset of field: JSTimers::xdrEncodingTime"]
-                [::std::mem::offset_of!(JSTimers, xdrEncodingTime) - 16usize];
-            ["Offset of field: JSTimers::gcTime"]
-                [::std::mem::offset_of!(JSTimers, gcTime) - 24usize];
-            ["Offset of field: JSTimers::protectTime"]
-                [::std::mem::offset_of!(JSTimers, protectTime) - 32usize];
-            ["Offset of field: JSTimers::baselineCompileTime"]
-                [::std::mem::offset_of!(JSTimers, baselineCompileTime) - 40usize];
         };
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS32SetMeasuringExecutionTimeEnabledEP9JSContextb"]
+            pub fn SetMeasuringExecutionTimeEnabled(cx: *mut root::JSContext, value: bool);
+        }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS11GetJSTimersEP9JSContext"]
             pub fn GetJSTimers(cx: *mut root::JSContext) -> root::JS::JSTimers;
@@ -11495,6 +11698,11 @@ pub mod root {
             pub fn IsResizableArrayBufferMaybeShared(obj: *mut root::JSObject) -> bool;
         }
         extern "C" {
+            #[doc = " Returns whether the passed array buffer is immutable.\n\n |obj| must pass a JS::IsArrayBufferObjectMaybeShared test."]
+            #[link_name = "\u{1}_ZN2JS33IsImmutableArrayBufferMaybeSharedEP8JSObject"]
+            pub fn IsImmutableArrayBufferMaybeShared(obj: *mut root::JSObject) -> bool;
+        }
+        extern "C" {
             #[doc = " Create a BigInt from a floating-point value. If the number isn't integral\n (that is, if it's NaN, an infinity, or contains a fractional component),\n this function returns null and throws an exception.\n\n Passing -0.0 will produce the bigint 0n."]
             #[link_name = "\u{1}_ZN2JS14NumberToBigIntEP9JSContextd"]
             pub fn NumberToBigInt(cx: *mut root::JSContext, num: f64) -> *mut root::JS::BigInt;
@@ -11692,13 +11900,6 @@ pub mod root {
                 utf8: *const ::std::os::raw::c_char,
                 length: usize,
             ) -> *mut root::JSFunction;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS22ExposeScriptToDebuggerEP9JSContextNS_6HandleIP8JSScriptEE"]
-            pub fn ExposeScriptToDebugger(
-                cx: *mut root::JSContext,
-                script: root::JS::Handle<*mut root::JSScript>,
-            );
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS19UpdateDebugMetadataEP9JSContextNS_6HandleIP8JSScriptEERKNS_18InstantiateOptionsENS2_INS_5ValueEEENS2_IP8JSStringEES5_S5_"]
@@ -11959,14 +12160,47 @@ pub mod root {
                 }
             }
             #[inline]
-            pub fn asyncStack_(&self) -> bool {
+            pub fn disableFilenameSecurityChecks_(&self) -> bool {
                 unsafe { ::std::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u8) }
+            }
+            #[inline]
+            pub fn set_disableFilenameSecurityChecks_(&mut self, val: bool) {
+                unsafe {
+                    let val: u8 = ::std::mem::transmute(val);
+                    self._bitfield_1.set(7usize, 1u8, val as u64)
+                }
+            }
+            #[inline]
+            pub unsafe fn disableFilenameSecurityChecks__raw(this: *const Self) -> bool {
+                unsafe {
+                    ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
+                        ::std::ptr::addr_of!((*this)._bitfield_1),
+                        7usize,
+                        1u8,
+                    ) as u8)
+                }
+            }
+            #[inline]
+            pub unsafe fn set_disableFilenameSecurityChecks__raw(this: *mut Self, val: bool) {
+                unsafe {
+                    let val: u8 = ::std::mem::transmute(val);
+                    <root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
+                        ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                        7usize,
+                        1u8,
+                        val as u64,
+                    )
+                }
+            }
+            #[inline]
+            pub fn asyncStack_(&self) -> bool {
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 1u8) as u8) }
             }
             #[inline]
             pub fn set_asyncStack_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(7usize, 1u8, val as u64)
+                    self._bitfield_1.set(8usize, 1u8, val as u64)
                 }
             }
             #[inline]
@@ -11974,7 +12208,7 @@ pub mod root {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
-                        7usize,
+                        8usize,
                         1u8,
                     ) as u8)
                 }
@@ -11985,7 +12219,7 @@ pub mod root {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
                         ::std::ptr::addr_of_mut!((*this)._bitfield_1),
-                        7usize,
+                        8usize,
                         1u8,
                         val as u64,
                     )
@@ -11993,13 +12227,13 @@ pub mod root {
             }
             #[inline]
             pub fn asyncStackCaptureDebuggeeOnly_(&self) -> bool {
-                unsafe { ::std::mem::transmute(self._bitfield_1.get(8usize, 1u8) as u8) }
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(9usize, 1u8) as u8) }
             }
             #[inline]
             pub fn set_asyncStackCaptureDebuggeeOnly_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(8usize, 1u8, val as u64)
+                    self._bitfield_1.set(9usize, 1u8, val as u64)
                 }
             }
             #[inline]
@@ -12007,7 +12241,7 @@ pub mod root {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
-                        8usize,
+                        9usize,
                         1u8,
                     ) as u8)
                 }
@@ -12018,7 +12252,7 @@ pub mod root {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
                         ::std::ptr::addr_of_mut!((*this)._bitfield_1),
-                        8usize,
+                        9usize,
                         1u8,
                         val as u64,
                     )
@@ -12026,13 +12260,13 @@ pub mod root {
             }
             #[inline]
             pub fn throwOnDebuggeeWouldRun_(&self) -> bool {
-                unsafe { ::std::mem::transmute(self._bitfield_1.get(9usize, 1u8) as u8) }
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u8) }
             }
             #[inline]
             pub fn set_throwOnDebuggeeWouldRun_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(9usize, 1u8, val as u64)
+                    self._bitfield_1.set(10usize, 1u8, val as u64)
                 }
             }
             #[inline]
@@ -12040,7 +12274,7 @@ pub mod root {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
-                        9usize,
+                        10usize,
                         1u8,
                     ) as u8)
                 }
@@ -12051,7 +12285,7 @@ pub mod root {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
                         ::std::ptr::addr_of_mut!((*this)._bitfield_1),
-                        9usize,
+                        10usize,
                         1u8,
                         val as u64,
                     )
@@ -12059,13 +12293,13 @@ pub mod root {
             }
             #[inline]
             pub fn dumpStackOnDebuggeeWouldRun_(&self) -> bool {
-                unsafe { ::std::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u8) }
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(11usize, 1u8) as u8) }
             }
             #[inline]
             pub fn set_dumpStackOnDebuggeeWouldRun_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(10usize, 1u8, val as u64)
+                    self._bitfield_1.set(11usize, 1u8, val as u64)
                 }
             }
             #[inline]
@@ -12073,7 +12307,7 @@ pub mod root {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
-                        10usize,
+                        11usize,
                         1u8,
                     ) as u8)
                 }
@@ -12084,7 +12318,7 @@ pub mod root {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
                         ::std::ptr::addr_of_mut!((*this)._bitfield_1),
-                        10usize,
+                        11usize,
                         1u8,
                         val as u64,
                     )
@@ -12092,13 +12326,13 @@ pub mod root {
             }
             #[inline]
             pub fn fuzzing_(&self) -> bool {
-                unsafe { ::std::mem::transmute(self._bitfield_1.get(11usize, 1u8) as u8) }
+                unsafe { ::std::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u8) }
             }
             #[inline]
             pub fn set_fuzzing_(&mut self, val: bool) {
                 unsafe {
                     let val: u8 = ::std::mem::transmute(val);
-                    self._bitfield_1.set(11usize, 1u8, val as u64)
+                    self._bitfield_1.set(12usize, 1u8, val as u64)
                 }
             }
             #[inline]
@@ -12106,7 +12340,7 @@ pub mod root {
                 unsafe {
                     ::std::mem::transmute(<root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
                         ::std::ptr::addr_of!((*this)._bitfield_1),
-                        11usize,
+                        12usize,
                         1u8,
                     ) as u8)
                 }
@@ -12117,7 +12351,7 @@ pub mod root {
                     let val: u8 = ::std::mem::transmute(val);
                     <root::__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
                         ::std::ptr::addr_of_mut!((*this)._bitfield_1),
-                        11usize,
+                        12usize,
                         1u8,
                         val as u64,
                     )
@@ -12132,6 +12366,7 @@ pub mod root {
                 testWasmAwaitTier2_: bool,
                 disableIon_: bool,
                 disableEvalSecurityChecks_: bool,
+                disableFilenameSecurityChecks_: bool,
                 asyncStack_: bool,
                 asyncStackCaptureDebuggeeOnly_: bool,
                 throwOnDebuggeeWouldRun_: bool,
@@ -12172,25 +12407,30 @@ pub mod root {
                     disableEvalSecurityChecks_ as u64
                 });
                 __bindgen_bitfield_unit.set(7usize, 1u8, {
+                    let disableFilenameSecurityChecks_: u8 =
+                        unsafe { ::std::mem::transmute(disableFilenameSecurityChecks_) };
+                    disableFilenameSecurityChecks_ as u64
+                });
+                __bindgen_bitfield_unit.set(8usize, 1u8, {
                     let asyncStack_: u8 = unsafe { ::std::mem::transmute(asyncStack_) };
                     asyncStack_ as u64
                 });
-                __bindgen_bitfield_unit.set(8usize, 1u8, {
+                __bindgen_bitfield_unit.set(9usize, 1u8, {
                     let asyncStackCaptureDebuggeeOnly_: u8 =
                         unsafe { ::std::mem::transmute(asyncStackCaptureDebuggeeOnly_) };
                     asyncStackCaptureDebuggeeOnly_ as u64
                 });
-                __bindgen_bitfield_unit.set(9usize, 1u8, {
+                __bindgen_bitfield_unit.set(10usize, 1u8, {
                     let throwOnDebuggeeWouldRun_: u8 =
                         unsafe { ::std::mem::transmute(throwOnDebuggeeWouldRun_) };
                     throwOnDebuggeeWouldRun_ as u64
                 });
-                __bindgen_bitfield_unit.set(10usize, 1u8, {
+                __bindgen_bitfield_unit.set(11usize, 1u8, {
                     let dumpStackOnDebuggeeWouldRun_: u8 =
                         unsafe { ::std::mem::transmute(dumpStackOnDebuggeeWouldRun_) };
                     dumpStackOnDebuggeeWouldRun_ as u64
                 });
-                __bindgen_bitfield_unit.set(11usize, 1u8, {
+                __bindgen_bitfield_unit.set(12usize, 1u8, {
                     let fuzzing_: u8 = unsafe { ::std::mem::transmute(fuzzing_) };
                     fuzzing_ as u64
                 });
@@ -12240,7 +12480,7 @@ pub mod root {
             ) -> *mut root::JSObject;
         }
         extern "C" {
-            #[doc = " Create a new Date object for a year/month/day-of-month/hour/minute/second.\n\n The created date is initialized with the time value\n\n   TimeClip(UTC(MakeDate(MakeDay(year, mon, mday),\n                MakeTime(hour, min, sec, 0.0))))\n\n where each function/operation is as specified in ECMAScript."]
+            #[doc = " Create a new Date object for a year/month/day-of-month/hour/minute/second.\n\n The created date is initialized with the time value\n\n   TimeClip(UTC(MakeDate(MakeDay(year, mon, mday),\n                MakeTime(hour, min, sec, 0.0))))\n\n where each function/operation is as specified in ECMAScript.\n\n Assert that mon < 12 to help catch off-by-one user errors, which are common\n due to the 0-based month numbering copied into JS from Java (java.util.Date\n in 1995)."]
             #[link_name = "\u{1}_ZN2JS13NewDateObjectEP9JSContextiiiiii"]
             pub fn NewDateObject1(
                 cx: *mut root::JSContext,
@@ -12315,10 +12555,6 @@ pub mod root {
             #[link_name = "\u{1}_ZN2JS41GetReduceMicrosecondTimePrecisionCallbackEv"]
             pub fn GetReduceMicrosecondTimePrecisionCallback(
             ) -> root::JS::ReduceMicrosecondTimePrecisionCallback;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS21SetTimeResolutionUsecEjb"]
-            pub fn SetTimeResolutionUsec(resolution: u32, jitter: bool);
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS14IsISOStyleDateEP9JSContextRKNS_11Latin1CharsE"]
@@ -12428,7 +12664,7 @@ pub mod root {
             pub fn SetAVXEnabled(enabled: bool);
         }
         extern "C" {
-            #[doc = " An API akin to JS_Stringify but with the goal of not having observable\n side-effects when the stringification is performed.  This means it does not\n allow a replacer or a custom space and has the following constraints on its\n input:\n\n 1) The input must be a plain object or array, not an abitrary value.\n 2) Every value in the graph reached by the algorithm starting with this\n    object must be one of the following: null, undefined, a string (NOT a\n    string object!), a boolean, a finite number (i.e. no NaN or Infinity or\n    -Infinity), a plain object with no accessor properties, or an Array with\n    no holes.\n\n The actual behavior differs from JS_Stringify only in asserting the above and\n NOT attempting to get the \"toJSON\" property from things, since that could\n clearly have side-effects."]
+            #[doc = " An API akin to JS_Stringify but with the goal of not having observable\n side-effects when the stringification is performed.  This means it does not\n allow a replacer or a custom space and has the following constraints on its\n input:\n\n 1) The input must be a plain object or array, not an arbitrary value.\n 2) Every value in the graph reached by the algorithm starting with this\n    object must be one of the following: null, undefined, a string (NOT a\n    string object!), a boolean, a finite number (i.e. no NaN or Infinity or\n    -Infinity), a plain object with no accessor properties, or an Array with\n    no holes.\n\n The actual behavior differs from JS_Stringify only in asserting the above and\n NOT attempting to get the \"toJSON\" property from things, since that could\n clearly have side-effects."]
             #[link_name = "\u{1}_ZN2JS17ToJSONMaybeSafelyEP9JSContextNS_6HandleIP8JSObjectEEPFbPKDsjPvES8_"]
             pub fn ToJSONMaybeSafely(
                 cx: *mut root::JSContext,
@@ -12560,8 +12796,9 @@ pub mod root {
         #[derive(Debug, Copy, Clone, PartialEq)]
         pub struct ClassInfo {
             pub objectsGCHeap: usize,
-            pub objectsMallocHeapSlots: usize,
-            pub objectsMallocHeapElementsNormal: usize,
+            pub objectsGCBufferSlots: usize,
+            pub objectsGCBufferElementsNormal: usize,
+            pub objectsMallocHeapElementsArrayBuffer: usize,
             pub objectsMallocHeapElementsAsmJS: usize,
             pub objectsMallocHeapGlobalData: usize,
             pub objectsMallocHeapMisc: usize,
@@ -12570,33 +12807,38 @@ pub mod root {
             pub objectsNonHeapElementsWasm: usize,
             pub objectsNonHeapElementsWasmShared: usize,
             pub objectsNonHeapCodeWasm: usize,
+            pub objectsGCBufferMisc: usize,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of ClassInfo"][::std::mem::size_of::<ClassInfo>() - 88usize];
+            ["Size of ClassInfo"][::std::mem::size_of::<ClassInfo>() - 104usize];
             ["Alignment of ClassInfo"][::std::mem::align_of::<ClassInfo>() - 8usize];
             ["Offset of field: ClassInfo::objectsGCHeap"]
                 [::std::mem::offset_of!(ClassInfo, objectsGCHeap) - 0usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapSlots"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapSlots) - 8usize];
-            ["Offset of field: ClassInfo::objectsMallocHeapElementsNormal"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapElementsNormal) - 16usize];
+            ["Offset of field: ClassInfo::objectsGCBufferSlots"]
+                [::std::mem::offset_of!(ClassInfo, objectsGCBufferSlots) - 8usize];
+            ["Offset of field: ClassInfo::objectsGCBufferElementsNormal"]
+                [::std::mem::offset_of!(ClassInfo, objectsGCBufferElementsNormal) - 16usize];
+            ["Offset of field: ClassInfo::objectsMallocHeapElementsArrayBuffer"]
+                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapElementsArrayBuffer) - 24usize];
             ["Offset of field: ClassInfo::objectsMallocHeapElementsAsmJS"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapElementsAsmJS) - 24usize];
+                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapElementsAsmJS) - 32usize];
             ["Offset of field: ClassInfo::objectsMallocHeapGlobalData"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapGlobalData) - 32usize];
+                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapGlobalData) - 40usize];
             ["Offset of field: ClassInfo::objectsMallocHeapMisc"]
-                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapMisc) - 40usize];
+                [::std::mem::offset_of!(ClassInfo, objectsMallocHeapMisc) - 48usize];
             ["Offset of field: ClassInfo::objectsNonHeapElementsNormal"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsNormal) - 48usize];
+                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsNormal) - 56usize];
             ["Offset of field: ClassInfo::objectsNonHeapElementsShared"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsShared) - 56usize];
+                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsShared) - 64usize];
             ["Offset of field: ClassInfo::objectsNonHeapElementsWasm"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsWasm) - 64usize];
+                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsWasm) - 72usize];
             ["Offset of field: ClassInfo::objectsNonHeapElementsWasmShared"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsWasmShared) - 72usize];
+                [::std::mem::offset_of!(ClassInfo, objectsNonHeapElementsWasmShared) - 80usize];
             ["Offset of field: ClassInfo::objectsNonHeapCodeWasm"]
-                [::std::mem::offset_of!(ClassInfo, objectsNonHeapCodeWasm) - 80usize];
+                [::std::mem::offset_of!(ClassInfo, objectsNonHeapCodeWasm) - 88usize];
+            ["Offset of field: ClassInfo::objectsGCBufferMisc"]
+                [::std::mem::offset_of!(ClassInfo, objectsGCBufferMisc) - 96usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -12628,10 +12870,10 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of NotableClassInfo"][::std::mem::size_of::<NotableClassInfo>() - 96usize];
+            ["Size of NotableClassInfo"][::std::mem::size_of::<NotableClassInfo>() - 112usize];
             ["Alignment of NotableClassInfo"][::std::mem::align_of::<NotableClassInfo>() - 8usize];
             ["Offset of field: NotableClassInfo::className_"]
-                [::std::mem::offset_of!(NotableClassInfo, className_) - 88usize];
+                [::std::mem::offset_of!(NotableClassInfo, className_) - 104usize];
         };
         #[doc = " Data for tracking JIT-code memory usage."]
         #[repr(C)]
@@ -12664,8 +12906,6 @@ pub mod root {
             pub marker: usize,
             pub nurseryCommitted: usize,
             pub nurseryMallocedBuffers: usize,
-            pub nurseryMallocedBlockCache: usize,
-            pub nurseryTrailerBlockSets: usize,
             pub storeBufferVals: usize,
             pub storeBufferCells: usize,
             pub storeBufferSlots: usize,
@@ -12675,29 +12915,25 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of GCSizes"][::std::mem::size_of::<GCSizes>() - 88usize];
+            ["Size of GCSizes"][::std::mem::size_of::<GCSizes>() - 72usize];
             ["Alignment of GCSizes"][::std::mem::align_of::<GCSizes>() - 8usize];
             ["Offset of field: GCSizes::marker"][::std::mem::offset_of!(GCSizes, marker) - 0usize];
             ["Offset of field: GCSizes::nurseryCommitted"]
                 [::std::mem::offset_of!(GCSizes, nurseryCommitted) - 8usize];
             ["Offset of field: GCSizes::nurseryMallocedBuffers"]
                 [::std::mem::offset_of!(GCSizes, nurseryMallocedBuffers) - 16usize];
-            ["Offset of field: GCSizes::nurseryMallocedBlockCache"]
-                [::std::mem::offset_of!(GCSizes, nurseryMallocedBlockCache) - 24usize];
-            ["Offset of field: GCSizes::nurseryTrailerBlockSets"]
-                [::std::mem::offset_of!(GCSizes, nurseryTrailerBlockSets) - 32usize];
             ["Offset of field: GCSizes::storeBufferVals"]
-                [::std::mem::offset_of!(GCSizes, storeBufferVals) - 40usize];
+                [::std::mem::offset_of!(GCSizes, storeBufferVals) - 24usize];
             ["Offset of field: GCSizes::storeBufferCells"]
-                [::std::mem::offset_of!(GCSizes, storeBufferCells) - 48usize];
+                [::std::mem::offset_of!(GCSizes, storeBufferCells) - 32usize];
             ["Offset of field: GCSizes::storeBufferSlots"]
-                [::std::mem::offset_of!(GCSizes, storeBufferSlots) - 56usize];
+                [::std::mem::offset_of!(GCSizes, storeBufferSlots) - 40usize];
             ["Offset of field: GCSizes::storeBufferWasmAnyRefs"]
-                [::std::mem::offset_of!(GCSizes, storeBufferWasmAnyRefs) - 64usize];
+                [::std::mem::offset_of!(GCSizes, storeBufferWasmAnyRefs) - 48usize];
             ["Offset of field: GCSizes::storeBufferWholeCells"]
-                [::std::mem::offset_of!(GCSizes, storeBufferWholeCells) - 72usize];
+                [::std::mem::offset_of!(GCSizes, storeBufferWholeCells) - 56usize];
             ["Offset of field: GCSizes::storeBufferGenerics"]
-                [::std::mem::offset_of!(GCSizes, storeBufferGenerics) - 80usize];
+                [::std::mem::offset_of!(GCSizes, storeBufferGenerics) - 64usize];
         };
         #[doc = " This class holds information about the memory taken up by identical copies of\n a particular string.  Multiple JSStrings may have their sizes aggregated\n together into one StringInfo object.  Note that two strings with identical\n chars will not be aggregated together if one is a short string and the other\n is not."]
         #[repr(C)]
@@ -12836,6 +13072,7 @@ pub mod root {
             pub scriptData: usize,
             pub wasmRuntime: usize,
             pub wasmGuardPages: usize,
+            pub wasmContStacks: usize,
             pub jitLazyLink: usize,
             pub scriptSourceInfo: root::JS::ScriptSourceInfo,
             pub gc: root::JS::GCSizes,
@@ -12845,7 +13082,7 @@ pub mod root {
         pub type RuntimeSizes_ScriptSourcesHashMap = root::__BindgenOpaqueArray<u64, 3usize>;
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of RuntimeSizes"][::std::mem::size_of::<RuntimeSizes>() - 272usize];
+            ["Size of RuntimeSizes"][::std::mem::size_of::<RuntimeSizes>() - 264usize];
             ["Alignment of RuntimeSizes"][::std::mem::align_of::<RuntimeSizes>() - 8usize];
             ["Offset of field: RuntimeSizes::object"]
                 [::std::mem::offset_of!(RuntimeSizes, object) - 0usize];
@@ -12873,16 +13110,18 @@ pub mod root {
                 [::std::mem::offset_of!(RuntimeSizes, wasmRuntime) - 88usize];
             ["Offset of field: RuntimeSizes::wasmGuardPages"]
                 [::std::mem::offset_of!(RuntimeSizes, wasmGuardPages) - 96usize];
+            ["Offset of field: RuntimeSizes::wasmContStacks"]
+                [::std::mem::offset_of!(RuntimeSizes, wasmContStacks) - 104usize];
             ["Offset of field: RuntimeSizes::jitLazyLink"]
-                [::std::mem::offset_of!(RuntimeSizes, jitLazyLink) - 104usize];
+                [::std::mem::offset_of!(RuntimeSizes, jitLazyLink) - 112usize];
             ["Offset of field: RuntimeSizes::scriptSourceInfo"]
-                [::std::mem::offset_of!(RuntimeSizes, scriptSourceInfo) - 112usize];
+                [::std::mem::offset_of!(RuntimeSizes, scriptSourceInfo) - 120usize];
             ["Offset of field: RuntimeSizes::gc"]
-                [::std::mem::offset_of!(RuntimeSizes, gc) - 128usize];
+                [::std::mem::offset_of!(RuntimeSizes, gc) - 136usize];
             ["Offset of field: RuntimeSizes::allScriptSources"]
-                [::std::mem::offset_of!(RuntimeSizes, allScriptSources) - 216usize];
+                [::std::mem::offset_of!(RuntimeSizes, allScriptSources) - 208usize];
             ["Offset of field: RuntimeSizes::notableScriptSources"]
-                [::std::mem::offset_of!(RuntimeSizes, notableScriptSources) - 248usize];
+                [::std::mem::offset_of!(RuntimeSizes, notableScriptSources) - 240usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -12899,11 +13138,10 @@ pub mod root {
             pub jitcode: usize,
             pub scope: usize,
             pub regExpShared: usize,
-            pub smallBuffer: usize,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of UnusedGCThingSizes"][::std::mem::size_of::<UnusedGCThingSizes>() - 104usize];
+            ["Size of UnusedGCThingSizes"][::std::mem::size_of::<UnusedGCThingSizes>() - 96usize];
             ["Alignment of UnusedGCThingSizes"]
                 [::std::mem::align_of::<UnusedGCThingSizes>() - 8usize];
             ["Offset of field: UnusedGCThingSizes::object"]
@@ -12930,8 +13168,6 @@ pub mod root {
                 [::std::mem::offset_of!(UnusedGCThingSizes, scope) - 80usize];
             ["Offset of field: UnusedGCThingSizes::regExpShared"]
                 [::std::mem::offset_of!(UnusedGCThingSizes, regExpShared) - 88usize];
-            ["Offset of field: UnusedGCThingSizes::smallBuffer"]
-                [::std::mem::offset_of!(UnusedGCThingSizes, smallBuffer) - 96usize];
         };
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -12939,10 +13175,13 @@ pub mod root {
             pub usedBytes: usize,
             pub freeBytes: usize,
             pub adminBytes: usize,
+            pub totalChunks: usize,
+            pub freeRegions: usize,
+            pub largeAllocs: usize,
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of GCBufferStats"][::std::mem::size_of::<GCBufferStats>() - 24usize];
+            ["Size of GCBufferStats"][::std::mem::size_of::<GCBufferStats>() - 48usize];
             ["Alignment of GCBufferStats"][::std::mem::align_of::<GCBufferStats>() - 8usize];
             ["Offset of field: GCBufferStats::usedBytes"]
                 [::std::mem::offset_of!(GCBufferStats, usedBytes) - 0usize];
@@ -12950,13 +13189,19 @@ pub mod root {
                 [::std::mem::offset_of!(GCBufferStats, freeBytes) - 8usize];
             ["Offset of field: GCBufferStats::adminBytes"]
                 [::std::mem::offset_of!(GCBufferStats, adminBytes) - 16usize];
+            ["Offset of field: GCBufferStats::totalChunks"]
+                [::std::mem::offset_of!(GCBufferStats, totalChunks) - 24usize];
+            ["Offset of field: GCBufferStats::freeRegions"]
+                [::std::mem::offset_of!(GCBufferStats, freeRegions) - 32usize];
+            ["Offset of field: GCBufferStats::largeAllocs"]
+                [::std::mem::offset_of!(GCBufferStats, largeAllocs) - 40usize];
         };
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct ZoneStats {
             pub symbolsGCHeap: usize,
             pub bigIntsGCHeap: usize,
-            pub bigIntsMallocHeap: usize,
+            pub bigIntsGCBuffers: usize,
             pub gcHeapArenaAdmin: usize,
             pub jitCodesGCHeap: usize,
             pub getterSettersGCHeap: usize,
@@ -12966,14 +13211,14 @@ pub mod root {
             pub propMapChildren: usize,
             pub propMapTables: usize,
             pub scopesGCHeap: usize,
-            pub scopesMallocHeap: usize,
+            pub scopesGCBuffers: usize,
             pub regExpSharedsGCHeap: usize,
             pub regExpSharedsMallocHeap: usize,
-            pub smallBuffersGCHeap: usize,
             pub zoneObject: usize,
             pub regexpZone: usize,
             pub jitZone: usize,
             pub cacheIRStubs: usize,
+            pub objectFuses: usize,
             pub uniqueIdMap: usize,
             pub initialPropMapTable: usize,
             pub shapeTables: usize,
@@ -12990,18 +13235,20 @@ pub mod root {
             pub allStrings: root::__BindgenOpaqueArray<u64, 4usize>,
             pub notableStrings: root::__BindgenOpaqueArray<u64, 3usize>,
             pub isTotals: bool,
+            pub stringsDeduplicationTruncated: bool,
+            pub stringsTotalCount: usize,
         }
         pub type ZoneStats_StringsHashMap = root::__BindgenOpaqueArray<u64, 3usize>;
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of ZoneStats"][::std::mem::size_of::<ZoneStats>() - 528usize];
+            ["Size of ZoneStats"][::std::mem::size_of::<ZoneStats>() - 552usize];
             ["Alignment of ZoneStats"][::std::mem::align_of::<ZoneStats>() - 8usize];
             ["Offset of field: ZoneStats::symbolsGCHeap"]
                 [::std::mem::offset_of!(ZoneStats, symbolsGCHeap) - 0usize];
             ["Offset of field: ZoneStats::bigIntsGCHeap"]
                 [::std::mem::offset_of!(ZoneStats, bigIntsGCHeap) - 8usize];
-            ["Offset of field: ZoneStats::bigIntsMallocHeap"]
-                [::std::mem::offset_of!(ZoneStats, bigIntsMallocHeap) - 16usize];
+            ["Offset of field: ZoneStats::bigIntsGCBuffers"]
+                [::std::mem::offset_of!(ZoneStats, bigIntsGCBuffers) - 16usize];
             ["Offset of field: ZoneStats::gcHeapArenaAdmin"]
                 [::std::mem::offset_of!(ZoneStats, gcHeapArenaAdmin) - 24usize];
             ["Offset of field: ZoneStats::jitCodesGCHeap"]
@@ -13020,22 +13267,22 @@ pub mod root {
                 [::std::mem::offset_of!(ZoneStats, propMapTables) - 80usize];
             ["Offset of field: ZoneStats::scopesGCHeap"]
                 [::std::mem::offset_of!(ZoneStats, scopesGCHeap) - 88usize];
-            ["Offset of field: ZoneStats::scopesMallocHeap"]
-                [::std::mem::offset_of!(ZoneStats, scopesMallocHeap) - 96usize];
+            ["Offset of field: ZoneStats::scopesGCBuffers"]
+                [::std::mem::offset_of!(ZoneStats, scopesGCBuffers) - 96usize];
             ["Offset of field: ZoneStats::regExpSharedsGCHeap"]
                 [::std::mem::offset_of!(ZoneStats, regExpSharedsGCHeap) - 104usize];
             ["Offset of field: ZoneStats::regExpSharedsMallocHeap"]
                 [::std::mem::offset_of!(ZoneStats, regExpSharedsMallocHeap) - 112usize];
-            ["Offset of field: ZoneStats::smallBuffersGCHeap"]
-                [::std::mem::offset_of!(ZoneStats, smallBuffersGCHeap) - 120usize];
             ["Offset of field: ZoneStats::zoneObject"]
-                [::std::mem::offset_of!(ZoneStats, zoneObject) - 128usize];
+                [::std::mem::offset_of!(ZoneStats, zoneObject) - 120usize];
             ["Offset of field: ZoneStats::regexpZone"]
-                [::std::mem::offset_of!(ZoneStats, regexpZone) - 136usize];
+                [::std::mem::offset_of!(ZoneStats, regexpZone) - 128usize];
             ["Offset of field: ZoneStats::jitZone"]
-                [::std::mem::offset_of!(ZoneStats, jitZone) - 144usize];
+                [::std::mem::offset_of!(ZoneStats, jitZone) - 136usize];
             ["Offset of field: ZoneStats::cacheIRStubs"]
-                [::std::mem::offset_of!(ZoneStats, cacheIRStubs) - 152usize];
+                [::std::mem::offset_of!(ZoneStats, cacheIRStubs) - 144usize];
+            ["Offset of field: ZoneStats::objectFuses"]
+                [::std::mem::offset_of!(ZoneStats, objectFuses) - 152usize];
             ["Offset of field: ZoneStats::uniqueIdMap"]
                 [::std::mem::offset_of!(ZoneStats, uniqueIdMap) - 160usize];
             ["Offset of field: ZoneStats::initialPropMapTable"]
@@ -13053,28 +13300,32 @@ pub mod root {
             ["Offset of field: ZoneStats::gcBuffers"]
                 [::std::mem::offset_of!(ZoneStats, gcBuffers) - 216usize];
             ["Offset of field: ZoneStats::unusedGCThings"]
-                [::std::mem::offset_of!(ZoneStats, unusedGCThings) - 240usize];
+                [::std::mem::offset_of!(ZoneStats, unusedGCThings) - 264usize];
             ["Offset of field: ZoneStats::stringInfo"]
-                [::std::mem::offset_of!(ZoneStats, stringInfo) - 344usize];
+                [::std::mem::offset_of!(ZoneStats, stringInfo) - 360usize];
             ["Offset of field: ZoneStats::shapeInfo"]
-                [::std::mem::offset_of!(ZoneStats, shapeInfo) - 384usize];
+                [::std::mem::offset_of!(ZoneStats, shapeInfo) - 400usize];
             ["Offset of field: ZoneStats::code"]
-                [::std::mem::offset_of!(ZoneStats, code) - 416usize];
+                [::std::mem::offset_of!(ZoneStats, code) - 432usize];
             ["Offset of field: ZoneStats::extra"]
-                [::std::mem::offset_of!(ZoneStats, extra) - 456usize];
+                [::std::mem::offset_of!(ZoneStats, extra) - 472usize];
             ["Offset of field: ZoneStats::allStrings"]
-                [::std::mem::offset_of!(ZoneStats, allStrings) - 464usize];
+                [::std::mem::offset_of!(ZoneStats, allStrings) - 480usize];
             ["Offset of field: ZoneStats::notableStrings"]
-                [::std::mem::offset_of!(ZoneStats, notableStrings) - 496usize];
+                [::std::mem::offset_of!(ZoneStats, notableStrings) - 512usize];
             ["Offset of field: ZoneStats::isTotals"]
-                [::std::mem::offset_of!(ZoneStats, isTotals) - 520usize];
+                [::std::mem::offset_of!(ZoneStats, isTotals) - 536usize];
+            ["Offset of field: ZoneStats::stringsDeduplicationTruncated"]
+                [::std::mem::offset_of!(ZoneStats, stringsDeduplicationTruncated) - 537usize];
+            ["Offset of field: ZoneStats::stringsTotalCount"]
+                [::std::mem::offset_of!(ZoneStats, stringsTotalCount) - 544usize];
         };
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct RealmStats {
             pub objectsPrivate: usize,
             pub scriptsGCHeap: usize,
-            pub scriptsMallocHeapData: usize,
+            pub scriptsGCBuffers: usize,
             pub baselineData: usize,
             pub allocSites: usize,
             pub ionData: usize,
@@ -13094,14 +13345,14 @@ pub mod root {
         pub type RealmStats_ClassesHashMap = root::__BindgenOpaqueArray<u64, 3usize>;
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of RealmStats"][::std::mem::size_of::<RealmStats>() - 264usize];
+            ["Size of RealmStats"][::std::mem::size_of::<RealmStats>() - 280usize];
             ["Alignment of RealmStats"][::std::mem::align_of::<RealmStats>() - 8usize];
             ["Offset of field: RealmStats::objectsPrivate"]
                 [::std::mem::offset_of!(RealmStats, objectsPrivate) - 0usize];
             ["Offset of field: RealmStats::scriptsGCHeap"]
                 [::std::mem::offset_of!(RealmStats, scriptsGCHeap) - 8usize];
-            ["Offset of field: RealmStats::scriptsMallocHeapData"]
-                [::std::mem::offset_of!(RealmStats, scriptsMallocHeapData) - 16usize];
+            ["Offset of field: RealmStats::scriptsGCBuffers"]
+                [::std::mem::offset_of!(RealmStats, scriptsGCBuffers) - 16usize];
             ["Offset of field: RealmStats::baselineData"]
                 [::std::mem::offset_of!(RealmStats, baselineData) - 24usize];
             ["Offset of field: RealmStats::allocSites"]
@@ -13125,13 +13376,13 @@ pub mod root {
             ["Offset of field: RealmStats::classInfo"]
                 [::std::mem::offset_of!(RealmStats, classInfo) - 104usize];
             ["Offset of field: RealmStats::extra"]
-                [::std::mem::offset_of!(RealmStats, extra) - 192usize];
+                [::std::mem::offset_of!(RealmStats, extra) - 208usize];
             ["Offset of field: RealmStats::allClasses"]
-                [::std::mem::offset_of!(RealmStats, allClasses) - 200usize];
+                [::std::mem::offset_of!(RealmStats, allClasses) - 216usize];
             ["Offset of field: RealmStats::notableClasses"]
-                [::std::mem::offset_of!(RealmStats, notableClasses) - 232usize];
+                [::std::mem::offset_of!(RealmStats, notableClasses) - 248usize];
             ["Offset of field: RealmStats::isTotals"]
-                [::std::mem::offset_of!(RealmStats, isTotals) - 256usize];
+                [::std::mem::offset_of!(RealmStats, isTotals) - 272usize];
         };
         pub type RealmStatsVector = root::__BindgenOpaqueArray<u64, 3usize>;
         pub type ZoneStatsVector = root::__BindgenOpaqueArray<u64, 3usize>;
@@ -13157,7 +13408,7 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of RuntimeStats"][::std::mem::size_of::<RuntimeStats>() - 1184usize];
+            ["Size of RuntimeStats"][::std::mem::size_of::<RuntimeStats>() - 1216usize];
             ["Alignment of RuntimeStats"][::std::mem::align_of::<RuntimeStats>() - 8usize];
             ["Offset of field: RuntimeStats::gcHeapChunkTotal"]
                 [::std::mem::offset_of!(RuntimeStats, gcHeapChunkTotal) - 8usize];
@@ -13174,17 +13425,17 @@ pub mod root {
             ["Offset of field: RuntimeStats::runtime"]
                 [::std::mem::offset_of!(RuntimeStats, runtime) - 56usize];
             ["Offset of field: RuntimeStats::realmTotals"]
-                [::std::mem::offset_of!(RuntimeStats, realmTotals) - 328usize];
+                [::std::mem::offset_of!(RuntimeStats, realmTotals) - 320usize];
             ["Offset of field: RuntimeStats::zTotals"]
-                [::std::mem::offset_of!(RuntimeStats, zTotals) - 592usize];
+                [::std::mem::offset_of!(RuntimeStats, zTotals) - 600usize];
             ["Offset of field: RuntimeStats::realmStatsVector"]
-                [::std::mem::offset_of!(RuntimeStats, realmStatsVector) - 1120usize];
+                [::std::mem::offset_of!(RuntimeStats, realmStatsVector) - 1152usize];
             ["Offset of field: RuntimeStats::zoneStatsVector"]
-                [::std::mem::offset_of!(RuntimeStats, zoneStatsVector) - 1144usize];
+                [::std::mem::offset_of!(RuntimeStats, zoneStatsVector) - 1176usize];
             ["Offset of field: RuntimeStats::currZoneStats"]
-                [::std::mem::offset_of!(RuntimeStats, currZoneStats) - 1168usize];
+                [::std::mem::offset_of!(RuntimeStats, currZoneStats) - 1200usize];
             ["Offset of field: RuntimeStats::mallocSizeOf_"]
-                [::std::mem::offset_of!(RuntimeStats, mallocSizeOf_) - 1176usize];
+                [::std::mem::offset_of!(RuntimeStats, mallocSizeOf_) - 1208usize];
         };
         #[repr(C)]
         pub struct ObjectPrivateVisitor__bindgen_vtable(::std::os::raw::c_void);
@@ -13243,13 +13494,14 @@ pub mod root {
             pub fn PeakSizeOfTemporary(cx: *const root::JSContext) -> usize;
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS12AddSizeOfTabEP9JSContextNS_6HandleIP8JSObjectEEPFmPKvEPNS_20ObjectPrivateVisitorEPNS_8TabSizesE"]
+            #[link_name = "\u{1}_ZN2JS12AddSizeOfTabEP9JSContextPNS_4ZoneEPFmPKvEPNS_20ObjectPrivateVisitorEPNS_8TabSizesERKNS_15AutoRequireNoGCE"]
             pub fn AddSizeOfTab(
                 cx: *mut root::JSContext,
-                obj: root::JS::HandleObject,
+                zone: *mut root::JS::Zone,
                 mallocSizeOf: root::mozilla::MallocSizeOf,
                 opv: *mut root::JS::ObjectPrivateVisitor,
                 sizes: *mut root::JS::TabSizes,
+                nogc: *const root::JS::AutoRequireNoGC,
             ) -> bool;
         }
         extern "C" {
@@ -13262,7 +13514,10 @@ pub mod root {
             ) -> bool;
         }
         impl root::JS::ModuleType {
-            pub const Limit: root::JS::ModuleType = ModuleType::JSON;
+            pub const JavaScriptOrWasm: root::JS::ModuleType = ModuleType::JavaScript;
+        }
+        impl root::JS::ModuleType {
+            pub const Limit: root::JS::ModuleType = ModuleType::Text;
         }
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -13270,33 +13525,70 @@ pub mod root {
             Unknown = 0,
             JavaScript = 1,
             JSON = 2,
+            CSS = 3,
+            Bytes = 4,
+            Text = 5,
         }
-        #[doc = " The HostResolveImportedModule hook.\n\n See: https://tc39.es/ecma262/#sec-hostresolveimportedmodule\n\n This embedding-defined hook is used to implement module loading. It is called\n to get or create a module object corresponding to |moduleRequest| occurring\n in the context of the script or module with private value\n |referencingPrivate|.\n\n The module specifier string for the request can be obtained by calling\n JS::GetModuleRequestSpecifier.\n\n The private value for a script or module is set with JS::SetScriptPrivate or\n JS::SetModulePrivate. It's assumed that the embedding can handle receiving\n either here.\n\n This hook must obey the restrictions defined in the spec:\n  - Each time the hook is called with the same arguemnts, the same module must\n    be returned.\n  - If a module cannot be created for the given arguments, an exception must\n    be thrown.\n\n This is a synchronous operation."]
-        pub type ModuleResolveHook = ::std::option::Option<
+        #[doc = " The HostLoadImportedModule hook.\n\n See: https://tc39.es/ecma262/#sec-HostLoadImportedModule\n\n This embedding-defined hook is used to implement module loading. It is called\n to get or create a module object corresponding to |moduleRequest| occurring\n in the context of the script or module |referrer| with private value\n |referencingPrivate|.\n\n The module specifier string for the request can be obtained by calling\n JS::GetModuleRequestSpecifier.\n\n The private value for a script or module is set with JS::SetScriptPrivate or\n JS::SetModulePrivate. It's assumed that the embedding can handle receiving\n either here.\n\n If this call succeeds then the embedding must call\n FinishLoadingImportedModule or one of the FinishLoadingImportedModuleFailed\n APIs at some point in the future. This is handled by the engine if the call\n returns false.\n\n This hook must obey the restrictions defined in the spec:\n  - Each time the hook is called with the same (referrer, referencingPrivate)\n    pair, then it must call FinishLoadingImportedModule with the same result\n    each time.\n  - The operation must treat the |payload| argument as an opaque\n    value to be passed through to FinishLoadingImportedModule."]
+        pub type ModuleLoadHook = ::std::option::Option<
             unsafe extern "C" fn(
                 cx: *mut root::JSContext,
-                referencingPrivate: root::JS::Handle<root::JS::Value>,
+                referrer: root::JS::Handle<*mut root::JSScript>,
                 moduleRequest: root::JS::Handle<*mut root::JSObject>,
-            ) -> *mut root::JSObject,
+                hostDefined: root::JS::Handle<root::JS::Value>,
+                payload: root::JS::Handle<root::JS::Value>,
+                lineNumber: u32,
+                columnNumber: root::JS::ColumnNumberOneOrigin,
+            ) -> bool,
         >;
         extern "C" {
-            #[doc = " Get the HostResolveImportedModule hook for the runtime."]
-            #[link_name = "\u{1}_ZN2JS20GetModuleResolveHookEP9JSRuntime"]
-            pub fn GetModuleResolveHook(rt: *mut root::JSRuntime) -> root::JS::ModuleResolveHook;
+            #[doc = " Get the HostLoadImportedModule hook for the runtime."]
+            #[link_name = "\u{1}_ZN2JS17GetModuleLoadHookEP9JSRuntime"]
+            pub fn GetModuleLoadHook(rt: *mut root::JSRuntime) -> root::JS::ModuleLoadHook;
         }
         extern "C" {
-            #[doc = " Set the HostResolveImportedModule hook for the runtime to the given function."]
-            #[link_name = "\u{1}_ZN2JS20SetModuleResolveHookEP9JSRuntimePFP8JSObjectP9JSContextNS_6HandleINS_5ValueEEENS6_IS3_EEE"]
-            pub fn SetModuleResolveHook(
-                rt: *mut root::JSRuntime,
-                func: root::JS::ModuleResolveHook,
-            );
+            #[doc = " Set the HostLoadImportedModule hook for the runtime to the given function."]
+            #[link_name = "\u{1}_ZN2JS17SetModuleLoadHookEP9JSRuntimePFbP9JSContextNS_6HandleIP8JSScriptEENS4_IP8JSObjectEENS4_INS_5ValueEEESC_jNS_21ColumnNumberOneOriginEE"]
+            pub fn SetModuleLoadHook(rt: *mut root::JSRuntime, func: root::JS::ModuleLoadHook);
+        }
+        pub type LoadModuleResolvedCallback = ::std::option::Option<
+            unsafe extern "C" fn(
+                cx: *mut root::JSContext,
+                arg1: root::JS::Handle<root::JS::Value>,
+            ) -> bool,
+        >;
+        pub type LoadModuleRejectedCallback = ::std::option::Option<
+            unsafe extern "C" fn(
+                cx: *mut root::JSContext,
+                hostDefined: root::JS::Handle<root::JS::Value>,
+                error: root::JS::Handle<root::JS::Value>,
+            ) -> bool,
+        >;
+        extern "C" {
+            #[doc = " https://tc39.es/ecma262/#sec-LoadRequestedModules\n\n Load the dependency module graph of the parameter 'module'.\n\n The spec defines using 'promise objects' to notify the result.\n To address the synchronous loading behavior from mozJSModuleLoader, an\n overloaded version that takes function callbacks to notify the result is also\n provided."]
+            #[link_name = "\u{1}_ZN2JS20LoadRequestedModulesEP9JSContextNS_6HandleIP8JSObjectEENS2_INS_5ValueEEEPFbS1_S7_EPFbS1_S7_S7_E"]
+            pub fn LoadRequestedModules(
+                cx: *mut root::JSContext,
+                module: root::JS::Handle<*mut root::JSObject>,
+                hostDefined: root::JS::Handle<root::JS::Value>,
+                resolved: root::JS::LoadModuleResolvedCallback,
+                rejected: root::JS::LoadModuleRejectedCallback,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS20LoadRequestedModulesEP9JSContextNS_6HandleIP8JSObjectEENS2_INS_5ValueEEENS_13MutableHandleIS4_EE"]
+            pub fn LoadRequestedModules1(
+                cx: *mut root::JSContext,
+                module: root::JS::Handle<*mut root::JSObject>,
+                hostDefined: root::JS::Handle<root::JS::Value>,
+                promiseOut: root::JS::MutableHandle<*mut root::JSObject>,
+            ) -> bool;
         }
         #[doc = " The module metadata hook.\n\n See: https://tc39.es/ecma262/#sec-hostgetimportmetaproperties\n\n Populate the |metaObject| object returned when import.meta is evaluated in\n the context of the script or module with private value |privateValue|.\n\n This is based on the spec's HostGetImportMetaProperties hook but defines\n properties on the meta object directly rather than returning a list."]
         pub type ModuleMetadataHook = ::std::option::Option<
             unsafe extern "C" fn(
                 cx: *mut root::JSContext,
-                privateValue: root::JS::Handle<root::JS::Value>,
+                moduleRecord: root::JS::Handle<*mut root::JSObject>,
                 metaObject: root::JS::Handle<*mut root::JSObject>,
             ) -> bool,
         >;
@@ -13307,45 +13599,49 @@ pub mod root {
         }
         extern "C" {
             #[doc = " Set the hook for populating the import.meta metadata object to the given\n function."]
-            #[link_name = "\u{1}_ZN2JS21SetModuleMetadataHookEP9JSRuntimePFbP9JSContextNS_6HandleINS_5ValueEEENS4_IP8JSObjectEEE"]
+            #[link_name = "\u{1}_ZN2JS21SetModuleMetadataHookEP9JSRuntimePFbP9JSContextNS_6HandleIP8JSObjectEES7_E"]
             pub fn SetModuleMetadataHook(
                 rt: *mut root::JSRuntime,
                 func: root::JS::ModuleMetadataHook,
             );
         }
-        #[doc = " The HostImportModuleDynamically hook.\n\n See https://tc39.es/ecma262/#sec-hostimportmoduledynamically\n\n Used to implement dynamic module import. Called when evaluating import()\n expressions.\n\n This starts an asynchronous operation. Some time after this hook is called\n the embedding must call JS::FinishDynamicModuleImport() passing the\n |referencingPrivate|, |moduleRequest| and |promise| arguments from the\n call. This must happen for both success and failure cases.\n\n In the meantime the embedding can take whatever steps it needs to make the\n module available. If successful, after calling FinishDynamicModuleImport()\n the module should be returned by the resolve hook when passed\n |referencingPrivate| and |moduleRequest|."]
-        pub type ModuleDynamicImportHook = ::std::option::Option<
-            unsafe extern "C" fn(
-                cx: *mut root::JSContext,
-                referencingPrivate: root::JS::Handle<root::JS::Value>,
-                moduleRequest: root::JS::Handle<*mut root::JSObject>,
-                promise: root::JS::Handle<*mut root::JSObject>,
-            ) -> bool,
-        >;
         extern "C" {
-            #[doc = " Get the HostImportModuleDynamically hook for the runtime."]
-            #[link_name = "\u{1}_ZN2JS26GetModuleDynamicImportHookEP9JSRuntime"]
-            pub fn GetModuleDynamicImportHook(
-                rt: *mut root::JSRuntime,
-            ) -> root::JS::ModuleDynamicImportHook;
+            #[doc = " A function callback called by the host layer to indicate the call of\n HostLoadImportedModule has finished.\n\n See https://tc39.es/ecma262/#sec-FinishLoadingImportedModule"]
+            #[link_name = "\u{1}_ZN2JS27FinishLoadingImportedModuleEP9JSContextNS_6HandleIP8JSScriptEENS2_IP8JSObjectEENS2_INS_5ValueEEES8_b"]
+            pub fn FinishLoadingImportedModule(
+                cx: *mut root::JSContext,
+                referrer: root::JS::Handle<*mut root::JSScript>,
+                moduleRequest: root::JS::Handle<*mut root::JSObject>,
+                payload: root::JS::Handle<root::JS::Value>,
+                result: root::JS::Handle<*mut root::JSObject>,
+                usePromise: bool,
+            ) -> bool;
         }
         extern "C" {
-            #[doc = " Set the HostImportModuleDynamically hook for the runtime to the given\n function.\n\n If this hook is not set (or set to nullptr) then the JS engine will throw an\n exception if dynamic module import is attempted."]
-            #[link_name = "\u{1}_ZN2JS26SetModuleDynamicImportHookEP9JSRuntimePFbP9JSContextNS_6HandleINS_5ValueEEENS4_IP8JSObjectEES9_E"]
-            pub fn SetModuleDynamicImportHook(
-                rt: *mut root::JSRuntime,
-                func: root::JS::ModuleDynamicImportHook,
-            );
+            #[doc = " Overloaded version of FinishLoadingImportedModule for error handling."]
+            #[link_name = "\u{1}_ZN2JS33FinishLoadingImportedModuleFailedEP9JSContextNS_6HandleINS_5ValueEEES4_"]
+            pub fn FinishLoadingImportedModuleFailed(
+                cx: *mut root::JSContext,
+                payload: root::JS::Handle<root::JS::Value>,
+                error: root::JS::Handle<root::JS::Value>,
+            ) -> bool;
         }
         extern "C" {
-            #[doc = " This must be called after a dynamic import operation is complete.\n\n If |evaluationPromise| is rejected, the rejection reason will be used to\n complete the user's promise."]
-            #[link_name = "\u{1}_ZN2JS25FinishDynamicModuleImportEP9JSContextNS_6HandleIP8JSObjectEENS2_INS_5ValueEEES5_S5_"]
-            pub fn FinishDynamicModuleImport(
+            #[link_name = "\u{1}_ZN2JS53FinishLoadingImportedModuleFailedWithPendingExceptionEP9JSContextNS_6HandleINS_5ValueEEE"]
+            pub fn FinishLoadingImportedModuleFailedWithPendingException(
                 cx: *mut root::JSContext,
-                evaluationPromise: root::JS::Handle<*mut root::JSObject>,
-                referencingPrivate: root::JS::Handle<root::JS::Value>,
+                payload: root::JS::Handle<root::JS::Value>,
+            ) -> bool;
+        }
+        extern "C" {
+            #[doc = " Servo-only. Allows a custom `ContinueDynamicImport` implementation to handle\n dynamic import descendant loading, bypassing SpiderMonkey's outdated implementation.\n\n See https://bugzilla.mozilla.org/show_bug.cgi?id=1990416"]
+            #[link_name = "\u{1}_ZN2JS34FinishLoadingDynamicImportedModuleEP9JSContextNS_6HandleIP8JSScriptEENS2_IP8JSObjectEENS2_INS_5ValueEEES8_"]
+            pub fn FinishLoadingDynamicImportedModule(
+                cx: *mut root::JSContext,
+                referrer: root::JS::Handle<*mut root::JSScript>,
                 moduleRequest: root::JS::Handle<*mut root::JSObject>,
-                promise: root::JS::Handle<*mut root::JSObject>,
+                payload: root::JS::Handle<root::JS::Value>,
+                result: root::JS::Handle<*mut root::JSObject>,
             ) -> bool;
         }
         extern "C" {
@@ -13385,6 +13681,32 @@ pub mod root {
             ) -> *mut root::JSObject;
         }
         extern "C" {
+            #[doc = " Create a synthetic module record that exports a single value as its default\n export. The caller is responsible for providing the already-constructed\n value to export.\n\n This matches the ECMAScript specification's definition:\n https://tc39.es/ecma262/#sec-create-default-export-synthetic-module"]
+            #[link_name = "\u{1}_ZN2JS34CreateDefaultExportSyntheticModuleEP9JSContextNS_6HandleINS_5ValueEEE"]
+            pub fn CreateDefaultExportSyntheticModule(
+                cx: *mut root::JSContext,
+                defaultExport: root::JS::Handle<root::JS::Value>,
+            ) -> *mut root::JSObject;
+        }
+        extern "C" {
+            #[doc = " Compile the given wasm source buffer as an evaluation phase module record."]
+            #[link_name = "\u{1}_ZN2JS17CompileWasmModuleEP9JSContextRKNS_22ReadOnlyCompileOptionsERN7mozilla6VectorIhLm0EN2js17MallocAllocPolicyEEE"]
+            pub fn CompileWasmModule(
+                cx: *mut root::JSContext,
+                options: *const root::JS::ReadOnlyCompileOptions,
+                srcBuf: *mut u8,
+            ) -> *mut root::JSObject;
+        }
+        extern "C" {
+            #[doc = " Compile the given wasm source buffer as a source phase module record."]
+            #[link_name = "\u{1}_ZN2JS25CompileWasmModuleAsSourceEP9JSContextRKNS_22ReadOnlyCompileOptionsERN7mozilla6VectorIhLm0EN2js17MallocAllocPolicyEEE"]
+            pub fn CompileWasmModuleAsSource(
+                cx: *mut root::JSContext,
+                options: *const root::JS::ReadOnlyCompileOptions,
+                srcBuf: *mut u8,
+            ) -> *mut root::JSObject;
+        }
+        extern "C" {
             #[doc = " Set a private value associated with a source text module record."]
             #[link_name = "\u{1}_ZN2JS16SetModulePrivateEP8JSObjectRKNS_5ValueE"]
             pub fn SetModulePrivate(module: *mut root::JSObject, value: *const root::JS::Value);
@@ -13398,6 +13720,11 @@ pub mod root {
             #[doc = " Checks if the given module is a cyclic module."]
             #[link_name = "\u{1}_ZN2JS14IsCyclicModuleEP8JSObject"]
             pub fn IsCyclicModule(module: *mut root::JSObject) -> bool;
+        }
+        extern "C" {
+            #[doc = " Set module status to New and clear the [[LoadedModules]] slot and in a Cycloc\n Module.\n Used to reset modules that were preloaded earlier, in case the resolution of\n their specifiers may have changed."]
+            #[link_name = "\u{1}_ZN2JS20ResetPreloadedModuleEP8JSObject"]
+            pub fn ResetPreloadedModule(module: *mut root::JSObject);
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS10ModuleLinkEP9JSContextNS_6HandleIP8JSObjectEE"]
@@ -13429,31 +13756,6 @@ pub mod root {
             ) -> bool;
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS24GetRequestedModulesCountEP9JSContextNS_6HandleIP8JSObjectEE"]
-            pub fn GetRequestedModulesCount(
-                cx: *mut root::JSContext,
-                moduleRecord: root::JS::Handle<*mut root::JSObject>,
-            ) -> u32;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS27GetRequestedModuleSpecifierEP9JSContextNS_6HandleIP8JSObjectEEj"]
-            pub fn GetRequestedModuleSpecifier(
-                cx: *mut root::JSContext,
-                moduleRecord: root::JS::Handle<*mut root::JSObject>,
-                index: u32,
-            ) -> *mut root::JSString;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS27GetRequestedModuleSourcePosEP9JSContextNS_6HandleIP8JSObjectEEjPjPNS_21ColumnNumberOneOriginE"]
-            pub fn GetRequestedModuleSourcePos(
-                cx: *mut root::JSContext,
-                moduleRecord: root::JS::Handle<*mut root::JSObject>,
-                index: u32,
-                lineNumber: *mut u32,
-                columnNumber: *mut root::JS::ColumnNumberOneOrigin,
-            );
-        }
-        extern "C" {
             #[link_name = "\u{1}_ZN2JS22GetRequestedModuleTypeEP9JSContextNS_6HandleIP8JSObjectEEj"]
             pub fn GetRequestedModuleType(
                 cx: *mut root::JSContext,
@@ -13468,14 +13770,6 @@ pub mod root {
             ) -> *mut root::JSScript;
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS19CreateModuleRequestEP9JSContextNS_6HandleIP8JSStringEENS_10ModuleTypeE"]
-            pub fn CreateModuleRequest(
-                cx: *mut root::JSContext,
-                specifierArg: root::JS::Handle<*mut root::JSString>,
-                moduleType: root::JS::ModuleType,
-            ) -> *mut root::JSObject;
-        }
-        extern "C" {
             #[link_name = "\u{1}_ZN2JS25GetModuleRequestSpecifierEP9JSContextNS_6HandleIP8JSObjectEE"]
             pub fn GetModuleRequestSpecifier(
                 cx: *mut root::JSContext,
@@ -13488,6 +13782,13 @@ pub mod root {
                 cx: *mut root::JSContext,
                 moduleRequestArg: root::JS::Handle<*mut root::JSObject>,
             ) -> root::JS::ModuleType;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS26ModuleRequestIsSourcePhaseEP9JSContextNS_6HandleIP8JSObjectEE"]
+            pub fn ModuleRequestIsSourcePhase(
+                cx: *mut root::JSContext,
+                moduleRequestArg: root::JS::Handle<*mut root::JSObject>,
+            ) -> bool;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS15GetModuleObjectENS_6HandleIP8JSScriptEE"]
@@ -13525,6 +13826,86 @@ pub mod root {
             pub fn ModuleIsLinked(moduleObj: *mut root::JSObject) -> bool;
         }
         extern "C" {
+            #[doc = " Create an Array from the current realm with the given contents."]
+            #[link_name = "\u{1}_ZN2JS14NewArrayObjectEP9JSContextRKNS_16HandleValueArrayE"]
+            pub fn NewArrayObject(
+                cx: *mut root::JSContext,
+                contents: *const root::JS::HandleValueArray,
+            ) -> *mut root::JSObject;
+        }
+        extern "C" {
+            #[doc = " Create an Array from the current realm with the given length and allocate\n memory for all its elements.  (The elements nonetheless will not exist as\n properties on the returned array until values have been assigned to them.)"]
+            #[link_name = "\u{1}_ZN2JS14NewArrayObjectEP9JSContextm"]
+            pub fn NewArrayObject1(cx: *mut root::JSContext, length: usize) -> *mut root::JSObject;
+        }
+        extern "C" {
+            #[doc = " Determine whether |value| is an Array object or a wrapper around one.  (An\n ES6 proxy whose target is an Array object, e.g.\n |var target = [], handler = {}; Proxy.revocable(target, handler).proxy|, is\n not considered to be an Array.)\n\n On success set |*isArray| accordingly and return true; on failure return\n false."]
+            #[link_name = "\u{1}_ZN2JS13IsArrayObjectEP9JSContextNS_6HandleINS_5ValueEEEPb"]
+            pub fn IsArrayObject(
+                cx: *mut root::JSContext,
+                value: root::JS::Handle<root::JS::Value>,
+                isArray: *mut bool,
+            ) -> bool;
+        }
+        extern "C" {
+            #[doc = " Determine whether |obj| is an Array object or a wrapper around one.  (An\n ES6 proxy whose target is an Array object, e.g.\n |var target = [], handler = {}; Proxy.revocable(target, handler).proxy|, is\n not considered to be an Array.)\n\n On success set |*isArray| accordingly and return true; on failure return\n false."]
+            #[link_name = "\u{1}_ZN2JS13IsArrayObjectEP9JSContextNS_6HandleIP8JSObjectEEPb"]
+            pub fn IsArrayObject1(
+                cx: *mut root::JSContext,
+                obj: root::JS::Handle<*mut root::JSObject>,
+                isArray: *mut bool,
+            ) -> bool;
+        }
+        extern "C" {
+            #[doc = " Store |*lengthp = ToLength(obj.length)| and return true on success, else\n return false.\n\n If the length does not fit in |uint32_t|, an exception is reported and false\n is returned.\n\n |ToLength| converts its input to an integer usable to index an\n array-like object.\n\n If |obj| is an Array, this overall operation is the same as getting\n |obj.length|."]
+            #[link_name = "\u{1}_ZN2JS14GetArrayLengthEP9JSContextNS_6HandleIP8JSObjectEEPj"]
+            pub fn GetArrayLength(
+                cx: *mut root::JSContext,
+                obj: root::JS::Handle<*mut root::JSObject>,
+                lengthp: *mut u32,
+            ) -> bool;
+        }
+        extern "C" {
+            #[doc = " Perform |obj.length = length| as if in strict mode code, with a fast path for\n the case where |obj| is an Array.\n\n This operation is exactly and only assigning to a \"length\" property.  In\n general, it can invoke an existing \"length\" setter, throw if the property is\n non-writable, or do anything else a property-set operation might do."]
+            #[link_name = "\u{1}_ZN2JS14SetArrayLengthEP9JSContextNS_6HandleIP8JSObjectEEj"]
+            pub fn SetArrayLength(
+                cx: *mut root::JSContext,
+                obj: root::JS::Handle<*mut root::JSObject>,
+                length: u32,
+            ) -> bool;
+        }
+        #[repr(i32)]
+        #[doc = " The answer to a successful query as to whether an object is an Array per\n ES6's internal |IsArray| operation (as exposed by |Array.isArray|)."]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum IsArrayAnswer {
+            Array = 0,
+            NotArray = 1,
+            RevokedProxy = 2,
+        }
+        extern "C" {
+            #[doc = " ES6 7.2.2.\n\n Returns false on failure, otherwise returns true and sets |*isArray|\n indicating whether the object passes ECMAScript's IsArray test.  This is the\n same test performed by |Array.isArray|.\n\n This is NOT the same as asking whether |obj| is an Array or a wrapper around\n one.  If |obj| is a proxy created by |Proxy.revocable()| and has been\n revoked, or if |obj| is a proxy whose target (at any number of hops) is a\n revoked proxy, this method throws a TypeError and returns false."]
+            #[link_name = "\u{1}_ZN2JS7IsArrayEP9JSContextNS_6HandleIP8JSObjectEEPb"]
+            pub fn IsArray(
+                cx: *mut root::JSContext,
+                obj: root::JS::Handle<*mut root::JSObject>,
+                isArray: *mut bool,
+            ) -> bool;
+        }
+        extern "C" {
+            #[doc = " Identical to IsArray above, but the nature of the object (if successfully\n determined) is communicated via |*answer|.  In particular this method\n returns true and sets |*answer = IsArrayAnswer::RevokedProxy| when called on\n a revoked proxy.\n\n Most users will want the overload above, not this one."]
+            #[link_name = "\u{1}_ZN2JS7IsArrayEP9JSContextNS_6HandleIP8JSObjectEEPNS_13IsArrayAnswerE"]
+            pub fn IsArray1(
+                cx: *mut root::JSContext,
+                obj: root::JS::Handle<*mut root::JSObject>,
+                answer: *mut root::JS::IsArrayAnswer,
+            ) -> bool;
+        }
+        pub type IsAcceptableThis =
+            ::std::option::Option<unsafe extern "C" fn(v: root::JS::HandleValue) -> bool>;
+        pub type NativeImpl = ::std::option::Option<
+            unsafe extern "C" fn(cx: *mut root::JSContext, args: *const root::JS::CallArgs) -> bool,
+        >;
+        extern "C" {
             #[doc = " Determine the ECMAScript \"class\" -- Date, String, RegExp, and all the other\n builtin object types (described in ECMAScript in terms of an objecting having\n \"an [[ArrayBufferData]] internal slot\" or similar language for other kinds of\n object -- of the provided object.\n\n If this function is passed a wrapper that can be unwrapped, the determination\n is performed on that object.  If the wrapper can't be unwrapped, and it's not\n a wrapper that prefers to treat this operation as a failure, this function\n will indicate that the object is |js::ESClass::Other|."]
             #[link_name = "\u{1}_ZN2JS15GetBuiltinClassEP9JSContextNS_6HandleIP8JSObjectEEPN2js7ESClassE"]
             pub fn GetBuiltinClass(
@@ -13532,6 +13913,11 @@ pub mod root {
                 obj: root::JS::Handle<*mut root::JSObject>,
                 cls: *mut root::js::ESClass,
             ) -> bool;
+        }
+        extern "C" {
+            #[doc = " Returns true if |obj| is a plain object: a standard JS object with no exotic\n behavior, such as one created from a '{}' object literal or 'Object.create'.\n Unlike |GetBuiltinClass|, this does not unwrap proxies and tests |obj|\n directly."]
+            #[link_name = "\u{1}_ZN2JS13IsPlainObjectEP8JSObject"]
+            pub fn IsPlainObject(obj: *mut root::JSObject) -> bool;
         }
         extern "C" {
             #[doc = " Returns true if the native object has own named properties, i.e. user-added\n properties (expandos). Must not be called on proxy objects."]
@@ -13570,6 +13956,10 @@ pub mod root {
             #[doc = " Tell SpiderMonkey to use `queue` to schedule promise reactions.\n\n SpiderMonkey does not take ownership of the queue; it is the embedding's\n responsibility to clean it up after the runtime is destroyed."]
             #[link_name = "\u{1}_ZN2JS11SetJobQueueEP9JSContextPNS_8JobQueueE"]
             pub fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS::JobQueue);
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS11GetJobQueueEP9JSContext"]
+            pub fn GetJobQueue(cx: *mut root::JSContext) -> *mut root::JS::JobQueue;
         }
         #[doc = " [SMDOC] Protecting the debuggee's job/microtask queue from debugger activity.\n\n When the JavaScript debugger interrupts the execution of some debuggee code\n (for a breakpoint, for example), the debuggee's execution must be paused\n while the developer takes time to look at it. During this interruption, other\n tabs should remain active and usable. If the debuggee shares a main thread\n with non-debuggee tabs, that means that the thread will have to process\n non-debuggee HTML tasks and microtasks as usual, even as the debuggee's are\n on hold until the debugger lets it continue execution. (Letting debuggee\n microtasks run during the interruption would mean that, from the debuggee's\n point of view, their side effects would take place wherever the breakpoint\n was set - in general, not a place other code should ever run, and a violation\n of the run-to-completion rule.)\n\n This means that, even though the timing and ordering of microtasks is\n carefully specified by the standard - and important to preserve for\n compatibility and predictability - debugger use may, correctly, have the\n effect of reordering microtasks. During the interruption, microtasks enqueued\n by non-debuggee tabs must run immediately alongside their HTML tasks as\n usual, whereas any debuggee microtasks that were in the queue when the\n interruption began must wait for the debuggee to be continued - and thus run\n after microtasks enqueued after they were.\n\n Fortunately, this reordering is visible only at the global level: when\n implemented correctly, it is not detectable by an individual debuggee. Note\n that a debuggee should generally be a complete unit of similar-origin related\n browsing contexts. Since non-debuggee activity falls outside that unit, it\n should never be visible to the debuggee (except via mechanisms that are\n already asynchronous, like events), so the debuggee should be unable to\n detect non-debuggee microtasks running when they normally would not. As long\n as behavior *visible to the debuggee* is unaffected by the interruption, we\n have respected the spirit of the rule.\n\n Of course, even as we accept the general principle that interrupting the\n debuggee should have as little detectable effect as possible, we still permit\n the developer to do things like evaluate expressions at the console that have\n arbitrary effects on the debuggee's state—effects that could never occur\n naturally at that point in the program. But since these are explicitly\n requested by the developer, who presumably knows what they're doing, we\n support this as best we can. If the developer evaluates an expression in the\n console that resolves a promise, it seems most natural for the promise's\n reaction microtasks to run immediately, within the interruption. This is an\n 'unnatural' time for the microtasks to run, but no more unnatural than the\n evaluation that triggered them.\n\n So the overall behavior we need is as follows:\n\n - When the debugger interrupts a debuggee, the debuggee's microtask queue\n   must be saved.\n\n - When debuggee execution resumes, the debuggee's microtask queue must be\n   restored exactly as it was when the interruption occurred.\n\n - Non-debuggee task and microtask execution must take place normally during\n   the interruption.\n\n Since each HTML task begins with an empty microtask queue, and it should not\n be possible for a task to mix debuggee and non-debuggee code, interrupting a\n debuggee should always find a microtask queue containing exclusively debuggee\n microtasks, if any. So saving and restoring the microtask queue should affect\n only the debuggee, not any non-debuggee content.\n\n AutoDebuggerJobQueueInterruption\n --------------------------------\n\n AutoDebuggerJobQueueInterruption is an RAII class, meant for use by the\n Debugger API implementation, that takes care of saving and restoring the\n queue.\n\n Constructing and initializing an instance of AutoDebuggerJobQueueInterruption\n sets aside the given JSContext's job queue, leaving the JSContext's queue\n empty. When the AutoDebuggerJobQueueInterruption instance is destroyed, it\n asserts that the JSContext's current job queue (holding jobs enqueued while\n the AutoDebuggerJobQueueInterruption was alive) is empty, and restores the\n saved queue to the JSContext.\n\n Since the Debugger API's behavior is up to us, we can specify that Debugger\n hooks begin execution with an empty job queue, and that we drain the queue\n after each hook function has run. This drain will be visible to debugger\n hooks, and makes hook calls resemble HTML tasks, with their own automatic\n microtask checkpoint. But, the drain will be invisible to the debuggee, as\n its queue is preserved across the hook invocation.\n\n To protect the debuggee's job queue, Debugger takes care to invoke callback\n functions only within the scope of an AutoDebuggerJobQueueInterruption\n instance.\n\n Why not let the hook functions themselves take care of this?\n ------------------------------------------------------------\n\n Certainly, we could leave responsibility for saving and restoring the job\n queue to the Debugger hook functions themselves.\n\n In fact, early versions of this change tried making the devtools server save\n and restore the queue explicitly, but because hooks are set and changed in\n numerous places, it was hard to be confident that every case had been\n covered, and it seemed that future changes could easily introduce new holes.\n\n Later versions of this change modified the accessor properties on the\n Debugger objects' prototypes to automatically protect the job queue when\n calling hooks, but the effect was essentially a monkeypatch applied to an API\n we defined and control, which doesn't make sense.\n\n In the end, since promises have become such a pervasive part of JavaScript\n programming, almost any imaginable use of Debugger would need to provide some\n kind of protection for the debuggee's job queue, so it makes sense to simply\n handle it once, carefully, in the implementation of Debugger itself."]
         #[repr(C)]
@@ -13683,10 +14073,17 @@ pub mod root {
             ) -> bool;
         }
         extern "C" {
-            #[doc = " Returns a js::SavedFrame linked list of the stack that lead to the given\n Promise's allocation."]
+            #[doc = " Returns a js::SavedFrame linked list of the stack that lead to the given\n Promise's allocation.\n\n The promise parameter here should be an unwrapped promise."]
             #[link_name = "\u{1}_ZN2JS24GetPromiseAllocationSiteENS_6HandleIP8JSObjectEE"]
             pub fn GetPromiseAllocationSite(promise: root::JS::HandleObject)
                 -> *mut root::JSObject;
+        }
+        extern "C" {
+            #[doc = " A more flexible version of the above: Handles the cases where\n 1. maybePromise is wrapped\n 2. maybePromise is null\n 3. maybePromise isn't actually a promise.\n\n Returns js::SavedFrame if the passed argument is a\n wrapped promise (that's not a dead object wrapper) and it\n has an allocation site."]
+            #[link_name = "\u{1}_ZN2JS55MaybeGetPromiseAllocationSiteFromPossiblyWrappedPromiseENS_6HandleIP8JSObjectEE"]
+            pub fn MaybeGetPromiseAllocationSiteFromPossiblyWrappedPromise(
+                maybePromise: root::JS::HandleObject,
+            ) -> *mut root::JSObject;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS24GetPromiseResolutionSiteENS_6HandleIP8JSObjectEE"]
@@ -13766,9 +14163,9 @@ pub mod root {
         }
         extern "C" {
             #[doc = " Returns the given Promise's activation behavior state flag per above as a\n JS::PromiseUserInputEventHandlingState value.  All promises are created with\n the DontCare state by default.\n\n Returns JS::PromiseUserInputEventHandlingState::DontCare if the given object\n is a wrapper that can't safely be unwrapped."]
-            #[link_name = "\u{1}_ZN2JS37GetPromiseUserInputEventHandlingStateENS_6HandleIP8JSObjectEE"]
+            #[link_name = "\u{1}_ZN2JS37GetPromiseUserInputEventHandlingStateEP8JSObject"]
             pub fn GetPromiseUserInputEventHandlingState(
-                promise: root::JS::HandleObject,
+                promise: *mut root::JSObject,
             ) -> root::JS::PromiseUserInputEventHandlingState;
         }
         extern "C" {
@@ -13794,6 +14191,7 @@ pub mod root {
         #[derive(Debug, PartialEq)]
         pub struct Dispatchable {
             pub vtable_: *const Dispatchable__bindgen_vtable,
+            pub registered_: bool,
         }
         #[repr(u32)]
         #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -13803,16 +14201,19 @@ pub mod root {
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
-            ["Size of Dispatchable"][::std::mem::size_of::<Dispatchable>() - 8usize];
+            ["Size of Dispatchable"][::std::mem::size_of::<Dispatchable>() - 16usize];
             ["Alignment of Dispatchable"][::std::mem::align_of::<Dispatchable>() - 8usize];
+            ["Offset of field: Dispatchable::registered_"]
+                [::std::mem::offset_of!(Dispatchable, registered_) - 8usize];
         };
-        #[doc = " Callbacks to dispatch a JS::Dispatchable to a JSContext's thread's event\n loop.\n\n The DispatchToEventLoopCallback set on a particular JSContext must accept\n JS::Dispatchable instances and arrange for their `run` methods to be called\n eventually on the JSContext's thread. This is used for cross-thread dispatch,\n so the callback itself must be safe to call from any thread. It cannot\n trigger a GC.\n\n The DelayedDispatchToEventLoopCallback in addition takes a delay, and it\n must accept JS::Dispatchable instances and arrange for their `run` methods\n to be called after the delay on the JSContext's thread.\n The embeddings must have its own timeout manager to handle the delay.\n If a timeout manager is not available for given context, it should return\n false, optionally with a warning message printed.\n\n If the callback returns `true`, it must eventually run the given\n Dispatchable; otherwise, SpiderMonkey may leak memory or hang.\n\n The callback may return `false` to indicate that the JSContext's thread is\n shutting down and is no longer accepting runnables. Shutting down is a\n one-way transition: once the callback has rejected a runnable, it must reject\n all subsequently submitted runnables as well.\n\n To establish a DispatchToEventLoopCallback, the embedding may either call\n InitDispatchsToEventLoop to provide its own, or call js::UseInternalJobQueues\n to select a default implementation built into SpiderMonkey. This latter\n depends on the embedding to call js::RunJobs on the JavaScript thread to\n process queued Dispatchables at appropriate times."]
+        #[doc = " Callback to dispatch a JS::Dispatchable to a JSContext's thread's event\n loop.\n\n The DispatchToEventLoopCallback set on a particular JSContext must accept\n JS::Dispatchable instances and arrange for their `run` methods to be called\n eventually on the JSContext's thread. This is used for cross-thread dispatch,\n so the callback itself must be safe to call from any thread. It cannot\n trigger a GC.\n\n The DelayedDispatchToEventLoopCallback in addition takes a delay, and it\n must accept JS::Dispatchable instances and arrange for their `run` methods\n to be called after the delay on the JSContext's thread.\n The embeddings must have its own timeout manager to handle the delay.\n If a timeout manager is not available for given context, it should return\n false, optionally with a warning message printed.\n\n The callback accepts a closure that is the same as the one given by the call\n to JS::InitAsyncTaskCallbacks.\n\n If the callback returns `true`, it must eventually run the given\n Dispatchable; otherwise, SpiderMonkey may leak memory or hang.\n\n The callback may return `false` to indicate that the JSContext's thread is\n shutting down and is no longer accepting runnables. Shutting down is a\n one-way transition: once the callback has rejected a runnable, it must reject\n all subsequently submitted runnables as well."]
         pub type DispatchToEventLoopCallback = ::std::option::Option<
             unsafe extern "C" fn(
                 closure: *mut ::std::os::raw::c_void,
                 dispatchable: *mut u8,
             ) -> bool,
         >;
+        #[doc = " Callback to dispatch a JS::Dispatchable to a JSContext's thread's event\n loop with a delay.\n\n The DelayedDispatchToEventLoopCallback set on a particular JSContext must\n accept JS::Dispatchable instances and arrange for their `run` methods to be\n called after the given delay on the JSContext's thread. This is used for\n cross-thread dispatch, so the callback itself must be safe to call from any\n thread. It cannot trigger a GC.\n\n The embeddings must have its own timeout manager to handle the delay.\n If a timeout manager is not available for given context, it should return\n false, optionally with a warning message printed.\n\n The callback accepts a closure that is the same as the one given by the call\n to JS::InitAsyncTaskCallbacks.\n\n If the callback returns `true`, it must eventually run the given\n Dispatchable; otherwise, SpiderMonkey may leak memory or hang.\n\n The callback may return `false` to indicate that the JSContext's thread is\n shutting down and is no longer accepting runnables. Shutting down is a\n one-way transition: once the callback has rejected a runnable, it must reject\n all subsequently submitted runnables as well."]
         pub type DelayedDispatchToEventLoopCallback = ::std::option::Option<
             unsafe extern "C" fn(
                 closure: *mut ::std::os::raw::c_void,
@@ -13820,100 +14221,42 @@ pub mod root {
                 delay: u32,
             ) -> bool,
         >;
+        #[doc = " Callback to notify the embedder that a background task has begun. This can\n be used to keep the JSContext's thread alive if it's subject to garbage\n collection (e.g. as web workers are).\n\n This callback will be called on the same thread as the JSContext, but it\n must not perform any garbage collection or re-enter the engine.\n\n The passed dispatchable can be used to track the async task. Most async\n tasks will finish in a bounded amount of time, but some\n (i.e. Atomics.waitAsync) are not guaranteed to finish. These tasks may be\n canceled using JS::CancelAsyncTasks.\n\n The callback accepts a closure that is the same as the one given by the call\n to JS::InitAsyncTaskCallbacks."]
+        pub type AsyncTaskStartedCallback = ::std::option::Option<
+            unsafe extern "C" fn(
+                closure: *mut ::std::os::raw::c_void,
+                dispatchable: *mut root::JS::Dispatchable,
+            ),
+        >;
+        #[doc = " Callback to notify the embedder that a background task has finished. This can\n be used to keep the JSContext's thread alive if it's subject to garbage\n collection (e.g. as web workers are).\n\n This callback will be called on the same thread as the JSContext, but it\n must not perform any garbage collection or re-enter the engine.\n\n The passed dispatchable will be the same as the one given in\n AsyncTaskStartedCallback. See that callback for more information.\n\n The callback accepts a closure that is the same as the one given by the call\n to JS::InitAsyncTaskCallbacks."]
+        pub type AsyncTaskFinishedCallback = ::std::option::Option<
+            unsafe extern "C" fn(
+                closure: *mut ::std::os::raw::c_void,
+                dispatchable: *mut root::JS::Dispatchable,
+            ),
+        >;
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS24InitDispatchsToEventLoopEP9JSContextPFbPvON7mozilla9UniquePtrINS_12DispatchableENS_12DeletePolicyIS5_EEEEEPFbS2_S9_jES2_"]
-            pub fn InitDispatchsToEventLoop(
+            #[doc = " Initialize the async task callbacks. Embedders must use this or else call\n js::UseInternalJobQueues to select a default implementation built into\n SpiderMonkey. This latter depends on the embedding to call js::RunJobs on\n the JavaScript thread to process queued Dispatchables at appropriate times.\n\n The dispatchCallback and delayedDispatchCallback are mandatory.\n asyncTaskStartedCallback and asyncTaskFinishedCallback are optional and may\n be null.\n"]
+            #[link_name = "\u{1}_ZN2JS22InitAsyncTaskCallbacksEP9JSContextPFbPvOSt10unique_ptrINS_12DispatchableENS_12DeletePolicyIS4_EEEEPFbS2_S8_jEPFvS2_PS4_ESF_S2_"]
+            pub fn InitAsyncTaskCallbacks(
                 cx: *mut root::JSContext,
-                callback: root::JS::DispatchToEventLoopCallback,
-                delayedCallback: root::JS::DelayedDispatchToEventLoopCallback,
+                dispatchCallback: root::JS::DispatchToEventLoopCallback,
+                delayedDispatchCallback: root::JS::DelayedDispatchToEventLoopCallback,
+                asyncTaskStartedCallback: root::JS::AsyncTaskStartedCallback,
+                asyncTaskFinishedCallback: root::JS::AsyncTaskFinishedCallback,
                 closure: *mut ::std::os::raw::c_void,
             );
         }
         extern "C" {
-            #[doc = " When a JSRuntime is destroyed it implicitly cancels all async tasks in\n progress, releasing any roots held by the task. However, this is not soon\n enough for cycle collection, which needs to have roots dropped earlier so\n that the cycle collector can transitively remove roots for a future GC. For\n these and other cases, the set of pending async tasks can be canceled\n with this call earlier than JSRuntime destruction."]
+            #[doc = " Cancel all cancellable async tasks. Some tasks may not be cancellable, and\n must be waited on through a call to JS::ShutdownAsyncTasks.\n\n This will fire JSAsyncTaskFinished callbacks for cancelled tasks."]
+            #[link_name = "\u{1}_ZN2JS16CancelAsyncTasksEP9JSContext"]
+            pub fn CancelAsyncTasks(cx: *mut root::JSContext);
+        }
+        extern "C" {
+            #[doc = " Cancel all cancellable async tasks and block until non-cancellable tasks are\n finished.\n\n This will fire JSAsyncTaskFinished callbacks for all tasks, and there should\n be no outstanding tasks after this returns. All roots held by tasks will be\n released.\n\n Destroying a JSRuntime will implicitly perform this. However, this is not\n soon enough for cycle collection, which needs to have roots dropped earlier\n so that the cycle collector can transitively remove roots for a future GC.\n For these and other cases, the set of pending async tasks can be canceled\n with this call earlier than JSRuntime destruction."]
             #[link_name = "\u{1}_ZN2JS18ShutdownAsyncTasksEP9JSContext"]
             pub fn ShutdownAsyncTasks(cx: *mut root::JSContext);
         }
-        extern "C" {
-            #[doc = " Create an Array from the current realm with the given contents."]
-            #[link_name = "\u{1}_ZN2JS14NewArrayObjectEP9JSContextRKNS_16HandleValueArrayE"]
-            pub fn NewArrayObject(
-                cx: *mut root::JSContext,
-                contents: *const root::JS::HandleValueArray,
-            ) -> *mut root::JSObject;
-        }
-        extern "C" {
-            #[doc = " Create an Array from the current realm with the given length and allocate\n memory for all its elements.  (The elements nonetheless will not exist as\n properties on the returned array until values have been assigned to them.)"]
-            #[link_name = "\u{1}_ZN2JS14NewArrayObjectEP9JSContextm"]
-            pub fn NewArrayObject1(cx: *mut root::JSContext, length: usize) -> *mut root::JSObject;
-        }
-        extern "C" {
-            #[doc = " Determine whether |value| is an Array object or a wrapper around one.  (An\n ES6 proxy whose target is an Array object, e.g.\n |var target = [], handler = {}; Proxy.revocable(target, handler).proxy|, is\n not considered to be an Array.)\n\n On success set |*isArray| accordingly and return true; on failure return\n false."]
-            #[link_name = "\u{1}_ZN2JS13IsArrayObjectEP9JSContextNS_6HandleINS_5ValueEEEPb"]
-            pub fn IsArrayObject(
-                cx: *mut root::JSContext,
-                value: root::JS::Handle<root::JS::Value>,
-                isArray: *mut bool,
-            ) -> bool;
-        }
-        extern "C" {
-            #[doc = " Determine whether |obj| is an Array object or a wrapper around one.  (An\n ES6 proxy whose target is an Array object, e.g.\n |var target = [], handler = {}; Proxy.revocable(target, handler).proxy|, is\n not considered to be an Array.)\n\n On success set |*isArray| accordingly and return true; on failure return\n false."]
-            #[link_name = "\u{1}_ZN2JS13IsArrayObjectEP9JSContextNS_6HandleIP8JSObjectEEPb"]
-            pub fn IsArrayObject1(
-                cx: *mut root::JSContext,
-                obj: root::JS::Handle<*mut root::JSObject>,
-                isArray: *mut bool,
-            ) -> bool;
-        }
-        extern "C" {
-            #[doc = " Store |*lengthp = ToLength(obj.length)| and return true on success, else\n return false.\n\n If the length does not fit in |uint32_t|, an exception is reported and false\n is returned.\n\n |ToLength| converts its input to an integer usable to index an\n array-like object.\n\n If |obj| is an Array, this overall operation is the same as getting\n |obj.length|."]
-            #[link_name = "\u{1}_ZN2JS14GetArrayLengthEP9JSContextNS_6HandleIP8JSObjectEEPj"]
-            pub fn GetArrayLength(
-                cx: *mut root::JSContext,
-                obj: root::JS::Handle<*mut root::JSObject>,
-                lengthp: *mut u32,
-            ) -> bool;
-        }
-        extern "C" {
-            #[doc = " Perform |obj.length = length| as if in strict mode code, with a fast path for\n the case where |obj| is an Array.\n\n This operation is exactly and only assigning to a \"length\" property.  In\n general, it can invoke an existing \"length\" setter, throw if the property is\n non-writable, or do anything else a property-set operation might do."]
-            #[link_name = "\u{1}_ZN2JS14SetArrayLengthEP9JSContextNS_6HandleIP8JSObjectEEj"]
-            pub fn SetArrayLength(
-                cx: *mut root::JSContext,
-                obj: root::JS::Handle<*mut root::JSObject>,
-                length: u32,
-            ) -> bool;
-        }
-        #[repr(i32)]
-        #[doc = " The answer to a successful query as to whether an object is an Array per\n ES6's internal |IsArray| operation (as exposed by |Array.isArray|)."]
-        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-        pub enum IsArrayAnswer {
-            Array = 0,
-            NotArray = 1,
-            RevokedProxy = 2,
-        }
-        extern "C" {
-            #[doc = " ES6 7.2.2.\n\n Returns false on failure, otherwise returns true and sets |*isArray|\n indicating whether the object passes ECMAScript's IsArray test.  This is the\n same test performed by |Array.isArray|.\n\n This is NOT the same as asking whether |obj| is an Array or a wrapper around\n one.  If |obj| is a proxy created by |Proxy.revocable()| and has been\n revoked, or if |obj| is a proxy whose target (at any number of hops) is a\n revoked proxy, this method throws a TypeError and returns false."]
-            #[link_name = "\u{1}_ZN2JS7IsArrayEP9JSContextNS_6HandleIP8JSObjectEEPb"]
-            pub fn IsArray(
-                cx: *mut root::JSContext,
-                obj: root::JS::Handle<*mut root::JSObject>,
-                isArray: *mut bool,
-            ) -> bool;
-        }
-        extern "C" {
-            #[doc = " Identical to IsArray above, but the nature of the object (if successfully\n determined) is communicated via |*answer|.  In particular this method\n returns true and sets |*answer = IsArrayAnswer::RevokedProxy| when called on\n a revoked proxy.\n\n Most users will want the overload above, not this one."]
-            #[link_name = "\u{1}_ZN2JS7IsArrayEP9JSContextNS_6HandleIP8JSObjectEEPNS_13IsArrayAnswerE"]
-            pub fn IsArray1(
-                cx: *mut root::JSContext,
-                obj: root::JS::Handle<*mut root::JSObject>,
-                answer: *mut root::JS::IsArrayAnswer,
-            ) -> bool;
-        }
-        pub type IsAcceptableThis =
-            ::std::option::Option<unsafe extern "C" fn(v: root::JS::HandleValue) -> bool>;
-        pub type NativeImpl = ::std::option::Option<
-            unsafe extern "C" fn(cx: *mut root::JSContext, args: *const root::JS::CallArgs) -> bool,
-        >;
         #[doc = " Regular expression flag values, suitable for initializing a collection of\n regular expression flags as defined below in |RegExpFlags|.  Flags are listed\n in alphabetical order by syntax -- /d, /g, /i, /m, /s, /u, /v, /y."]
         #[repr(C)]
         #[derive(Debug, Copy, Clone, PartialEq)]
@@ -14377,7 +14720,7 @@ pub mod root {
         };
         #[repr(C)]
         pub struct WasmModule__bindgen_vtable(::std::os::raw::c_void);
-        #[doc = " The WasmModule interface allows the embedding to hold a reference to the\n underying C++ implementation of a JS WebAssembly.Module object for purposes\n of efficient postMessage() and (de)serialization from a random thread.\n\n In particular, this allows postMessage() of a WebAssembly.Module:\n GetWasmModule() is called when making a structured clone of a payload\n containing a WebAssembly.Module object. The structured clone buffer holds a\n refcount of the JS::WasmModule until createObject() is called in the target\n agent's JSContext. The new WebAssembly.Module object continues to hold the\n JS::WasmModule and thus the final reference of a JS::WasmModule may be\n dropped from any thread and so the virtual destructor (and all internal\n methods of the C++ module) must be thread-safe."]
+        #[doc = " The WasmModule interface allows the embedding to hold a reference to the\n underlying C++ implementation of a JS WebAssembly.Module object for purposes\n of efficient postMessage() and (de)serialization from a random thread.\n\n In particular, this allows postMessage() of a WebAssembly.Module:\n GetWasmModule() is called when making a structured clone of a payload\n containing a WebAssembly.Module object. The structured clone buffer holds a\n refcount of the JS::WasmModule until createObject() is called in the target\n agent's JSContext. The new WebAssembly.Module object continues to hold the\n JS::WasmModule and thus the final reference of a JS::WasmModule may be\n dropped from any thread and so the virtual destructor (and all internal\n methods of the C++ module) must be thread-safe."]
         #[repr(C)]
         #[derive(Debug, PartialEq)]
         pub struct WasmModule {
@@ -14499,59 +14842,70 @@ pub mod root {
                 stencilOut: *mut *mut root::JS::Stencil,
             ) -> root::JS::TranscodeResult;
         }
+        #[repr(i32)]
+        #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+        pub enum CollectDelazificationsResult {
+            NewlyStarted = 0,
+            AlreadyStarted = 1,
+            NotSupported = 2,
+        }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS30StartCollectingDelazificationsEP9JSContextNS_6HandleIP8JSScriptEEPN2js8frontend32InitialStencilAndDelazificationsERb"]
+            #[link_name = "\u{1}_ZN2JS30StartCollectingDelazificationsEP9JSContextNS_6HandleIP8JSScriptEEPN2js8frontend32InitialStencilAndDelazificationsERNS_28CollectDelazificationsResultE"]
             pub fn StartCollectingDelazifications(
                 cx: *mut root::JSContext,
                 script: root::JS::Handle<*mut root::JSScript>,
                 stencil: *mut root::JS::Stencil,
-                alreadyStarted: *mut bool,
+                result: *mut root::JS::CollectDelazificationsResult,
             ) -> bool;
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS30StartCollectingDelazificationsEP9JSContextNS_6HandleIP8JSObjectEEPN2js8frontend32InitialStencilAndDelazificationsERb"]
+            #[link_name = "\u{1}_ZN2JS30StartCollectingDelazificationsEP9JSContextNS_6HandleIP8JSObjectEEPN2js8frontend32InitialStencilAndDelazificationsERNS_28CollectDelazificationsResultE"]
             pub fn StartCollectingDelazifications1(
                 cx: *mut root::JSContext,
                 module: root::JS::Handle<*mut root::JSObject>,
                 stencil: *mut root::JS::Stencil,
-                alreadyStarted: *mut bool,
-            ) -> bool;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS31FinishCollectingDelazificationsEP9JSContextNS_6HandleIP8JSScriptEERN7mozilla6VectorIhLm0ENS6_17MallocAllocPolicyEEE"]
-            pub fn FinishCollectingDelazifications(
-                cx: *mut root::JSContext,
-                script: root::JS::Handle<*mut root::JSScript>,
-                buffer: *mut root::JS::TranscodeBuffer,
-            ) -> bool;
-        }
-        extern "C" {
-            #[link_name = "\u{1}_ZN2JS31FinishCollectingDelazificationsEP9JSContextNS_6HandleIP8JSObjectEERN7mozilla6VectorIhLm0ENS6_17MallocAllocPolicyEEE"]
-            pub fn FinishCollectingDelazifications1(
-                cx: *mut root::JSContext,
-                module: root::JS::Handle<*mut root::JSObject>,
-                buffer: *mut root::JS::TranscodeBuffer,
+                result: *mut root::JS::CollectDelazificationsResult,
             ) -> bool;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS31FinishCollectingDelazificationsEP9JSContextNS_6HandleIP8JSScriptEEPPN2js8frontend32InitialStencilAndDelazificationsE"]
-            pub fn FinishCollectingDelazifications2(
+            pub fn FinishCollectingDelazifications(
                 cx: *mut root::JSContext,
                 script: root::JS::Handle<*mut root::JSScript>,
                 stencilOut: *mut *mut root::JS::Stencil,
             ) -> bool;
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS30AbortCollectingDelazificationsENS_6HandleIP8JSScriptEE"]
-            pub fn AbortCollectingDelazifications(script: root::JS::Handle<*mut root::JSScript>);
+            #[link_name = "\u{1}_ZN2JS31FinishCollectingDelazificationsEP9JSContextNS_6HandleIP8JSObjectEEPPN2js8frontend32InitialStencilAndDelazificationsE"]
+            pub fn FinishCollectingDelazifications1(
+                cx: *mut root::JSContext,
+                module: root::JS::Handle<*mut root::JSObject>,
+                stencilOut: *mut *mut root::JS::Stencil,
+            ) -> bool;
         }
         extern "C" {
-            #[link_name = "\u{1}_ZN2JS30AbortCollectingDelazificationsENS_6HandleIP8JSObjectEE"]
-            pub fn AbortCollectingDelazifications1(module: root::JS::Handle<*mut root::JSObject>);
+            #[link_name = "\u{1}_ZN2JS30AbortCollectingDelazificationsEP8JSScript"]
+            pub fn AbortCollectingDelazifications(script: *mut root::JSScript);
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS30AbortCollectingDelazificationsEP8JSObject"]
+            pub fn AbortCollectingDelazifications1(module: *mut root::JSObject);
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS18IsStencilCacheableEPN2js8frontend32InitialStencilAndDelazificationsE"]
             pub fn IsStencilCacheable(stencil: *mut root::JS::Stencil) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS21GetScriptSourceLengthEPN2js8frontend32InitialStencilAndDelazificationsE"]
+            pub fn GetScriptSourceLength(stencil: *mut root::JS::Stencil) -> usize;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS19GetScriptSourceTextEP9JSContextPN2js8frontend32InitialStencilAndDelazificationsENS_13MutableHandleINS_5ValueEEE"]
+            pub fn GetScriptSourceText(
+                cx: *mut root::JSContext,
+                stencil: *mut root::JS::Stencil,
+                result: root::JS::MutableHandle<root::JS::Value>,
+            ) -> bool;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS22IsLargeArrayBufferViewEP8JSObject"]
@@ -14560,6 +14914,10 @@ pub mod root {
         extern "C" {
             #[link_name = "\u{1}_ZN2JS26IsResizableArrayBufferViewEP8JSObject"]
             pub fn IsResizableArrayBufferView(obj: *mut root::JSObject) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS26IsImmutableArrayBufferViewEP8JSObject"]
+            pub fn IsImmutableArrayBufferView(obj: *mut root::JSObject) -> bool;
         }
         extern "C" {
             #[link_name = "\u{1}_ZN2JS26PinArrayBufferOrViewLengthEP8JSObjectb"]
@@ -14600,6 +14958,10 @@ pub mod root {
             pub static ArrayBuffer_ResizableUnsharedClass: *const root::JSClass;
         }
         extern "C" {
+            #[link_name = "\u{1}_ZN2JS11ArrayBuffer22ImmutableUnsharedClassE"]
+            pub static ArrayBuffer_ImmutableUnsharedClass: *const root::JSClass;
+        }
+        extern "C" {
             #[link_name = "\u{1}_ZN2JS11ArrayBuffer22FixedLengthSharedClassE"]
             pub static ArrayBuffer_FixedLengthSharedClass: *const root::JSClass;
         }
@@ -14635,6 +14997,10 @@ pub mod root {
             #[link_name = "\u{1}_ZN2JS8DataView17ResizableClassPtrE"]
             pub static DataView_ResizableClassPtr: *const root::JSClass;
         }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS8DataView17ImmutableClassPtrE"]
+            pub static DataView_ImmutableClassPtr: *const root::JSClass;
+        }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
             ["Size of DataView"][::std::mem::size_of::<DataView>() - 8usize];
@@ -14652,6 +15018,10 @@ pub mod root {
         extern "C" {
             #[link_name = "\u{1}_ZN2JS15TypedArray_base16resizableClassesE"]
             pub static TypedArray_base_resizableClasses: *const root::JSClass;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS15TypedArray_base16immutableClassesE"]
+            pub static TypedArray_base_immutableClasses: *const root::JSClass;
         }
         #[allow(clippy::unnecessary_operation, clippy::identity_op)]
         const _: () = {
@@ -14699,6 +15069,140 @@ pub mod root {
                 domProxyShadowsCheck: root::JS::DOMProxyShadowsCheck,
                 domRemoteProxyHandlerFamily: *const ::std::os::raw::c_void,
             );
+        }
+        #[doc = " [SMDOC] JS::Value type\n\n JS::Value is the interface for a single JavaScript Engine value.  A few\n general notes on JS::Value:\n\n - JS::Value has setX() and isX() members for X in\n\n     { Int32, Double, String, Symbol, BigInt, Boolean, Undefined, Null,\n       Object, Magic }\n\n   JS::Value also contains toX() for each of the non-singleton types.\n\n - Magic is a singleton type whose payload contains either a JSWhyMagic\n   \"reason\" for the magic value or a uint32_t value. By providing JSWhyMagic\n   values when creating and checking for magic values, it is possible to\n   assert, at runtime, that only magic values with the expected reason flow\n   through a particular value. For example, if cx->exception has a magic\n   value, the reason must be JS_GENERATOR_CLOSING.\n\n - To help prevent mistakenly boxing a nullable JSObject* as an object,\n   Value::setObject takes a JSObject&. (Conversely, Value::toObject returns a\n   JSObject&.)  A convenience member Value::setObjectOrNull is provided.\n\n - Note that JS::Value is 8 bytes on 32 and 64-bit architectures. Because most\n   of our users are now on 64-bit platforms, code should prefer passing\n   JS::Value by value instead of |const Value&|.\n\n Spectre mitigations\n ===================\n To mitigate Spectre attacks, we do the following:\n\n - On 64-bit platforms, when unboxing a Value, we XOR the bits with the\n   expected type tag (instead of masking the payload bits). This guarantees\n   that toString, toObject, toSymbol will return an invalid pointer (because\n   some high bits will be set) when called on a Value with a different type\n   tag.\n\n - On 32-bit platforms,when unboxing an object/string/symbol Value, we use a\n   conditional move (not speculated) to zero the payload register if the type\n   doesn't match."]
+        pub type GenericMicroTask = root::JS::Value;
+        pub type JSMicroTask = root::JSObject;
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS13IsJSMicroTaskERKNS_5ValueE"]
+            pub fn IsJSMicroTask(hv: *const root::JS::GenericMicroTask) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS22ToUnwrappedJSMicroTaskERKNS_5ValueE"]
+            pub fn ToUnwrappedJSMicroTask(
+                genericMicroTask: *const root::JS::GenericMicroTask,
+            ) -> *mut root::JS::JSMicroTask;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS25ToMaybeWrappedJSMicroTaskERKNS_5ValueE"]
+            pub fn ToMaybeWrappedJSMicroTask(
+                genericMicroTask: *const root::JS::GenericMicroTask,
+            ) -> *mut root::JS::JSMicroTask;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS14RunJSMicroTaskEP9JSContextNS_6HandleIP8JSObjectEE"]
+            pub fn RunJSMicroTask(
+                cx: *mut root::JSContext,
+                entry: root::JS::Handle<*mut root::JS::JSMicroTask>,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS16EnqueueMicroTaskEP9JSContextRKNS_5ValueE"]
+            pub fn EnqueueMicroTask(
+                cx: *mut root::JSContext,
+                entry: *const root::JS::GenericMicroTask,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS21EnqueueDebugMicroTaskEP9JSContextRKNS_5ValueE"]
+            pub fn EnqueueDebugMicroTask(
+                cx: *mut root::JSContext,
+                entry: *const root::JS::GenericMicroTask,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS16PrependMicroTaskEP9JSContextRKNS_5ValueE"]
+            pub fn PrependMicroTask(
+                cx: *mut root::JSContext,
+                entry: *const root::JS::GenericMicroTask,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS28DequeueNextDebuggerMicroTaskEP9JSContext"]
+            pub fn DequeueNextDebuggerMicroTask(
+                cx: *mut root::JSContext,
+            ) -> root::JS::GenericMicroTask;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS27DequeueNextRegularMicroTaskEP9JSContext"]
+            pub fn DequeueNextRegularMicroTask(
+                cx: *mut root::JSContext,
+            ) -> root::JS::GenericMicroTask;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS17PeekNextMicroTaskEP9JSContext"]
+            pub fn PeekNextMicroTask(cx: *mut root::JSContext) -> root::JS::GenericMicroTask;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS16HasAnyMicroTasksEP9JSContext"]
+            pub fn HasAnyMicroTasks(cx: *mut root::JSContext) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS21HasDebuggerMicroTasksEP9JSContext"]
+            pub fn HasDebuggerMicroTasks(cx: *mut root::JSContext) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS20HasRegularMicroTasksEP9JSContext"]
+            pub fn HasRegularMicroTasks(cx: *mut root::JSContext) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS24GetRegularMicroTaskCountEP9JSContext"]
+            pub fn GetRegularMicroTaskCount(cx: *mut root::JSContext) -> usize;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS33GetExecutionGlobalFromJSMicroTaskEP8JSObject"]
+            pub fn GetExecutionGlobalFromJSMicroTask(
+                entry: *mut root::JS::JSMicroTask,
+            ) -> *mut root::JSObject;
+        }
+        #[repr(C)]
+        pub struct SavedMicroTaskQueue__bindgen_vtable(::std::os::raw::c_void);
+        #[repr(C)]
+        #[derive(Debug, PartialEq)]
+        pub struct SavedMicroTaskQueue {
+            pub vtable_: *const SavedMicroTaskQueue__bindgen_vtable,
+        }
+        #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+        const _: () = {
+            ["Size of SavedMicroTaskQueue"][::std::mem::size_of::<SavedMicroTaskQueue>() - 8usize];
+            ["Alignment of SavedMicroTaskQueue"]
+                [::std::mem::align_of::<SavedMicroTaskQueue>() - 8usize];
+        };
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS18SaveMicroTaskQueueEP9JSContext"]
+            pub fn SaveMicroTaskQueue(cx: *mut root::JSContext) -> u8;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS21RestoreMicroTaskQueueEP9JSContextSt10unique_ptrINS_19SavedMicroTaskQueueENS_12DeletePolicyIS3_EEE"]
+            pub fn RestoreMicroTaskQueue(cx: *mut root::JSContext, savedQueue: u8);
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS38MaybeGetHostDefinedDataFromJSMicroTaskEP8JSObjectNS_13MutableHandleIS1_EES3_"]
+            pub fn MaybeGetHostDefinedDataFromJSMicroTask(
+                entry: *mut root::JS::JSMicroTask,
+                incumbentGlobal: root::JS::MutableHandleObject,
+                optionalHostDefinedData: root::JS::MutableHandleObject,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS37MaybeGetAllocationSiteFromJSMicroTaskEP8JSObjectNS_13MutableHandleIS1_EE"]
+            pub fn MaybeGetAllocationSiteFromJSMicroTask(
+                entry: *mut root::JS::JSMicroTask,
+                out: root::JS::MutableHandleObject,
+            ) -> bool;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS30MaybeGetPromiseFromJSMicroTaskEP8JSObject"]
+            pub fn MaybeGetPromiseFromJSMicroTask(
+                entry: *mut root::JS::JSMicroTask,
+            ) -> *mut root::JSObject;
+        }
+        extern "C" {
+            #[link_name = "\u{1}_ZN2JS24GetFlowIdFromJSMicroTaskEP8JSObjectPm"]
+            pub fn GetFlowIdFromJSMicroTask(
+                entry: *mut root::JS::JSMicroTask,
+                uid: *mut u64,
+            ) -> bool;
         }
         extern "C" {
             #[doc = " Set all of the uninitialized lexicals on an object to undefined. Return\n true if any lexicals were initialized and false otherwise."]
@@ -14963,35 +15467,35 @@ pub mod root {
         JSProto_EvalError = 15,
         JSProto_RangeError = 16,
         JSProto_ReferenceError = 17,
-        JSProto_SyntaxError = 18,
-        JSProto_TypeError = 19,
-        JSProto_URIError = 20,
-        JSProto_DebuggeeWouldRun = 21,
-        JSProto_CompileError = 22,
-        JSProto_LinkError = 23,
-        JSProto_RuntimeError = 24,
-        JSProto_SuspendError = 25,
-        JSProto_ArrayBuffer = 26,
-        JSProto_Int8Array = 27,
-        JSProto_Uint8Array = 28,
-        JSProto_Int16Array = 29,
-        JSProto_Uint16Array = 30,
-        JSProto_Int32Array = 31,
-        JSProto_Uint32Array = 32,
-        JSProto_Float32Array = 33,
-        JSProto_Float64Array = 34,
-        JSProto_Uint8ClampedArray = 35,
-        JSProto_BigInt64Array = 36,
-        JSProto_BigUint64Array = 37,
-        JSProto_Float16Array = 38,
-        JSProto_BigInt = 39,
-        JSProto_Proxy = 40,
-        JSProto_WeakMap = 41,
-        JSProto_Map = 42,
-        JSProto_Set = 43,
-        JSProto_DataView = 44,
-        JSProto_Symbol = 45,
-        JSProto_ShadowRealm = 46,
+        JSProto_SuppressedError = 18,
+        JSProto_SyntaxError = 19,
+        JSProto_TypeError = 20,
+        JSProto_URIError = 21,
+        JSProto_DebuggeeWouldRun = 22,
+        JSProto_CompileError = 23,
+        JSProto_LinkError = 24,
+        JSProto_RuntimeError = 25,
+        JSProto_SuspendError = 26,
+        JSProto_ArrayBuffer = 27,
+        JSProto_Int8Array = 28,
+        JSProto_Uint8Array = 29,
+        JSProto_Int16Array = 30,
+        JSProto_Uint16Array = 31,
+        JSProto_Int32Array = 32,
+        JSProto_Uint32Array = 33,
+        JSProto_Float32Array = 34,
+        JSProto_Float64Array = 35,
+        JSProto_Uint8ClampedArray = 36,
+        JSProto_BigInt64Array = 37,
+        JSProto_BigUint64Array = 38,
+        JSProto_Float16Array = 39,
+        JSProto_BigInt = 40,
+        JSProto_Proxy = 41,
+        JSProto_WeakMap = 42,
+        JSProto_Map = 43,
+        JSProto_Set = 44,
+        JSProto_DataView = 45,
+        JSProto_Symbol = 46,
         JSProto_SharedArrayBuffer = 47,
         JSProto_Intl = 48,
         JSProto_Collator = 49,
@@ -15015,29 +15519,33 @@ pub mod root {
         JSProto_AsyncGeneratorFunction = 67,
         JSProto_WebAssembly = 68,
         JSProto_WasmModule = 69,
-        JSProto_WasmInstance = 70,
-        JSProto_WasmMemory = 71,
-        JSProto_WasmTable = 72,
-        JSProto_WasmGlobal = 73,
-        JSProto_WasmTag = 74,
-        JSProto_WasmFunction = 75,
-        JSProto_WasmSuspending = 76,
-        JSProto_WasmException = 77,
-        JSProto_FinalizationRegistry = 78,
-        JSProto_WeakRef = 79,
-        JSProto_Iterator = 80,
-        JSProto_AsyncIterator = 81,
-        JSProto_Temporal = 82,
-        JSProto_Duration = 83,
-        JSProto_Instant = 84,
-        JSProto_PlainDate = 85,
-        JSProto_PlainDateTime = 86,
-        JSProto_PlainMonthDay = 87,
-        JSProto_PlainYearMonth = 88,
-        JSProto_PlainTime = 89,
-        JSProto_TemporalNow = 90,
-        JSProto_ZonedDateTime = 91,
-        JSProto_LIMIT = 92,
+        JSProto_WasmComponent = 70,
+        JSProto_WasmInstance = 71,
+        JSProto_WasmMemory = 72,
+        JSProto_WasmTable = 73,
+        JSProto_WasmGlobal = 74,
+        JSProto_WasmTag = 75,
+        JSProto_WasmFunction = 76,
+        JSProto_WasmSuspending = 77,
+        JSProto_WasmException = 78,
+        JSProto_FinalizationRegistry = 79,
+        JSProto_WeakRef = 80,
+        JSProto_Iterator = 81,
+        JSProto_AsyncIterator = 82,
+        JSProto_AbstractModuleSource = 83,
+        JSProto_DisposableStack = 84,
+        JSProto_AsyncDisposableStack = 85,
+        JSProto_Temporal = 86,
+        JSProto_Duration = 87,
+        JSProto_Instant = 88,
+        JSProto_PlainDate = 89,
+        JSProto_PlainDateTime = 90,
+        JSProto_PlainMonthDay = 91,
+        JSProto_PlainYearMonth = 92,
+        JSProto_PlainTime = 93,
+        JSProto_TemporalNow = 94,
+        JSProto_ZonedDateTime = 95,
+        JSProto_LIMIT = 96,
     }
     #[repr(C)]
     #[derive(Debug, Copy, Clone)]
@@ -15056,6 +15564,17 @@ pub mod root {
     }
     pub type JSConstDoubleSpec = root::JSConstScalarSpec;
     pub type JSConstIntegerSpec = root::JSConstScalarSpec;
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct InfallibleAllocPolicy {
+        pub _address: u8,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of InfallibleAllocPolicy"][::std::mem::size_of::<InfallibleAllocPolicy>() - 1usize];
+        ["Alignment of InfallibleAllocPolicy"]
+            [::std::mem::align_of::<InfallibleAllocPolicy>() - 1usize];
+    };
     pub type arena_id_t = usize;
     extern "C" {
         #[link_name = "\u{1}_Z9JS_AssertPKcS0_i"]
@@ -15063,12 +15582,62 @@ pub mod root {
             s: *const ::std::os::raw::c_char,
             file: *const ::std::os::raw::c_char,
             ln: ::std::os::raw::c_int,
-        ) -> !;
+        );
     }
     extern "C" {
         #[doc = " Complain when out of memory."]
         #[link_name = "\u{1}_Z20JS_ReportOutOfMemoryP9JSContext"]
         pub fn JS_ReportOutOfMemory(cx: *mut root::JSContext);
+    }
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct JSInfallibleAllocPolicy {
+        pub _address: u8,
+    }
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of JSInfallibleAllocPolicy"]
+            [::std::mem::size_of::<JSInfallibleAllocPolicy>() - 1usize];
+        ["Alignment of JSInfallibleAllocPolicy"]
+            [::std::mem::align_of::<JSInfallibleAllocPolicy>() - 1usize];
+    };
+    #[doc = " already_AddRefed cooperates with reference counting smart pointers to enable\n you to assign in a pointer _without_ |AddRef|ing it.  You might want to use\n this as a return type from a function that returns an already |AddRef|ed\n pointer.  Or, you might want to use this as a parameter type in a function\n that wants to force a transfer-of-ownership from a RefPtr in the caller (for\n example, if the function expects callers to pass in a newly-created object,\n which the function then takes ownership of).\n\n TODO Move already_AddRefed to namespace mozilla.  This has not yet been done\n because of the sheer number of usages of already_AddRefed.\n\n When should you use already_AddRefed<>?\n * Ensure a consumer takes ownership of a reference\n * Pass ownership without calling AddRef/Release (sometimes required in\n   off-main-thread code)\n * The ref pointer type you're using doesn't support move construction\n\n Otherwise, use std::move(RefPtr/nsCOMPtr/etc)."]
+    #[repr(C)]
+    #[derive(Debug, PartialEq)]
+    pub struct already_AddRefed<T> {
+        pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
+        pub mRawPtr: *mut T,
+    }
+    pub mod fmt {
+        #[allow(unused_imports)]
+        use self::super::super::root;
+        pub mod detail {
+            #[allow(unused_imports)]
+            use self::super::super::super::root;
+        }
+    }
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone)]
+    pub struct nsISupports {
+        _unused: [u8; 0],
+    }
+    #[repr(C)]
+    #[derive(Debug, PartialEq)]
+    pub struct RefPtr<T> {
+        pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
+        pub mRawPtr: *mut T,
+    }
+    pub type RefPtr_element_type<T> = T;
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct RefPtr_Proxy {
+        pub _address: u8,
+    }
+    pub type RefPtr_Proxy_member_function = u8;
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
+    pub struct RefPtr_ConstRemovingRefPtrTraits {
+        pub _address: u8,
     }
     #[repr(C)]
     pub struct JSTracer__bindgen_vtable(::std::os::raw::c_void);
@@ -15077,21 +15646,21 @@ pub mod root {
     pub struct JSTracer {
         pub vtable_: *const JSTracer__bindgen_vtable,
         pub runtime_: *mut root::JSRuntime,
+        pub context_: root::JS::TracingContext,
         pub kind_: root::JS::TracerKind,
         pub options_: root::JS::TraceOptions,
-        pub context_: root::JS::TracingContext,
     }
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of JSTracer"][::std::mem::size_of::<JSTracer>() - 48usize];
+        ["Size of JSTracer"][::std::mem::size_of::<JSTracer>() - 40usize];
         ["Alignment of JSTracer"][::std::mem::align_of::<JSTracer>() - 8usize];
         ["Offset of field: JSTracer::runtime_"]
             [::std::mem::offset_of!(JSTracer, runtime_) - 8usize];
-        ["Offset of field: JSTracer::kind_"][::std::mem::offset_of!(JSTracer, kind_) - 16usize];
-        ["Offset of field: JSTracer::options_"]
-            [::std::mem::offset_of!(JSTracer, options_) - 20usize];
         ["Offset of field: JSTracer::context_"]
-            [::std::mem::offset_of!(JSTracer, context_) - 32usize];
+            [::std::mem::offset_of!(JSTracer, context_) - 16usize];
+        ["Offset of field: JSTracer::kind_"][::std::mem::offset_of!(JSTracer, kind_) - 32usize];
+        ["Offset of field: JSTracer::options_"]
+            [::std::mem::offset_of!(JSTracer, options_) - 33usize];
     };
     #[doc = " MozRefCountType is Mozilla's reference count type.\n\n We use the same type to represent the refcount of RefCounted objects\n as well, in order to be able to use the leak detection facilities\n that are implemented by XPCOM.\n\n Note that this type is not in the mozilla namespace so that it is\n usable for both C and C++ code."]
     pub type MozRefCountType = usize;
@@ -15394,6 +15963,7 @@ pub mod root {
         #[link_name = "\u{1}_ZL18JS_NULL_OBJECT_OPS"]
         pub static JS_NULL_OBJECT_OPS: *const root::js::ObjectOps;
     }
+    pub const JSCLASS_PRESERVES_WRAPPER: u32 = 1;
     pub const JSCLASS_DELAY_METADATA_BUILDER: u32 = 2;
     pub const JSCLASS_IS_WRAPPED_NATIVE: u32 = 4;
     pub const JSCLASS_SLOT0_IS_NSISUPPORTS: u32 = 8;
@@ -15419,6 +15989,7 @@ pub mod root {
     pub const JSCLASS_GLOBAL_FLAGS: u32 = 132608;
     pub const JSCLASS_CACHED_PROTO_SHIFT: u32 = 25;
     pub const JSCLASS_CACHED_PROTO_MASK: u32 = 127;
+    pub const JS_OBJECT_WRAPPER_SLOT: usize = 0;
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
     pub struct JSClassOps {
@@ -15586,7 +16157,7 @@ pub mod root {
         JSGC_MAX_HELPER_THREADS = 40,
         #[doc = " The number of background threads to use for parallel GC work.\n\n This parameter is read-only and is set based on the\n JSGC_HELPER_THREAD_RATIO and JSGC_MAX_HELPER_THREADS parameters."]
         JSGC_HELPER_THREAD_COUNT = 41,
-        #[doc = " A number that is incremented on every major GC slice."]
+        #[doc = " A number that is incremented at the start of every major GC."]
         JSGC_MAJOR_GC_NUMBER = 44,
         #[doc = " A number that is incremented on every minor GC."]
         JSGC_MINOR_GC_NUMBER = 45,
@@ -15614,16 +16185,15 @@ pub mod root {
         JSGC_HIGH_FREQUENCY_MODE = 56,
         #[doc = " The engine attempts to keep nursery collection time less than this limit by\n restricting the size of the nursery.\n\n This only happens in optimized builds. It does not happen during pageload\n (as indicated by js::gc::SetPerformanceHint).\n\n Setting this to zero disables this feature.\n\n Default: 4\n Pref: javascript.options.mem.nursery_max_time_goal_ms"]
         JSGC_NURSERY_MAX_TIME_GOAL_MS = 57,
+        #[doc = " The engine attempts to keep nursery collection time less than this limit by\n restricting the size of the nursery.\n\n This only happens in optimized builds. It does not happen during pageload\n (as indicated by js::gc::SetPerformanceHint).\n\n Setting this to zero disables this feature.\n\n Default: 4\n Pref: javascript.options.mem.nursery_max_time_goal_ms"]
+        JSGC_STORE_BUFFER_ENTRIES = 58,
+        #[doc = " The engine attempts to keep nursery collection time less than this limit by\n restricting the size of the nursery.\n\n This only happens in optimized builds. It does not happen during pageload\n (as indicated by js::gc::SetPerformanceHint).\n\n Setting this to zero disables this feature.\n\n Default: 4\n Pref: javascript.options.mem.nursery_max_time_goal_ms"]
+        JSGC_STORE_BUFFER_SCALING = 59,
+        #[doc = " Whether experimental concurrent marking support is enabled. This also\n requires that the code has been built with --enable-gc-concurrent-marking\n configuration flag.\n\n Default: false"]
+        JSGC_CONCURRENT_MARKING_ENABLED = 60,
     }
     pub type JSTraceDataOp = ::std::option::Option<
         unsafe extern "C" fn(trc: *mut root::JSTracer, data: *mut ::std::os::raw::c_void),
-    >;
-    pub type JSGrayRootsTracer = ::std::option::Option<
-        unsafe extern "C" fn(
-            trc: *mut root::JSTracer,
-            budget: *mut root::JS::SliceBudget,
-            data: *mut ::std::os::raw::c_void,
-        ) -> bool,
     >;
     #[repr(u32)]
     #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -15631,9 +16201,6 @@ pub mod root {
         JSGC_BEGIN = 0,
         JSGC_END = 1,
     }
-    pub type JSObjectsTenuredCallback = ::std::option::Option<
-        unsafe extern "C" fn(gcx: *mut root::JS::GCContext, data: *mut ::std::os::raw::c_void),
-    >;
     #[repr(u32)]
     #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
     pub enum JSFinalizeStatus {
@@ -15724,14 +16291,6 @@ pub mod root {
         pub fn JS_SetGCCallback(
             cx: *mut root::JSContext,
             cb: root::JSGCCallback,
-            data: *mut ::std::os::raw::c_void,
-        );
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z28JS_SetObjectsTenuredCallbackP9JSContextPFvPN2JS9GCContextEPvES4_"]
-        pub fn JS_SetObjectsTenuredCallback(
-            cx: *mut root::JSContext,
-            cb: root::JSObjectsTenuredCallback,
             data: *mut ::std::os::raw::c_void,
         );
     }
@@ -15872,6 +16431,10 @@ pub mod root {
         ) -> bool;
     }
     extern "C" {
+        #[link_name = "\u{1}_Z23JS_GetLastOOMStackTraceP9JSContext"]
+        pub fn JS_GetLastOOMStackTrace(cx: *mut root::JSContext) -> *const ::std::os::raw::c_char;
+    }
+    extern "C" {
         #[link_name = "\u{1}_Z25JS_TracerEnterLabelLatin1P9JSContextPKc"]
         pub fn JS_TracerEnterLabelLatin1(
             cx: *mut root::JSContext,
@@ -15923,6 +16486,42 @@ pub mod root {
             arg1: *mut root::JSRuntime,
         ) -> *mut root::JSErrorInterceptor;
     }
+    extern "C" {
+        #[link_name = "\u{1}_Z21JS_IsExceptionPendingP9JSContext"]
+        pub fn JS_IsExceptionPending(cx: *mut root::JSContext) -> bool;
+    }
+    extern "C" {
+        #[link_name = "\u{1}_Z24JS_IsThrowingOutOfMemoryP9JSContext"]
+        pub fn JS_IsThrowingOutOfMemory(cx: *mut root::JSContext) -> bool;
+    }
+    extern "C" {
+        #[link_name = "\u{1}_Z22JS_GetPendingExceptionP9JSContextN2JS13MutableHandleINS1_5ValueEEE"]
+        pub fn JS_GetPendingException(
+            cx: *mut root::JSContext,
+            vp: root::JS::MutableHandleValue,
+        ) -> bool;
+    }
+    extern "C" {
+        #[link_name = "\u{1}_Z22JS_SetPendingExceptionP9JSContextN2JS6HandleINS1_5ValueEEENS1_22ExceptionStackBehaviorE"]
+        pub fn JS_SetPendingException(
+            cx: *mut root::JSContext,
+            v: root::JS::HandleValue,
+            behavior: root::JS::ExceptionStackBehavior,
+        );
+    }
+    extern "C" {
+        #[link_name = "\u{1}_Z24JS_ClearPendingExceptionP9JSContext"]
+        pub fn JS_ClearPendingException(cx: *mut root::JSContext);
+    }
+    extern "C" {
+        #[doc = " If the given object is an exception object, the exception will have (or be\n able to lazily create) an error report struct, and this function will\n populate |errorReport| with it and return true. Otherwise, returns false.\n\n See |BorrowedErrorReport| for a usage example."]
+        #[link_name = "\u{1}_Z21JS_ErrorFromExceptionP9JSContextN2JS6HandleIP8JSObjectEERNS1_19BorrowedErrorReportE"]
+        pub fn JS_ErrorFromException(
+            cx: *mut root::JSContext,
+            obj: root::JS::HandleObject,
+            errorReport: *mut root::JS::BorrowedErrorReport,
+        ) -> bool;
+    }
     impl root::JSExnType {
         pub const JSEXN_FIRST: root::JSExnType = JSExnType::JSEXN_ERR;
     }
@@ -15939,17 +16538,18 @@ pub mod root {
         JSEXN_EVALERR = 3,
         JSEXN_RANGEERR = 4,
         JSEXN_REFERENCEERR = 5,
-        JSEXN_SYNTAXERR = 6,
-        JSEXN_TYPEERR = 7,
-        JSEXN_URIERR = 8,
-        JSEXN_DEBUGGEEWOULDRUN = 9,
-        JSEXN_WASMCOMPILEERROR = 10,
-        JSEXN_WASMLINKERROR = 11,
-        JSEXN_WASMRUNTIMEERROR = 12,
-        JSEXN_WASMSUSPENDERROR = 13,
-        JSEXN_ERROR_LIMIT = 14,
-        JSEXN_NOTE = 15,
-        JSEXN_LIMIT = 16,
+        JSEXN_SUPPRESSEDERR = 6,
+        JSEXN_SYNTAXERR = 7,
+        JSEXN_TYPEERR = 8,
+        JSEXN_URIERR = 9,
+        JSEXN_DEBUGGEEWOULDRUN = 10,
+        JSEXN_WASMCOMPILEERROR = 11,
+        JSEXN_WASMLINKERROR = 12,
+        JSEXN_WASMRUNTIMEERROR = 13,
+        JSEXN_WASMSUSPENDERROR = 14,
+        JSEXN_ERROR_LIMIT = 15,
+        JSEXN_NOTE = 16,
+        JSEXN_LIMIT = 17,
     }
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
@@ -16084,7 +16684,6 @@ pub mod root {
         pub note_: *mut u64,
     }
     pub type JSErrorNotes_iterator_iterator_category = root::std::input_iterator_tag;
-    #[doc = " UniquePtr is a smart pointer that wholly owns a resource.  Ownership may be\n transferred out of a UniquePtr through explicit action, but otherwise the\n resource is destroyed when the UniquePtr is destroyed.\n\n UniquePtr is similar to C++98's std::auto_ptr, but it improves upon auto_ptr\n in one crucial way: it's impossible to copy a UniquePtr.  Copying an auto_ptr\n obviously *can't* copy ownership of its singly-owned resource.  So what\n happens if you try to copy one?  Bizarrely, ownership is implicitly\n *transferred*, preserving single ownership but breaking code that assumes a\n copy of an object is identical to the original.  (This is why auto_ptr is\n prohibited in STL containers.)\n\n UniquePtr solves this problem by being *movable* rather than copyable.\n Instead of passing a |UniquePtr u| directly to the constructor or assignment\n operator, you pass |Move(u)|.  In doing so you indicate that you're *moving*\n ownership out of |u|, into the target of the construction/assignment.  After\n the transfer completes, |u| contains |nullptr| and may be safely destroyed.\n This preserves single ownership but also allows UniquePtr to be moved by\n algorithms that have been made move-safe.  (Note: if |u| is instead a\n temporary expression, don't use |Move()|: just pass the expression, because\n it's already move-ready.  For more information see Move.h.)\n\n UniquePtr is also better than std::auto_ptr in that the deletion operation is\n customizable.  An optional second template parameter specifies a class that\n (through its operator()(T*)) implements the desired deletion policy.  If no\n policy is specified, mozilla::DefaultDelete<T> is used -- which will either\n |delete| or |delete[]| the resource, depending whether the resource is an\n array.  Custom deletion policies ideally should be empty classes (no member\n fields, no member fields in base classes, no virtual methods/inheritance),\n because then UniquePtr can be just as efficient as a raw pointer.\n\n Use of UniquePtr proceeds like so:\n\n   UniquePtr<int> g1; // initializes to nullptr\n   g1.reset(new int); // switch resources using reset()\n   g1 = nullptr; // clears g1, deletes the int\n\n   UniquePtr<int> g2(new int); // owns that int\n   int* p = g2.release(); // g2 leaks its int -- still requires deletion\n   delete p; // now freed\n\n   struct S { int x; S(int x) : x(x) {} };\n   UniquePtr<S> g3, g4(new S(5));\n   g3 = std::move(g4); // g3 owns the S, g4 cleared\n   S* p = g3.get(); // g3 still owns |p|\n   assert(g3->x == 5); // operator-> works (if .get() != nullptr)\n   assert((*g3).x == 5); // also operator* (again, if not cleared)\n   std::swap(g3, g4); // g4 now owns the S, g3 cleared\n   g3.swap(g4);  // g3 now owns the S, g4 cleared\n   UniquePtr<S> g5(std::move(g3)); // g5 owns the S, g3 cleared\n   g5.reset(); // deletes the S, g5 cleared\n\n   struct FreePolicy { void operator()(void* p) { free(p); } };\n   UniquePtr<int, FreePolicy> g6(static_cast<int*>(malloc(sizeof(int))));\n   int* ptr = g6.get();\n   g6 = nullptr; // calls free(ptr)\n\n Now, carefully note a few things you *can't* do:\n\n   UniquePtr<int> b1;\n   b1 = new int; // BAD: can only assign another UniquePtr\n   int* ptr = b1; // BAD: no auto-conversion to pointer, use get()\n\n   UniquePtr<int> b2(b1); // BAD: can't copy a UniquePtr\n   UniquePtr<int> b3 = b1; // BAD: can't copy-assign a UniquePtr\n\n (Note that changing a UniquePtr to store a direct |new| expression is\n permitted, but usually you should use MakeUnique, defined at the end of this\n header.)\n\n A few miscellaneous notes:\n\n UniquePtr, when not instantiated for an array type, can be move-constructed\n and move-assigned, not only from itself but from \"derived\" UniquePtr<U, E>\n instantiations where U converts to T and E converts to D.  If you want to use\n this, you're going to have to specify a deletion policy for both UniquePtr\n instantations, and T pretty much has to have a virtual destructor.  In other\n words, this doesn't work:\n\n   struct Base { virtual ~Base() {} };\n   struct Derived : Base {};\n\n   UniquePtr<Base> b1;\n   // BAD: DefaultDelete<Base> and DefaultDelete<Derived> don't interconvert\n   UniquePtr<Derived> d1(std::move(b));\n\n   UniquePtr<Base> b2;\n   UniquePtr<Derived, DefaultDelete<Base>> d2(std::move(b2)); // okay\n\n UniquePtr is specialized for array types.  Specializing with an array type\n creates a smart-pointer version of that array -- not a pointer to such an\n array.\n\n   UniquePtr<int[]> arr(new int[5]);\n   arr[0] = 4;\n\n What else is different?  Deletion of course uses |delete[]|.  An operator[]\n is provided.  Functionality that doesn't make sense for arrays is removed.\n The constructors and mutating methods only accept array pointers (not T*, U*\n that converts to T*, or UniquePtr<U[]> or UniquePtr<U>) or |nullptr|.\n\n It's perfectly okay for a function to return a UniquePtr. This transfers\n the UniquePtr's sole ownership of the data, to the fresh UniquePtr created\n in the calling function, that will then solely own that data. Such functions\n can return a local variable UniquePtr, |nullptr|, |UniquePtr(ptr)| where\n |ptr| is a |T*|, or a UniquePtr |Move()|'d from elsewhere.\n\n UniquePtr will commonly be a member of a class, with lifetime equivalent to\n that of that class.  If you want to expose the related resource, you could\n expose a raw pointer via |get()|, but ownership of a raw pointer is\n inherently unclear.  So it's better to expose a |const UniquePtr&| instead.\n This prohibits mutation but still allows use of |get()| when needed (but\n operator-> is preferred).  Of course, you can only use this smart pointer as\n long as the enclosing class instance remains live -- no different than if you\n exposed the |get()| raw pointer.\n\n To pass a UniquePtr-managed resource as a pointer, use a |const UniquePtr&|\n argument.  To specify an inout parameter (where the method may or may not\n take ownership of the resource, or reset it), or to specify an out parameter\n (where simply returning a |UniquePtr| isn't possible), use a |UniquePtr&|\n argument.  To unconditionally transfer ownership of a UniquePtr\n into a method, use a |UniquePtr| argument.  To conditionally transfer\n ownership of a resource into a method, should the method want it, use a\n |UniquePtr&&| argument."]
     pub type JSErrorNotes_iterator_value_type = u64;
     pub type JSErrorNotes_iterator_difference_type = isize;
     pub type JSErrorNotes_iterator_pointer = *mut root::JSErrorNotes_iterator_value_type;
@@ -16385,41 +16984,6 @@ pub mod root {
         #[doc = " Complain when an allocation size overflows the maximum supported limit."]
         #[link_name = "\u{1}_Z27JS_ReportAllocationOverflowP9JSContext"]
         pub fn JS_ReportAllocationOverflow(cx: *mut root::JSContext);
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z21JS_IsExceptionPendingP9JSContext"]
-        pub fn JS_IsExceptionPending(cx: *mut root::JSContext) -> bool;
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z24JS_IsThrowingOutOfMemoryP9JSContext"]
-        pub fn JS_IsThrowingOutOfMemory(cx: *mut root::JSContext) -> bool;
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z22JS_GetPendingExceptionP9JSContextN2JS13MutableHandleINS1_5ValueEEE"]
-        pub fn JS_GetPendingException(
-            cx: *mut root::JSContext,
-            vp: root::JS::MutableHandleValue,
-        ) -> bool;
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z22JS_SetPendingExceptionP9JSContextN2JS6HandleINS1_5ValueEEENS1_22ExceptionStackBehaviorE"]
-        pub fn JS_SetPendingException(
-            cx: *mut root::JSContext,
-            v: root::JS::HandleValue,
-            behavior: root::JS::ExceptionStackBehavior,
-        );
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z24JS_ClearPendingExceptionP9JSContext"]
-        pub fn JS_ClearPendingException(cx: *mut root::JSContext);
-    }
-    extern "C" {
-        #[doc = " If the given object is an exception object, the exception will have (or be\n able to lazily create) an error report struct, and this function will return\n the address of that struct.  Otherwise, it returns nullptr. The lifetime\n of the error report struct that might be returned is the same as the\n lifetime of the exception object."]
-        #[link_name = "\u{1}_Z21JS_ErrorFromExceptionP9JSContextN2JS6HandleIP8JSObjectEE"]
-        pub fn JS_ErrorFromException(
-            cx: *mut root::JSContext,
-            obj: root::JS::HandleObject,
-        ) -> *mut root::JSErrorReport;
     }
     extern "C" {
         #[link_name = "\u{1}_Z17JS_IsGlobalObjectP8JSObject"]
@@ -18302,7 +18866,7 @@ pub mod root {
         ) -> bool;
     }
     extern "C" {
-        #[doc = " Change the prototype of obj.\n\n Implements: ES6 [[SetPrototypeOf]] internal method.\n\n In cases where ES6 [[SetPrototypeOf]] returns false without an exception,\n JS_SetPrototype throws a TypeError and returns false.\n\n Performance warning: JS_SetPrototype is very bad for performance. It may\n cause compiled jit-code to be invalidated. It also causes not only obj but\n all other objects in the same \"group\" as obj to be permanently deoptimized.\n It's better to create the object with the right prototype from the start."]
+        #[doc = " Change the prototype of obj.\n\n Implements: ES6 [[SetPrototypeOf]] internal method.\n\n In cases where ES6 [[SetPrototypeOf]] returns false without an exception,\n JS_SetPrototype throws a TypeError and returns false."]
         #[link_name = "\u{1}_Z15JS_SetPrototypeP9JSContextN2JS6HandleIP8JSObjectEES5_"]
         pub fn JS_SetPrototype(
             cx: *mut root::JSContext,
@@ -19008,8 +19572,9 @@ pub mod root {
         ) -> bool;
     }
     extern "C" {
-        #[link_name = "\u{1}_Z18JS_WriteUint32PairP23JSStructuredCloneWriterjj"]
-        pub fn JS_WriteUint32Pair(
+        #[doc = " Same as JS_WriteUint32Pair but let implicit conversions from integers of a\n wider range happen without performing bounds checks.\n Using this function directly is not recommended: it is here mainly to allow\n compiler optimizations in JS_WriteUint32Pair for cases where integer values\n are known at compile time (in which case .isValid() calls can be elided)"]
+        #[link_name = "\u{1}_Z27JS_WriteUint32PairUncheckedP23JSStructuredCloneWriterjj"]
+        pub fn JS_WriteUint32PairUnchecked(
             w: *mut root::JSStructuredCloneWriter,
             tag: u32,
             data: u32,
@@ -20332,91 +20897,91 @@ pub mod root {
         JSMSG_CSP_BLOCKED_EVAL = 120,
         JSMSG_CSP_BLOCKED_FUNCTION = 121,
         JSMSG_CSP_BLOCKED_WASM = 122,
-        JSMSG_CSP_BLOCKED_SHADOWREALM = 123,
-        JSMSG_ACCESSOR_DEF_DENIED = 124,
-        JSMSG_DEAD_OBJECT = 125,
-        JSMSG_OBJECT_ACCESS_DENIED = 126,
-        JSMSG_PROPERTY_ACCESS_DENIED = 127,
-        JSMSG_CANT_CLONE_OBJECT = 128,
-        JSMSG_CANT_OPEN = 129,
-        JSMSG_SUPPORT_NOT_ENABLED = 130,
-        JSMSG_USER_DEFINED_ERROR = 131,
-        JSMSG_ALLOC_OVERFLOW = 132,
-        JSMSG_BAD_BYTECODE = 133,
-        JSMSG_BUFFER_TOO_SMALL = 134,
-        JSMSG_BYTECODE_TOO_BIG = 135,
-        JSMSG_NEED_DIET = 136,
-        JSMSG_OUT_OF_MEMORY = 137,
-        JSMSG_OVER_RECURSED = 138,
-        JSMSG_TOO_DEEP = 139,
-        JSMSG_UNCAUGHT_EXCEPTION = 140,
-        JSMSG_UNKNOWN_FORMAT = 141,
-        JSMSG_UNSAFE_FILENAME = 142,
-        JSMSG_ACCESSOR_WRONG_ARGS = 143,
-        JSMSG_ARRAY_INIT_TOO_BIG = 144,
-        JSMSG_AS_AFTER_IMPORT_STAR = 145,
-        JSMSG_AS_AFTER_RESERVED_WORD = 146,
-        JSMSG_AS_AFTER_STRING = 147,
-        JSMSG_AWAIT_IN_PARAMETER = 148,
-        JSMSG_AWAIT_OUTSIDE_ASYNC = 149,
-        JSMSG_AWAIT_OUTSIDE_ASYNC_OR_MODULE = 150,
-        JSMSG_TOP_LEVEL_AWAIT_NOT_SUPPORTED = 151,
-        JSMSG_BAD_ARROW_ARGS = 152,
-        JSMSG_BAD_CLASS_MEMBER_DEF = 153,
-        JSMSG_BAD_COALESCE_MIXING = 154,
-        JSMSG_BAD_CONST_DECL = 155,
-        JSMSG_BAD_USING_DECL = 156,
-        JSMSG_BAD_CONSTRUCTOR_DEF = 157,
-        JSMSG_BAD_CONTINUE = 158,
-        JSMSG_BAD_DESTRUCT_ASS = 159,
-        JSMSG_BAD_DESTRUCT_TARGET = 160,
-        JSMSG_BAD_DESTRUCT_PARENS = 161,
-        JSMSG_BAD_DESTRUCT_DECL = 162,
-        JSMSG_BAD_DUP_ARGS = 163,
-        JSMSG_BAD_FOR_LEFTSIDE = 164,
-        JSMSG_LEXICAL_DECL_DEFINES_LET = 165,
-        JSMSG_BAD_STARTING_FOROF_LHS = 166,
-        JSMSG_BAD_INCOP_OPERAND = 167,
-        JSMSG_BAD_LEFTSIDE_OF_ASS = 168,
-        JSMSG_BAD_LOCAL_STRING_EXPORT = 169,
-        JSMSG_BAD_POW_LEFTSIDE = 170,
-        JSMSG_BAD_PROP_ID = 171,
-        JSMSG_BAD_RETURN_OR_YIELD = 172,
-        JSMSG_BAD_STRICT_ASSIGN = 173,
-        JSMSG_BAD_STRICT_ASSIGN_ARGUMENTS = 174,
-        JSMSG_BAD_STRICT_ASSIGN_EVAL = 175,
-        JSMSG_BAD_SWITCH = 176,
-        JSMSG_BAD_SUPER = 177,
-        JSMSG_BAD_SUPERPROP = 178,
-        JSMSG_BAD_SUPERPRIVATE = 179,
-        JSMSG_BAD_SUPERCALL = 180,
-        JSMSG_BAD_ARGUMENTS = 181,
-        JSMSG_BRACKET_AFTER_LIST = 182,
-        JSMSG_BRACKET_IN_INDEX = 183,
-        JSMSG_BRACKET_OPENED = 184,
-        JSMSG_CATCH_IDENTIFIER = 185,
-        JSMSG_CATCH_OR_FINALLY = 186,
-        JSMSG_CATCH_WITHOUT_TRY = 187,
-        JSMSG_CLASS_STATIC_PROTO = 188,
-        JSMSG_COLON_AFTER_CASE = 189,
-        JSMSG_COLON_AFTER_ID = 190,
-        JSMSG_COLON_IN_COND = 191,
-        JSMSG_COMP_PROP_UNTERM_EXPR = 192,
-        JSMSG_CURLY_AFTER_BODY = 193,
-        JSMSG_CURLY_OPENED = 194,
-        JSMSG_CURLY_AFTER_CATCH = 195,
-        JSMSG_CURLY_AFTER_FINALLY = 196,
-        JSMSG_CURLY_AFTER_LIST = 197,
-        JSMSG_CURLY_AFTER_TRY = 198,
-        JSMSG_CURLY_BEFORE_BODY = 199,
-        JSMSG_CURLY_BEFORE_CATCH = 200,
-        JSMSG_CURLY_BEFORE_CLASS = 201,
-        JSMSG_CURLY_BEFORE_FINALLY = 202,
-        JSMSG_CURLY_BEFORE_SWITCH = 203,
-        JSMSG_CURLY_BEFORE_TRY = 204,
-        JSMSG_CURLY_IN_COMPOUND = 205,
-        JSMSG_DECLARATION_AFTER_EXPORT = 206,
-        JSMSG_DECLARATION_AFTER_IMPORT = 207,
+        JSMSG_ACCESSOR_DEF_DENIED = 123,
+        JSMSG_DEAD_OBJECT = 124,
+        JSMSG_OBJECT_ACCESS_DENIED = 125,
+        JSMSG_PROPERTY_ACCESS_DENIED = 126,
+        JSMSG_CANT_OPEN = 127,
+        JSMSG_SUPPORT_NOT_ENABLED = 128,
+        JSMSG_USER_DEFINED_ERROR = 129,
+        JSMSG_ALLOC_OVERFLOW = 130,
+        JSMSG_BAD_BYTECODE = 131,
+        JSMSG_BUFFER_TOO_SMALL = 132,
+        JSMSG_BYTECODE_TOO_BIG = 133,
+        JSMSG_NEED_DIET = 134,
+        JSMSG_OUT_OF_MEMORY = 135,
+        JSMSG_OVER_RECURSED = 136,
+        JSMSG_TOO_DEEP = 137,
+        JSMSG_UNCAUGHT_EXCEPTION = 138,
+        JSMSG_UNKNOWN_FORMAT = 139,
+        JSMSG_UNSAFE_FILENAME = 140,
+        JSMSG_ACCESSOR_WRONG_ARGS = 141,
+        JSMSG_ARRAY_INIT_TOO_BIG = 142,
+        JSMSG_AS_AFTER_IMPORT_STAR = 143,
+        JSMSG_AS_AFTER_RESERVED_WORD = 144,
+        JSMSG_AS_AFTER_STRING = 145,
+        JSMSG_AWAIT_IN_PARAMETER = 146,
+        JSMSG_AWAIT_OUTSIDE_ASYNC = 147,
+        JSMSG_AWAIT_OUTSIDE_ASYNC_OR_MODULE = 148,
+        JSMSG_TOP_LEVEL_AWAIT_NOT_SUPPORTED = 149,
+        JSMSG_BAD_ARROW_ARGS = 150,
+        JSMSG_BAD_CLASS_MEMBER_DEF = 151,
+        JSMSG_BAD_COALESCE_MIXING = 152,
+        JSMSG_BAD_CONST_DECL = 153,
+        JSMSG_BAD_USING_DECL = 154,
+        JSMSG_NO_DESTRUCT_IN_USING = 155,
+        JSMSG_BAD_CONSTRUCTOR_DEF = 156,
+        JSMSG_BAD_CONTINUE = 157,
+        JSMSG_BAD_DESTRUCT_ASS = 158,
+        JSMSG_BAD_DESTRUCT_TARGET = 159,
+        JSMSG_BAD_DESTRUCT_PARENS = 160,
+        JSMSG_BAD_DESTRUCT_DECL = 161,
+        JSMSG_BAD_DUP_ARGS = 162,
+        JSMSG_BAD_FOR_LEFTSIDE = 163,
+        JSMSG_LEXICAL_DECL_DEFINES_LET = 164,
+        JSMSG_BAD_STARTING_FOROF_LHS = 165,
+        JSMSG_BAD_INCOP_OPERAND = 166,
+        JSMSG_BAD_LEFTSIDE_OF_ASS = 167,
+        JSMSG_BAD_LOCAL_STRING_EXPORT = 168,
+        JSMSG_BAD_POW_LEFTSIDE = 169,
+        JSMSG_BAD_PROP_ID = 170,
+        JSMSG_BAD_RETURN_OR_YIELD = 171,
+        JSMSG_BAD_STRICT_ASSIGN = 172,
+        JSMSG_BAD_STRICT_ASSIGN_ARGUMENTS = 173,
+        JSMSG_BAD_STRICT_ASSIGN_EVAL = 174,
+        JSMSG_BAD_SWITCH = 175,
+        JSMSG_BAD_SUPER = 176,
+        JSMSG_BAD_SUPERPROP = 177,
+        JSMSG_BAD_SUPERPRIVATE = 178,
+        JSMSG_BAD_SUPERCALL = 179,
+        JSMSG_BAD_ARGUMENTS = 180,
+        JSMSG_BRACKET_AFTER_LIST = 181,
+        JSMSG_BRACKET_IN_INDEX = 182,
+        JSMSG_BRACKET_OPENED = 183,
+        JSMSG_CATCH_IDENTIFIER = 184,
+        JSMSG_CATCH_OR_FINALLY = 185,
+        JSMSG_CATCH_WITHOUT_TRY = 186,
+        JSMSG_CLASS_STATIC_PROTO = 187,
+        JSMSG_COLON_AFTER_CASE = 188,
+        JSMSG_COLON_AFTER_ID = 189,
+        JSMSG_COLON_IN_COND = 190,
+        JSMSG_COMP_PROP_UNTERM_EXPR = 191,
+        JSMSG_CURLY_AFTER_BODY = 192,
+        JSMSG_CURLY_OPENED = 193,
+        JSMSG_CURLY_AFTER_CATCH = 194,
+        JSMSG_CURLY_AFTER_FINALLY = 195,
+        JSMSG_CURLY_AFTER_LIST = 196,
+        JSMSG_CURLY_AFTER_TRY = 197,
+        JSMSG_CURLY_BEFORE_BODY = 198,
+        JSMSG_CURLY_BEFORE_CATCH = 199,
+        JSMSG_CURLY_BEFORE_CLASS = 200,
+        JSMSG_CURLY_BEFORE_FINALLY = 201,
+        JSMSG_CURLY_BEFORE_SWITCH = 202,
+        JSMSG_CURLY_BEFORE_TRY = 203,
+        JSMSG_CURLY_IN_COMPOUND = 204,
+        JSMSG_DECLARATION_AFTER_EXPORT = 205,
+        JSMSG_DECLARATION_AFTER_IMPORT = 206,
+        JSMSG_DECLARATION_AFTER_IMPORT_SOURCE = 207,
         JSMSG_DEPRECATED_DELETE_OPERAND = 208,
         JSMSG_DEPRECATED_OCTAL_LITERAL = 209,
         JSMSG_DEPRECATED_OCTAL_ESCAPE = 210,
@@ -20528,19 +21093,19 @@ pub mod root {
         JSMSG_BAD_NEWTARGET = 316,
         JSMSG_BAD_NEW_OPTIONAL = 317,
         JSMSG_BAD_OPTIONAL_TEMPLATE = 318,
-        JSMSG_IMPORT_ATTRIBUTES_NOT_SUPPORTED = 319,
-        JSMSG_ILLEGAL_PRIVATE_FIELD = 320,
-        JSMSG_ILLEGAL_PRIVATE_NAME = 321,
-        JSMSG_INVALID_PRIVATE_NAME_PRECEDENCE = 322,
-        JSMSG_INVALID_PRIVATE_NAME_IN_UNARY_EXPR = 323,
-        JSMSG_ILLEGAL_PRIVATE_EXOTIC = 324,
-        JSMSG_PRIVATE_FIELD_DOUBLE = 325,
-        JSMSG_PRIVATE_BRAND_DOUBLE = 326,
-        JSMSG_CURLY_AFTER_ASSERT = 327,
-        JSMSG_DUPLICATE_ASSERT_KEY = 328,
-        JSMSG_COLON_AFTER_ASSERT_KEY = 329,
-        JSMSG_ASSERT_STRING_LITERAL = 330,
-        JSMSG_ASSERT_KEY_EXPECTED = 331,
+        JSMSG_ILLEGAL_PRIVATE_FIELD = 319,
+        JSMSG_ILLEGAL_PRIVATE_NAME = 320,
+        JSMSG_INVALID_PRIVATE_NAME_PRECEDENCE = 321,
+        JSMSG_INVALID_PRIVATE_NAME_IN_UNARY_EXPR = 322,
+        JSMSG_ILLEGAL_PRIVATE_EXOTIC = 323,
+        JSMSG_PRIVATE_FIELD_DOUBLE = 324,
+        JSMSG_PRIVATE_BRAND_DOUBLE = 325,
+        JSMSG_CURLY_AFTER_WITH = 326,
+        JSMSG_DUPLICATE_ATTRIBUTE_KEY = 327,
+        JSMSG_COLON_AFTER_ATTRIBUTE_KEY = 328,
+        JSMSG_WITH_CLAUSE_STRING_LITERAL = 329,
+        JSMSG_ATTRIBUTE_KEY_EXPECTED = 330,
+        JSMSG_RC_AFTER_IMPORT_ATTRIBUTE_LIST = 331,
         JSMSG_DECORATOR_NAME_EXPECTED = 332,
         JSMSG_CLASS_EXPECTED = 333,
         JSMSG_NO_IN_WITH_USING = 334,
@@ -20568,10 +21133,10 @@ pub mod root {
         JSMSG_WASM_BAD_IMP_ADDRESS = 356,
         JSMSG_WASM_BAD_IMP_SIZE = 357,
         JSMSG_WASM_BAD_IMP_MAX = 358,
-        JSMSG_WASM_IMP_SHARED_REQD = 359,
-        JSMSG_WASM_IMP_SHARED_BANNED = 360,
-        JSMSG_WASM_NO_SHMEM_LINK = 361,
-        JSMSG_WASM_NO_MEM64_LINK = 362,
+        JSMSG_WASM_BAD_IMP_PAGE_SIZE = 359,
+        JSMSG_WASM_IMP_SHARED_REQD = 360,
+        JSMSG_WASM_IMP_SHARED_BANNED = 361,
+        JSMSG_WASM_NO_SHMEM_LINK = 362,
         JSMSG_WASM_BAD_GLOB_MUT_LINK = 363,
         JSMSG_WASM_BAD_GLOB_TYPE_LINK = 364,
         JSMSG_WASM_BAD_TBL_TYPE_LINK = 365,
@@ -20582,453 +21147,453 @@ pub mod root {
         JSMSG_WASM_INVALID_CONVERSION = 370,
         JSMSG_WASM_INT_DIVIDE_BY_ZERO = 371,
         JSMSG_WASM_OUT_OF_BOUNDS = 372,
-        JSMSG_WASM_UNALIGNED_ACCESS = 373,
-        JSMSG_WASM_WAKE_OVERFLOW = 374,
-        JSMSG_WASM_DEREF_NULL = 375,
-        JSMSG_WASM_BAD_CAST = 376,
-        JSMSG_WASM_MEM_IMP_LIMIT = 377,
-        JSMSG_WASM_TABLE_IMP_LIMIT = 378,
-        JSMSG_WASM_ARRAY_IMP_LIMIT = 379,
-        JSMSG_WASM_ARRAY_NEW_ELEM_NOT_IMPLEMENTED = 380,
-        JSMSG_WASM_BAD_RANGE = 381,
-        JSMSG_WASM_BAD_GROW = 382,
-        JSMSG_WASM_MAX_LT_INITIAL = 383,
-        JSMSG_WASM_TABLE_OUT_OF_BOUNDS = 384,
-        JSMSG_WASM_BAD_ENFORCE_RANGE = 385,
-        JSMSG_WASM_BAD_BUF_ARG = 386,
-        JSMSG_WASM_BAD_MOD_ARG = 387,
-        JSMSG_WASM_BAD_BUF_MOD_ARG = 388,
-        JSMSG_WASM_BAD_DESC_ARG = 389,
-        JSMSG_WASM_BAD_IMPORT_ARG = 390,
-        JSMSG_WASM_BAD_IMPORT_FIELD = 391,
-        JSMSG_WASM_BAD_REF_NONNULLABLE_VALUE = 392,
-        JSMSG_WASM_BAD_FUNCREF_VALUE = 393,
-        JSMSG_WASM_BAD_NULL_EXNREF_VALUE = 394,
-        JSMSG_WASM_BAD_NULL_EXTERNREF_VALUE = 395,
-        JSMSG_WASM_BAD_NULL_FUNCREF_VALUE = 396,
-        JSMSG_WASM_BAD_NULL_ANYREF_VALUE = 397,
-        JSMSG_WASM_BAD_EQREF_VALUE = 398,
-        JSMSG_WASM_BAD_I31REF_VALUE = 399,
-        JSMSG_WASM_BAD_STRUCTREF_VALUE = 400,
-        JSMSG_WASM_BAD_ARRAYREF_VALUE = 401,
-        JSMSG_WASM_BAD_TYPEREF_VALUE = 402,
-        JSMSG_WASM_BAD_VAL_TYPE = 403,
-        JSMSG_WASM_BAD_STRING_VAL_TYPE = 404,
-        JSMSG_WASM_BAD_STRING_ADDR_TYPE = 405,
-        JSMSG_WASM_BAD_EXN_ARG = 406,
-        JSMSG_WASM_BAD_EXN_PAYLOAD = 407,
-        JSMSG_WASM_BAD_EXN_PAYLOAD_LEN = 408,
-        JSMSG_WASM_BAD_EXN_TAG = 409,
-        JSMSG_WASM_BAD_EXN_OPTIONS = 410,
-        JSMSG_WASM_BAD_FUNCTION_TYPE = 411,
-        JSMSG_WASM_BAD_FUNCTION_VALUE = 412,
-        JSMSG_WASM_BAD_COMPILE_OPTIONS = 413,
-        JSMSG_WASM_DUPLICATE_BUILTIN = 414,
-        JSMSG_WASM_BAD_CODEPOINT = 415,
-        JSMSG_WASM_NO_TRANSFER = 416,
-        JSMSG_WASM_TEXT_FAIL = 417,
-        JSMSG_WASM_MISSING_MAXIMUM = 418,
-        JSMSG_WASM_GLOBAL_IMMUTABLE = 419,
-        JSMSG_WASM_WRONG_NUMBER_OF_VALUES = 420,
-        JSMSG_WASM_NONSHARED_WAIT = 421,
-        JSMSG_WASM_SUPPLY_ONLY_ONE = 422,
-        JSMSG_WASM_MISSING_REQUIRED = 423,
-        JSMSG_WASM_MODIFIED_GC_OBJECT = 424,
-        JSMSG_WASM_ARRAYBUFFER_PAGE_MULTIPLE = 425,
-        JSMSG_WASM_ARRAYBUFFER_CANNOT_SHRINK = 426,
-        JSMSG_WASM_MEMORY_NOT_RESIZABLE = 427,
-        JSMSG_WASM_LEGACY_EXCEPTIONS_DEPRECATED = 428,
-        JSMSG_USE_ASM_DEPRECATED = 429,
-        JSMSG_JSPI_ARG_POSITION = 430,
-        JSMSG_JSPI_INVALID_SUSPENDER = 431,
-        JSMSG_JSPI_INVALID_STATE = 432,
-        JSMSG_JSPI_EXPECTED_SUSPENDER = 433,
-        JSMSG_JSPI_EXPECTED_PROMISE = 434,
-        JSMSG_JSPI_SIGNATURE_MISMATCH = 435,
-        JSMSG_JSPI_SUSPENDER_LIMIT = 436,
-        JSMSG_BAD_GETPROTOTYPEOF_TRAP_RETURN = 437,
-        JSMSG_INCONSISTENT_GETPROTOTYPEOF_TRAP = 438,
-        JSMSG_PROXY_SETPROTOTYPEOF_RETURNED_FALSE = 439,
-        JSMSG_INCONSISTENT_SETPROTOTYPEOF_TRAP = 440,
-        JSMSG_CANT_CHANGE_EXTENSIBILITY = 441,
-        JSMSG_CANT_DEFINE_INVALID = 442,
-        JSMSG_CANT_DEFINE_NEW = 443,
-        JSMSG_CANT_DEFINE_NE_AS_NC = 444,
-        JSMSG_PROXY_DEFINE_RETURNED_FALSE = 445,
-        JSMSG_PROXY_DELETE_RETURNED_FALSE = 446,
-        JSMSG_PROXY_PREVENTEXTENSIONS_RETURNED_FALSE = 447,
-        JSMSG_PROXY_SET_RETURNED_FALSE = 448,
-        JSMSG_CANT_REPORT_AS_NON_EXTENSIBLE = 449,
-        JSMSG_CANT_DELETE_NON_EXTENSIBLE = 450,
-        JSMSG_CANT_REPORT_C_AS_NC = 451,
-        JSMSG_CANT_REPORT_E_AS_NE = 452,
-        JSMSG_CANT_REPORT_INVALID = 453,
-        JSMSG_CANT_REPORT_NC_AS_NE = 454,
-        JSMSG_CANT_REPORT_NEW = 455,
-        JSMSG_CANT_REPORT_NE_AS_NC = 456,
-        JSMSG_CANT_REPORT_W_AS_NW = 457,
-        JSMSG_CANT_SET_NW_NC = 458,
-        JSMSG_CANT_SET_WO_SETTER = 459,
-        JSMSG_CANT_SKIP_NC = 460,
-        JSMSG_OWNKEYS_STR_SYM = 461,
-        JSMSG_OWNKEYS_DUPLICATE = 462,
-        JSMSG_MUST_REPORT_SAME_VALUE = 463,
-        JSMSG_MUST_REPORT_UNDEFINED = 464,
-        JSMSG_PROXY_CONSTRUCT_OBJECT = 465,
-        JSMSG_PROXY_EXTENSIBILITY = 466,
-        JSMSG_PROXY_GETOWN_OBJORUNDEF = 467,
-        JSMSG_PROXY_REVOKED = 468,
-        JSMSG_BAD_TRAP = 469,
-        JSMSG_SC_BAD_CLONE_VERSION = 470,
-        JSMSG_SC_BAD_SERIALIZED_DATA = 471,
-        JSMSG_SC_DUP_TRANSFERABLE = 472,
-        JSMSG_SC_NOT_TRANSFERABLE = 473,
-        JSMSG_SC_TRANSFERABLE_TWICE = 474,
-        JSMSG_SC_UNSUPPORTED_TYPE = 475,
-        JSMSG_SC_NOT_CLONABLE = 476,
-        JSMSG_SC_NOT_CLONABLE_WITH_COOP_COEP = 477,
-        JSMSG_SC_SAB_DISABLED = 478,
-        JSMSG_SC_SAB_REFCNT_OFLO = 479,
-        JSMSG_SC_SHMEM_TRANSFERABLE = 480,
-        JSMSG_SC_SHMEM_POLICY = 481,
-        JSMSG_ASSIGN_FUNCTION_OR_NULL = 482,
-        JSMSG_DEBUG_BAD_LINE = 483,
-        JSMSG_DEBUG_BAD_OFFSET = 484,
-        JSMSG_DEBUG_BREAKPOINT_NOT_ALLOWED = 485,
-        JSMSG_DEBUG_BAD_REFERENT = 486,
-        JSMSG_DEBUG_BAD_RESUMPTION = 487,
-        JSMSG_DEBUG_RESUMPTION_CONFLICT = 488,
-        JSMSG_DEBUG_CANT_DEBUG_GLOBAL = 489,
-        JSMSG_DEBUG_SAME_COMPARTMENT = 490,
-        JSMSG_DEBUG_CCW_REQUIRED = 491,
-        JSMSG_DEBUG_COMPARTMENT_MISMATCH = 492,
-        JSMSG_DEBUG_LOOP = 493,
-        JSMSG_DEBUG_NOT_DEBUGGEE = 494,
-        JSMSG_DEBUG_NOT_DEBUGGING = 495,
-        JSMSG_DEBUG_NOT_IDLE = 496,
-        JSMSG_DEBUG_NOT_ON_STACK = 497,
-        JSMSG_DEBUG_NOT_ON_STACK_OR_SUSPENDED = 498,
-        JSMSG_DEBUG_NO_ENV_OBJECT = 499,
-        JSMSG_DEBUG_PROTO = 500,
-        JSMSG_DEBUG_WRONG_OWNER = 501,
-        JSMSG_DEBUG_OPTIMIZED_OUT = 502,
-        JSMSG_DEBUG_OPTIMIZED_OUT_FUN = 503,
-        JSMSG_DEBUG_FORCED_RETURN_DISALLOWED = 504,
-        JSMSG_DEBUG_RESUMPTION_VALUE_DISALLOWED = 505,
-        JSMSG_DEBUG_VARIABLE_NOT_FOUND = 506,
-        JSMSG_DEBUG_WRAPPER_IN_WAY = 507,
-        JSMSG_DEBUGGEE_WOULD_RUN = 508,
-        JSMSG_NOT_CALLABLE_OR_UNDEFINED = 509,
-        JSMSG_NOT_TRACKING_ALLOCATIONS = 510,
-        JSMSG_OBJECT_METADATA_CALLBACK_ALREADY_SET = 511,
-        JSMSG_QUERY_INNERMOST_WITHOUT_LINE_URL = 512,
-        JSMSG_QUERY_LINE_WITHOUT_URL = 513,
-        JSMSG_QUERY_USE_START_AND_END_TOGETHER = 514,
-        JSMSG_QUERY_START_LINE_IS_AFTER_END = 515,
-        JSMSG_DEBUG_CANT_SET_OPT_ENV = 516,
-        JSMSG_DEBUG_INVISIBLE_COMPARTMENT = 517,
-        JSMSG_DEBUG_CENSUS_BREAKDOWN = 518,
-        JSMSG_DEBUG_CENSUS_BREAKDOWN_NESTED = 519,
-        JSMSG_DEBUG_PROMISE_NOT_RESOLVED = 520,
-        JSMSG_DEBUG_PROMISE_NOT_FULFILLED = 521,
-        JSMSG_DEBUG_PROMISE_NOT_REJECTED = 522,
-        JSMSG_DEBUG_NO_BINARY_SOURCE = 523,
-        JSMSG_DEBUG_EXCLUSIVE_FRAME_COVERAGE = 524,
-        JSMSG_DEBUG_EXCLUSIVE_EXECUTION_TRACE_COVERAGE = 525,
-        JSMSG_NATIVE_TRACING_BUFFER_MALFORMED = 526,
-        JSMSG_TESTING_SCRIPTS_ONLY = 527,
-        JSMSG_INVALID_ARGS = 528,
-        JSMSG_TRACELOGGER_ENABLE_FAIL = 529,
-        JSMSG_DATE_NOT_FINITE = 530,
-        JSMSG_DUPLICATE_VARIANT_SUBTAG = 531,
-        JSMSG_INTERNAL_INTL_ERROR = 532,
-        JSMSG_INVALID_CURRENCY_CODE = 533,
-        JSMSG_INVALID_UNIT_IDENTIFIER = 534,
-        JSMSG_INVALID_DIGITS_VALUE = 535,
-        JSMSG_INVALID_KEY = 536,
-        JSMSG_INVALID_LANGUAGE_TAG = 537,
-        JSMSG_INVALID_LOCALES_ELEMENT = 538,
-        JSMSG_INVALID_LOCALE_MATCHER = 539,
-        JSMSG_INVALID_OPTION_VALUE = 540,
-        JSMSG_INVALID_TIME_ZONE = 541,
-        JSMSG_INVALID_DATETIME_OPTION = 542,
-        JSMSG_INVALID_DATETIME_STYLE = 543,
-        JSMSG_UNDEFINED_CURRENCY = 544,
-        JSMSG_UNDEFINED_UNIT = 545,
-        JSMSG_UNDEFINED_DATE = 546,
-        JSMSG_UNDEFINED_NUMBER = 547,
-        JSMSG_UNDEFINED_TYPE = 548,
-        JSMSG_NAN_NUMBER_RANGE = 549,
-        JSMSG_INVALID_NUMBER_OPTION = 550,
-        JSMSG_UNEQUAL_FRACTION_DIGITS = 551,
-        JSMSG_INTL_DURATION_INVALID_NON_NUMERIC_OPTION = 552,
-        JSMSG_INTL_DURATION_INVALID_DISPLAY_OPTION = 553,
-        JSMSG_INTL_DURATION_INVALID_DISPLAY_OPTION_DEFAULT_STYLE = 554,
-        JSMSG_INTL_DURATION_INVALID_DISPLAY_OPTION_DEFAULT_DISPLAY = 555,
-        JSMSG_INTL_DURATION_NOT_INTEGER = 556,
-        JSMSG_INTL_DURATION_INVALID_SIGN = 557,
-        JSMSG_INTL_DURATION_INVALID_LIMIT = 558,
-        JSMSG_INTL_DURATION_MISSING_UNIT = 559,
-        JSMSG_INTL_DURATION_UNEXPECTED_STRING = 560,
-        JSMSG_INVALID_FORMAT_OPTIONS = 561,
-        JSMSG_BAD_CLASS_RANGE = 562,
-        JSMSG_ESCAPE_AT_END_OF_REGEXP = 563,
-        JSMSG_EXEC_NOT_OBJORNULL = 564,
-        JSMSG_INVALID_DECIMAL_ESCAPE = 565,
-        JSMSG_INVALID_GROUP = 566,
-        JSMSG_REPEATED_FLAG = 567,
-        JSMSG_INVALID_FLAG_GROUP = 568,
-        JSMSG_INVALID_IDENTITY_ESCAPE = 569,
-        JSMSG_INVALID_UNICODE_ESCAPE = 570,
-        JSMSG_MISSING_PAREN = 571,
-        JSMSG_NEWREGEXP_FLAGGED = 572,
-        JSMSG_NOTHING_TO_REPEAT = 573,
-        JSMSG_NUMBERS_OUT_OF_ORDER = 574,
-        JSMSG_RANGE_WITH_CLASS_ESCAPE = 575,
-        JSMSG_RAW_BRACKET_IN_REGEXP = 576,
-        JSMSG_TOO_MANY_PARENS = 577,
-        JSMSG_UNICODE_OVERFLOW = 578,
-        JSMSG_UNMATCHED_RIGHT_PAREN = 579,
-        JSMSG_UNTERM_CLASS = 580,
-        JSMSG_INVALID_PROPERTY_NAME = 581,
-        JSMSG_INVALID_CLASS_PROPERTY_NAME = 582,
-        JSMSG_INCOMPLETE_QUANTIFIER = 583,
-        JSMSG_INVALID_QUANTIFIER = 584,
-        JSMSG_INVALID_CAPTURE_NAME = 585,
-        JSMSG_DUPLICATE_CAPTURE_NAME = 586,
-        JSMSG_INVALID_NAMED_REF = 587,
-        JSMSG_INVALID_NAMED_CAPTURE_REF = 588,
-        JSMSG_INCOMPATIBLE_REGEXP_GETTER = 589,
-        JSMSG_INVALID_CLASS_SET_OP = 590,
-        JSMSG_INVALID_CHAR_IN_CLASS = 591,
-        JSMSG_NEGATED_CLASS_WITH_STR = 592,
-        JSMSG_MULTIPLE_FLAG_DASHES = 593,
-        JSMSG_TYPEDOBJECT_SETTING_IMMUTABLE = 594,
-        JSMSG_TOO_LONG_ARRAY = 595,
-        JSMSG_BAD_INDEX = 596,
-        JSMSG_DEFINE_BAD_INDEX = 597,
-        JSMSG_NON_ARRAY_BUFFER_RETURNED = 598,
-        JSMSG_SAME_ARRAY_BUFFER_RETURNED = 599,
-        JSMSG_SHORT_ARRAY_BUFFER_RETURNED = 600,
-        JSMSG_TYPED_ARRAY_BAD_ARGS = 601,
-        JSMSG_TYPED_ARRAY_DETACHED = 602,
-        JSMSG_ARRAYBUFFER_LENGTH_PINNED = 603,
-        JSMSG_TYPED_ARRAY_RESIZED_BOUNDS = 604,
-        JSMSG_TYPED_ARRAY_CONSTRUCT_OFFSET_BOUNDS = 605,
-        JSMSG_TYPED_ARRAY_CONSTRUCT_OFFSET_MISALIGNED = 606,
-        JSMSG_TYPED_ARRAY_CONSTRUCT_OFFSET_LENGTH_BOUNDS = 607,
-        JSMSG_TYPED_ARRAY_CONSTRUCT_ARRAY_LENGTH_BOUNDS = 608,
-        JSMSG_TYPED_ARRAY_CONSTRUCT_TOO_LARGE = 609,
-        JSMSG_TYPED_ARRAY_BAD_HEX_STRING_LENGTH = 610,
-        JSMSG_TYPED_ARRAY_BAD_HEX_DIGIT = 611,
-        JSMSG_TYPED_ARRAY_BAD_BASE64_ALPHABET = 612,
-        JSMSG_TYPED_ARRAY_BAD_BASE64_LAST_CHUNK_HANDLING = 613,
-        JSMSG_TYPED_ARRAY_BAD_BASE64_CHAR = 614,
-        JSMSG_TYPED_ARRAY_BAD_INCOMPLETE_CHUNK = 615,
-        JSMSG_TYPED_ARRAY_BAD_BASE64_AFTER_PADDING = 616,
-        JSMSG_TYPED_ARRAY_MISSING_BASE64_PADDING = 617,
-        JSMSG_TYPED_ARRAY_EXTRA_BASE64_BITS = 618,
-        JSMSG_TYPED_ARRAY_CALL_OR_CONSTRUCT = 619,
-        JSMSG_NON_TYPED_ARRAY_RETURNED = 620,
-        JSMSG_SHORT_TYPED_ARRAY_RETURNED = 621,
-        JSMSG_TYPED_ARRAY_NOT_COMPATIBLE = 622,
-        JSMSG_ARRAYBUFFER_REQUIRED = 623,
-        JSMSG_ARRAYBUFFER_LENGTH_LARGER_THAN_MAXIMUM = 624,
-        JSMSG_ARRAYBUFFER_NON_RESIZABLE = 625,
-        JSMSG_ARRAYBUFFER_COPY_RANGE = 626,
-        JSMSG_SHARED_ARRAY_BAD_LENGTH = 627,
-        JSMSG_NON_SHARED_ARRAY_BUFFER_RETURNED = 628,
-        JSMSG_SAME_SHARED_ARRAY_BUFFER_RETURNED = 629,
-        JSMSG_SHORT_SHARED_ARRAY_BUFFER_RETURNED = 630,
-        JSMSG_SHARED_ARRAY_LENGTH_SMALLER_THAN_CURRENT = 631,
-        JSMSG_BAD_PARSE_NODE = 632,
-        JSMSG_SYMBOL_TO_STRING = 633,
-        JSMSG_SYMBOL_TO_NUMBER = 634,
-        JSMSG_ATOMICS_BAD_ARRAY = 635,
-        JSMSG_ATOMICS_WAIT_NOT_ALLOWED = 636,
-        JSMSG_ATOMICS_PAUSE_BAD_COUNT = 637,
-        JSMSG_CANT_SET_INTERPOSED = 638,
-        JSMSG_CANT_DEFINE_WINDOW_ELEMENT = 639,
-        JSMSG_CANT_DELETE_WINDOW_ELEMENT = 640,
-        JSMSG_CANT_DEFINE_WINDOW_NAMED_PROPERTY = 641,
-        JSMSG_CANT_DELETE_WINDOW_NAMED_PROPERTY = 642,
-        JSMSG_CANT_PREVENT_EXTENSIONS = 643,
-        JSMSG_CANT_DEFINE_WINDOW_NC = 644,
-        JSMSG_NO_NAMED_SETTER = 645,
-        JSMSG_NO_INDEXED_SETTER = 646,
-        JSMSG_NOT_DATA_DESCRIPTOR = 647,
-        JSMSG_CANT_DELETE_SUPER = 648,
-        JSMSG_REINIT_THIS = 649,
-        JSMSG_MODULE_NO_EXPORT = 650,
-        JSMSG_MODULE_CIRCULAR_IMPORT = 651,
-        JSMSG_MODULE_AMBIGUOUS = 652,
-        JSMSG_MISSING_EXPORT = 653,
-        JSMSG_BAD_MODULE_STATUS = 654,
-        JSMSG_DYNAMIC_IMPORT_FAILED = 655,
-        JSMSG_DYNAMIC_IMPORT_NOT_SUPPORTED = 656,
-        JSMSG_BAD_MODULE_TYPE = 657,
-        JSMSG_IMPORT_MAPS_PARSE_FAILED = 658,
-        JSMSG_IMPORT_MAPS_NOT_A_MAP = 659,
-        JSMSG_IMPORT_MAPS_IMPORTS_NOT_A_MAP = 660,
-        JSMSG_IMPORT_MAPS_SCOPES_NOT_A_MAP = 661,
-        JSMSG_IMPORT_MAPS_SCOPE_VALUE_NOT_A_MAP = 662,
-        JSMSG_IMPORT_MAPS_INTEGRITY_NOT_A_MAP = 663,
-        JSMSG_IMPORT_ATTRIBUTES_STATIC_IMPORT_UNSUPPORTED_ATTRIBUTE = 664,
-        JSMSG_IMPORT_ATTRIBUTES_DYNAMIC_IMPORT_UNSUPPORTED_ATTRIBUTE = 665,
-        JSMSG_CANNOT_RESOLVE_PROMISE_WITH_ITSELF = 666,
-        JSMSG_PROMISE_CAPABILITY_HAS_SOMETHING_ALREADY = 667,
-        JSMSG_PROMISE_RESOLVE_FUNCTION_NOT_CALLABLE = 668,
-        JSMSG_PROMISE_REJECT_FUNCTION_NOT_CALLABLE = 669,
-        JSMSG_PROMISE_ERROR_IN_WRAPPED_REJECTION_REASON = 670,
-        JSMSG_PROMISE_ANY_REJECTION = 671,
-        JSMSG_RETURN_NOT_CALLABLE = 672,
-        JSMSG_ITERATOR_NO_THROW = 673,
-        JSMSG_UNHANDLABLE_PROMISE_REJECTION_WARNING = 674,
-        JSMSG_UNHANDLABLE_PROMISE_RESOLUTION_WARNING = 675,
-        JSMSG_FOR_AWAIT_NOT_OF = 676,
-        JSMSG_NOT_AN_ASYNC_GENERATOR = 677,
-        JSMSG_GET_ASYNC_ITER_RETURNED_PRIMITIVE = 678,
-        JSMSG_SUSPENDED_QUEUE_NOT_EMPTY = 679,
-        JSMSG_WASM_ERROR_CONSUMING_RESPONSE = 680,
-        JSMSG_WASM_BAD_RESPONSE_VALUE = 681,
-        JSMSG_WASM_BAD_RESPONSE_MIME_TYPE = 682,
-        JSMSG_WASM_BAD_RESPONSE_CORS_SAME_ORIGIN = 683,
-        JSMSG_WASM_BAD_RESPONSE_STATUS = 684,
-        JSMSG_WASM_RESPONSE_ALREADY_CONSUMED = 685,
-        JSMSG_BIGINT_TO_NUMBER = 686,
-        JSMSG_NONINTEGER_NUMBER_TO_BIGINT = 687,
-        JSMSG_BIGINT_TOO_LARGE = 688,
-        JSMSG_BIGINT_DIVISION_BY_ZERO = 689,
-        JSMSG_BIGINT_NEGATIVE_EXPONENT = 690,
-        JSMSG_BIGINT_INVALID_SYNTAX = 691,
-        JSMSG_BIGINT_NOT_SERIALIZABLE = 692,
-        JSMSG_NOT_A_FINALIZATION_REGISTRY = 693,
-        JSMSG_BAD_HELD_VALUE = 694,
-        JSMSG_BAD_UNREGISTER_TOKEN = 695,
-        JSMSG_BAD_FINALIZATION_REGISTRY_OBJECT = 696,
-        JSMSG_NOT_A_WEAK_REF = 697,
-        JSMSG_BAD_WEAKREF_TARGET = 698,
-        JSMSG_NEGATIVE_LIMIT = 699,
-        JSMSG_SET_NEGATIVE_SIZE = 700,
-        JSMSG_NOT_SHADOW_REALM = 701,
-        JSMSG_SHADOW_REALM_EVALUATE_NOT_STRING = 702,
-        JSMSG_SHADOW_REALM_INVALID_RETURN = 703,
-        JSMSG_SHADOW_REALM_WRAP_FAILURE = 704,
-        JSMSG_SHADOW_REALM_EVALUATE_FAILURE = 705,
-        JSMSG_SHADOW_REALM_EVALUATE_FAILURE_DETAIL = 706,
-        JSMSG_SHADOW_REALM_WRAPPED_EXECUTION_FAILURE = 707,
-        JSMSG_SHADOW_REALM_WRAPPED_EXECUTION_FAILURE_DETAIL = 708,
-        JSMSG_SHADOW_REALM_EXPORT_NOT_STRING = 709,
-        JSMSG_SHADOW_REALM_IMPORTVALUE_FAILED = 710,
-        JSMSG_SHADOW_REALM_VALUE_NOT_EXPORTED = 711,
-        JSMSG_DECORATOR_INVALID_RETURN_TYPE = 712,
-        JSMSG_TEMPORAL_INVALID_UNIT_RANGE = 713,
-        JSMSG_TEMPORAL_INVALID_UNIT_OPTION = 714,
-        JSMSG_TEMPORAL_INVALID_NUMBER = 715,
-        JSMSG_TEMPORAL_INVALID_INTEGER = 716,
-        JSMSG_TEMPORAL_MISSING_OPTION = 717,
-        JSMSG_TEMPORAL_MISSING_PROPERTY = 718,
-        JSMSG_TEMPORAL_UNEXPECTED_PROPERTY = 719,
-        JSMSG_TEMPORAL_MISSING_TEMPORAL_FIELDS = 720,
-        JSMSG_TEMPORAL_INSTANT_INVALID = 721,
-        JSMSG_TEMPORAL_INSTANT_NONINTEGER = 722,
-        JSMSG_TEMPORAL_INSTANT_BAD_DURATION = 723,
-        JSMSG_TEMPORAL_TIMEZONE_INVALID_IDENTIFIER = 724,
-        JSMSG_TEMPORAL_TIMEZONE_INCOMPATIBLE = 725,
-        JSMSG_TEMPORAL_TIMEZONE_INSTANT_AMBIGUOUS = 726,
-        JSMSG_TEMPORAL_DURATION_INVALID_SIGN = 727,
-        JSMSG_TEMPORAL_DURATION_INVALID_NON_FINITE = 728,
-        JSMSG_TEMPORAL_DURATION_INVALID_NORMALIZED_TIME = 729,
-        JSMSG_TEMPORAL_DURATION_MISSING_UNIT = 730,
-        JSMSG_TEMPORAL_DURATION_NOT_INTEGER = 731,
-        JSMSG_TEMPORAL_DURATION_MISSING_UNIT_SPECIFIER = 732,
-        JSMSG_TEMPORAL_DURATION_UNCOMPARABLE = 733,
-        JSMSG_TEMPORAL_CALENDAR_INVALID_ID = 734,
-        JSMSG_TEMPORAL_CALENDAR_MISSING_FIELD = 735,
-        JSMSG_TEMPORAL_CALENDAR_OVERFLOW_FIELD = 736,
-        JSMSG_TEMPORAL_CALENDAR_INVALID_MONTHCODE = 737,
-        JSMSG_TEMPORAL_CALENDAR_INVALID_ERA = 738,
-        JSMSG_TEMPORAL_CALENDAR_INCOMPATIBLE = 739,
-        JSMSG_TEMPORAL_CALENDAR_INCOMPATIBLE_YEAR = 740,
-        JSMSG_TEMPORAL_CALENDAR_INCOMPATIBLE_MONTHCODE = 741,
-        JSMSG_TEMPORAL_CALENDAR_INTERNAL_ERROR = 742,
-        JSMSG_TEMPORAL_PLAIN_DATE_INVALID = 743,
-        JSMSG_TEMPORAL_PLAIN_DATE_INVALID_VALUE = 744,
-        JSMSG_TEMPORAL_PLAIN_DATE_TIME_INVALID = 745,
-        JSMSG_TEMPORAL_PLAIN_TIME_INVALID = 746,
-        JSMSG_TEMPORAL_PLAIN_TIME_INVALID_VALUE = 747,
-        JSMSG_TEMPORAL_PLAIN_TIME_MISSING_UNIT = 748,
-        JSMSG_TEMPORAL_PLAIN_MONTH_DAY_INVALID = 749,
-        JSMSG_TEMPORAL_PLAIN_YEAR_MONTH_INVALID = 750,
-        JSMSG_TEMPORAL_ZONED_DATE_TIME_NO_TIME_FOUND = 751,
-        JSMSG_TEMPORAL_ZONED_DATE_TIME_INCONSISTENT_INSTANT = 752,
-        JSMSG_TEMPORAL_PARSER_NEGATIVE_ZERO_YEAR = 753,
-        JSMSG_TEMPORAL_PARSER_MISSING_EXTENDED_YEAR = 754,
-        JSMSG_TEMPORAL_PARSER_MISSING_YEAR = 755,
-        JSMSG_TEMPORAL_PARSER_MISSING_MONTH = 756,
-        JSMSG_TEMPORAL_PARSER_MISSING_DAY = 757,
-        JSMSG_TEMPORAL_PARSER_MISSING_HOUR = 758,
-        JSMSG_TEMPORAL_PARSER_MISSING_MINUTE = 759,
-        JSMSG_TEMPORAL_PARSER_MISSING_SECOND = 760,
-        JSMSG_TEMPORAL_PARSER_MISSING_TIMEZONE_SIGN = 761,
-        JSMSG_TEMPORAL_PARSER_INVALID_MONTH = 762,
-        JSMSG_TEMPORAL_PARSER_INVALID_DAY = 763,
-        JSMSG_TEMPORAL_PARSER_INVALID_HOUR = 764,
-        JSMSG_TEMPORAL_PARSER_INVALID_MINUTE = 765,
-        JSMSG_TEMPORAL_PARSER_INVALID_SECOND = 766,
-        JSMSG_TEMPORAL_PARSER_INVALID_LEAPSECOND = 767,
-        JSMSG_TEMPORAL_PARSER_BRACKET_BEFORE_TIMEZONE = 768,
-        JSMSG_TEMPORAL_PARSER_BRACKET_AFTER_TIMEZONE = 769,
-        JSMSG_TEMPORAL_PARSER_MISSING_TIMEZONE = 770,
-        JSMSG_TEMPORAL_PARSER_MISSING_TIMEZONE_NAME = 771,
-        JSMSG_TEMPORAL_PARSER_UNEXPECTED_CHARACTERS_AT_END = 772,
-        JSMSG_TEMPORAL_PARSER_MISSING_DURATION_DESIGNATOR = 773,
-        JSMSG_TEMPORAL_PARSER_MISSING_TIME_DESIGNATOR = 774,
-        JSMSG_TEMPORAL_PARSER_MISSING_DURATION_DIGITS = 775,
-        JSMSG_TEMPORAL_PARSER_MISSING_DURATION_UNIT_DESIGNATOR = 776,
-        JSMSG_TEMPORAL_PARSER_INVALID_DURATION_MINUTES = 777,
-        JSMSG_TEMPORAL_PARSER_INVALID_DURATION_SECONDS = 778,
-        JSMSG_TEMPORAL_PARSER_INVALID_ANNOTATION_KEY = 779,
-        JSMSG_TEMPORAL_PARSER_INVALID_ANNOTATION_VALUE = 780,
-        JSMSG_TEMPORAL_PARSER_BRACKET_BEFORE_ANNOTATION = 781,
-        JSMSG_TEMPORAL_PARSER_BRACKET_AFTER_ANNOTATION = 782,
-        JSMSG_TEMPORAL_PARSER_ASSIGNMENT_IN_ANNOTATION = 783,
-        JSMSG_TEMPORAL_PARSER_INVALID_CRITICAL_ANNOTATION = 784,
-        JSMSG_TEMPORAL_PARSER_MISSING_DATE_TIME_SEPARATOR = 785,
-        JSMSG_TEMPORAL_PARSER_AMBIGUOUS_TIME_MONTH_DAY = 786,
-        JSMSG_TEMPORAL_PARSER_AMBIGUOUS_TIME_YEAR_MONTH = 787,
-        JSMSG_TEMPORAL_PARSER_INVALID_UTC_DESIGNATOR = 788,
-        JSMSG_TEMPORAL_PARSER_INVALID_UTC_DESIGNATOR_WITHOUT_NAME = 789,
-        JSMSG_TEMPORAL_PARSER_MONTH_DAY_CALENDAR_NOT_ISO8601 = 790,
-        JSMSG_TEMPORAL_PARSER_YEAR_MONTH_CALENDAR_NOT_ISO8601 = 791,
-        JSMSG_TEMPORAL_PARSER_INVALID_SUBMINUTE_TIMEZONE = 792,
-        JSMSG_TEMPORAL_PARSER_INCONSISTENT_DATE_SEPARATOR = 793,
-        JSMSG_TEMPORAL_PARSER_INCONSISTENT_TIME_SEPARATOR = 794,
-        JSMSG_TEMPORAL_PARSER_EMPTY_STRING = 795,
-        JSMSG_ERROR_WAS_SUPPRESSED = 796,
-        JSMSG_DISPOSABLE_STACK_DISPOSED = 797,
-        JSMSG_ITERATOR_RANGE_INVALID_START = 798,
-        JSMSG_ITERATOR_RANGE_INVALID_START_RANGEERR = 799,
-        JSMSG_ITERATOR_RANGE_INVALID_END_RANGEERR = 800,
-        JSMSG_ITERATOR_RANGE_INVALID_END = 801,
-        JSMSG_ITERATOR_RANGE_START_INFINITY = 802,
-        JSMSG_ITERATOR_RANGE_STEP_NAN = 803,
-        JSMSG_ITERATOR_RANGE_STEP_NOT_NUMBER = 804,
-        JSMSG_ITERATOR_RANGE_STEP_NOT_FINITE = 805,
-        JSMSG_ITERATOR_RANGE_STEP_ZERO = 806,
-        JSMSG_ITERATOR_RANGE_INVALID_STEP = 807,
-        JSMSG_ITERATOR_RANGE_STEP_NOT_BIGINT = 808,
-        JSMSG_SUMPRECISE_TOO_MANY_VALUES = 809,
-        JSMSG_SUMPRECISE_EXPECTED_NUMBER = 810,
-        JSErr_Limit = 811,
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z23JS_SetGrayGCRootsTracerP9JSContextPFbP8JSTracerRN2JS11SliceBudgetEPvES6_"]
-        pub fn JS_SetGrayGCRootsTracer(
-            cx: *mut root::JSContext,
-            traceOp: root::JSGrayRootsTracer,
-            data: *mut ::std::os::raw::c_void,
-        );
+        JSMSG_WASM_OUT_OF_BOUNDS_AT = 373,
+        JSMSG_WASM_UNALIGNED_ACCESS = 374,
+        JSMSG_WASM_WAKE_OVERFLOW = 375,
+        JSMSG_WASM_DEREF_NULL = 376,
+        JSMSG_WASM_BAD_CAST = 377,
+        JSMSG_WASM_UNIMPLEMENTED = 378,
+        JSMSG_WASM_MEM_IMP_LIMIT = 379,
+        JSMSG_WASM_TABLE_IMP_LIMIT = 380,
+        JSMSG_WASM_ARRAY_IMP_LIMIT = 381,
+        JSMSG_WASM_ARRAY_NEW_ELEM_NOT_IMPLEMENTED = 382,
+        JSMSG_WASM_BAD_RANGE = 383,
+        JSMSG_WASM_BAD_GROW = 384,
+        JSMSG_WASM_MAX_LT_INITIAL = 385,
+        JSMSG_WASM_TABLE_OUT_OF_BOUNDS = 386,
+        JSMSG_WASM_BAD_ENFORCE_RANGE = 387,
+        JSMSG_WASM_BAD_BUF_ARG = 388,
+        JSMSG_WASM_BAD_MOD_ARG = 389,
+        JSMSG_WASM_BAD_BUF_MOD_ARG = 390,
+        JSMSG_WASM_BAD_DESC_ARG = 391,
+        JSMSG_WASM_BAD_IMPORT_ARG = 392,
+        JSMSG_WASM_BAD_IMPORT_FIELD = 393,
+        JSMSG_WASM_BAD_REF_NONNULLABLE_VALUE = 394,
+        JSMSG_WASM_BAD_FUNCREF_VALUE = 395,
+        JSMSG_WASM_BAD_NULL_EXNREF_VALUE = 396,
+        JSMSG_WASM_BAD_NULL_CONTREF_VALUE = 397,
+        JSMSG_WASM_BAD_NULL_EXTERNREF_VALUE = 398,
+        JSMSG_WASM_BAD_NULL_FUNCREF_VALUE = 399,
+        JSMSG_WASM_BAD_NULL_ANYREF_VALUE = 400,
+        JSMSG_WASM_BAD_EQREF_VALUE = 401,
+        JSMSG_WASM_BAD_I31REF_VALUE = 402,
+        JSMSG_WASM_BAD_STRUCTREF_VALUE = 403,
+        JSMSG_WASM_BAD_ARRAYREF_VALUE = 404,
+        JSMSG_WASM_BAD_TYPEREF_VALUE = 405,
+        JSMSG_WASM_BAD_VAL_TYPE = 406,
+        JSMSG_WASM_BAD_STRING_VAL_TYPE = 407,
+        JSMSG_WASM_BAD_STRING_ADDR_TYPE = 408,
+        JSMSG_WASM_BAD_EXN_ARG = 409,
+        JSMSG_WASM_BAD_EXN_PAYLOAD = 410,
+        JSMSG_WASM_BAD_EXN_PAYLOAD_LEN = 411,
+        JSMSG_WASM_BAD_EXN_TAG = 412,
+        JSMSG_WASM_BAD_JSTAG_WRAP = 413,
+        JSMSG_WASM_BAD_EXN_TAG_PARAMS = 414,
+        JSMSG_WASM_BAD_EXN_OPTIONS = 415,
+        JSMSG_WASM_BAD_FUNCTION_TYPE = 416,
+        JSMSG_WASM_BAD_FUNCTION_VALUE = 417,
+        JSMSG_WASM_BAD_COMPILE_OPTIONS = 418,
+        JSMSG_WASM_DUPLICATE_BUILTIN = 419,
+        JSMSG_WASM_BAD_CODEPOINT = 420,
+        JSMSG_WASM_NO_TRANSFER = 421,
+        JSMSG_WASM_TEXT_FAIL = 422,
+        JSMSG_WASM_MISSING_MAXIMUM = 423,
+        JSMSG_WASM_GLOBAL_IMMUTABLE = 424,
+        JSMSG_WASM_WRONG_NUMBER_OF_VALUES = 425,
+        JSMSG_WASM_NONSHARED_WAIT = 426,
+        JSMSG_WASM_SUPPLY_ONLY_ONE = 427,
+        JSMSG_WASM_MISSING_REQUIRED = 428,
+        JSMSG_WASM_MODIFIED_GC_OBJECT = 429,
+        JSMSG_WASM_ARRAYBUFFER_PAGE_MULTIPLE = 430,
+        JSMSG_WASM_ARRAYBUFFER_CANNOT_SHRINK = 431,
+        JSMSG_WASM_MEMORY_NOT_RESIZABLE = 432,
+        JSMSG_WASM_ESM_RESERVED_MODULE_NAME = 433,
+        JSMSG_WASM_ESM_RESERVED_FIELD_NAME = 434,
+        JSMSG_WASM_ESM_RESERVED_EXPORT_NAME = 435,
+        JSMSG_WASM_LEGACY_EXCEPTIONS_DEPRECATED = 436,
+        JSMSG_USE_ASM_DEPRECATED = 437,
+        JSMSG_JSPI_INVALID_STATE = 438,
+        JSMSG_JSPI_SUSPEND_ERROR = 439,
+        JSMSG_BAD_GETPROTOTYPEOF_TRAP_RETURN = 440,
+        JSMSG_INCONSISTENT_GETPROTOTYPEOF_TRAP = 441,
+        JSMSG_PROXY_SETPROTOTYPEOF_RETURNED_FALSE = 442,
+        JSMSG_INCONSISTENT_SETPROTOTYPEOF_TRAP = 443,
+        JSMSG_CANT_CHANGE_EXTENSIBILITY = 444,
+        JSMSG_CANT_DEFINE_INVALID = 445,
+        JSMSG_CANT_DEFINE_NEW = 446,
+        JSMSG_CANT_DEFINE_NE_AS_NC = 447,
+        JSMSG_PROXY_DEFINE_RETURNED_FALSE = 448,
+        JSMSG_PROXY_DELETE_RETURNED_FALSE = 449,
+        JSMSG_PROXY_PREVENTEXTENSIONS_RETURNED_FALSE = 450,
+        JSMSG_PROXY_SET_RETURNED_FALSE = 451,
+        JSMSG_CANT_REPORT_AS_NON_EXTENSIBLE = 452,
+        JSMSG_CANT_DELETE_NON_EXTENSIBLE = 453,
+        JSMSG_CANT_REPORT_C_AS_NC = 454,
+        JSMSG_CANT_REPORT_E_AS_NE = 455,
+        JSMSG_CANT_REPORT_INVALID = 456,
+        JSMSG_CANT_REPORT_NC_AS_NE = 457,
+        JSMSG_CANT_REPORT_NEW = 458,
+        JSMSG_CANT_REPORT_NE_AS_NC = 459,
+        JSMSG_CANT_REPORT_W_AS_NW = 460,
+        JSMSG_CANT_SET_NW_NC = 461,
+        JSMSG_CANT_SET_WO_SETTER = 462,
+        JSMSG_CANT_SKIP_NC = 463,
+        JSMSG_OWNKEYS_STR_SYM = 464,
+        JSMSG_OWNKEYS_DUPLICATE = 465,
+        JSMSG_MUST_REPORT_SAME_VALUE = 466,
+        JSMSG_MUST_REPORT_UNDEFINED = 467,
+        JSMSG_PROXY_CONSTRUCT_OBJECT = 468,
+        JSMSG_PROXY_EXTENSIBILITY = 469,
+        JSMSG_PROXY_GETOWN_OBJORUNDEF = 470,
+        JSMSG_PROXY_REVOKED = 471,
+        JSMSG_BAD_TRAP = 472,
+        JSMSG_SC_BAD_CLONE_VERSION = 473,
+        JSMSG_SC_BAD_SERIALIZED_DATA = 474,
+        JSMSG_SC_DUP_TRANSFERABLE = 475,
+        JSMSG_SC_NOT_TRANSFERABLE = 476,
+        JSMSG_SC_TRANSFERABLE_TWICE = 477,
+        JSMSG_SC_UNSUPPORTED_TYPE = 478,
+        JSMSG_SC_NOT_CLONABLE = 479,
+        JSMSG_SC_NOT_CLONABLE_WITH_COOP_COEP = 480,
+        JSMSG_SC_SAB_DISABLED = 481,
+        JSMSG_SC_SAB_REFCNT_OFLO = 482,
+        JSMSG_SC_SHMEM_TRANSFERABLE = 483,
+        JSMSG_SC_SHMEM_POLICY = 484,
+        JSMSG_ASSIGN_FUNCTION_OR_NULL = 485,
+        JSMSG_DEBUG_BAD_LINE = 486,
+        JSMSG_DEBUG_BAD_OFFSET = 487,
+        JSMSG_DEBUG_BREAKPOINT_NOT_ALLOWED = 488,
+        JSMSG_DEBUG_BAD_REFERENT = 489,
+        JSMSG_DEBUG_BAD_RESUMPTION = 490,
+        JSMSG_DEBUG_RESUMPTION_CONFLICT = 491,
+        JSMSG_DEBUG_CANT_DEBUG_GLOBAL = 492,
+        JSMSG_DEBUG_SAME_COMPARTMENT = 493,
+        JSMSG_DEBUG_CCW_REQUIRED = 494,
+        JSMSG_DEBUG_COMPARTMENT_MISMATCH = 495,
+        JSMSG_DEBUG_LOOP = 496,
+        JSMSG_DEBUG_NOT_DEBUGGEE = 497,
+        JSMSG_DEBUG_NOT_DEBUGGING = 498,
+        JSMSG_DEBUG_NOT_IDLE = 499,
+        JSMSG_DEBUG_NOT_ON_STACK = 500,
+        JSMSG_DEBUG_NOT_ON_STACK_OR_SUSPENDED = 501,
+        JSMSG_DEBUG_NO_ENV_OBJECT = 502,
+        JSMSG_DEBUG_PROTO = 503,
+        JSMSG_DEBUG_WRONG_OWNER = 504,
+        JSMSG_DEBUG_OPTIMIZED_OUT = 505,
+        JSMSG_DEBUG_OPTIMIZED_OUT_FUN = 506,
+        JSMSG_DEBUG_FORCED_RETURN_DISALLOWED = 507,
+        JSMSG_DEBUG_RESUMPTION_VALUE_DISALLOWED = 508,
+        JSMSG_DEBUG_VARIABLE_NOT_FOUND = 509,
+        JSMSG_DEBUG_WRAPPER_IN_WAY = 510,
+        JSMSG_DEBUGGEE_WOULD_RUN = 511,
+        JSMSG_NOT_CALLABLE_OR_UNDEFINED = 512,
+        JSMSG_NOT_TRACKING_ALLOCATIONS = 513,
+        JSMSG_OBJECT_METADATA_CALLBACK_ALREADY_SET = 514,
+        JSMSG_QUERY_INNERMOST_WITHOUT_LINE_URL = 515,
+        JSMSG_QUERY_LINE_WITHOUT_URL = 516,
+        JSMSG_QUERY_USE_START_AND_END_TOGETHER = 517,
+        JSMSG_QUERY_START_LINE_IS_AFTER_END = 518,
+        JSMSG_DEBUG_CANT_SET_OPT_ENV = 519,
+        JSMSG_DEBUG_INVISIBLE_COMPARTMENT = 520,
+        JSMSG_DEBUG_CENSUS_BREAKDOWN = 521,
+        JSMSG_DEBUG_CENSUS_BREAKDOWN_NESTED = 522,
+        JSMSG_DEBUG_PROMISE_NOT_RESOLVED = 523,
+        JSMSG_DEBUG_PROMISE_NOT_FULFILLED = 524,
+        JSMSG_DEBUG_PROMISE_NOT_REJECTED = 525,
+        JSMSG_DEBUG_NO_BINARY_SOURCE = 526,
+        JSMSG_DEBUG_EXCLUSIVE_FRAME_COVERAGE = 527,
+        JSMSG_DEBUG_EXCLUSIVE_EXECUTION_TRACE_COVERAGE = 528,
+        JSMSG_NATIVE_TRACING_BUFFER_MALFORMED = 529,
+        JSMSG_TESTING_SCRIPTS_ONLY = 530,
+        JSMSG_INVALID_ARGS = 531,
+        JSMSG_TRACELOGGER_ENABLE_FAIL = 532,
+        JSMSG_DATE_NOT_FINITE = 533,
+        JSMSG_DUPLICATE_VARIANT_SUBTAG = 534,
+        JSMSG_INTERNAL_INTL_ERROR = 535,
+        JSMSG_INVALID_CURRENCY_CODE = 536,
+        JSMSG_INVALID_UNIT_IDENTIFIER = 537,
+        JSMSG_INVALID_DIGITS_VALUE = 538,
+        JSMSG_INVALID_KEY = 539,
+        JSMSG_INVALID_LANGUAGE_TAG = 540,
+        JSMSG_INVALID_LOCALES_ELEMENT = 541,
+        JSMSG_INVALID_LOCALE_MATCHER = 542,
+        JSMSG_INVALID_OPTION_VALUE = 543,
+        JSMSG_INVALID_DATETIME_OPTION = 544,
+        JSMSG_INVALID_DATETIME_STYLE = 545,
+        JSMSG_UNDEFINED_CURRENCY = 546,
+        JSMSG_UNDEFINED_UNIT = 547,
+        JSMSG_UNDEFINED_DATE = 548,
+        JSMSG_UNDEFINED_NUMBER = 549,
+        JSMSG_UNDEFINED_TYPE = 550,
+        JSMSG_NAN_NUMBER_RANGE = 551,
+        JSMSG_INVALID_NUMBER_OPTION = 552,
+        JSMSG_UNEQUAL_FRACTION_DIGITS = 553,
+        JSMSG_INTL_DURATION_INVALID_NON_NUMERIC_OPTION = 554,
+        JSMSG_INTL_DURATION_INVALID_DISPLAY_OPTION = 555,
+        JSMSG_INTL_DURATION_INVALID_DISPLAY_OPTION_DEFAULT_STYLE = 556,
+        JSMSG_INTL_DURATION_INVALID_DISPLAY_OPTION_DEFAULT_DISPLAY = 557,
+        JSMSG_INVALID_FORMAT_OPTIONS = 558,
+        JSMSG_ISLAMIC_FALLBACK = 559,
+        JSMSG_BAD_CLASS_RANGE = 560,
+        JSMSG_ESCAPE_AT_END_OF_REGEXP = 561,
+        JSMSG_EXEC_NOT_OBJORNULL = 562,
+        JSMSG_INVALID_DECIMAL_ESCAPE = 563,
+        JSMSG_INVALID_GROUP = 564,
+        JSMSG_REPEATED_FLAG = 565,
+        JSMSG_INVALID_FLAG_GROUP = 566,
+        JSMSG_INVALID_IDENTITY_ESCAPE = 567,
+        JSMSG_INVALID_UNICODE_ESCAPE = 568,
+        JSMSG_MISSING_PAREN = 569,
+        JSMSG_NEWREGEXP_FLAGGED = 570,
+        JSMSG_NOTHING_TO_REPEAT = 571,
+        JSMSG_NUMBERS_OUT_OF_ORDER = 572,
+        JSMSG_RANGE_WITH_CLASS_ESCAPE = 573,
+        JSMSG_RAW_BRACKET_IN_REGEXP = 574,
+        JSMSG_TOO_MANY_PARENS = 575,
+        JSMSG_UNICODE_OVERFLOW = 576,
+        JSMSG_UNMATCHED_RIGHT_PAREN = 577,
+        JSMSG_UNTERM_CLASS = 578,
+        JSMSG_INVALID_PROPERTY_NAME = 579,
+        JSMSG_INVALID_CLASS_PROPERTY_NAME = 580,
+        JSMSG_INCOMPLETE_QUANTIFIER = 581,
+        JSMSG_INVALID_QUANTIFIER = 582,
+        JSMSG_INVALID_CAPTURE_NAME = 583,
+        JSMSG_DUPLICATE_CAPTURE_NAME = 584,
+        JSMSG_INVALID_NAMED_REF = 585,
+        JSMSG_INVALID_NAMED_CAPTURE_REF = 586,
+        JSMSG_INCOMPATIBLE_REGEXP_GETTER = 587,
+        JSMSG_INCOMPATIBLE_REGEXP_METHOD = 588,
+        JSMSG_INVALID_CLASS_SET_OP = 589,
+        JSMSG_INVALID_CHAR_IN_CLASS = 590,
+        JSMSG_NEGATED_CLASS_WITH_STR = 591,
+        JSMSG_MULTIPLE_FLAG_DASHES = 592,
+        JSMSG_INCOMPATIBLE_RECEIVER = 593,
+        JSMSG_REGEXP_STATIC_EMPTY = 594,
+        JSMSG_REGEXP_CROSS_REALM = 595,
+        JSMSG_REGEXP_LEGACY_FEATURES_DISABLED = 596,
+        JSMSG_TYPEDOBJECT_SETTING_IMMUTABLE = 597,
+        JSMSG_TOO_LONG_ARRAY = 598,
+        JSMSG_BAD_INDEX = 599,
+        JSMSG_DEFINE_BAD_INDEX = 600,
+        JSMSG_NON_ARRAY_BUFFER_RETURNED = 601,
+        JSMSG_SAME_ARRAY_BUFFER_RETURNED = 602,
+        JSMSG_SHORT_ARRAY_BUFFER_RETURNED = 603,
+        JSMSG_TYPED_ARRAY_BAD_ARGS = 604,
+        JSMSG_TYPED_ARRAY_DETACHED = 605,
+        JSMSG_ARRAYBUFFER_IMMUTABLE = 606,
+        JSMSG_ARRAYBUFFER_LENGTH_PINNED = 607,
+        JSMSG_TYPED_ARRAY_RESIZED_BOUNDS = 608,
+        JSMSG_TYPED_ARRAY_CONSTRUCT_OFFSET_BOUNDS = 609,
+        JSMSG_TYPED_ARRAY_CONSTRUCT_OFFSET_MISALIGNED = 610,
+        JSMSG_TYPED_ARRAY_CONSTRUCT_OFFSET_LENGTH_BOUNDS = 611,
+        JSMSG_TYPED_ARRAY_CONSTRUCT_ARRAY_LENGTH_BOUNDS = 612,
+        JSMSG_TYPED_ARRAY_CONSTRUCT_TOO_LARGE = 613,
+        JSMSG_TYPED_ARRAY_BAD_HEX_STRING_LENGTH = 614,
+        JSMSG_TYPED_ARRAY_BAD_HEX_DIGIT = 615,
+        JSMSG_TYPED_ARRAY_BAD_BASE64_ALPHABET = 616,
+        JSMSG_TYPED_ARRAY_BAD_BASE64_LAST_CHUNK_HANDLING = 617,
+        JSMSG_TYPED_ARRAY_BAD_BASE64_CHAR = 618,
+        JSMSG_TYPED_ARRAY_BAD_INCOMPLETE_CHUNK = 619,
+        JSMSG_TYPED_ARRAY_BAD_BASE64_AFTER_PADDING = 620,
+        JSMSG_TYPED_ARRAY_MISSING_BASE64_PADDING = 621,
+        JSMSG_TYPED_ARRAY_EXTRA_BASE64_BITS = 622,
+        JSMSG_TYPED_ARRAY_CALL_OR_CONSTRUCT = 623,
+        JSMSG_NON_TYPED_ARRAY_RETURNED = 624,
+        JSMSG_SHORT_TYPED_ARRAY_RETURNED = 625,
+        JSMSG_TYPED_ARRAY_NOT_COMPATIBLE = 626,
+        JSMSG_ARRAYBUFFER_REQUIRED = 627,
+        JSMSG_ARRAYBUFFER_LENGTH_LARGER_THAN_MAXIMUM = 628,
+        JSMSG_ARRAYBUFFER_NON_RESIZABLE = 629,
+        JSMSG_ARRAYBUFFER_COPY_RANGE = 630,
+        JSMSG_SHARED_ARRAY_BAD_LENGTH = 631,
+        JSMSG_NON_SHARED_ARRAY_BUFFER_RETURNED = 632,
+        JSMSG_SAME_SHARED_ARRAY_BUFFER_RETURNED = 633,
+        JSMSG_SHORT_SHARED_ARRAY_BUFFER_RETURNED = 634,
+        JSMSG_SHARED_ARRAY_LENGTH_SMALLER_THAN_CURRENT = 635,
+        JSMSG_BAD_PARSE_NODE = 636,
+        JSMSG_SYMBOL_TO_STRING = 637,
+        JSMSG_SYMBOL_TO_NUMBER = 638,
+        JSMSG_ATOMICS_BAD_ARRAY = 639,
+        JSMSG_ATOMICS_WAIT_NOT_ALLOWED = 640,
+        JSMSG_ATOMICS_PAUSE_BAD_COUNT = 641,
+        JSMSG_CANT_SET_INTERPOSED = 642,
+        JSMSG_CANT_DEFINE_WINDOW_ELEMENT = 643,
+        JSMSG_CANT_DELETE_WINDOW_ELEMENT = 644,
+        JSMSG_CANT_DEFINE_WINDOW_NAMED_PROPERTY = 645,
+        JSMSG_CANT_DELETE_WINDOW_NAMED_PROPERTY = 646,
+        JSMSG_CANT_PREVENT_EXTENSIONS = 647,
+        JSMSG_CANT_DEFINE_WINDOW_NC = 648,
+        JSMSG_NO_NAMED_SETTER = 649,
+        JSMSG_NO_INDEXED_SETTER = 650,
+        JSMSG_NOT_DATA_DESCRIPTOR = 651,
+        JSMSG_CANT_DELETE_SUPER = 652,
+        JSMSG_REINIT_THIS = 653,
+        JSMSG_MODULE_NO_EXPORT = 654,
+        JSMSG_MODULE_CIRCULAR_IMPORT = 655,
+        JSMSG_MODULE_AMBIGUOUS = 656,
+        JSMSG_MISSING_EXPORT = 657,
+        JSMSG_BAD_MODULE_STATUS = 658,
+        JSMSG_DYNAMIC_IMPORT_FAILED = 659,
+        JSMSG_DYNAMIC_IMPORT_NOT_SUPPORTED = 660,
+        JSMSG_BAD_MODULE_TYPE = 661,
+        JSMSG_ABSTRACT_MODULE_SOURCE_CTOR = 662,
+        JSMSG_MODULE_SOURCE_NOT_AVAILABLE = 663,
+        JSMSG_WASM_ESM_EVAL_NOT_SUPPORTED = 664,
+        JSMSG_IMPORT_MAPS_PARSE_FAILED = 665,
+        JSMSG_IMPORT_MAPS_NOT_A_MAP = 666,
+        JSMSG_IMPORT_MAPS_IMPORTS_NOT_A_MAP = 667,
+        JSMSG_IMPORT_MAPS_SCOPES_NOT_A_MAP = 668,
+        JSMSG_IMPORT_MAPS_SCOPE_VALUE_NOT_A_MAP = 669,
+        JSMSG_IMPORT_MAPS_INTEGRITY_NOT_A_MAP = 670,
+        JSMSG_IMPORT_ATTRIBUTES_STATIC_IMPORT_UNSUPPORTED_ATTRIBUTE = 671,
+        JSMSG_IMPORT_ATTRIBUTES_DYNAMIC_IMPORT_UNSUPPORTED_ATTRIBUTE = 672,
+        JSMSG_CANNOT_RESOLVE_PROMISE_WITH_ITSELF = 673,
+        JSMSG_PROMISE_CAPABILITY_HAS_SOMETHING_ALREADY = 674,
+        JSMSG_PROMISE_RESOLVE_FUNCTION_NOT_CALLABLE = 675,
+        JSMSG_PROMISE_REJECT_FUNCTION_NOT_CALLABLE = 676,
+        JSMSG_PROMISE_ERROR_IN_WRAPPED_REJECTION_REASON = 677,
+        JSMSG_PROMISE_ANY_REJECTION = 678,
+        JSMSG_RETURN_NOT_CALLABLE = 679,
+        JSMSG_ITERATOR_NO_THROW = 680,
+        JSMSG_UNHANDLABLE_PROMISE_REJECTION_WARNING = 681,
+        JSMSG_UNHANDLABLE_PROMISE_RESOLUTION_WARNING = 682,
+        JSMSG_FOR_AWAIT_NOT_OF = 683,
+        JSMSG_NOT_AN_ASYNC_GENERATOR = 684,
+        JSMSG_GET_ASYNC_ITER_RETURNED_PRIMITIVE = 685,
+        JSMSG_SUSPENDED_QUEUE_NOT_EMPTY = 686,
+        JSMSG_WASM_ERROR_CONSUMING_RESPONSE = 687,
+        JSMSG_WASM_BAD_RESPONSE_VALUE = 688,
+        JSMSG_WASM_BAD_RESPONSE_MIME_TYPE = 689,
+        JSMSG_WASM_BAD_RESPONSE_CORS_SAME_ORIGIN = 690,
+        JSMSG_WASM_BAD_RESPONSE_STATUS = 691,
+        JSMSG_WASM_RESPONSE_ALREADY_CONSUMED = 692,
+        JSMSG_BIGINT_TO_NUMBER = 693,
+        JSMSG_NONINTEGER_NUMBER_TO_BIGINT = 694,
+        JSMSG_BIGINT_TOO_LARGE = 695,
+        JSMSG_BIGINT_DIVISION_BY_ZERO = 696,
+        JSMSG_BIGINT_NEGATIVE_EXPONENT = 697,
+        JSMSG_BIGINT_INVALID_SYNTAX = 698,
+        JSMSG_BIGINT_NOT_SERIALIZABLE = 699,
+        JSMSG_NOT_A_FINALIZATION_REGISTRY = 700,
+        JSMSG_BAD_FINALIZATION_REGISTRY_TARGET = 701,
+        JSMSG_BAD_HELD_VALUE = 702,
+        JSMSG_BAD_UNREGISTER_TOKEN = 703,
+        JSMSG_BAD_FINALIZATION_REGISTRY_OBJECT = 704,
+        JSMSG_NOT_A_WEAK_REF = 705,
+        JSMSG_BAD_WEAKREF_TARGET = 706,
+        JSMSG_NEGATIVE_LIMIT = 707,
+        JSMSG_INVALID_CHUNKSIZE = 708,
+        JSMSG_INVALID_WINDOWSIZE = 709,
+        JSMSG_INVALID_SKIP_COUNT = 710,
+        JSMSG_INVALID_UNDERSIZED_OPTION_VALUE = 711,
+        JSMSG_ITERATOR_ZIP_INVALID_OPTION_TYPE = 712,
+        JSMSG_ITERATOR_ZIP_INVALID_OPTION_VALUE = 713,
+        JSMSG_ITERATOR_ZIP_STRICT_OPEN_ITERATOR = 714,
+        JSMSG_SET_NEGATIVE_SIZE = 715,
+        JSMSG_DECORATOR_INVALID_RETURN_TYPE = 716,
+        JSMSG_DECORATOR_FUZZING_UNSAFE = 717,
+        JSMSG_DECORATOR_COMPUTED_NYI = 718,
+        JSMSG_TEMPORAL_INVALID_UNIT_RANGE = 719,
+        JSMSG_TEMPORAL_INVALID_UNIT_OPTION = 720,
+        JSMSG_TEMPORAL_INVALID_NUMBER = 721,
+        JSMSG_TEMPORAL_INVALID_INTEGER = 722,
+        JSMSG_TEMPORAL_MISSING_OPTION = 723,
+        JSMSG_TEMPORAL_MISSING_PROPERTY = 724,
+        JSMSG_TEMPORAL_UNEXPECTED_PROPERTY = 725,
+        JSMSG_TEMPORAL_MISSING_TEMPORAL_FIELDS = 726,
+        JSMSG_TEMPORAL_INSTANT_INVALID = 727,
+        JSMSG_TEMPORAL_INSTANT_NONINTEGER = 728,
+        JSMSG_TEMPORAL_INSTANT_BAD_DURATION = 729,
+        JSMSG_TEMPORAL_TIMEZONE_INVALID_IDENTIFIER = 730,
+        JSMSG_TEMPORAL_TIMEZONE_INCOMPATIBLE = 731,
+        JSMSG_TEMPORAL_TIMEZONE_INSTANT_AMBIGUOUS = 732,
+        JSMSG_TEMPORAL_TIMEZONE_INSTANT_AMBIGUOUS_DATE_SKIPPED = 733,
+        JSMSG_TEMPORAL_DURATION_INVALID_SIGN = 734,
+        JSMSG_TEMPORAL_DURATION_INVALID_NON_FINITE = 735,
+        JSMSG_TEMPORAL_DURATION_INVALID_NORMALIZED_TIME = 736,
+        JSMSG_TEMPORAL_DURATION_MISSING_UNIT = 737,
+        JSMSG_TEMPORAL_DURATION_NOT_INTEGER = 738,
+        JSMSG_TEMPORAL_DURATION_MISSING_UNIT_SPECIFIER = 739,
+        JSMSG_TEMPORAL_DURATION_UNCOMPARABLE = 740,
+        JSMSG_TEMPORAL_CALENDAR_INVALID_ID = 741,
+        JSMSG_TEMPORAL_CALENDAR_MISSING_FIELD = 742,
+        JSMSG_TEMPORAL_CALENDAR_OVERFLOW_FIELD = 743,
+        JSMSG_TEMPORAL_CALENDAR_INVALID_MONTHCODE = 744,
+        JSMSG_TEMPORAL_CALENDAR_INVALID_ERA = 745,
+        JSMSG_TEMPORAL_CALENDAR_INCOMPATIBLE = 746,
+        JSMSG_TEMPORAL_CALENDAR_INCOMPATIBLE_YEAR = 747,
+        JSMSG_TEMPORAL_CALENDAR_INCOMPATIBLE_MONTHCODE = 748,
+        JSMSG_TEMPORAL_CALENDAR_INTERNAL_ERROR = 749,
+        JSMSG_TEMPORAL_PLAIN_DATE_INVALID = 750,
+        JSMSG_TEMPORAL_PLAIN_DATE_INVALID_VALUE = 751,
+        JSMSG_TEMPORAL_PLAIN_DATE_TIME_INVALID = 752,
+        JSMSG_TEMPORAL_PLAIN_TIME_INVALID = 753,
+        JSMSG_TEMPORAL_PLAIN_TIME_INVALID_VALUE = 754,
+        JSMSG_TEMPORAL_PLAIN_TIME_MISSING_UNIT = 755,
+        JSMSG_TEMPORAL_PLAIN_MONTH_DAY_INVALID = 756,
+        JSMSG_TEMPORAL_PLAIN_YEAR_MONTH_INVALID = 757,
+        JSMSG_TEMPORAL_PLAIN_YEAR_MONTH_BAD_DURATION = 758,
+        JSMSG_TEMPORAL_ZONED_DATE_TIME_NO_TIME_FOUND = 759,
+        JSMSG_TEMPORAL_ZONED_DATE_TIME_INCONSISTENT_INSTANT = 760,
+        JSMSG_TEMPORAL_PARSER_NEGATIVE_ZERO_YEAR = 761,
+        JSMSG_TEMPORAL_PARSER_MISSING_EXTENDED_YEAR = 762,
+        JSMSG_TEMPORAL_PARSER_MISSING_YEAR = 763,
+        JSMSG_TEMPORAL_PARSER_MISSING_MONTH = 764,
+        JSMSG_TEMPORAL_PARSER_MISSING_DAY = 765,
+        JSMSG_TEMPORAL_PARSER_MISSING_HOUR = 766,
+        JSMSG_TEMPORAL_PARSER_MISSING_MINUTE = 767,
+        JSMSG_TEMPORAL_PARSER_MISSING_SECOND = 768,
+        JSMSG_TEMPORAL_PARSER_MISSING_TIMEZONE_SIGN = 769,
+        JSMSG_TEMPORAL_PARSER_INVALID_MONTH = 770,
+        JSMSG_TEMPORAL_PARSER_INVALID_DAY = 771,
+        JSMSG_TEMPORAL_PARSER_INVALID_HOUR = 772,
+        JSMSG_TEMPORAL_PARSER_INVALID_MINUTE = 773,
+        JSMSG_TEMPORAL_PARSER_INVALID_SECOND = 774,
+        JSMSG_TEMPORAL_PARSER_INVALID_LEAPSECOND = 775,
+        JSMSG_TEMPORAL_PARSER_BRACKET_BEFORE_TIMEZONE = 776,
+        JSMSG_TEMPORAL_PARSER_BRACKET_AFTER_TIMEZONE = 777,
+        JSMSG_TEMPORAL_PARSER_MISSING_TIMEZONE = 778,
+        JSMSG_TEMPORAL_PARSER_MISSING_TIMEZONE_NAME = 779,
+        JSMSG_TEMPORAL_PARSER_UNEXPECTED_CHARACTERS_AT_END = 780,
+        JSMSG_TEMPORAL_PARSER_MISSING_DURATION_DESIGNATOR = 781,
+        JSMSG_TEMPORAL_PARSER_MISSING_TIME_DESIGNATOR = 782,
+        JSMSG_TEMPORAL_PARSER_MISSING_DURATION_DIGITS = 783,
+        JSMSG_TEMPORAL_PARSER_MISSING_DURATION_UNIT_DESIGNATOR = 784,
+        JSMSG_TEMPORAL_PARSER_INVALID_DURATION_MINUTES = 785,
+        JSMSG_TEMPORAL_PARSER_INVALID_DURATION_SECONDS = 786,
+        JSMSG_TEMPORAL_PARSER_INVALID_ANNOTATION_KEY = 787,
+        JSMSG_TEMPORAL_PARSER_INVALID_ANNOTATION_VALUE = 788,
+        JSMSG_TEMPORAL_PARSER_BRACKET_BEFORE_ANNOTATION = 789,
+        JSMSG_TEMPORAL_PARSER_BRACKET_AFTER_ANNOTATION = 790,
+        JSMSG_TEMPORAL_PARSER_ASSIGNMENT_IN_ANNOTATION = 791,
+        JSMSG_TEMPORAL_PARSER_INVALID_CRITICAL_ANNOTATION = 792,
+        JSMSG_TEMPORAL_PARSER_MISSING_DATE_TIME_SEPARATOR = 793,
+        JSMSG_TEMPORAL_PARSER_AMBIGUOUS_TIME_MONTH_DAY = 794,
+        JSMSG_TEMPORAL_PARSER_AMBIGUOUS_TIME_YEAR_MONTH = 795,
+        JSMSG_TEMPORAL_PARSER_INVALID_UTC_DESIGNATOR = 796,
+        JSMSG_TEMPORAL_PARSER_INVALID_UTC_DESIGNATOR_WITHOUT_NAME = 797,
+        JSMSG_TEMPORAL_PARSER_MONTH_DAY_CALENDAR_NOT_ISO8601 = 798,
+        JSMSG_TEMPORAL_PARSER_YEAR_MONTH_CALENDAR_NOT_ISO8601 = 799,
+        JSMSG_TEMPORAL_PARSER_INVALID_SUBMINUTE_TIMEZONE = 800,
+        JSMSG_TEMPORAL_PARSER_INCONSISTENT_DATE_SEPARATOR = 801,
+        JSMSG_TEMPORAL_PARSER_INCONSISTENT_TIME_SEPARATOR = 802,
+        JSMSG_TEMPORAL_PARSER_EMPTY_STRING = 803,
+        JSMSG_ERROR_WAS_SUPPRESSED = 804,
+        JSMSG_DISPOSABLE_STACK_DISPOSED = 805,
+        JSMSG_ITERATOR_RANGE_INVALID_START = 806,
+        JSMSG_ITERATOR_RANGE_INVALID_START_RANGEERR = 807,
+        JSMSG_ITERATOR_RANGE_INVALID_END_RANGEERR = 808,
+        JSMSG_ITERATOR_RANGE_INVALID_END = 809,
+        JSMSG_ITERATOR_RANGE_START_INFINITY = 810,
+        JSMSG_ITERATOR_RANGE_STEP_NAN = 811,
+        JSMSG_ITERATOR_RANGE_STEP_NOT_NUMBER = 812,
+        JSMSG_ITERATOR_RANGE_STEP_NOT_FINITE = 813,
+        JSMSG_ITERATOR_RANGE_STEP_ZERO = 814,
+        JSMSG_ITERATOR_RANGE_INVALID_STEP = 815,
+        JSMSG_ITERATOR_RANGE_STEP_NOT_BIGINT = 816,
+        JSMSG_SUMPRECISE_TOO_MANY_VALUES = 817,
+        JSMSG_SUMPRECISE_EXPECTED_NUMBER = 818,
+        JSErr_Limit = 819,
     }
     extern "C" {
         #[link_name = "\u{1}_Z23JS_FindCompilationScopeP9JSContextN2JS6HandleIP8JSObjectEE"]
@@ -21080,20 +21645,6 @@ pub mod root {
         ) -> *mut root::JSObject;
     }
     extern "C" {
-        #[link_name = "\u{1}_Z35JS_TraceShapeCycleCollectorChildrenPN2JS14CallbackTracerENS_9GCCellPtrE"]
-        pub fn JS_TraceShapeCycleCollectorChildren(
-            trc: *mut root::JS::CallbackTracer,
-            shape: root::JS::GCCellPtr,
-        );
-    }
-    extern "C" {
-        #[link_name = "\u{1}_Z41JS_TraceObjectGroupCycleCollectorChildrenPN2JS14CallbackTracerENS_9GCCellPtrE"]
-        pub fn JS_TraceObjectGroupCycleCollectorChildren(
-            trc: *mut root::JS::CallbackTracer,
-            group: root::JS::GCCellPtr,
-        );
-    }
-    extern "C" {
         #[link_name = "\u{1}_Z22JS_GetScriptPrincipalsP8JSScript"]
         pub fn JS_GetScriptPrincipals(script: *mut root::JSScript) -> *mut root::JSPrincipals;
     }
@@ -21102,29 +21653,12 @@ pub mod root {
         pub fn JS_ScriptHasMutedErrors(script: *mut root::JSScript) -> bool;
     }
     extern "C" {
-        #[link_name = "\u{1}_Z14JS_CloneObjectP9JSContextN2JS6HandleIP8JSObjectEES5_"]
-        pub fn JS_CloneObject(
-            cx: *mut root::JSContext,
-            obj: root::JS::HandleObject,
-            proto: root::JS::HandleObject,
-        ) -> *mut root::JSObject;
-    }
-    extern "C" {
         #[doc = " Copy the own properties of src to dst in a fast way.  src and dst must both\n be native and must be in the compartment of cx.  They must have the same\n class, the same parent, and the same prototype.  Class reserved slots will\n NOT be copied.\n\n dst must not have any properties on it before this function is called.\n\n src must have been allocated via JS_NewObjectWithoutMetadata so that we can\n be sure it has no metadata that needs copying to dst.  This also means that\n dst needs to have the compartment global as its parent.  This function will\n preserve the existing metadata on dst, if any."]
         #[link_name = "\u{1}_Z49JS_InitializePropertiesFromCompatibleNativeObjectP9JSContextN2JS6HandleIP8JSObjectEES5_"]
         pub fn JS_InitializePropertiesFromCompatibleNativeObject(
             cx: *mut root::JSContext,
             dst: root::JS::HandleObject,
             src: root::JS::HandleObject,
-        ) -> bool;
-    }
-    extern "C" {
-        #[doc = " Copies all own properties and private fields from |obj| to |target|. Both\n |obj| and |target| must not be cross-compartment wrappers because we have to\n enter their realms.\n\n This function immediately enters a realm, and does not impose any\n restrictions on the realm of |cx|."]
-        #[link_name = "\u{1}_Z36JS_CopyOwnPropertiesAndPrivateFieldsP9JSContextN2JS6HandleIP8JSObjectEES5_"]
-        pub fn JS_CopyOwnPropertiesAndPrivateFields(
-            cx: *mut root::JSContext,
-            target: root::JS::HandleObject,
-            obj: root::JS::HandleObject,
         ) -> bool;
     }
     extern "C" {
@@ -21683,26 +22217,12 @@ pub mod root {
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
         ["Size of template specialization: GenericTracerImpl_open0_CallbackTracer_close0"]
-            [::std::mem::size_of::<root::js::GenericTracerImpl>() - 48usize];
+            [::std::mem::size_of::<root::js::GenericTracerImpl>() - 40usize];
         ["Align of template specialization: GenericTracerImpl_open0_CallbackTracer_close0"]
             [::std::mem::align_of::<root::js::GenericTracerImpl>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
         ["Size of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
             [::std::mem::size_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
                 - 8usize];
@@ -21754,13 +22274,6 @@ pub mod root {
         ["Align of template specialization: RefPtr_open0_ProgressLogger_SharedProgress_close0"]
             [::std::mem::align_of::<root::RefPtr<root::mozilla::ProgressLogger_SharedProgress>>()
                 - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_JSONWriteFunc_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -21771,256 +22284,8 @@ pub mod root {
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunkManager_close0"] [:: std :: mem :: align_of :: < root :: mozilla :: DefaultDelete > () - 1usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileBufferChunk_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
         ["Size of template specialization: RefPtr_open0_ProfileChunkedBuffer_RequestedChunkRefCountedHolder_close0"] [:: std :: mem :: size_of :: < root :: RefPtr < root :: mozilla :: ProfileChunkedBuffer_RequestedChunkRefCountedHolder > > () - 8usize] ;
         ["Align of template specialization: RefPtr_open0_ProfileChunkedBuffer_RequestedChunkRefCountedHolder_close0"] [:: std :: mem :: align_of :: < root :: RefPtr < root :: mozilla :: ProfileChunkedBuffer_RequestedChunkRefCountedHolder > > () - 8usize] ;
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::size_of::<root::mozilla::DefaultDelete>() - 1usize];
-        ["Align of template specialization: DefaultDelete_open0_ProfileChunkedBuffer_close0"]
-            [::std::mem::align_of::<root::mozilla::DefaultDelete>() - 1usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -22052,7 +22317,7 @@ pub mod root {
     };
     #[repr(C)]
     #[derive(Debug, Copy, Clone, PartialEq)]
-    pub struct _bindgen_ty_74 {
+    pub struct _bindgen_ty_69 {
         pub _address: u8,
     }
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
@@ -23568,10 +23833,10 @@ pub mod root {
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of template specialization: RefPtr_open0_LocaleString_close0"]
-            [::std::mem::size_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
-        ["Align of template specialization: RefPtr_open0_LocaleString_close0"]
-            [::std::mem::align_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
+        ["Size of template specialization: RefCounted_open0_TimeZoneString_close0"]
+            [::std::mem::size_of::<root::js::RefCounted>() - 8usize];
+        ["Align of template specialization: RefCounted_open0_TimeZoneString_close0"]
+            [::std::mem::align_of::<root::js::RefCounted>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -23579,6 +23844,27 @@ pub mod root {
             [::std::mem::size_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
         ["Align of template specialization: RefPtr_open0_LocaleString_close0"]
             [::std::mem::align_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: RefPtr_open0_TimeZoneString_close0"]
+            [::std::mem::size_of::<root::RefPtr<root::JS::TimeZoneString>>() - 8usize];
+        ["Align of template specialization: RefPtr_open0_TimeZoneString_close0"]
+            [::std::mem::align_of::<root::RefPtr<root::JS::TimeZoneString>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: RefPtr_open0_LocaleString_close0"]
+            [::std::mem::size_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
+        ["Align of template specialization: RefPtr_open0_LocaleString_close0"]
+            [::std::mem::align_of::<root::RefPtr<root::JS::LocaleString>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: RefPtr_open0_TimeZoneString_close0"]
+            [::std::mem::size_of::<root::RefPtr<root::JS::TimeZoneString>>() - 8usize];
+        ["Align of template specialization: RefPtr_open0_TimeZoneString_close0"]
+            [::std::mem::align_of::<root::RefPtr<root::JS::TimeZoneString>>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -24147,6 +24433,41 @@ pub mod root {
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
         ["Size of template specialization: Handle_open0_Value_close0"]
             [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
         ["Align of template specialization: Handle_open0_Value_close0"]
@@ -24179,153 +24500,6 @@ pub mod root {
             [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
         ["Align of template specialization: Handle_open0_Value_close0"]
             [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-        ["Align of template specialization: Handle_open0_Value_close0"]
-            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSString_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSString>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-    };
-    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
-    const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -24336,17 +24510,164 @@ pub mod root {
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
-        ["Align of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
-            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: Handle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::Handle<root::JS::Value>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -24401,6 +24722,55 @@ pub mod root {
             [::std::mem::size_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
         ["Align of template specialization: Handle_open0_PropertyDescriptor_close0"]
             [::std::mem::align_of::<root::JS::Handle<root::JS::PropertyDescriptor>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: MutableHandle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
+            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
+        ["Align of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
+            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
+            [::std::mem::size_of::<root::JS::DeletePolicy>() - 1usize];
+        ["Align of template specialization: DeletePolicy_open0_JobQueue_SavedJobQueue_close0"]
+            [::std::mem::align_of::<root::JS::DeletePolicy>() - 1usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -24648,10 +25018,10 @@ pub mod root {
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
-        ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
-        ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
-            [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+        ["Size of template specialization: MutableHandle_open0_Value_close0"]
+            [::std::mem::size_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
+        ["Align of template specialization: MutableHandle_open0_Value_close0"]
+            [::std::mem::align_of::<root::JS::MutableHandle<root::JS::Value>>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
@@ -24950,6 +25320,13 @@ pub mod root {
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {
+        ["Size of template specialization: Handle_open0_ptr_JSMicroTask_close0"]
+            [::std::mem::size_of::<root::JS::Handle<*mut root::JS::JSMicroTask>>() - 8usize];
+        ["Align of template specialization: Handle_open0_ptr_JSMicroTask_close0"]
+            [::std::mem::align_of::<root::JS::Handle<*mut root::JS::JSMicroTask>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
         ["Size of template specialization: Handle_open0_ptr_JSObject_close0"]
             [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
         ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
@@ -24989,6 +25366,20 @@ pub mod root {
             [::std::mem::size_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
         ["Align of template specialization: Handle_open0_ptr_JSObject_close0"]
             [::std::mem::align_of::<root::JS::Handle<*mut root::JSObject>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
+            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
+        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
+            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
+    };
+    #[allow(clippy::unnecessary_operation, clippy::identity_op)]
+    const _: () = {
+        ["Size of template specialization: MutableHandle_open0_ptr_JSString_close0"]
+            [::std::mem::size_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
+        ["Align of template specialization: MutableHandle_open0_ptr_JSString_close0"]
+            [::std::mem::align_of::<root::JS::MutableHandle<*mut root::JSString>>() - 8usize];
     };
     #[allow(clippy::unnecessary_operation, clippy::identity_op)]
     const _: () = {

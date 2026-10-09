@@ -174,8 +174,8 @@ const fn proxy_class_def(name: &'static std::ffi::CStr, slots: u32) -> root::JSC
 
 /// `js::ProxyClass`, for proxies created without a class.
 static PROXY_CLASS: root::JSClass = proxy_class_def(c"Proxy", 2);
-/// mozjs's `WindowProxyClass`.
-static WINDOW_PROXY_CLASS: root::JSClass = proxy_class_def(c"Proxy", 1);
+/// mozjs's `WindowProxyClass`, with `js::SwappableProxyReservedSlots` slots.
+static WINDOW_PROXY_CLASS: root::JSClass = proxy_class_def(c"Proxy", 2);
 
 // Proxy objects.
 
@@ -1239,42 +1239,6 @@ pub(crate) unsafe fn JS_IsDeadWrapper(obj: *mut root::JSObject) -> bool {
     proxy_handler(obj).is_some_and(|handler| handler.kind == Kind::Dead)
 }
 
-pub(crate) unsafe fn NukeCrossCompartmentWrapper(
-    cx: *mut root::JSContext,
-    wrapper: *mut root::JSObject,
-) {
-    let _ = cx;
-    if let Some(data) = proxy_data(wrapper) {
-        data.handler = &DEAD_HANDLER;
-        set_counted(&mut data.private, UndefinedValue());
-    }
-}
-
-pub(crate) unsafe fn NukeCrossCompartmentWrappers(
-    cx: *mut root::JSContext,
-    sourceFilter: *const root::js::CompartmentFilter,
-    target: *mut root::JS::Realm,
-    nukeReferencesToWindow: root::js::NukeReferencesToWindow,
-    nukeReferencesFromTarget: root::js::NukeReferencesFromTarget,
-) -> bool {
-    let _ = (
-        cx,
-        sourceFilter,
-        target,
-        nukeReferencesToWindow,
-        nukeReferencesFromTarget,
-    );
-    true
-}
-
-pub(crate) unsafe fn NukeCrossCompartmentWrapperIfExists(
-    cx: *mut root::JSContext,
-    source: *mut root::JS::Compartment,
-    target: *mut root::JSObject,
-) {
-    let _ = (cx, source, target);
-}
-
 pub(crate) unsafe fn RemapRemoteWindowProxies(
     cx: *mut root::JSContext,
     callback: *mut root::js::CompartmentTransplantCallback,
@@ -1290,22 +1254,6 @@ pub(crate) unsafe fn RemapAllWrappersForObject(
 ) -> bool {
     let _ = (cx, oldTarget, newTarget);
     true
-}
-
-pub(crate) unsafe fn RemapWrapper(
-    cx: *mut root::JSContext,
-    wobj: *mut root::JSObject,
-    newTarget: *mut root::JSObject,
-) {
-    let _ = (cx, wobj, newTarget);
-}
-
-pub(crate) unsafe fn RemapDeadWrapper(
-    cx: *mut root::JSContext,
-    wobj: root::JS::HandleObject,
-    newTarget: root::JS::HandleObject,
-) {
-    let _ = (cx, wobj, newTarget);
 }
 
 pub(crate) unsafe fn RecomputeWrappers(

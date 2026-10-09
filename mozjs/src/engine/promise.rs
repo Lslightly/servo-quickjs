@@ -4,10 +4,9 @@
 
 //! Promises, the job (microtask) queue, interrupts and security callbacks.
 //!
-//! With a `JS::JobQueue` installed, QuickJS hands every promise job to the embedder (patch Q4):
-//! the job becomes a native function (a "job thunk") passed to the queue's `enqueuePromiseJob`
-//! trap, which runs it at its microtask checkpoint. Without one, jobs stay in QuickJS's internal
-//! list and `RunJobs` drains it.
+//! With a `JS::JobQueue` installed, QuickJS hands every promise job to the shim (patch Q4), which
+//! queues it as a microtask for the embedder to run at its microtask checkpoint. Without one, jobs
+//! stay in QuickJS's internal list and `RunJobs` drains it.
 
 use std::ffi::{c_int, c_void};
 use std::ptr;
@@ -16,7 +15,6 @@ use std::sync::Arc;
 
 use servo_quickjs as q;
 
-use super::class::{function_data, new_function};
 use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::{JSVal, UndefinedValue};
@@ -24,6 +22,8 @@ use crate::sys::jsval::{JSVal, UndefinedValue};
 /// Per-runtime state of this module (a field of `Cx`).
 pub(crate) struct RuntimeHooks {
     job_queue: *mut JobQueue,
+    /// The microtask queue; objects are counted.
+    microtasks: std::collections::VecDeque<q::JSValue>,
     rejection_tracker: root::JS::PromiseRejectionTrackerCallback,
     rejection_tracker_data: *mut c_void,
     interrupt_callbacks: Vec<root::JSInterruptCallback>,
@@ -36,6 +36,7 @@ impl Default for RuntimeHooks {
     fn default() -> Self {
         RuntimeHooks {
             job_queue: ptr::null_mut(),
+            microtasks: Default::default(),
             rejection_tracker: None,
             rejection_tracker_data: ptr::null_mut(),
             interrupt_callbacks: Vec::new(),
@@ -259,10 +260,10 @@ pub(crate) unsafe fn SetPromiseUserInputEventHandlingState(
 }
 
 pub(crate) unsafe fn GetPromiseUserInputEventHandlingState(
-    promise: root::JS::HandleObject,
+    promise: *mut root::JSObject,
 ) -> root::JS::PromiseUserInputEventHandlingState {
     use root::JS::PromiseUserInputEventHandlingState as State;
-    match q::JS_GetPromiseUserInputState(obj_val(*promise.ptr)) {
+    match q::JS_GetPromiseUserInputState(obj_val(promise)) {
         1 => State::HadUserInteractionAtCreation,
         2 => State::DidntHaveUserInteractionAtCreation,
         _ => State::DontCare,
@@ -315,32 +316,22 @@ unsafe fn notify_rejection_tracker(
 
 // The job queue.
 
-/// What a `JS::JobQueue*` points to: the embedder's traps (mozjs's `RustJobQueue`).
-struct JobQueue {
-    traps: crate::glue::JobQueueTraps,
-    queue: *const c_void,
-    interrupt_queues: *mut c_void,
-}
+/// What a `JS::JobQueue*` points to: mozjs's `RustJobQueue`, whose `draining` flag Servo reads.
+type JobQueue = crate::glue::RustJobQueue;
 
 pub(crate) unsafe fn CreateJobQueue(
     aTraps: *const crate::glue::JobQueueTraps,
-    aQueue: *const ::std::os::raw::c_void,
-    aInterruptQueues: *mut ::std::os::raw::c_void,
-) -> *mut root::JS::JobQueue {
-    let queue = Box::new(JobQueue {
-        traps: *aTraps,
-        queue: aQueue,
-        interrupt_queues: aInterruptQueues,
-    });
-    Box::into_raw(queue) as *mut root::JS::JobQueue
+) -> *mut crate::glue::RustJobQueue {
+    Box::into_raw(Box::new(JobQueue {
+        vtable_: ptr::null(),
+        mTraps: *aTraps,
+        draining: false,
+    }))
 }
 
-pub(crate) unsafe fn DeleteJobQueue(queue: *mut root::JS::JobQueue) {
+pub(crate) unsafe fn DeleteJobQueue(queue: *mut crate::glue::RustJobQueue) {
     // Like SpiderMonkey, the runtime must not run jobs with a deleted queue still installed.
-    let queue = Box::from_raw(queue as *mut JobQueue);
-    if let Some(drop_interrupt_queues) = queue.traps.dropInterruptQueues {
-        drop_interrupt_queues(queue.interrupt_queues);
-    }
+    drop(Box::from_raw(queue));
 }
 
 pub(crate) unsafe fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS::JobQueue) {
@@ -354,6 +345,10 @@ pub(crate) unsafe fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS:
     q::JS_SetEnqueueJobHook(cx.rt, hook, cx as *mut Cx as *mut c_void);
 }
 
+pub(crate) unsafe fn GetJobQueue(cx: *mut root::JSContext) -> *mut root::JS::JobQueue {
+    Cx::from_raw(cx).hooks.job_queue as *mut root::JS::JobQueue
+}
+
 pub(crate) unsafe fn UseInternalJobQueues(cx: *mut root::JSContext) -> bool {
     SetJobQueue(cx, ptr::null_mut());
     true
@@ -363,8 +358,8 @@ pub(crate) unsafe fn RunJobs(cx: *mut root::JSContext) {
     let cx = Cx::from_raw(cx);
     let queue = cx.hooks.job_queue;
     if !queue.is_null() {
-        if let Some(run_jobs) = (*queue).traps.runJobs {
-            run_jobs((*queue).queue, cx.as_raw());
+        if let Some(run_jobs) = (*queue).mTraps.runJobs {
+            run_jobs(cx.as_raw());
         }
         return;
     }
@@ -390,11 +385,85 @@ pub(crate) unsafe fn JobQueueMayNotBeEmpty(cx: *mut root::JSContext) {
     let _ = cx;
 }
 
-/// Slots of a job thunk: the QuickJS job function, and an array of the job's arguments.
-const JOB_FUNC_SLOT: usize = 0;
-const JOB_ARGS_SLOT: usize = 1;
+// The microtask queue. As in SpiderMonkey 153, it belongs to the context and the embedder runs
+// it at its microtask checkpoints. Promise jobs (patch Q4's hook) become `MicroTask` objects,
+// SpiderMonkey's "JS microtasks"; any other entry is the embedder's own, and only passed back.
+// Both share one queue, so their order is kept.
 
-/// Patch Q4's hook: wraps a QuickJS promise job in a job thunk and passes it to the embedder.
+/// Opaque data of `MicroTask` objects: a QuickJS promise job.
+struct MicroTaskData {
+    job_func: q::JSJobFunc,
+    /// Counted; taken when the job runs.
+    args: Vec<q::JSValue>,
+    /// Held (`hold_realm`) and marked: the realm the job was enqueued in, which it runs in.
+    realm: *mut RealmData,
+    /// The incumbent global when the job was enqueued (counted), or `JS_UNDEFINED`.
+    incumbent: q::JSValue,
+    /// The promise of the reaction (Q30), for its user input state (counted), or `JS_UNDEFINED`.
+    promise: q::JSValue,
+}
+
+static MICROTASK_CLASS: std::sync::OnceLock<q::JSClassID> = std::sync::OnceLock::new();
+
+unsafe fn microtask_class(rt: *mut q::JSRuntime) -> q::JSClassID {
+    let id = *MICROTASK_CLASS.get_or_init(|| {
+        let mut id = 0;
+        q::JS_NewClassID(&mut id);
+        id
+    });
+    if q::JS_IsRegisteredClass(rt, id) == 0 {
+        let def = q::JSClassDef {
+            class_name: c"MicroTask".as_ptr(),
+            finalizer: Some(microtask_finalize),
+            gc_mark: Some(microtask_gc_mark),
+            call: None,
+            exotic: ptr::null_mut(),
+        };
+        assert_eq!(q::JS_NewClass(rt, id, &def), 0);
+    }
+    id
+}
+
+unsafe fn microtask_data<'a>(task: *mut root::JSObject) -> Option<&'a mut MicroTaskData> {
+    let id = *MICROTASK_CLASS.get()?;
+    (q::JS_GetOpaque(obj_val(task), id) as *mut MicroTaskData).as_mut()
+}
+
+unsafe extern "C" fn microtask_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
+    let data = q::JS_GetOpaque(val, *MICROTASK_CLASS.get().unwrap()) as *mut MicroTaskData;
+    if !data.is_null() {
+        let data = Box::from_raw(data);
+        for v in data.args.iter().chain([&data.incumbent, &data.promise]) {
+            q::JS_FreeValueRT(rt, *v);
+        }
+        super::release_realm(data.realm);
+    }
+}
+
+unsafe extern "C" fn microtask_gc_mark(
+    rt: *mut q::JSRuntime,
+    val: q::JSValue,
+    mark: q::JS_MarkFunc,
+) {
+    let data = q::JS_GetOpaque(val, *MICROTASK_CLASS.get().unwrap()) as *mut MicroTaskData;
+    if let Some(data) = data.as_ref() {
+        for v in data.args.iter().chain([&data.incumbent, &data.promise]) {
+            if v.has_ref_count() {
+                q::JS_MarkValue(rt, *v, mark);
+            }
+        }
+        super::mark_realm(rt, data.realm, mark);
+    }
+}
+
+/// Frees the queued microtasks, before the runtime is destroyed.
+pub(crate) unsafe fn free_microtasks(cx: &mut Cx) {
+    for task in std::mem::take(&mut cx.hooks.microtasks) {
+        q::JS_FreeValueRT(cx.rt, task);
+    }
+}
+
+/// Patch Q4's hook: queues a QuickJS promise job as a `MicroTask`.
 unsafe extern "C" fn enqueue_job(
     ctx: *mut q::JSContext,
     job_func: q::JSJobFunc,
@@ -408,12 +477,12 @@ unsafe extern "C" fn enqueue_job(
     assert!(!queue.is_null());
     let realm = q::JS_GetContextOpaque(ctx) as *mut RealmData;
     let entered = enter_qctx(cx, ctx);
-    let result = enqueue_thunk(cx, &*queue, realm, job_func, argc, argv, promise);
+    let result = enqueue_microtask(cx, &*queue, realm, job_func, argc, argv, promise);
     leave_qctx(cx, entered);
     result
 }
 
-unsafe fn enqueue_thunk(
+unsafe fn enqueue_microtask(
     cx: &mut Cx,
     queue: &JobQueue,
     realm: *mut RealmData,
@@ -422,93 +491,166 @@ unsafe fn enqueue_thunk(
     argv: *mut q::JSValue,
     promise: q::JSValue,
 ) -> c_int {
-    let qctx = cx.qctx();
-    let args = q::JS_NewArray(qctx);
-    if args.tag() == q::JS_TAG_EXCEPTION {
-        return -1;
-    }
-    for i in 0..argc as u32 {
-        let arg = q::JS_DupValueRT(cx.rt, *argv.add(i as usize));
-        if q::JS_DefinePropertyValueUint32(qctx, args, i, arg, q::JS_PROP_C_W_E as c_int) < 0 {
-            q::JS_FreeValueRT(cx.rt, args);
-            return -1;
-        }
-    }
-    let thunk = new_function(cx, Some(run_job), ptr::null(), 0, false, 0);
-    if thunk.tag() == q::JS_TAG_EXCEPTION {
-        q::JS_FreeValueRT(cx.rt, args);
-        return -1;
-    }
-    let thunk = cx.adopt(thunk).to_object();
-    let data = function_data(thunk).unwrap();
-    // The job runs in the context that enqueued it (the base context has no realm).
-    let created_in = std::mem::replace(&mut data.realm, super::hold_realm(realm));
-    super::release_realm(created_in);
-    data.slots[JOB_FUNC_SLOT] =
-        q::JSValue::mkptr(q::JS_TAG_FLOAT64, job_func.unwrap() as *mut c_void);
-    data.slots[JOB_ARGS_SLOT] = args;
-
+    let mut incumbent: *mut root::JSObject = ptr::null_mut();
     let mut host_defined_data: *mut root::JSObject = ptr::null_mut();
-    if let Some(get_host_defined_data) = queue.traps.getHostDefinedData {
-        let out = root::JS::MutableHandle::from_marked_location(&mut host_defined_data);
-        if !get_host_defined_data(queue.queue, cx.as_raw(), out) {
+    if let Some(get_host_defined_data) = queue.mTraps.getHostDefinedData {
+        let ok = get_host_defined_data(
+            cx.as_raw(),
+            root::JS::MutableHandle::from_marked_location(&mut incumbent),
+            root::JS::MutableHandle::from_marked_location(&mut host_defined_data),
+        );
+        if !ok {
             return -1;
         }
     }
-    let enqueue = queue
-        .traps
-        .enqueuePromiseJob
-        .expect("JobQueueTraps without enqueuePromiseJob");
-    let null: *mut root::JSObject = ptr::null_mut();
-    // The promise of the reaction (Q30), for its user input state.
-    let promise = if promise.tag() == q::JS_TAG_OBJECT {
-        val_obj(promise)
-    } else {
-        null
-    };
-    let ok = enqueue(
-        queue.queue,
-        cx.as_raw(),
-        handle(&promise),
-        handle(&thunk),
-        handle(&null),
-        handle(&host_defined_data),
-    );
-    if !ok {
-        if q::JS_HasException(cx.qctx()) == 0 {
-            q::JS_ThrowInternalError(cx.qctx(), c"failed to enqueue a promise job".as_ptr());
-        }
+    let task = q::JS_NewObjectProtoClass(cx.qctx(), q::JS_NULL, microtask_class(cx.rt));
+    if task.tag() == q::JS_TAG_EXCEPTION {
         return -1;
     }
+    let data = Box::new(MicroTaskData {
+        job_func,
+        args: (0..argc as usize)
+            .map(|i| q::JS_DupValueRT(cx.rt, *argv.add(i)))
+            .collect(),
+        realm: super::hold_realm(realm),
+        incumbent: q::JS_DupValueRT(cx.rt, object_or_undefined(incumbent)),
+        // The promise of the reaction (Q30), for its user input state.
+        promise: if promise.tag() == q::JS_TAG_OBJECT {
+            q::JS_DupValueRT(cx.rt, promise)
+        } else {
+            q::JS_UNDEFINED
+        },
+    });
+    q::JS_SetOpaque(task, Box::into_raw(data) as *mut c_void);
+    cx.hooks.microtasks.push_back(task);
     0
 }
 
-/// The native of job thunks: runs the job once.
-unsafe extern "C" fn run_job(cx: *mut root::JSContext, argc: u32, vp: *mut JSVal) -> bool {
-    let _ = argc;
+pub(crate) unsafe fn EnqueueMicroTask(
+    cx: *mut root::JSContext,
+    entry: *const root::JS::GenericMicroTask,
+) -> bool {
     let cx = Cx::from_raw(cx);
-    let data = function_data((*vp).to_object()).expect("job thunk without function data");
-    let args = std::mem::replace(&mut data.slots[JOB_ARGS_SLOT], q::JS_UNDEFINED);
-    *vp = UndefinedValue();
-    if args.tag() != q::JS_TAG_OBJECT {
-        return true;
+    let entry = (*entry).to_qjs();
+    cx.hooks
+        .microtasks
+        .push_back(q::JS_DupValueRT(cx.rt, entry));
+    true
+}
+
+pub(crate) unsafe fn PrependMicroTask(
+    cx: *mut root::JSContext,
+    entry: *const root::JS::GenericMicroTask,
+) -> bool {
+    let cx = Cx::from_raw(cx);
+    let entry = (*entry).to_qjs();
+    cx.hooks
+        .microtasks
+        .push_front(q::JS_DupValueRT(cx.rt, entry));
+    true
+}
+
+pub(crate) unsafe fn HasAnyMicroTasks(cx: *mut root::JSContext) -> bool {
+    !Cx::from_raw(cx).hooks.microtasks.is_empty()
+}
+
+pub(crate) unsafe fn HasRegularMicroTasks(cx: *mut root::JSContext) -> bool {
+    HasAnyMicroTasks(cx)
+}
+
+pub(crate) unsafe fn GetRegularMicroTaskCount(cx: *mut root::JSContext) -> usize {
+    Cx::from_raw(cx).hooks.microtasks.len()
+}
+
+pub(crate) unsafe fn PeekNextMicroTask(cx: *mut root::JSContext) -> root::JS::GenericMicroTask {
+    let cx = Cx::from_raw(cx);
+    match cx.hooks.microtasks.front() {
+        Some(&entry) => cx.retain(JSVal::from_qjs(entry)),
+        None => UndefinedValue(),
     }
-    let job_func: q::JSJobFunc = std::mem::transmute(data.slots[JOB_FUNC_SLOT].ptr());
+}
+
+pub(crate) unsafe fn DequeueNextRegularMicroTask(
+    cx: *mut root::JSContext,
+) -> root::JS::GenericMicroTask {
+    let cx = Cx::from_raw(cx);
+    match cx.hooks.microtasks.pop_front() {
+        Some(entry) => cx.adopt(entry),
+        None => UndefinedValue(),
+    }
+}
+
+pub(crate) unsafe fn JS_DequeueNextMicroTask(
+    cx: *mut root::JSContext,
+    task: root::JS::MutableHandle<root::JS::GenericMicroTask>,
+) {
+    *task.ptr = DequeueNextRegularMicroTask(cx);
+}
+
+pub(crate) unsafe fn IsJSMicroTask(hv: *const root::JS::GenericMicroTask) -> bool {
+    (*hv).is_object()
+}
+
+pub(crate) unsafe fn ToMaybeWrappedJSMicroTask(
+    genericMicroTask: *const root::JS::GenericMicroTask,
+) -> *mut root::JS::JSMicroTask {
+    if (*genericMicroTask).is_object() {
+        (*genericMicroTask).to_object()
+    } else {
+        ptr::null_mut()
+    }
+}
+
+pub(crate) unsafe fn GetExecutionGlobalFromJSMicroTask(
+    entry: *mut root::JS::JSMicroTask,
+) -> *mut root::JSObject {
+    match microtask_data(entry) {
+        Some(data) if !data.realm.is_null() => (*data.realm).global,
+        _ => ptr::null_mut(),
+    }
+}
+
+pub(crate) unsafe fn MaybeGetHostDefinedDataFromJSMicroTask(
+    entry: *mut root::JS::JSMicroTask,
+    incumbentGlobal: root::JS::MutableHandleObject,
+    optionalHostDefinedData: root::JS::MutableHandleObject,
+) -> bool {
+    *optionalHostDefinedData.ptr = ptr::null_mut();
+    *incumbentGlobal.ptr = match microtask_data(entry) {
+        Some(data) if data.incumbent.tag() == q::JS_TAG_OBJECT => val_obj(data.incumbent),
+        _ => ptr::null_mut(),
+    };
+    true
+}
+
+pub(crate) unsafe fn MaybeGetPromiseFromJSMicroTask(
+    entry: *mut root::JS::JSMicroTask,
+) -> *mut root::JSObject {
+    match microtask_data(entry) {
+        Some(data) if data.promise.tag() == q::JS_TAG_OBJECT => val_obj(data.promise),
+        _ => ptr::null_mut(),
+    }
+}
+
+/// Runs the job once; false with the job's exception pending if it threw.
+pub(crate) unsafe fn RunJSMicroTask(
+    cx: *mut root::JSContext,
+    entry: root::JS::Handle<*mut root::JS::JSMicroTask>,
+) -> bool {
+    let cx = Cx::from_raw(cx);
+    let Some(data) = microtask_data(*entry.ptr) else {
+        q::JS_ThrowTypeError(cx.qctx(), c"not a microtask".as_ptr());
+        return false;
+    };
+    let mut args = std::mem::take(&mut data.args);
     let ctx = if data.realm.is_null() {
         cx.base_ctx
     } else {
         (*data.realm).qctx
     };
-    let mut len = 0u32;
-    let len_val = q::JS_GetPropertyStr(ctx, args, c"length".as_ptr());
-    q::JS_ToUint32(ctx, &mut len, len_val);
-    q::JS_FreeValueRT(cx.rt, len_val);
-    let mut argv: Vec<q::JSValue> = (0..len)
-        .map(|i| q::JS_GetPropertyUint32(ctx, args, i))
-        .collect();
-    q::JS_FreeValueRT(cx.rt, args);
-    let result = job_func.unwrap()(ctx, argv.len() as c_int, argv.as_mut_ptr());
-    for v in argv {
+    let job_func = data.job_func.unwrap();
+    let result = job_func(ctx, args.len() as c_int, args.as_mut_ptr());
+    for v in args {
         q::JS_FreeValueRT(cx.rt, v);
     }
     if result.tag() == q::JS_TAG_EXCEPTION {

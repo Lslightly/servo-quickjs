@@ -599,6 +599,8 @@ fn window_proxy_and_transplant() {
             let cx = &mut *realm;
             wp.set(NewWindowProxy(cx.raw_cx(), g1.handle().into(), handler));
             SetProxyReservedSlot(wp.get(), 0, &PrivateValue(1 as *const c_void));
+            // Servo keeps its cross-origin property holders in the second slot.
+            SetProxyReservedSlot(wp.get(), 1, &UndefinedValue());
             SetWindowProxy(cx.raw_cx(), g1.handle().into(), wp.handle().into());
         }
         let wp = wp.get();
@@ -860,7 +862,8 @@ fn principals_and_compartments() {
         JS_InitDestroyPrincipalsCallback(cx.raw_cx(), Some(destroy_principals));
         let callbacks = JSPrincipalsCallbacks {
             write: None,
-            isSystemOrAddonPrincipal: None,
+            isSystemPrincipal: None,
+            isAddonPrincipal: None,
         };
         let principals =
             CreateRustJSPrincipals(&callbacks, Box::into_raw(Box::new(5u32)) as *mut c_void);

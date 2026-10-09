@@ -627,11 +627,12 @@ unsafe fn lossy_cstring(s: String) -> CString {
 pub(crate) unsafe fn JS_ErrorFromException(
     cx: *mut root::JSContext,
     obj: root::JS::HandleObject,
-) -> *mut root::JSErrorReport {
+    errorReport: *mut root::JS::BorrowedErrorReport,
+) -> bool {
     let cx = Cx::from_raw(cx);
     let error = obj_val(*obj.ptr);
     if q::JS_IsError(cx.qctx(), error) == 0 {
-        return ptr::null_mut();
+        return false;
     }
     let info = error_report_info(cx, error);
     let mut owned = Box::new(OwnedReport {
@@ -646,7 +647,9 @@ pub(crate) unsafe fn JS_ErrorFromException(
     owned.report.exnType = root::JSExnType::JSEXN_ERR as i16;
     // SpiderMonkey keeps the report alive with the error object; the pool keeps it for the task.
     let owned = pool_owned(cx, owned);
-    &mut (*owned).report
+    (*errorReport).owner_.data = *obj.ptr;
+    (*errorReport).report_ = &mut (*owned).report;
+    true
 }
 
 pub(crate) unsafe fn PendingExceptionStackInfo(

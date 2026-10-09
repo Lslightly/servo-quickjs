@@ -75,7 +75,7 @@ impl Atom {
     }
 }
 
-const WELL_KNOWN_SYMBOLS: [&std::ffi::CStr; 13] = [
+const WELL_KNOWN_SYMBOLS: [&std::ffi::CStr; 15] = [
     c"isConcatSpreadable",
     c"iterator",
     c"match",
@@ -89,12 +89,14 @@ const WELL_KNOWN_SYMBOLS: [&std::ffi::CStr; 13] = [
     c"unscopables",
     c"asyncIterator",
     c"matchAll",
+    c"dispose",
+    c"asyncDispose",
 ];
 
 thread_local! {
     /// Well-known symbols are predefined QuickJS atoms, so their indices are the same in every
     /// runtime and can be cached.
-    static SYMBOL_ATOMS: std::cell::Cell<[q::JSAtom; 13]> = const { std::cell::Cell::new([0; 13]) };
+    static SYMBOL_ATOMS: std::cell::Cell<[q::JSAtom; 15]> = const { std::cell::Cell::new([0; 15]) };
 }
 
 /// The atom of `Symbol[name]` for SpiderMonkey's `SymbolCode` `code` (atoms are permanent).
@@ -117,7 +119,12 @@ unsafe fn lookup_well_known_symbol_atom(cx: &mut Cx, code: usize) -> q::JSAtom {
     let global = q::JS_GetGlobalObject(qctx);
     let symbol_ctor = q::JS_GetPropertyStr(qctx, global, c"Symbol".as_ptr());
     let symbol = q::JS_GetPropertyStr(qctx, symbol_ctor, WELL_KNOWN_SYMBOLS[code].as_ptr());
-    let atom = q::JS_ValueToAtom(qctx, symbol);
+    // QuickJS has no `Symbol.dispose` and `Symbol.asyncDispose`: their atom is `JS_ATOM_NULL`.
+    let atom = if symbol.tag() == q::JS_TAG_SYMBOL {
+        q::JS_ValueToAtom(qctx, symbol)
+    } else {
+        q::JS_ATOM_NULL
+    };
     for v in [symbol, symbol_ctor, global] {
         q::JS_FreeValue(qctx, v);
     }

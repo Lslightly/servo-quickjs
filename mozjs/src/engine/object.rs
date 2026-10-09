@@ -1477,6 +1477,18 @@ pub(crate) unsafe fn NewWeakMapObject(cx: *mut root::JSContext) -> *mut root::JS
     new_intrinsic(cx, CLASS_WEAKMAP)
 }
 
+pub(crate) unsafe fn IsWeakMapObject(obj: *mut root::JSObject) -> bool {
+    q::JS_GetClassID(obj_val(obj)) == CLASS_WEAKMAP
+}
+
+/// A unique object of the current realm, as a weak map key: its `Object.prototype`, which its
+/// context keeps alive and marks. The shim has no security wrappers that could cache it.
+pub(crate) unsafe fn GetRealmKeyObject(cx: *mut root::JSContext) -> *mut root::JSObject {
+    let cx = Cx::from_raw(cx);
+    let proto = q::JS_GetClassProto(cx.qctx(), QJS_CLASS_OBJECT);
+    adopt_object(cx, proto)
+}
+
 pub(crate) unsafe fn GetWeakMapEntry(
     cx: *mut root::JSContext,
     mapObj: root::JS::HandleObject,
