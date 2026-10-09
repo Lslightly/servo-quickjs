@@ -593,6 +593,37 @@ fn builtin_conformance() {
             "
         )
         .to_boolean());
+        // Q28: Array.fromAsync.
+        eval(
+            cx,
+            global,
+            "
+            var results = [];
+            async function* gen() { yield 1; yield Promise.resolve(2); }
+            Array.fromAsync(gen()).then(a => results.push('async:' + a.join()));
+            Array.fromAsync([Promise.resolve(3), 4], (x, i) => x * 2 + i)
+                .then(a => results.push('sync:' + a.join()));
+            Array.fromAsync({ length: 2, 0: 'a', 1: Promise.resolve('b') })
+                .then(a => results.push('arraylike:' + a.join()));
+            Array.fromAsync([1], 5).catch(e => results.push('mapfn:' + (e instanceof TypeError)));
+            var closed = false;
+            var rejecting = { [Symbol.iterator]() { return {
+                next() { return { value: Promise.reject('r'), done: false }; },
+                return() { closed = true; return {}; } }; } };
+            Array.fromAsync(rejecting).catch(e => results.push('rejected:' + e + ':' + closed));
+            class MyArray extends Array {}
+            MyArray.fromAsync([1]).then(a => results.push('subclass:' + (a instanceof MyArray)));
+            ",
+        );
+        mozjs::jsapi::RunJobs(cx.raw_cx());
+        assert!(eval(
+            cx,
+            global,
+            "Array.fromAsync.length === 1 && Array.fromAsync.name === 'fromAsync' && \
+             results.sort().join(' ') === \
+             'arraylike:a,b async:1,2 mapfn:true rejected:r:true subclass:true sync:6,9'"
+        )
+        .to_boolean());
         // Q26: localeCompare returns -1, 0 or 1.
         assert!(eval(
             cx,

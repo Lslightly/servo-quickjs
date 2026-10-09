@@ -188,6 +188,7 @@ The cost is memory: values stay alive until the end of the task.
 | Q25 | `Iterator.prototype.constructor` has a setter of its own (QuickJS used the getter as the setter), which implements SetterThatIgnoresPrototypeProperties like the `@@toStringTag` one | small |
 | Q26 | `localeCompare` returns -1, 0 or 1, like other engines, instead of the difference of the first differing code points (without `Intl`; the ICU one already did) | small |
 | Q27 | `Error.isError` asks a host hook (`JS_SetIsErrorHook`) about objects that aren't errors, for DOM objects with [[ErrorData]] | small |
+| Q28 | `Array.fromAsync` (in all major browsers since 2024): an async function compiled on the first call in each realm and kept by its context, so realms that don't use it pay nothing. The operations a page could replace (calls, CreateDataPropertyOrThrow, IsConstructor, ToObject, ToLength, the iterator symbols, TypeError) are C helpers passed to it. Values of sync iterables are awaited as by CreateAsyncFromSyncIterator, including closing the iterator when one rejects, but with fewer microtask ticks | small |
 
 ## Not supported
 

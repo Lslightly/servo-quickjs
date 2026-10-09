@@ -568,6 +568,8 @@ struct JSContext {
     JSValue promise_ctor;
     JSValue native_error_proto[JS_NATIVE_ERROR_COUNT];
     JSValue iterator_ctor;
+    /* Servo: Array.fromAsync's algorithm, compiled on first use (Q28) */
+    JSValue array_from_async;
     JSValue async_iterator_proto;
     JSValue array_proto_values;
     JSValue throw_type_error;
@@ -2715,6 +2717,7 @@ JSContext *JS_NewContextRaw(JSRuntime *rt)
         ctx->class_proto[i] = JS_NULL;
     ctx->array_ctor = JS_NULL;
     ctx->iterator_ctor = JS_NULL;
+    ctx->array_from_async = JS_UNDEFINED;
     ctx->regexp_ctor = JS_NULL;
     ctx->promise_ctor = JS_NULL;
     ctx->global_this = JS_UNDEFINED; /* Servo */
@@ -2843,6 +2846,7 @@ static void JS_MarkContext(JSRuntime *rt, JSContext *ctx,
         JS_MarkValue(rt, ctx->class_proto[i], mark_func);
     }
     JS_MarkValue(rt, ctx->iterator_ctor, mark_func);
+    JS_MarkValue(rt, ctx->array_from_async, mark_func);
     JS_MarkValue(rt, ctx->async_iterator_proto, mark_func);
     JS_MarkValue(rt, ctx->promise_ctor, mark_func);
     JS_MarkValue(rt, ctx->array_ctor, mark_func);
@@ -2920,6 +2924,7 @@ void JS_FreeContext(JSContext *ctx)
     }
     js_free_rt(rt, ctx->class_proto);
     JS_FreeValue(ctx, ctx->iterator_ctor);
+    JS_FreeValue(ctx, ctx->array_from_async);
     JS_FreeValue(ctx, ctx->async_iterator_proto);
     JS_FreeValue(ctx, ctx->promise_ctor);
     JS_FreeValue(ctx, ctx->array_ctor);
@@ -42540,9 +42545,196 @@ static JSValue JS_ArraySpeciesCreate(JSContext *ctx, JSValueConst obj, int64_t l
     return ret;
 }
 
+/* Servo: Array.fromAsync (Q28). The algorithm is an async function, compiled on first use in
+   each realm. The operations a page could change are done by these helpers. */
+enum {
+    FROM_ASYNC_IS_CONSTRUCTOR,
+    FROM_ASYNC_CALL,
+    FROM_ASYNC_DEFINE,
+    FROM_ASYNC_TYPE_ERROR,
+    FROM_ASYNC_TO_OBJECT,
+    FROM_ASYNC_TO_LENGTH,
+    FROM_ASYNC_HELPER_COUNT,
+};
+
+static JSValue js_array_from_async_helper(JSContext *ctx, JSValueConst this_val,
+                                          int argc, JSValueConst *argv, int magic)
+{
+    const char *msg;
+    int64_t len;
+
+    switch(magic) {
+    case FROM_ASYNC_IS_CONSTRUCTOR:
+        return JS_NewBool(ctx, JS_IsConstructor(ctx, argv[0]));
+    case FROM_ASYNC_CALL:
+        return JS_Call(ctx, argv[0], argv[1], max_int(argc - 2, 0), argv + 2);
+    case FROM_ASYNC_DEFINE:
+        if (JS_DefinePropertyValueValue(ctx, argv[0], JS_DupValue(ctx, argv[1]),
+                                        JS_DupValue(ctx, argv[2]),
+                                        JS_PROP_C_W_E | JS_PROP_THROW) < 0)
+            return JS_EXCEPTION;
+        return JS_UNDEFINED;
+    case FROM_ASYNC_TYPE_ERROR:
+        msg = JS_ToCString(ctx, argv[0]);
+        if (!msg)
+            return JS_EXCEPTION;
+        JS_ThrowTypeError(ctx, "%s", msg);
+        JS_FreeCString(ctx, msg);
+        return JS_GetException(ctx);
+    case FROM_ASYNC_TO_OBJECT:
+        return JS_ToObject(ctx, argv[0]);
+    case FROM_ASYNC_TO_LENGTH:
+        if (JS_ToLengthFree(ctx, &len, JS_DupValue(ctx, argv[0])))
+            return JS_EXCEPTION;
+        return JS_NewInt64(ctx, len);
+    default:
+        abort();
+    }
+}
+
+static const char js_array_from_async_source[] =
+    "(function (isConstructor, call, defineData, typeError, toObject, toLength,\n"
+    "           asyncIteratorSymbol, iteratorSymbol) {\n"
+    "    'use strict';\n"
+    "    function isObject(v) {\n"
+    "        return (typeof v === 'object' && v !== null) || typeof v === 'function';\n"
+    "    }\n"
+    "    function getMethod(o, key) {\n"
+    "        var m = o[key];\n"
+    "        if (m === undefined || m === null)\n"
+    "            return undefined;\n"
+    "        if (typeof m !== 'function')\n"
+    "            throw typeError('not a function');\n"
+    "        return m;\n"
+    "    }\n"
+    "    async function close(iterator, isAsync) {\n"
+    "        try {\n"
+    "            var ret = iterator.return;\n"
+    "            if (ret !== undefined && ret !== null) {\n"
+    "                var r = call(ret, iterator);\n"
+    "                if (isAsync)\n"
+    "                    await r;\n"
+    "            }\n"
+    "        } catch (e) {\n"
+    "        }\n"
+    "    }\n"
+    "    return async function fromAsync(C, items, mapfn, thisArg) {\n"
+    "        var mapping = mapfn !== undefined;\n"
+    "        if (mapping && typeof mapfn !== 'function')\n"
+    "            throw typeError('mapfn is not a function');\n"
+    "        var asyncMethod = getMethod(items, asyncIteratorSymbol);\n"
+    "        var syncMethod = asyncMethod === undefined ? getMethod(items, iteratorSymbol) : undefined;\n"
+    "        var A, k, value;\n"
+    "        if (asyncMethod !== undefined || syncMethod !== undefined) {\n"
+    "            var isAsync = asyncMethod !== undefined;\n"
+    "            var iterator = call(isAsync ? asyncMethod : syncMethod, items);\n"
+    "            if (!isObject(iterator))\n"
+    "                throw typeError('iterator is not an object');\n"
+    "            var next = iterator.next;\n"
+    "            A = isConstructor(C) ? new C() : [];\n"
+    "            for (k = 0; ; k++) {\n"
+    "                var result = call(next, iterator);\n"
+    "                if (isAsync)\n"
+    "                    result = await result;\n"
+    "                if (!isObject(result))\n"
+    "                    throw typeError('iterator result is not an object');\n"
+    "                var done = !!result.done;\n"
+    "                if (isAsync && done) {\n"
+    "                    A.length = k;\n"
+    "                    return A;\n"
+    "                }\n"
+    "                value = result.value;\n"
+    "                if (!isAsync) {\n"
+    /* CreateAsyncFromSyncIterator: the value is awaited, and its rejection closes the iterator */
+    "                    try {\n"
+    "                        value = await value;\n"
+    "                    } catch (e) {\n"
+    "                        if (!done)\n"
+    "                            await close(iterator, false);\n"
+    "                        throw e;\n"
+    "                    }\n"
+    "                    if (done) {\n"
+    "                        A.length = k;\n"
+    "                        return A;\n"
+    "                    }\n"
+    "                }\n"
+    "                try {\n"
+    "                    if (mapping)\n"
+    "                        value = await call(mapfn, thisArg, value, k);\n"
+    "                    defineData(A, k, value);\n"
+    "                } catch (e) {\n"
+    "                    await close(iterator, isAsync);\n"
+    "                    throw e;\n"
+    "                }\n"
+    "            }\n"
+    "        }\n"
+    "        var arrayLike = toObject(items);\n"
+    "        var len = toLength(arrayLike.length);\n"
+    "        if (isConstructor(C)) {\n"
+    "            A = new C(len);\n"
+    "        } else {\n"
+    "            A = [];\n"
+    "            A.length = len;\n"
+    "        }\n"
+    "        for (k = 0; k < len; k++) {\n"
+    "            value = await arrayLike[k];\n"
+    "            if (mapping)\n"
+    "                value = await call(mapfn, thisArg, value, k);\n"
+    "            defineData(A, k, value);\n"
+    "        }\n"
+    "        A.length = len;\n"
+    "        return A;\n"
+    "    };\n"
+    "})\n";
+
+static int js_array_from_async_init(JSContext *ctx)
+{
+    JSValue factory, impl, args[FROM_ASYNC_HELPER_COUNT + 2];
+    int i, n = 0;
+
+    factory = JS_Eval(ctx, js_array_from_async_source,
+                      sizeof(js_array_from_async_source) - 1,
+                      "<Array.fromAsync>", JS_EVAL_TYPE_GLOBAL);
+    if (JS_IsException(factory))
+        return -1;
+    impl = JS_EXCEPTION;
+    for(n = 0; n < FROM_ASYNC_HELPER_COUNT; n++) {
+        args[n] = JS_NewCFunctionMagic(ctx, js_array_from_async_helper, "", 3,
+                                       JS_CFUNC_generic_magic, n);
+        if (JS_IsException(args[n]))
+            goto done;
+    }
+    args[n++] = JS_AtomToValue(ctx, JS_ATOM_Symbol_asyncIterator);
+    args[n++] = JS_AtomToValue(ctx, JS_ATOM_Symbol_iterator);
+    impl = JS_Call(ctx, factory, JS_UNDEFINED, n, (JSValueConst *)args);
+ done:
+    JS_FreeValue(ctx, factory);
+    for(i = 0; i < n; i++)
+        JS_FreeValue(ctx, args[i]);
+    if (JS_IsException(impl))
+        return -1;
+    ctx->array_from_async = impl;
+    return 0;
+}
+
+static JSValue js_array_fromAsync(JSContext *ctx, JSValueConst this_val,
+                                  int argc, JSValueConst *argv)
+{
+    JSValueConst args[4];
+    int i;
+
+    if (JS_IsUndefined(ctx->array_from_async) && js_array_from_async_init(ctx) < 0)
+        return JS_EXCEPTION;
+    args[0] = this_val;
+    for(i = 0; i < 3; i++)
+        args[i + 1] = i < argc ? argv[i] : JS_UNDEFINED;
+    return JS_Call(ctx, ctx->array_from_async, JS_UNDEFINED, 4, args);
+}
+
 static const JSCFunctionListEntry js_array_funcs[] = {
     JS_CFUNC_DEF("isArray", 1, js_array_isArray ),
     JS_CFUNC_DEF("from", 1, js_array_from ),
+    JS_CFUNC_DEF("fromAsync", 1, js_array_fromAsync ),
     JS_CFUNC_DEF("of", 0, js_array_of ),
     JS_CGETSET_DEF("[Symbol.species]", js_get_this, NULL ),
 };
