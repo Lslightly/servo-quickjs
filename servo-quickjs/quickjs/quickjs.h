@@ -1192,8 +1192,14 @@ int JS_EnqueueJob(JSContext *ctx, JSJobFunc *job_func, int argc, JSValueConst *a
 /* Servo: if set, the jobs of JS_EnqueueJob() (promise jobs) are passed to the hook
    instead of the internal job list. 'argv' is borrowed. Return < 0 on exception. */
 typedef int JSEnqueueJobHook(JSContext *ctx, JSJobFunc *job_func, int argc,
-                             JSValueConst *argv, void *opaque);
+                             JSValueConst *argv, JSValueConst promise, void *opaque);
 void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque);
+/* Servo: a promise's user input state for the host (SpiderMonkey's
+   PromiseUserInputEventHandlingState, 0 when not set). then() copies it to the
+   promise it creates, and the enqueue hook receives that promise for reaction
+   jobs, the promise to resolve for thenable jobs, else JS_UNDEFINED (Q30). */
+int JS_GetPromiseUserInputState(JSValueConst promise);
+void JS_SetPromiseUserInputState(JSValueConst promise, int state);
 
 JS_BOOL JS_IsJobPending(JSRuntime *rt);
 int JS_ExecutePendingJob(JSRuntime *rt, JSContext **pctx);

@@ -1969,6 +1969,7 @@ pub type JSEnqueueJobHook = ::std::option::Option<
         job_func: JSJobFunc,
         argc: ::std::os::raw::c_int,
         argv: *mut JSValue,
+        promise: JSValue,
         opaque: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int,
 >;
@@ -1978,6 +1979,12 @@ unsafe extern "C" {
         hook: JSEnqueueJobHook,
         opaque: *mut ::std::os::raw::c_void,
     );
+}
+unsafe extern "C" {
+    pub fn JS_GetPromiseUserInputState(promise: JSValue) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_SetPromiseUserInputState(promise: JSValue, state: ::std::os::raw::c_int);
 }
 unsafe extern "C" {
     pub fn JS_IsJobPending(rt: *mut JSRuntime) -> ::std::os::raw::c_int;

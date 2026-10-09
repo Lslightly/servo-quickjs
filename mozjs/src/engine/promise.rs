@@ -254,16 +254,19 @@ pub(crate) unsafe fn SetPromiseUserInputEventHandlingState(
     promise: root::JS::HandleObject,
     state: root::JS::PromiseUserInputEventHandlingState,
 ) -> bool {
-    // Not tracked: jobs are enqueued without their promise, so the state is never read back.
-    let _ = (promise, state);
+    q::JS_SetPromiseUserInputState(obj_val(*promise.ptr), state as c_int);
     true
 }
 
 pub(crate) unsafe fn GetPromiseUserInputEventHandlingState(
     promise: root::JS::HandleObject,
 ) -> root::JS::PromiseUserInputEventHandlingState {
-    let _ = promise;
-    root::JS::PromiseUserInputEventHandlingState::DontCare
+    use root::JS::PromiseUserInputEventHandlingState as State;
+    match q::JS_GetPromiseUserInputState(obj_val(*promise.ptr)) {
+        1 => State::HadUserInteractionAtCreation,
+        2 => State::DidntHaveUserInteractionAtCreation,
+        _ => State::DontCare,
+    }
 }
 
 pub(crate) unsafe fn SetPromiseRejectionTrackerCallback(
@@ -397,6 +400,7 @@ unsafe extern "C" fn enqueue_job(
     job_func: q::JSJobFunc,
     argc: c_int,
     argv: *mut q::JSValue,
+    promise: q::JSValue,
     opaque: *mut c_void,
 ) -> c_int {
     let cx = hook_cx(opaque);
@@ -404,7 +408,7 @@ unsafe extern "C" fn enqueue_job(
     assert!(!queue.is_null());
     let realm = q::JS_GetContextOpaque(ctx) as *mut RealmData;
     let entered = enter_qctx(cx, ctx);
-    let result = enqueue_thunk(cx, &*queue, realm, job_func, argc, argv);
+    let result = enqueue_thunk(cx, &*queue, realm, job_func, argc, argv, promise);
     leave_qctx(cx, entered);
     result
 }
@@ -416,6 +420,7 @@ unsafe fn enqueue_thunk(
     job_func: q::JSJobFunc,
     argc: c_int,
     argv: *mut q::JSValue,
+    promise: q::JSValue,
 ) -> c_int {
     let qctx = cx.qctx();
     let args = q::JS_NewArray(qctx);
@@ -455,10 +460,16 @@ unsafe fn enqueue_thunk(
         .enqueuePromiseJob
         .expect("JobQueueTraps without enqueuePromiseJob");
     let null: *mut root::JSObject = ptr::null_mut();
+    // The promise of the reaction (Q30), for its user input state.
+    let promise = if promise.tag() == q::JS_TAG_OBJECT {
+        val_obj(promise)
+    } else {
+        null
+    };
     let ok = enqueue(
         queue.queue,
         cx.as_raw(),
-        handle(&null),
+        handle(&promise),
         handle(&thunk),
         handle(&null),
         handle(&host_defined_data),

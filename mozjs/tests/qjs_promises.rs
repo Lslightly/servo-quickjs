@@ -19,7 +19,7 @@ use mozjs::jsapi::{
     self, CallArgs, CompilationType, Handle, HandleObject, HandleString, HandleValue,
     HandleValueArray, Heap, JSObject, JSSecurityCallbacks, JSString, MutableHandleObject,
     MutableHandleString, MutableHandleValue, OnNewGlobalHookOption, PromiseRejectionHandlingState,
-    PromiseState, RuntimeCode, Value,
+    PromiseState, PromiseUserInputEventHandlingState, RuntimeCode, Value,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -163,6 +163,8 @@ fn resolve_and_reject(cx: &mut JSContext, global: SafeHandleObject) {
 struct TestQueue {
     jobs: RefCell<VecDeque<Box<Heap<*mut JSObject>>>>,
     enqueued: Cell<usize>,
+    /// The user input state of the promise of each job, as Servo reads it.
+    states: RefCell<Vec<PromiseUserInputEventHandlingState>>,
 }
 
 unsafe extern "C" fn get_host_defined_data(
@@ -177,12 +179,17 @@ unsafe extern "C" fn get_host_defined_data(
 unsafe extern "C" fn enqueue_promise_job(
     queue: *const c_void,
     _: *mut RawJSContext,
-    _promise: HandleObject,
+    promise: HandleObject,
     job: HandleObject,
     _allocation_site: HandleObject,
     _host_defined_data: HandleObject,
 ) -> bool {
     let queue = &*(queue as *const TestQueue);
+    queue.states.borrow_mut().push(if promise.get().is_null() {
+        PromiseUserInputEventHandlingState::DontCare
+    } else {
+        jsapi::GetPromiseUserInputEventHandlingState(promise)
+    });
     queue.jobs.borrow_mut().push_back(Heap::boxed(*job.ptr));
     queue.enqueued.set(queue.enqueued.get() + 1);
     true
@@ -264,6 +271,30 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
         jsapi::RunJobs(cx.raw_cx());
         assert!(queue.jobs.borrow().is_empty());
         assert!(eval_bool(cx, global, "log.join() === 'sync,1,2,a,3'"));
+
+        // A promise's user input state goes to the promises then() derives from it, and reaction
+        // jobs are enqueued with them; awaiting it doesn't propagate the state (Q30).
+        let p = new_promise(cx, ptr::null_mut());
+        assert!(jsapi::SetPromiseUserInputEventHandlingState(
+            handle(&p),
+            PromiseUserInputEventHandlingState::HadUserInteractionAtCreation
+        ));
+        set_global(cx, global, c"interacted", ObjectValue(p));
+        eval(
+            cx,
+            global,
+            "interacted.then(() => 1).then(() => 2); (async () => { await interacted; })();",
+        )
+        .unwrap();
+        queue.states.borrow_mut().clear();
+        assert!(jsapi::ResolvePromise(
+            cx.raw_cx(),
+            handle(&p),
+            handle(&Int32Value(1))
+        ));
+        jsapi::RunJobs(cx.raw_cx());
+        use PromiseUserInputEventHandlingState::{DontCare, HadUserInteractionAtCreation as Had};
+        assert_eq!(*queue.states.borrow(), [Had, DontCare, Had]);
 
         // Arrays filled internally don't run inherited setters.
         assert!(eval_bool(
