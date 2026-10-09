@@ -375,6 +375,9 @@ struct JSRuntime {
     /* Servo: host check for eval() and Function() */
     JSCanCompileStringsHook *can_compile_strings_hook;
     void *can_compile_strings_opaque;
+    /* Servo: HostGetCodeForEval */
+    JSCodeForEvalHook *code_for_eval_hook;
+    void *code_for_eval_opaque;
     /* Servo: debug hook called when an object is freed */
     JSFreeObjectHook *free_object_hook;
     /* Servo: JS_HasPropertyCached() results, valid while proto_epoch is unchanged. It
@@ -37847,16 +37850,32 @@ static JSValue JS_EvalObject(JSContext *ctx, JSValueConst this_obj,
                              JSValueConst val, int flags, int scope_idx,
                              int compile_kind)
 {
-    JSValue ret;
+    JSRuntime *rt = ctx->rt;
+    JSValue ret, code;
     const char *str;
     size_t len;
 
-    if (!JS_IsString(val))
-        return JS_DupValue(ctx, val);
+    if (JS_IsString(val)) {
+        code = JS_DupValue(ctx, val);
+    } else {
+        /* Servo: HostGetCodeForEval */
+        if (compile_kind < 0 || !JS_IsObject(val) || !rt->code_for_eval_hook)
+            return JS_DupValue(ctx, val);
+        code = rt->code_for_eval_hook(ctx, val, rt->code_for_eval_opaque);
+        if (JS_IsException(code))
+            return JS_EXCEPTION;
+        if (!JS_IsString(code)) {
+            JS_FreeValue(ctx, code);
+            return JS_DupValue(ctx, val);
+        }
+    }
     if (compile_kind >= 0 &&
-        js_host_can_compile_strings(ctx, compile_kind, val, 0, NULL, NULL) < 0)
+        js_host_can_compile_strings(ctx, compile_kind, code, 1, &code, &val) < 0) {
+        JS_FreeValue(ctx, code);
         return JS_EXCEPTION;
-    str = JS_ToCStringLen(ctx, &len, val);
+    }
+    str = JS_ToCStringLen(ctx, &len, code);
+    JS_FreeValue(ctx, code);
     if (!str)
         return JS_EXCEPTION;
     ret = JS_EvalInternal(ctx, this_obj, str, len, "<input>", flags, scope_idx);
@@ -41608,7 +41627,7 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
 {
     JSFunctionKindEnum func_kind = magic;
     int i, n, ret;
-    JSValue s, proto, obj = JS_UNDEFINED;
+    JSValue s, code, proto, obj = JS_UNDEFINED;
     StringBuffer b_s, *b = &b_s;
     JSValue *strs = NULL;
 
@@ -41655,8 +41674,17 @@ static JSValue js_function_constructor(JSContext *ctx, JSValueConst new_target,
     if (JS_IsException(s))
         goto fail1;
 
-    if (js_host_can_compile_strings(ctx, JS_COMPILE_FUNCTION, s, argc,
-                                    (JSValueConst *)strs, argv) < 0) {
+    /* Servo: the host sees the source text without the parentheses around it (Q22) */
+    code = js_sub_string(ctx, JS_VALUE_GET_STRING(s), 1,
+                         JS_VALUE_GET_STRING(s)->len - 1);
+    if (JS_IsException(code)) {
+        JS_FreeValue(ctx, s);
+        goto fail1;
+    }
+    ret = js_host_can_compile_strings(ctx, JS_COMPILE_FUNCTION, code, argc,
+                                      (JSValueConst *)strs, argv);
+    JS_FreeValue(ctx, code);
+    if (ret < 0) {
         JS_FreeValue(ctx, s);
         goto fail1;
     }
@@ -62272,6 +62300,12 @@ void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
 {
     rt->can_compile_strings_hook = hook;
     rt->can_compile_strings_opaque = opaque;
+}
+
+void JS_SetCodeForEvalHook(JSRuntime *rt, JSCodeForEvalHook *hook, void *opaque)
+{
+    rt->code_for_eval_hook = hook;
+    rt->code_for_eval_opaque = opaque;
 }
 
 /* Servo: the uncatchable-exception flag, exception locations and structured stack frames

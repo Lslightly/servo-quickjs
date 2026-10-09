@@ -1037,10 +1037,12 @@ void JS_SetPromiseIsHandled(JSValueConst promise, JS_BOOL is_handled);
 typedef int JSInterruptHandler(JSRuntime *rt, void *opaque);
 void JS_SetInterruptHandler(JSRuntime *rt, JSInterruptHandler *cb, void *opaque);
 /* Servo: host check before eval() and the Function constructors compile code
-   (HostEnsureCanCompileStrings). 'code' is the source text. For the Function
-   constructors, 'arg_strings' (converted to strings) and 'args' (as passed) are the
-   parameters followed by the body. Return 1 to allow, 0 to block (an EvalError is
-   thrown) or < 0 on exception. */
+   (HostEnsureCanCompileStrings). 'code' is the source text; for the Function
+   constructors, from the parameter list to the closing brace, as SpiderMonkey passes it.
+   For the Function constructors, 'arg_strings' (converted to strings) and 'args' (as
+   passed) are the parameters followed by the body. For eval, 'args' is the argument as
+   passed (argc 1): the code itself, or an object whose code the code-for-eval hook gave.
+   Return 1 to allow, 0 to block (an EvalError is thrown) or < 0 on exception. */
 typedef enum JSCompileKindEnum {
     JS_COMPILE_DIRECT_EVAL,
     JS_COMPILE_INDIRECT_EVAL,
@@ -1052,6 +1054,11 @@ typedef int JSCanCompileStringsHook(JSContext *ctx, JSCompileKindEnum kind,
                                     void *opaque);
 void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
                                  void *opaque);
+/* Servo: the code of an eval() argument that is an object (HostGetCodeForEval, e.g. a
+   TrustedScript): a string to evaluate, JS_UNDEFINED to return the argument unchanged, or
+   JS_EXCEPTION. */
+typedef JSValue JSCodeForEvalHook(JSContext *ctx, JSValueConst obj, void *opaque);
+void JS_SetCodeForEvalHook(JSRuntime *rt, JSCodeForEvalHook *hook, void *opaque);
 /* Servo: the realm 'obj' was created in, where known (functions and proxies); NULL otherwise */
 JSContext *JS_GetObjectRealm(JSValueConst obj);
 /* Servo: debug hook called when an object is freed, before its finalizer */

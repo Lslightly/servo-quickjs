@@ -1699,6 +1699,20 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+pub type JSCodeForEvalHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        ctx: *mut JSContext,
+        obj: JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> JSValue,
+>;
+unsafe extern "C" {
+    pub fn JS_SetCodeForEvalHook(
+        rt: *mut JSRuntime,
+        hook: JSCodeForEvalHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
 unsafe extern "C" {
     pub fn JS_GetObjectRealm(obj: JSValue) -> *mut JSContext;
 }
