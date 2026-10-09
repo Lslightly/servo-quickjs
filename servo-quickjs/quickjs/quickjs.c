@@ -6973,7 +6973,8 @@ static void gc_free_cycles(JSRuntime *rt)
 #ifndef DUMP_LEAKS
 /* Servo: free every remaining GC object, whatever its reference count. Their
    memory is released at the end, so finalizers may still release references
-   to the other objects being freed. */
+   to the other objects being freed. They are marked as gc_decref() marks the
+   objects of a cycle, so that js_weakref_free() leaves them to gc_free_cycles(). */
 static void gc_free_all(JSRuntime *rt)
 {
     struct list_head *el, *el1;
@@ -6982,6 +6983,7 @@ static void gc_free_all(JSRuntime *rt)
     init_list_head(&rt->tmp_obj_list);
     list_for_each_safe(el, el1, &rt->gc_obj_list) {
         p = list_entry(el, JSGCObjectHeader, link);
+        js_rc(p)->mark = 1;
         list_del(&p->link);
         list_add_tail(&p->link, &rt->tmp_obj_list);
     }
