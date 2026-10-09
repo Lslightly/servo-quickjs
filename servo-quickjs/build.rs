@@ -25,6 +25,11 @@ fn main() {
         .flag_if_supported("-Wno-format-truncation")
         .flag_if_supported("-Wno-infinite-recursion")
         .warnings(false);
+    // Optimized in debug builds too, like SpiderMonkey: at -O0 a promise job takes twice the
+    // instructions. `CFLAGS=-O0` still applies after this, for debugging QuickJS itself.
+    if std::env::var("OPT_LEVEL").as_deref() == Ok("0") {
+        build.opt_level(2);
+    }
     if std::env::var_os("CARGO_FEATURE_DUMP_LEAKS").is_some() {
         build.define("DUMP_LEAKS", "1");
     }
