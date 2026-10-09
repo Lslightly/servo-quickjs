@@ -1761,8 +1761,23 @@ pub(crate) unsafe fn SetDOMCallbacks(
     cx: *mut root::JSContext,
     callbacks: *const root::js::DOMCallbacks,
 ) {
-    let _ = cx;
     DOM_CALLBACKS.with(|c| c.set(callbacks));
+    let hook: q::JSIsErrorHook = match callbacks.as_ref() {
+        Some(callbacks) if callbacks.instanceClassIsError.is_some() => Some(is_dom_error),
+        _ => None,
+    };
+    q::JS_SetIsErrorHook(Cx::from_raw(cx).rt, hook);
+}
+
+/// Patch Q27's hook: `Error.isError` asks `instanceClassIsError` about DOM objects, as in
+/// SpiderMonkey.
+unsafe extern "C" fn is_dom_error(_ctx: *mut q::JSContext, obj: q::JSValue) -> c_int {
+    let callbacks = DOM_CALLBACKS.with(|c| c.get());
+    let Some(is_error) = callbacks.as_ref().and_then(|c| c.instanceClassIsError) else {
+        return 0;
+    };
+    let clasp = class::object_class(val_obj(obj));
+    ((*clasp).flags & root::JSCLASS_IS_DOMJSCLASS != 0 && is_error(clasp)) as c_int
 }
 
 pub(crate) unsafe fn GetDOMCallbacks(cx: *mut root::JSContext) -> *const root::js::DOMCallbacks {
@@ -1828,7 +1843,7 @@ pub(crate) unsafe fn RealmBehaviorsRef1(
 static RESOLVE_EXOTIC: q::JSClassExoticMethods = q::JSClassExoticMethods {
     get_own_property: Some(resolve_own_property),
     get_own_property_names: Some(resolve_all),
-    delete_property: None,
+    delete_property: Some(resolve_delete_property),
     define_own_property: None,
     has_property: None,
     get_property: None,
@@ -1907,6 +1922,21 @@ unsafe extern "C" fn resolve_own_property(
     };
     RESOLVING.with(|r| r.borrow_mut().retain(|k| *k != key));
     r
+}
+
+/// Deletes a property that isn't an own property yet (QuickJS calls this hook only then): as
+/// SpiderMonkey's lookup does, the resolve hook runs first. Otherwise a resolve hook that defines
+/// a property only once (Servo's interface objects) would define a deleted property later.
+unsafe extern "C" fn resolve_delete_property(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    prop: q::JSAtom,
+) -> c_int {
+    match resolve_own_property(ctx, ptr::null_mut(), obj, prop) {
+        r if r < 0 => -1,
+        0 => 1,
+        _ => q::JS_DeleteProperty(ctx, obj, prop, 0),
+    }
 }
 
 /// Resolves every lazy property (QuickJS reads the shape afterwards, patch Q1), so there are no

@@ -33,6 +33,7 @@ Rule: anything that can outlive the current task holds a reference count; anythi
 | Global's `ProtoOrIfaceArray` entries | Counted: every store and the global's finalizer go through `<*mut JSObject>::post_barrier`, i.e. `HeapObjectWriteBarriers`; marked by `trace_global`. |
 | Servo `Dom<T>` (feature `js-quickjs`) | Counted on the target's JS object (`from_ref`/`clone` retain, `Drop` releases), and marked by the existing `trace`. Still one pointer, see "Finalization" below. A `Dom<T>` made before its target is reflected (a `DissimilarOriginWindow`'s `WindowProxy`) records a pending count, taken when the reflector is set. |
 | Servo `DomRoot<T>` | A `Dom<T>` inside, so counted. |
+| The last count of an object, released by Rust (`release_object`) | Moved to the pool instead, so the object is freed when the pool drains, after the current native call or task. Freeing it at once ran finalizers while Servo held borrows (a WebGL framebuffer's attachments `RefCell`, released from inside a framebuffer method). In a cycle collection the object may be part of the cycle being freed, and goes with it. |
 | `Reflector` | **Uncounted**: `set_jsobject` bypasses the barrier, and finalization clears it; under the feature `Reflector` has a `Drop` that clears it too, for reflectors owned by Rust (`Rc<Promise>`). A counted self-reference would never be marked (`Reflector`'s trace is a no-op) and would leak every DOM object. Uncounted, DOM objects are freed promptly by refcounting. `repr(C)` under the feature, so `object` comes first. |
 | `Trusted<T>` | The live-references table entry holds one count from creation until `sweep_live_references` (end of each task) drops entries whose `Trusted` values are gone. Releasing in `Drop` is not possible because `Trusted` values may die on other threads. |
 | `Rc<T>` fields | Traced only while `strong_count == 1`. A shared `Rc` would be traced once per owner but its contents counted once, and the cycle collector would free live objects. Shared contents act as external references instead: they may leak, but are never freed early. |
@@ -42,6 +43,7 @@ Rule: anything that can outlive the current task holds a reference count; anythi
 - So reflectors are registered in a per-thread map (Rust address → JS object) when reflected, and unregistered by the finalize hooks before the Rust struct drops. The hooks run the drop with a `FINALIZING` flag set.
 - While finalizing, `Dom::drop` looks up the map: a missing entry means the target died in the same collection, and there is nothing to release.
 - Outside finalization the target is alive (the `Dom` holds a count), so its reflector is read directly.
+- `JS::RuntimeHeapState` is `MajorCollecting` while the cycle collector frees a garbage cycle (Q23), and `Idle` otherwise, also while an object whose count dropped to zero is finalized: its references are alive. Servo's `during_gc_collection()` guards (e.g. `LoadBlocker::drop`) then skip work on objects that die in the same cycle; without it a `Trusted<Document>` was made for a document of the cycle, and swept after it was freed.
 
 Why the pool is safe:
 - Under SM, an unrooted value dies at the next GC, which can happen at any `CanGc` point.
@@ -70,7 +72,9 @@ The cost is memory: values stay alive until the end of the task.
   | `finalizer` | `cOps.finalize(gcx, obj)`, then frees `ObjectData` |
   | `call` | `cOps.call` / `cOps.construct` |
 
-- **Resolve hooks** (`cOps.resolve`, used by globals): run lazily from an exotic `get_own_property` hook on global classes.
+- **Resolve hooks** (`cOps.resolve`, used by globals): run lazily from an exotic `get_own_property` hook on global classes. Deleting a property that isn't defined yet runs the hook first, from an exotic `delete_property` hook, as SpiderMonkey's lookup does: Servo's interface objects are defined by the first resolution only, so `delete window.File` before any access would otherwise bring `File` back.
+- **Assignments from Rust** (`JS_SetProperty`, `JS_SetPropertyById`, `JS_SetUCProperty`, `JS_SetElement`) ignore a failed assignment, like SpiderMonkey's (sloppy mode); only exceptions fail. `[PutForwards]` relies on it.
+- **`Error.isError`** asks `DOMCallbacks::instanceClassIsError` about objects of DOM classes (Q27), so it is true for a `DOMException`.
 - **Native functions** (every `JSNative`, e.g. bindings' `generic_method`/`getter`/`setter` with `JSJitInfo`) become objects of one `ShimFunction` class.
   - Its `call` hook receives `func_obj`, `this` (or `new.target`) and flags.
   - Its opaque data: `{native, jitinfo, realm, reserved slots for NewFunctionWithReserved}`.
@@ -113,14 +117,15 @@ The cost is memory: values stay alive until the end of the task.
 - **Error reports:** `JS_ErrorFromException` and `ErrorInfo` are filled by reading `fileName`, `lineNumber` and `columnNumber`, which Bellard sets on syntax errors, otherwise from the first frame of `stack`. Values that are not Error objects are reported at their throw site (patch Q9). `exnType` is always `JSEXN_ERR`.
 - **Saved frames** (`CaptureCurrentStack`, `JS_StackCapture_*`, `BuildStackString`) are objects of a shim `SavedFrame` class built from Q9 frames. QuickJS's columns point at the call's `(`, so they differ from SpiderMonkey's.
 - **Scripted caller private:** `JS_GetScriptedCallerPrivate` maps the innermost frame's file name to a script or module private (see "Modules").
-- **Known gaps:** code from `new Function` reports its file as `<input>` (SpiderMonkey: `page.html line N > Function`). `codeForEvalGets` is not supported, so `eval(TrustedScript)` returns its argument.
+- **eval of an object** asks `codeForEvalGets` for its code (Q22), so `eval(trustedScript)` evaluates the script after the CSP and Trusted Types checks, which see the object as the argument. For `Function`, the checks see the source text `function anonymous(…\n) {\n…\n}`, as with SpiderMonkey.
+- **Known gaps:** code from `new Function` reports its file as `<input>` (SpiderMonkey: `page.html line N > Function`). `stack` is an own data property of errors, as in V8, not an `Error.prototype` accessor as in SpiderMonkey (the error-stack-accessor proposal), so a `DOMException` has no `stack`.
 
 ## Microtasks
 
 - Servo installs a `JobQueue` (`CreateJobQueue` traps). SpiderMonkey calls `enqueuePromiseJob(job)`, and Servo runs the job as a callable at its microtask checkpoint.
 - **Patch Q4** adds an enqueue hook to QuickJS. Each promise job (job function + args + realm) is wrapped in a `ShimFunction` "job thunk" and handed to Servo's `enqueuePromiseJob` trap. The order of Servo's own microtasks and promise jobs therefore stays exactly as today.
 - `JS_ExecutePendingJob` is not used.
-- A job thunk holds the job function in slot 0 and its arguments in a counted array in slot 1; its realm is the context that enqueued the job: the realm of the reaction's handler or thenable's `then` (patch Q17, NewPromiseReactionJob), which Servo uses as the job's entry realm. Promise resolving functions run in the realm that created them (Q18), so a rejection is reported to that realm's global. It runs once and then releases the arguments. `getHostDefinedData` is called at enqueue time, not at `then()` time, so user-input state is not propagated through reactions.
+- A job thunk holds the job function in slot 0 and its arguments in a counted array in slot 1 (defined, not assigned, so a page's setters on `Array.prototype` don't run); its realm is the context that enqueued the job: the realm of the reaction's handler or thenable's `then` (patch Q17, NewPromiseReactionJob), which Servo uses as the job's entry realm. Promise resolving functions run in the realm that created them (Q18), so a rejection is reported to that realm's global. It runs once and then releases the arguments. `getHostDefinedData` is called at enqueue time, not at `then()` time, so user-input state is not propagated through reactions.
 - FinalizationRegistry jobs stay on QuickJS's internal list (they are enqueued during GC), so they never run while a host queue is installed.
 - **Interrupts:** `JS_AddInterruptCallback` callbacks run from QuickJS's interrupt handler; one returning false terminates the script uncatchably. `JS_IsExceptionPending` / `JS_GetPendingException` then report no exception, as in SpiderMonkey.
 - **Unhandled rejections:** `SetPromiseRejectionTrackerCallback` → `JS_SetHostPromiseRejectionTracker`. `mutedErrors` is that of the innermost scripted frame's script, as in SpiderMonkey (`JS_EVAL_FLAG_MUTED_ERRORS`, Q16).

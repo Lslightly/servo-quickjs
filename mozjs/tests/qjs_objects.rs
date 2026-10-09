@@ -23,8 +23,9 @@ use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     CheckRegExpSyntax, DateGetMsecSinceEpoch, ExecuteRegExpNoStatics, GetArrayLength,
     GetBuiltinClass, GetPropertyKeys, GetRealmObjectPrototype, GetWeakMapEntry, IsArrayObject,
-    JS_DefineFunctions, JS_DefineProperty, JS_FreezeObject, JS_GetElement, JS_GetFunctionId,
-    JS_GetPropertyById, JS_HasInstance, JS_NewGlobalObject, JS_NewPlainObject, MapEntries, MapGet,
+    JS_ClearPendingException, JS_DefineFunctions, JS_DefineProperty, JS_FreezeObject,
+    JS_GetElement, JS_GetFunctionId, JS_GetPropertyById, JS_HasInstance, JS_IsExceptionPending,
+    JS_NewGlobalObject, JS_NewPlainObject, JS_SetElement, JS_SetProperty, MapEntries, MapGet,
     MapSet, MapSize, NewArrayObject, NewDateObject, NewFunctionWithReserved, NewMapObject,
     NewSetObject, NewUCRegExpObject, NewWeakMapObject, ObjectIsDate, SetAdd, SetWeakMapEntry,
     JS_GC,
@@ -115,6 +116,26 @@ fn arrays() {
         assert!(JS_FreezeObject(cx, array.handle()));
         set_global(cx, global, c"frozen", ObjectValue(array.get()));
         assert!(eval(cx, global, "Object.isFrozen(frozen) && frozen[1] === 2").to_boolean());
+
+        // As in SpiderMonkey, failed assignments are ignored, but exceptions are not.
+        rooted!(&in(cx) let v = Int32Value(7));
+        assert!(JS_SetElement(cx, array.handle(), 1, v.handle()));
+        assert!(JS_SetProperty(
+            cx,
+            array.handle(),
+            c"x".as_ptr(),
+            v.handle()
+        ));
+        assert!(eval(cx, global, "frozen[1] === 2 && !('x' in frozen)").to_boolean());
+        rooted!(&in(cx) let thrower = eval(cx, global, "({ set x(v) { throw 1; } })").to_object());
+        assert!(!JS_SetProperty(
+            cx,
+            thrower.handle(),
+            c"x".as_ptr(),
+            v.handle()
+        ));
+        assert!(JS_IsExceptionPending(cx));
+        JS_ClearPendingException(cx);
 
         rooted!(&in(cx) let ctor = eval(cx, global, "Array").to_object());
         rooted!(&in(cx) let v = ObjectValue(array.get()));
@@ -550,5 +571,34 @@ fn accessor_function_names() {
         let s =
             mozjs::conversions::jsstr_to_string(cx, std::ptr::NonNull::new(v.to_string()).unwrap());
         assert_eq!(s, "7,get x,set x");
+    });
+}
+
+/// QuickJS behaviour changed to match SpiderMonkey and the specification.
+#[test]
+fn builtin_conformance() {
+    with_global(|cx, global| unsafe {
+        // Q25: Iterator.prototype.constructor has a getter and a setter of its own.
+        assert!(eval(
+            cx,
+            global,
+            "
+            var d = Object.getOwnPropertyDescriptor(Iterator.prototype, 'constructor');
+            var o = Object.create(Iterator.prototype);
+            o.constructor = 5;
+            var threw = false;
+            try { d.set.call(Iterator.prototype, 1); } catch (e) { threw = e instanceof TypeError; }
+            d.get !== d.set && d.set.length === 1 && Iterator.prototype.constructor === Iterator &&
+                Object.getOwnPropertyDescriptor(o, 'constructor').value === 5 && threw
+            "
+        )
+        .to_boolean());
+        // Q26: localeCompare returns -1, 0 or 1.
+        assert!(eval(
+            cx,
+            global,
+            "['a'.localeCompare('z'), 'z'.localeCompare('a'), 'a'.localeCompare('a')].join() === '-1,1,0'"
+        )
+        .to_boolean());
     });
 }

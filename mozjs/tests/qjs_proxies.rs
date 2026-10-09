@@ -675,6 +675,7 @@ thread_local! {
     static GLOBAL_TRACED: Cell<usize> = const { Cell::new(0) };
     static GLOBAL_FINALIZED: Cell<usize> = const { Cell::new(0) };
     static RESOLVED: Cell<usize> = const { Cell::new(0) };
+    static ONCE_DEFINED: Cell<bool> = const { Cell::new(false) };
 }
 
 unsafe extern "C" fn trace_global(_trc: *mut JSTracer, _global: *mut JSObject) {
@@ -692,7 +693,23 @@ unsafe extern "C" fn resolve_global(
     resolved: *mut bool,
 ) -> bool {
     *resolved = false;
-    if id_name(cx, id).as_deref() != Some("lazyThing") {
+    let name = id_name(cx, id);
+    // Like Servo's interface objects, defined by the first resolution only.
+    if name.as_deref() == Some("onceThing") {
+        *resolved = true;
+        if ONCE_DEFINED.with(|c| c.replace(true)) {
+            return true;
+        }
+        let value = Int32Value(1);
+        return mozjs::jsapi::JS_DefinePropertyById2(
+            cx,
+            obj,
+            id,
+            Handle::from_marked_location(&value),
+            JSPROP_ENUMERATE as u32,
+        );
+    }
+    if name.as_deref() != Some("lazyThing") {
         return true;
     }
     RESOLVED.with(|c| c.set(c.get() + 1));
@@ -800,6 +817,13 @@ fn global_class_slots_trace_and_resolve() {
             "delete lazyThing && (function() { return lazyThing; })() === 42",
         );
         eval_true(cx, global.handle(), "typeof notLazy === 'undefined' && Object.keys(this).filter(k => k === 'lazyThing').length === 0");
+        // Deleting a property that wasn't resolved yet resolves it first, so it stays deleted.
+        eval_true(
+            cx,
+            global.handle(),
+            "delete this.onceThing && typeof onceThing === 'undefined' && \
+             Object.getOwnPropertyDescriptor(this, 'onceThing') === undefined",
+        );
         assert!(RESOLVED.with(|c| c.get()) >= 3);
         assert_eq!(GLOBAL_FINALIZED.with(|c| c.get()), 0);
     });

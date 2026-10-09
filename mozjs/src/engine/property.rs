@@ -154,9 +154,12 @@ unsafe fn get(
     true
 }
 
+/// Like SpiderMonkey's `JS_SetProperty`, a failed assignment (e.g. to a read-only property) is
+/// ignored, as in sloppy mode; only exceptions fail.
 unsafe fn set(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, v: JSVal) -> bool {
     let v = q::JS_DupValueRT(cx.rt, v.to_qjs());
-    ok(q::JS_SetProperty(cx.qctx(), obj_val(obj), atom, v))
+    let obj = obj_val(obj);
+    ok(q::JS_SetPropertyInternal(cx.qctx(), obj, atom, v, obj, 0))
 }
 
 unsafe fn define_value(
@@ -338,13 +341,12 @@ pub(crate) unsafe fn JS_SetElement(
     v: root::JS::Handle<root::JS::Value>,
 ) -> bool {
     let cx = Cx::from_raw(cx);
-    let v = q::JS_DupValueRT(cx.rt, (*v.ptr).to_qjs());
-    ok(q::JS_SetPropertyUint32(
-        cx.qctx(),
-        obj_val(*obj.ptr),
-        index,
-        v,
-    ))
+    let atom = q::JS_NewAtomUInt32(cx.qctx(), index);
+    if atom == q::JS_ATOM_NULL {
+        return false;
+    }
+    let atom = cx.adopt_atom(atom);
+    set(cx, *obj.ptr, atom, *v.ptr)
 }
 
 unsafe fn has(cx: &mut Cx, obj: *mut root::JSObject, atom: q::JSAtom, foundp: *mut bool) -> bool {

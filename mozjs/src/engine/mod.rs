@@ -268,8 +268,19 @@ pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
 #[inline]
 pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
     if let Some(cx) = try_current() {
-        verify::count(obj_val(obj), -1);
-        q::JS_FreeValueRT(cx.rt, obj_val(obj));
+        let v = obj_val(obj);
+        verify::count(v, -1);
+        // The last reference is dropped when the pool drains, after the current native call or
+        // task, so finalizers don't run inside the Rust code that released it: SpiderMonkey
+        // finalizes in GC, and Servo relies on that (e.g. replacing a `Dom<T>` under a `RefCell`
+        // borrow that the target's finalizer takes too). In a cycle collection, the object may
+        // belong to the cycle being freed and must go with it.
+        if q::JS_GetRefCount(v) == 1 && q::JS_IsCollectingCycles(cx.rt) == 0 {
+            verify::pooled(v, 1);
+            cx.pool.push(v);
+        } else {
+            q::JS_FreeValueRT(cx.rt, v);
+        }
     }
 }
 

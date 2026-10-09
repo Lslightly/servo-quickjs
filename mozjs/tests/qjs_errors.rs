@@ -431,9 +431,50 @@ foo();";
     }
 }
 
+static DOM_ERROR_CLASS: jsapi::JSClass = jsapi::JSClass {
+    name: c"DOMError".as_ptr(),
+    flags: jsapi::JSCLASS_IS_DOMJSCLASS,
+    cOps: ptr::null(),
+    spec: ptr::null(),
+    ext: ptr::null(),
+    oOps: ptr::null(),
+};
+
+unsafe extern "C" fn instance_class_is_error(clasp: *const jsapi::JSClass) -> bool {
+    clasp == &DOM_ERROR_CLASS as *const _
+}
+
+static DOM_CALLBACKS: jsapi::DOMCallbacks = jsapi::DOMCallbacks {
+    instanceClassMatchesProto: None,
+    instanceClassIsError: Some(instance_class_is_error),
+};
+
+/// `Error.isError` asks the embedder about DOM objects, which may have [[ErrorData]].
+fn dom_errors(cx: &mut JSContext, global: SafeHandleObject) {
+    unsafe {
+        mozjs::rust::wrappers2::SetDOMCallbacks(cx, &DOM_CALLBACKS);
+        rooted!(&in(cx) let obj = mozjs::rust::wrappers2::JS_NewObject(cx, &DOM_ERROR_CLASS));
+        rooted!(&in(cx) let v = ObjectValue(obj.get()));
+        assert!(jsapi::JS_SetProperty(
+            cx.raw_cx(),
+            Handle::from_marked_location(&global.get()),
+            c"domError".as_ptr(),
+            Handle::from_marked_location(&v.get()),
+        ));
+        assert!(eval_bool(
+            cx,
+            global,
+            "Error.isError(domError) && Error.isError(new TypeError()) && !Error.isError({})"
+        ));
+        mozjs::rust::wrappers2::SetDOMCallbacks(cx, ptr::null());
+        assert!(eval_bool(cx, global, "!Error.isError(domError)"));
+    }
+}
+
 #[test]
 fn errors() {
     let engine = JSEngine::init().unwrap();
     with_global(&engine, reports);
     with_global(&engine, stacks);
+    with_global(&engine, dom_errors);
 }

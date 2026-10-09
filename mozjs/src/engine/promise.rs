@@ -424,7 +424,7 @@ unsafe fn enqueue_thunk(
     }
     for i in 0..argc as u32 {
         let arg = q::JS_DupValueRT(cx.rt, *argv.add(i as usize));
-        if q::JS_SetPropertyUint32(qctx, args, i, arg) < 0 {
+        if q::JS_DefinePropertyValueUint32(qctx, args, i, arg, q::JS_PROP_C_W_E as c_int) < 0 {
             q::JS_FreeValueRT(cx.rt, args);
             return -1;
         }
@@ -572,6 +572,13 @@ pub(crate) unsafe fn JS_SetSecurityCallbacks(
         None
     };
     q::JS_SetCanCompileStringsHook(cx.rt, hook, cx as *mut Cx as *mut c_void);
+    let code_for_eval_hook: q::JSCodeForEvalHook =
+        if !callbacks.is_null() && (*callbacks).codeForEvalGets.is_some() {
+            Some(code_for_eval)
+        } else {
+            None
+        };
+    q::JS_SetCodeForEvalHook(cx.rt, code_for_eval_hook, cx as *mut Cx as *mut c_void);
 }
 
 pub(crate) unsafe fn JS_GetSecurityCallbacks(
@@ -586,6 +593,42 @@ pub(crate) unsafe fn JS_SetTrustedPrincipals(
 ) {
     // There are no system compartments to select.
     let _ = (cx, prin);
+}
+
+/// Patch Q22's hook: SpiderMonkey's `codeForEvalGets`, the code of an object passed to eval (a
+/// TrustedScript).
+unsafe extern "C" fn code_for_eval(
+    ctx: *mut q::JSContext,
+    obj: q::JSValue,
+    opaque: *mut c_void,
+) -> q::JSValue {
+    let cx = hook_cx(opaque);
+    let Some(gets) = (*cx.hooks.security_callbacks).codeForEvalGets else {
+        return q::JS_UNDEFINED;
+    };
+    let entered = enter_qctx(cx, ctx);
+    let code = val_obj(obj);
+    let mut out: *mut root::JSString = ptr::null_mut();
+    let ok = gets(
+        cx.as_raw(),
+        handle(&code),
+        root::JS::MutableHandle::from_marked_location(&mut out),
+    );
+    leave_qctx(cx, entered);
+    if !ok {
+        if q::JS_HasException(ctx) == 0 {
+            q::JS_ThrowInternalError(ctx, c"script terminated".as_ptr());
+            q::JS_SetUncatchableException(ctx, 1);
+        }
+        return q::JS_EXCEPTION;
+    }
+    if out.is_null() {
+        return q::JS_UNDEFINED;
+    }
+    q::JS_DupValueRT(
+        cx.rt,
+        q::JSValue::mkptr(q::JS_TAG_STRING, out as *mut c_void),
+    )
 }
 
 /// Patch Q5's hook: SpiderMonkey's `contentSecurityPolicyAllows` for eval and `Function`.
@@ -630,7 +673,9 @@ unsafe extern "C" fn can_compile_strings(
         } else {
             root::JS::CompilationType::IndirectEval
         };
-        (compilation_type, code_string, JSVal::from_qjs(code))
+        // The argument itself, which differs from the code for an object such as a TrustedScript.
+        let body_arg = if argc > 0 { *args } else { code };
+        (compilation_type, code_string, JSVal::from_qjs(body_arg))
     };
     let mut can_compile = false;
     let ok = allows(

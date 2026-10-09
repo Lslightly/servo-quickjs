@@ -151,7 +151,12 @@ pub(crate) unsafe fn IsIncrementalGCInProgress(cx: *mut root::JSContext) -> bool
 }
 
 pub(crate) unsafe fn RuntimeHeapState() -> root::JS::HeapState {
-    root::JS::HeapState::Idle
+    // Freeing a garbage cycle corresponds to SpiderMonkey's finalization during GC. Freeing an
+    // object whose count dropped to zero doesn't: the objects it reaches are still alive.
+    match super::try_current() {
+        Some(cx) if q::JS_IsCollectingCycles(cx.rt) != 0 => root::JS::HeapState::MajorCollecting,
+        _ => root::JS::HeapState::Idle,
+    }
 }
 
 pub(crate) unsafe fn JS_TracerIsTracing(cx: *mut root::JSContext) -> bool {

@@ -7,18 +7,19 @@
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 use std::ffi::c_void;
-use std::ptr;
+use std::ptr::{self, NonNull};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::time::Duration;
 
 use mozjs::context::{JSContext, RawJSContext};
+use mozjs::conversions::jsstr_to_string;
 use mozjs::gc::StackGCVector;
 use mozjs::glue::{CreateJobQueue, DeleteJobQueue, JobQueueTraps};
 use mozjs::jsapi::{
     self, CallArgs, CompilationType, Handle, HandleObject, HandleString, HandleValue,
     HandleValueArray, Heap, JSObject, JSSecurityCallbacks, JSString, MutableHandleObject,
-    MutableHandleValue, OnNewGlobalHookOption, PromiseRejectionHandlingState, PromiseState,
-    RuntimeCode, Value,
+    MutableHandleString, MutableHandleValue, OnNewGlobalHookOption, PromiseRejectionHandlingState,
+    PromiseState, RuntimeCode, Value,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -263,6 +264,23 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
         jsapi::RunJobs(cx.raw_cx());
         assert!(queue.jobs.borrow().is_empty());
         assert!(eval_bool(cx, global, "log.join() === 'sync,1,2,a,3'"));
+
+        // Arrays filled internally don't run inherited setters.
+        assert!(eval_bool(
+            cx,
+            global,
+            "
+            Object.defineProperty(Array.prototype, 1, { get() { throw 1; }, configurable: true });
+            var reached = false;
+            Promise.resolve(1).then(() => reached = true);
+            var a = new Array(4, 5, 6);
+            var json = JSON.stringify({ x: 1, y: 2 }, ['x', 'y']);
+            delete Array.prototype[1];
+            a.join() === '4,5,6' && json === '{\"x\":1,\"y\":2}'
+        "
+        ));
+        jsapi::RunJobs(cx.raw_cx());
+        assert!(eval_bool(cx, global, "reached"));
 
         // Reactions added from Rust, settled from Rust.
         let p = new_promise(cx, ptr::null_mut());
@@ -539,6 +557,63 @@ static SECURITY_CALLBACKS: JSSecurityCallbacks = JSSecurityCallbacks {
     subsumes: None,
 };
 
+thread_local!(static EVAL_BODY_ARGS: RefCell<Vec<&'static str>> = const { RefCell::new(Vec::new()) });
+
+/// The code of objects with a string `code` property, like Servo's TrustedScript.
+unsafe extern "C" fn code_for_eval_gets(
+    cx: *mut RawJSContext,
+    code: HandleObject,
+    out: MutableHandleString,
+) -> bool {
+    let mut v = UndefinedValue();
+    if !jsapi::JS_GetProperty(
+        cx,
+        code,
+        c"code".as_ptr(),
+        MutableHandleValue::from_marked_location(&mut v),
+    ) {
+        return false;
+    }
+    if v.is_string() {
+        out.set(v.to_string());
+    }
+    true
+}
+
+thread_local!(static FUNCTION_CODE: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) });
+
+unsafe extern "C" fn allow_and_record_body_arg(
+    cx: *mut RawJSContext,
+    _runtime_code: RuntimeCode,
+    code_string: HandleString,
+    compilation_type: CompilationType,
+    _parameter_strings: Handle<StackGCVector<*mut JSString>>,
+    _body_string: HandleString,
+    _parameter_args: Handle<StackGCVector<JSVal>>,
+    body_arg: HandleValue,
+    can_compile_strings: *mut bool,
+) -> bool {
+    let kind = if body_arg.get().is_object() {
+        "object"
+    } else {
+        "string"
+    };
+    EVAL_BODY_ARGS.with(|a| a.borrow_mut().push(kind));
+    if compilation_type == CompilationType::Function {
+        let cx = JSContext::from_ptr(NonNull::new(cx).unwrap());
+        let code = jsstr_to_string(&cx, NonNull::new(code_string.get()).unwrap());
+        FUNCTION_CODE.with(|c| c.borrow_mut().push(code));
+    }
+    *can_compile_strings = true;
+    true
+}
+
+static CODE_FOR_EVAL_CALLBACKS: JSSecurityCallbacks = JSSecurityCallbacks {
+    contentSecurityPolicyAllows: Some(allow_and_record_body_arg),
+    codeForEvalGets: Some(code_for_eval_gets),
+    subsumes: None,
+};
+
 fn csp(cx: &mut JSContext, global: SafeHandleObject) {
     unsafe {
         jsapi::JS_SetSecurityCallbacks(cx.raw_cx(), &SECURITY_CALLBACKS);
@@ -573,6 +648,33 @@ fn csp(cx: &mut JSContext, global: SafeHandleObject) {
                 (CompilationType::Function, 2),
             ]
         );
+
+        // Objects passed to eval are evaluated as the code they stand for, which the checks see
+        // with the object as argument; others are returned without a check.
+        jsapi::JS_SetSecurityCallbacks(cx.raw_cx(), &CODE_FOR_EVAL_CALLBACKS);
+        assert!(eval_bool(
+            cx,
+            global,
+            "
+            var trusted = { code: '6 * 7' }, other = {};
+            eval(trusted) === 42 && (0, eval)(trusted) === 42 && eval(other) === other &&
+                eval('1') === 1 && Function('a', 'b', 'return a + b')(1, 2) === 3 &&
+                (async function () {}).constructor('await 1') instanceof Function
+        "
+        ));
+        assert_eq!(
+            EVAL_BODY_ARGS.with(|a| a.borrow().clone()),
+            ["object", "object", "string", "string", "string"]
+        );
+        // The source text, as in SpiderMonkey.
+        assert_eq!(
+            FUNCTION_CODE.with(|c| c.borrow().clone()),
+            [
+                "function anonymous(a,b\n) {\nreturn a + b\n}",
+                "async function anonymous(\n) {\nawait 1\n}",
+            ]
+        );
+
         jsapi::JS_SetSecurityCallbacks(cx.raw_cx(), ptr::null());
         assert_eq!(eval(cx, global, "eval('6')").unwrap().to_int32(), 6);
     }

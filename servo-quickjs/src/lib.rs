@@ -65,6 +65,12 @@ pub unsafe fn JS_DupValueRT(_rt: *mut JSRuntime, v: JSValue) -> JSValue {
     v
 }
 
+/// The reference count of a value that has one.
+#[inline(always)]
+pub unsafe fn JS_GetRefCount(v: JSValue) -> i32 {
+    unsafe { *ref_count(v) }
+}
+
 #[inline(always)]
 pub unsafe fn JS_DupValue(_ctx: *mut JSContext, v: JSValue) -> JSValue {
     unsafe { JS_DupValueRT(std::ptr::null_mut(), v) }
