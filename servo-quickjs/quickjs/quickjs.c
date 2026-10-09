@@ -42286,8 +42286,10 @@ static JSValue js_array_constructor(JSContext *ctx, JSValueConst new_target,
         if (JS_SetProperty(ctx, obj, JS_ATOM_length, JS_NewUint32(ctx, len)) < 0)
             goto fail;
     } else {
+        /* Servo: CreateDataPropertyOrThrow, not Set, as inherited setters must not run (Q24) */
         for(i = 0; i < argc; i++) {
-            if (JS_SetPropertyUint32(ctx, obj, i, JS_DupValue(ctx, argv[i])) < 0)
+            if (JS_DefinePropertyValueUint32(ctx, obj, i, JS_DupValue(ctx, argv[i]),
+                                             JS_PROP_C_W_E | JS_PROP_THROW) < 0)
                 goto fail;
         }
     }
@@ -50869,7 +50871,10 @@ JSValue JS_JSONStringify(JSContext *ctx, JSValueConst obj,
                     goto exception;
                 }
                 if (!JS_ToBoolFree(ctx, present)) {
-                    JS_SetPropertyInt64(ctx, jsc->property_list, j++, v);
+                    /* Servo: the list is internal, so inherited setters must not run (Q24) */
+                    if (JS_DefinePropertyValueInt64(ctx, jsc->property_list, j++, v,
+                                                    JS_PROP_C_W_E | JS_PROP_THROW) < 0)
+                        goto exception;
                 } else {
                     JS_FreeValue(ctx, v);
                 }
