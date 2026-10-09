@@ -160,12 +160,17 @@ fn resolve_and_reject(cx: &mut JSContext, global: SafeHandleObject) {
 // The user input state of the promise of each job run, as Servo reads it.
 thread_local!(static STATES: RefCell<Vec<PromiseUserInputEventHandlingState>> = const { RefCell::new(Vec::new()) });
 
+// The incumbent global the job queue reports, as Servo's settings stack would.
+thread_local!(static INCUMBENT: std::cell::Cell<*mut JSObject> = const { std::cell::Cell::new(ptr::null_mut()) });
+// The incumbent of each job run.
+thread_local!(static INCUMBENTS: RefCell<Vec<*mut JSObject>> = const { RefCell::new(Vec::new()) });
+
 unsafe extern "C" fn get_host_defined_data(
     _: *mut RawJSContext,
     incumbent: MutableHandleObject,
     data: MutableHandleObject,
 ) -> bool {
-    incumbent.set(ptr::null_mut());
+    incumbent.set(INCUMBENT.with(|i| i.get()));
     data.set(ptr::null_mut());
     true
 }
@@ -189,6 +194,14 @@ unsafe extern "C" fn run_jobs(cx: *mut RawJSContext) {
             })
         });
         assert!(!jsapi::GetExecutionGlobalFromJSMicroTask(task).is_null());
+        let mut incumbent = ptr::null_mut();
+        let mut data = ptr::null_mut();
+        assert!(jsapi::MaybeGetHostDefinedDataFromJSMicroTask(
+            task,
+            MutableHandleObject::from_marked_location(&mut incumbent),
+            MutableHandleObject::from_marked_location(&mut data),
+        ));
+        INCUMBENTS.with(|i| i.borrow_mut().push(incumbent));
         assert!(jsapi::RunJSMicroTask(cx, handle(&task)));
     }
 }
@@ -343,6 +356,31 @@ fn job_queue(cx: &mut JSContext, global: SafeHandleObject) {
             );
             jsapi::RunJobs(cx.raw_cx());
         }
+
+        // A reaction's incumbent is the one when then() or await created it (HostMakeJobCallback,
+        // as in SpiderMonkey 153); a thenable job's is the one when it was enqueued.
+        let p = new_promise(cx, ptr::null_mut());
+        set_global(cx, global, c"pending", ObjectValue(p));
+        INCUMBENT.with(|i| i.set(other.get()));
+        eval(
+            cx,
+            global,
+            "pending.then(() => {}); (async () => { await pending; })();",
+        )
+        .unwrap();
+        INCUMBENT.with(|i| i.set(global.get()));
+        let thenable = eval(cx, global, "({ then(resolve) { resolve(); } })").unwrap();
+        INCUMBENTS.with(|i| i.borrow_mut().clear());
+        assert!(jsapi::ResolvePromise(
+            cx.raw_cx(),
+            handle(&p),
+            handle(&thenable)
+        ));
+        jsapi::RunJobs(cx.raw_cx());
+        let incumbents = INCUMBENTS.with(|i| i.borrow().clone());
+        assert_eq!(incumbents[0], global.get(), "thenable job");
+        assert_eq!(&incumbents[1..3], [other.get(), other.get()], "reactions");
+        INCUMBENT.with(|i| i.set(ptr::null_mut()));
 
         // The embedder's own tasks share the queue, in order.
         let own = mozjs::jsval::PrivateValue(7 as *const c_void);

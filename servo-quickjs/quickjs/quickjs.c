@@ -372,6 +372,9 @@ struct JSRuntime {
     /* Servo: host job queue */
     JSEnqueueJobHook *enqueue_job_hook;
     void *enqueue_job_opaque;
+    /* Servo: HostMakeJobCallback (Q32) */
+    JSHostMakeJobCallbackHook *make_job_callback_hook;
+    void *make_job_callback_opaque;
     /* Servo: host check for eval() and Function() */
     JSCanCompileStringsHook *can_compile_strings_hook;
     void *can_compile_strings_opaque;
@@ -2354,7 +2357,7 @@ int JS_GetStripInfo(JSRuntime *rt)
 
 static int JS_EnqueueJob2(JSContext *ctx, JSJobFunc *job_func,
                           int argc, JSValueConst *argv, BOOL no_exception,
-                          JSValueConst promise)
+                          JSValueConst promise, JSValueConst host_defined)
 {
     JSRuntime *rt = ctx->rt;
     JSJobEntry *e;
@@ -2362,7 +2365,8 @@ static int JS_EnqueueJob2(JSContext *ctx, JSJobFunc *job_func,
 
     /* Servo: promise jobs go to the host's job queue */
     if (!no_exception && rt->enqueue_job_hook)
-        return rt->enqueue_job_hook(ctx, job_func, argc, argv, promise, rt->enqueue_job_opaque);
+        return rt->enqueue_job_hook(ctx, job_func, argc, argv, promise, host_defined,
+                                    rt->enqueue_job_opaque);
     if (no_exception)
         e = js_malloc_rt(ctx->rt, sizeof(*e) + argc * sizeof(JSValue));
     else
@@ -2383,7 +2387,7 @@ static int JS_EnqueueJob2(JSContext *ctx, JSJobFunc *job_func,
 int JS_EnqueueJob(JSContext *ctx, JSJobFunc *job_func,
                   int argc, JSValueConst *argv)
 {
-    return JS_EnqueueJob2(ctx, job_func, argc, argv, FALSE, JS_UNDEFINED);
+    return JS_EnqueueJob2(ctx, job_func, argc, argv, FALSE, JS_UNDEFINED, JS_UNDEFINED);
 }
 
 BOOL JS_IsJobPending(JSRuntime *rt)
@@ -54216,6 +54220,9 @@ typedef struct JSPromiseReactionData {
     /* Servo: the promise then() created, or JS_UNDEFINED, passed to the
        enqueue hook as SpiderMonkey's reaction promise (Q30) */
     JSValue promise;
+    /* Servo: the host's data for the job, taken when the reaction was created
+       (HostMakeJobCallback, Q32), or JS_UNDEFINED */
+    JSValue host_defined;
 } JSPromiseReactionData;
 
 JSPromiseStateEnum JS_PromiseState(JSContext *ctx, JSValue promise)
@@ -54244,6 +54251,7 @@ static void promise_reaction_data_free(JSRuntime *rt,
     JS_FreeValueRT(rt, rd->resolving_funcs[1]);
     JS_FreeValueRT(rt, rd->handler);
     JS_FreeValueRT(rt, rd->promise);
+    JS_FreeValueRT(rt, rd->host_defined);
     js_free_rt(rt, rd);
 }
 
@@ -54252,7 +54260,7 @@ static void promise_reaction_data_free(JSRuntime *rt,
    uses it as the job's entry realm. */
 static int js_enqueue_promise_job(JSContext *ctx, JSJobFunc *job_func, int argc,
                                   JSValueConst *argv, JSValueConst handler,
-                                  JSValueConst promise)
+                                  JSValueConst promise, JSValueConst host_defined)
 {
     JSContext *realm = ctx;
 
@@ -54263,7 +54271,7 @@ static int js_enqueue_promise_job(JSContext *ctx, JSJobFunc *job_func, int argc,
             realm = ctx;
         }
     }
-    return JS_EnqueueJob2(realm, job_func, argc, argv, FALSE, promise);
+    return JS_EnqueueJob2(realm, job_func, argc, argv, FALSE, promise, host_defined);
 }
 
 static JSValue promise_reaction_job(JSContext *ctx, int argc,
@@ -54346,7 +54354,8 @@ static void fulfill_or_reject_promise(JSContext *ctx, JSValueConst promise,
         args[2] = rd->handler;
         args[3] = JS_NewBool(ctx, is_reject);
         args[4] = value;
-        js_enqueue_promise_job(ctx, promise_reaction_job, 5, args, rd->handler, rd->promise);
+        js_enqueue_promise_job(ctx, promise_reaction_job, 5, args, rd->handler, rd->promise,
+                               rd->host_defined);
         list_del(&rd->link);
         promise_reaction_data_free(ctx->rt, rd);
     }
@@ -54517,7 +54526,8 @@ static JSValue js_promise_resolve_function_call(JSContext *ctx,
         args[0] = s->promise;
         args[1] = resolution;
         args[2] = then;
-        js_enqueue_promise_job(ctx, js_promise_resolve_thenable_job, 3, args, then, s->promise);
+        js_enqueue_promise_job(ctx, js_promise_resolve_thenable_job, 3, args, then, s->promise,
+                               JS_UNDEFINED);
         JS_FreeValue(ctx, then);
     }
     return JS_UNDEFINED;
@@ -54559,6 +54569,7 @@ static void js_promise_mark(JSRuntime *rt, JSValueConst val,
             JS_MarkValue(rt, rd->resolving_funcs[1], mark_func);
             JS_MarkValue(rt, rd->handler, mark_func);
             JS_MarkValue(rt, rd->promise, mark_func);
+            JS_MarkValue(rt, rd->host_defined, mark_func);
         }
     }
     JS_MarkValue(rt, s->promise_result, mark_func);
@@ -55102,6 +55113,13 @@ static __exception int perform_promise_then(JSContext *ctx,
             handler = JS_UNDEFINED;
         rd->handler = JS_DupValue(ctx, handler);
         rd->promise = JS_DupValue(ctx, derived_promise);
+        /* Servo: HostMakeJobCallback (Q32) */
+        if (i == 1)
+            rd->host_defined = JS_DupValue(ctx, rd_array[0]->host_defined);
+        else if (ctx->rt->make_job_callback_hook)
+            rd->host_defined = ctx->rt->make_job_callback_hook(ctx, ctx->rt->make_job_callback_opaque);
+        else
+            rd->host_defined = JS_UNDEFINED;
         rd_array[i] = rd;
     }
 
@@ -55124,7 +55142,8 @@ static __exception int perform_promise_then(JSContext *ctx,
         args[2] = rd->handler;
         args[3] = JS_NewBool(ctx, i);
         args[4] = s->promise_result;
-        js_enqueue_promise_job(ctx, promise_reaction_job, 5, args, rd->handler, rd->promise);
+        js_enqueue_promise_job(ctx, promise_reaction_job, 5, args, rd->handler, rd->promise,
+                               rd->host_defined);
         for(i = 0; i < 2; i++)
             promise_reaction_data_free(ctx->rt, rd_array[i]);
     }
@@ -62324,7 +62343,7 @@ static void finrec_delete_weakref(JSRuntime *rt, JSWeakRefHeader *wh)
             args[0] = frd->cb;
             args[1] = fre->held_val;
             /* no exception is raised to avoid recursing into the GC */
-            JS_EnqueueJob2(frd->realm, js_finrec_job, 2, args, TRUE, JS_UNDEFINED);
+            JS_EnqueueJob2(frd->realm, js_finrec_job, 2, args, TRUE, JS_UNDEFINED, JS_UNDEFINED);
                 
             js_weakref_free(rt, fre->target);
             js_weakref_free(rt, fre->token);
@@ -62521,6 +62540,14 @@ void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque)
 {
     rt->enqueue_job_hook = hook;
     rt->enqueue_job_opaque = opaque;
+}
+
+/* Servo: HostMakeJobCallback (Q32) */
+void JS_SetHostMakeJobCallbackHook(JSRuntime *rt, JSHostMakeJobCallbackHook *hook,
+                                   void *opaque)
+{
+    rt->make_job_callback_hook = hook;
+    rt->make_job_callback_opaque = opaque;
 }
 
 JSValue JS_PromiseResolve(JSContext *ctx, JSValueConst value, BOOL is_reject)

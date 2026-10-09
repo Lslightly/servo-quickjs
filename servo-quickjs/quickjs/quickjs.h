@@ -1197,10 +1197,19 @@ void JS_MarkPromiseHandled(JSContext *ctx, JSValueConst promise);
 typedef JSValue JSJobFunc(JSContext *ctx, int argc, JSValueConst *argv);
 int JS_EnqueueJob(JSContext *ctx, JSJobFunc *job_func, int argc, JSValueConst *argv);
 /* Servo: if set, the jobs of JS_EnqueueJob() (promise jobs) are passed to the hook
-   instead of the internal job list. 'argv' is borrowed. Return < 0 on exception. */
+   instead of the internal job list. 'argv' is borrowed. 'host_defined' is what the
+   HostMakeJobCallback hook returned when the reaction was created, JS_UNDEFINED for
+   other jobs. Return < 0 on exception. */
 typedef int JSEnqueueJobHook(JSContext *ctx, JSJobFunc *job_func, int argc,
-                             JSValueConst *argv, JSValueConst promise, void *opaque);
+                             JSValueConst *argv, JSValueConst promise,
+                             JSValueConst host_defined, void *opaque);
 void JS_SetEnqueueJobHook(JSRuntime *rt, JSEnqueueJobHook *hook, void *opaque);
+/* Servo: HostMakeJobCallback. Called when then() or await creates a promise
+   reaction; the reaction keeps the result (a new reference, JS_UNDEFINED for none)
+   and passes it to the enqueue hook with its job (Q32). */
+typedef JSValue JSHostMakeJobCallbackHook(JSContext *ctx, void *opaque);
+void JS_SetHostMakeJobCallbackHook(JSRuntime *rt, JSHostMakeJobCallbackHook *hook,
+                                   void *opaque);
 /* Servo: a promise's user input state for the host (SpiderMonkey's
    PromiseUserInputEventHandlingState, 0 when not set). then() copies it to the
    promise it creates, and the enqueue hook receives that promise for reaction

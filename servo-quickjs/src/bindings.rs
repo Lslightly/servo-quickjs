@@ -1979,6 +1979,7 @@ pub type JSEnqueueJobHook = ::std::option::Option<
         argc: ::std::os::raw::c_int,
         argv: *mut JSValue,
         promise: JSValue,
+        host_defined: JSValue,
         opaque: *mut ::std::os::raw::c_void,
     ) -> ::std::os::raw::c_int,
 >;
@@ -1986,6 +1987,16 @@ unsafe extern "C" {
     pub fn JS_SetEnqueueJobHook(
         rt: *mut JSRuntime,
         hook: JSEnqueueJobHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+pub type JSHostMakeJobCallbackHook = ::std::option::Option<
+    unsafe extern "C" fn(ctx: *mut JSContext, opaque: *mut ::std::os::raw::c_void) -> JSValue,
+>;
+unsafe extern "C" {
+    pub fn JS_SetHostMakeJobCallbackHook(
+        rt: *mut JSRuntime,
+        hook: JSHostMakeJobCallbackHook,
         opaque: *mut ::std::os::raw::c_void,
     );
 }

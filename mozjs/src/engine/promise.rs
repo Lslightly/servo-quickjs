@@ -337,12 +337,14 @@ pub(crate) unsafe fn DeleteJobQueue(queue: *mut crate::glue::RustJobQueue) {
 pub(crate) unsafe fn SetJobQueue(cx: *mut root::JSContext, queue: *mut root::JS::JobQueue) {
     let cx = Cx::from_raw(cx);
     cx.hooks.job_queue = queue as *mut JobQueue;
-    let hook: q::JSEnqueueJobHook = if queue.is_null() {
-        None
+    let opaque = cx as *mut Cx as *mut c_void;
+    if queue.is_null() {
+        q::JS_SetEnqueueJobHook(cx.rt, None, opaque);
+        q::JS_SetHostMakeJobCallbackHook(cx.rt, None, opaque);
     } else {
-        Some(enqueue_job)
-    };
-    q::JS_SetEnqueueJobHook(cx.rt, hook, cx as *mut Cx as *mut c_void);
+        q::JS_SetEnqueueJobHook(cx.rt, Some(enqueue_job), opaque);
+        q::JS_SetHostMakeJobCallbackHook(cx.rt, Some(make_job_callback), opaque);
+    }
 }
 
 pub(crate) unsafe fn GetJobQueue(cx: *mut root::JSContext) -> *mut root::JS::JobQueue {
@@ -397,7 +399,8 @@ struct MicroTaskData {
     args: Vec<q::JSValue>,
     /// Held (`hold_realm`) and marked: the realm the job was enqueued in, which it runs in.
     realm: *mut RealmData,
-    /// The incumbent global when the job was enqueued (counted), or `JS_UNDEFINED`.
+    /// The incumbent global (counted), or `JS_UNDEFINED`: for a reaction, when it was created
+    /// (Q32), for other jobs when they were enqueued.
     incumbent: q::JSValue,
     /// The promise of the reaction (Q30), for its user input state (counted), or `JS_UNDEFINED`.
     promise: q::JSValue,
@@ -463,6 +466,42 @@ pub(crate) unsafe fn free_microtasks(cx: &mut Cx) {
     }
 }
 
+/// The incumbent global from the queue's `getHostDefinedData` (null if none), or `None` if it
+/// failed.
+unsafe fn incumbent_global(cx: &mut Cx, queue: &JobQueue) -> Option<*mut root::JSObject> {
+    let mut incumbent: *mut root::JSObject = ptr::null_mut();
+    let mut host_defined_data: *mut root::JSObject = ptr::null_mut();
+    if let Some(get_host_defined_data) = queue.mTraps.getHostDefinedData {
+        let ok = get_host_defined_data(
+            cx.as_raw(),
+            root::JS::MutableHandle::from_marked_location(&mut incumbent),
+            root::JS::MutableHandle::from_marked_location(&mut host_defined_data),
+        );
+        if !ok {
+            return None;
+        }
+    }
+    Some(incumbent)
+}
+
+/// Patch Q32's hook, HostMakeJobCallback: the incumbent global when `then()` or `await` creates
+/// a reaction, as SpiderMonkey takes it (`JS_NULL` for none, `JS_UNDEFINED` if it failed).
+unsafe extern "C" fn make_job_callback(ctx: *mut q::JSContext, opaque: *mut c_void) -> q::JSValue {
+    let cx = hook_cx(opaque);
+    let queue = cx.hooks.job_queue;
+    if queue.is_null() {
+        return q::JS_UNDEFINED;
+    }
+    let entered = enter_qctx(cx, ctx);
+    let incumbent = incumbent_global(cx, &*queue);
+    leave_qctx(cx, entered);
+    match incumbent {
+        Some(incumbent) if !incumbent.is_null() => q::JS_DupValueRT(cx.rt, obj_val(incumbent)),
+        Some(_) => q::JS_NULL,
+        None => q::JS_UNDEFINED,
+    }
+}
+
 /// Patch Q4's hook: queues a QuickJS promise job as a `MicroTask`.
 unsafe extern "C" fn enqueue_job(
     ctx: *mut q::JSContext,
@@ -470,6 +509,7 @@ unsafe extern "C" fn enqueue_job(
     argc: c_int,
     argv: *mut q::JSValue,
     promise: q::JSValue,
+    host_defined: q::JSValue,
     opaque: *mut c_void,
 ) -> c_int {
     let cx = hook_cx(opaque);
@@ -477,7 +517,16 @@ unsafe extern "C" fn enqueue_job(
     assert!(!queue.is_null());
     let realm = q::JS_GetContextOpaque(ctx) as *mut RealmData;
     let entered = enter_qctx(cx, ctx);
-    let result = enqueue_microtask(cx, &*queue, realm, job_func, argc, argv, promise);
+    let result = enqueue_microtask(
+        cx,
+        &*queue,
+        realm,
+        job_func,
+        argc,
+        argv,
+        promise,
+        host_defined,
+    );
     leave_qctx(cx, entered);
     result
 }
@@ -490,21 +539,20 @@ unsafe fn enqueue_microtask(
     argc: c_int,
     argv: *mut q::JSValue,
     promise: q::JSValue,
+    host_defined: q::JSValue,
 ) -> c_int {
-    let mut incumbent: *mut root::JSObject = ptr::null_mut();
-    let mut host_defined_data: *mut root::JSObject = ptr::null_mut();
-    if let Some(get_host_defined_data) = queue.mTraps.getHostDefinedData {
-        let ok = get_host_defined_data(
-            cx.as_raw(),
-            root::JS::MutableHandle::from_marked_location(&mut incumbent),
-            root::JS::MutableHandle::from_marked_location(&mut host_defined_data),
-        );
-        if !ok {
-            return -1;
-        }
-    }
+    // A reaction's incumbent was taken when it was created (Q32); other jobs take it now.
+    let incumbent = match host_defined.tag() {
+        q::JS_TAG_OBJECT => q::JS_DupValueRT(cx.rt, host_defined),
+        q::JS_TAG_NULL => q::JS_UNDEFINED,
+        _ => match incumbent_global(cx, queue) {
+            Some(incumbent) => q::JS_DupValueRT(cx.rt, object_or_undefined(incumbent)),
+            None => return -1,
+        },
+    };
     let task = q::JS_NewObjectProtoClass(cx.qctx(), q::JS_NULL, microtask_class(cx.rt));
     if task.tag() == q::JS_TAG_EXCEPTION {
+        q::JS_FreeValueRT(cx.rt, incumbent);
         return -1;
     }
     let data = Box::new(MicroTaskData {
@@ -513,7 +561,7 @@ unsafe fn enqueue_microtask(
             .map(|i| q::JS_DupValueRT(cx.rt, *argv.add(i)))
             .collect(),
         realm: super::hold_realm(realm),
-        incumbent: q::JS_DupValueRT(cx.rt, object_or_undefined(incumbent)),
+        incumbent,
         // The promise of the reaction (Q30), for its user input state.
         promise: if promise.tag() == q::JS_TAG_OBJECT {
             q::JS_DupValueRT(cx.rt, promise)
