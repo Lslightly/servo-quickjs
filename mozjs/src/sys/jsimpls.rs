@@ -124,13 +124,12 @@ impl<T> JS::MutableHandle<T> {
 }
 
 impl JS::HandleValue {
-    // QuickJS: plain statics, not extern ones.
     pub fn null() -> JS::HandleValue {
-        JS::NullHandleValue
+        unsafe { JS::NullHandleValue }
     }
 
     pub fn undefined() -> JS::HandleValue {
-        JS::UndefinedHandleValue
+        unsafe { JS::UndefinedHandleValue }
     }
 }
 

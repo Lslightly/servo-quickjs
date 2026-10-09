@@ -122,8 +122,22 @@ def convert_item(item, indent, implemented, stats):
         attrs = LINK_NAME.sub("", m.group("attrs"))
         # Raw pointers are never `Sync`; everything else gets an `unsafe impl Sync` in `sys`.
         mut = "mut " if m.group("mut") or m.group("ty").lstrip().startswith("*") else ""
-        init = STATIC_INIT.get(m.group("name"), "unsafe { ::core::mem::zeroed() }")
-        return f"{indent}{attrs.strip()}\n{indent}pub static {mut}{m.group('name')}: {m.group('ty')} = {init};\n"
+        name, ty = m.group("name"), m.group("ty")
+        init = STATIC_INIT.get(name, "unsafe { ::core::mem::zeroed() }")
+        if mut:
+            return f"{indent}{attrs.strip()}\n{indent}pub static {mut}{name}: {ty} = {init};\n"
+        # Exported under a private symbol and declared `extern` again, so that reading it needs
+        # `unsafe` as with SpiderMonkey.
+        symbol = f"mozjs_qjs_{stats['static']}_{name}"
+        return (
+            f"{indent}#[unsafe(export_name = \"{symbol}\")]\n"
+            f"{indent}static __qjs_{name}: {ty} = {init};\n"
+            f"{indent}unsafe extern \"C\" {{\n"
+            f"{indent}    {attrs.strip()}\n"
+            f"{indent}    #[link_name = \"{symbol}\"]\n"
+            f"{indent}    pub static {name}: {ty};\n"
+            f"{indent}}}\n"
+        )
     raise ValueError("unrecognised extern item: " + text[:300])
 
 
