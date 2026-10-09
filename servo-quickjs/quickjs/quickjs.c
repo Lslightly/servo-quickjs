@@ -62302,6 +62302,11 @@ void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
     rt->can_compile_strings_opaque = opaque;
 }
 
+JS_BOOL JS_IsCollectingCycles(JSRuntime *rt)
+{
+    return rt->gc_phase == JS_GC_PHASE_REMOVE_CYCLES;
+}
+
 void JS_SetCodeForEvalHook(JSRuntime *rt, JSCodeForEvalHook *hook, void *opaque)
 {
     rt->code_for_eval_hook = hook;

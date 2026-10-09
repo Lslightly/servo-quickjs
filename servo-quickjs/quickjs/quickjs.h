@@ -1059,6 +1059,10 @@ void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
    JS_EXCEPTION. */
 typedef JSValue JSCodeForEvalHook(JSContext *ctx, JSValueConst obj, void *opaque);
 void JS_SetCodeForEvalHook(JSRuntime *rt, JSCodeForEvalHook *hook, void *opaque);
+/* Servo: whether the cycle collector is freeing a garbage cycle. Its objects are finalized
+   in any order, so finalizers must not reach the other objects of the cycle (SpiderMonkey's
+   finalization during GC). */
+JS_BOOL JS_IsCollectingCycles(JSRuntime *rt);
 /* Servo: the realm 'obj' was created in, where known (functions and proxies); NULL otherwise */
 JSContext *JS_GetObjectRealm(JSValueConst obj);
 /* Servo: debug hook called when an object is freed, before its finalizer */
