@@ -1059,6 +1059,10 @@ void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
    JS_EXCEPTION. */
 typedef JSValue JSCodeForEvalHook(JSContext *ctx, JSValueConst obj, void *opaque);
 void JS_SetCodeForEvalHook(JSRuntime *rt, JSCodeForEvalHook *hook, void *opaque);
+/* Servo: whether an object that isn't an Error has [[ErrorData]] (Error.isError), e.g. a
+   DOMException. Must not run JavaScript. */
+typedef JS_BOOL JSIsErrorHook(JSContext *ctx, JSValueConst obj);
+void JS_SetIsErrorHook(JSRuntime *rt, JSIsErrorHook *hook);
 /* Servo: whether the cycle collector is freeing a garbage cycle. Its objects are finalized
    in any order, so finalizers must not reach the other objects of the cycle (SpiderMonkey's
    finalization during GC). */

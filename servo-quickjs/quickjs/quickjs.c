@@ -378,6 +378,8 @@ struct JSRuntime {
     /* Servo: HostGetCodeForEval */
     JSCodeForEvalHook *code_for_eval_hook;
     void *code_for_eval_opaque;
+    /* Servo: whether objects of the host have [[ErrorData]] (Error.isError) */
+    JSIsErrorHook *is_error_hook;
     /* Servo: debug hook called when an object is freed */
     JSFreeObjectHook *free_object_hook;
     /* Servo: JS_HasPropertyCached() results, valid while proto_epoch is unchanged. It
@@ -42173,6 +42175,9 @@ static const JSCFunctionListEntry js_native_error_proto_funcs[] = {
 static JSValue js_error_isError(JSContext *ctx, JSValueConst this_val,
                                 int argc, JSValueConst *argv)
 {
+    /* Servo: host objects such as DOMException can have [[ErrorData]] too (Q27) */
+    if (!JS_IsError(ctx, argv[0]) && JS_IsObject(argv[0]) && ctx->rt->is_error_hook)
+        return JS_NewBool(ctx, ctx->rt->is_error_hook(ctx, argv[0]));
     return JS_NewBool(ctx, JS_IsError(ctx, argv[0]));
 }
 
@@ -62326,6 +62331,11 @@ void JS_SetCanCompileStringsHook(JSRuntime *rt, JSCanCompileStringsHook *hook,
 {
     rt->can_compile_strings_hook = hook;
     rt->can_compile_strings_opaque = opaque;
+}
+
+void JS_SetIsErrorHook(JSRuntime *rt, JSIsErrorHook *hook)
+{
+    rt->is_error_hook = hook;
 }
 
 JS_BOOL JS_IsCollectingCycles(JSRuntime *rt)

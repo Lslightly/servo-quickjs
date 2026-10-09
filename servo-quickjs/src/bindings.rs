@@ -1713,6 +1713,12 @@ unsafe extern "C" {
         opaque: *mut ::std::os::raw::c_void,
     );
 }
+pub type JSIsErrorHook = ::std::option::Option<
+    unsafe extern "C" fn(ctx: *mut JSContext, obj: JSValue) -> ::std::os::raw::c_int,
+>;
+unsafe extern "C" {
+    pub fn JS_SetIsErrorHook(rt: *mut JSRuntime, hook: JSIsErrorHook);
+}
 unsafe extern "C" {
     pub fn JS_IsCollectingCycles(rt: *mut JSRuntime) -> ::std::os::raw::c_int;
 }
