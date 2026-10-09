@@ -181,6 +181,7 @@ The cost is memory: values stay alive until the end of the task.
 | Q23 | `JS_IsCollectingCycles`: whether the cycle collector is freeing a garbage cycle, for `JS::RuntimeHeapState` | small |
 | Q24 | CreateDataProperty instead of Set where QuickJS used Set on arrays it creates: `new Array(a, b, …)` and JSON.stringify's property list. With a setter or a getter-only accessor on `Array.prototype[1]` they ran it or threw | small |
 | Q25 | `Iterator.prototype.constructor` has a setter of its own (QuickJS used the getter as the setter), which implements SetterThatIgnoresPrototypeProperties like the `@@toStringTag` one | small |
+| Q26 | `localeCompare` returns -1, 0 or 1, like other engines, instead of the difference of the first differing code points (without `Intl`; the ICU one already did) | small |
 
 ## Not supported
 

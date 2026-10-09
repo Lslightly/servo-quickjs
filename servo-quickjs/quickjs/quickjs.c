@@ -47268,7 +47268,8 @@ static JSValue js_string_localeCompare(JSContext *ctx, JSValueConst this_val,
     cmp = js_UTF32_compare(a_buf, a_len, b_buf, b_len);
     js_free(ctx, a_buf);
     js_free(ctx, b_buf);
-    return JS_NewInt32(ctx, cmp);
+    /* Servo: -1, 0 or 1, like other engines (Q26) */
+    return JS_NewInt32(ctx, (cmp > 0) - (cmp < 0));
 }
 #else /* CONFIG_ALL_UNICODE */
 static JSValue js_string_localeCompare(JSContext *ctx, JSValueConst this_val,
@@ -47288,7 +47289,8 @@ static JSValue js_string_localeCompare(JSContext *ctx, JSValueConst this_val,
     cmp = js_string_compare(ctx, JS_VALUE_GET_STRING(a), JS_VALUE_GET_STRING(b));
     JS_FreeValue(ctx, a);
     JS_FreeValue(ctx, b);
-    return JS_NewInt32(ctx, cmp);
+    /* Servo: -1, 0 or 1, like other engines (Q26) */
+    return JS_NewInt32(ctx, (cmp > 0) - (cmp < 0));
 }
 #endif /* !CONFIG_ALL_UNICODE */
 
