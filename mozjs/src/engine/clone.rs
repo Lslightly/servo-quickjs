@@ -377,12 +377,10 @@ impl Writer {
         if list.tag() != q::JS_TAG_OBJECT {
             return self.report(root::JS_SCERR_TRANSFERABLE);
         }
-        let cx = self.cx();
-        match q::JS_IsArray(cx.qctx(), list) {
-            r if r < 0 => return false,
-            0 => return self.report(root::JS_SCERR_TRANSFERABLE),
-            _ => {}
+        if !super::object::is_array_object(list) {
+            return self.report(root::JS_SCERR_TRANSFERABLE);
         }
+        let cx = self.cx();
         let Some(len) = array_length(cx, list) else {
             return false;
         };

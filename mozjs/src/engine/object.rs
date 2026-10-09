@@ -180,20 +180,20 @@ pub(crate) unsafe fn NewArrayObject1(
     adopt_object(cx, arr)
 }
 
+/// Whether `v` is an Array, by its builtin class as in SpiderMonkey's `IsArrayObject`: unlike
+/// ECMAScript's IsArray, a JS Proxy of an array isn't one (e.g. not an IndexedDB array key).
+pub(crate) unsafe fn is_array_object(v: q::JSValue) -> bool {
+    v.tag() == q::JS_TAG_OBJECT && class_of(val_obj(v)) == CLASS_ARRAY
+}
+
 pub(crate) unsafe fn IsArrayObject(
     cx: *mut root::JSContext,
     value: root::JS::Handle<root::JS::Value>,
     isArray: *mut bool,
 ) -> bool {
-    let cx = Cx::from_raw(cx);
-    let v = (*value.ptr).to_qjs();
-    if v.tag() != q::JS_TAG_OBJECT {
-        *isArray = false;
-        return true;
-    }
-    let r = q::JS_IsArray(cx.qctx(), v);
-    *isArray = r > 0;
-    ok(r)
+    let _ = cx;
+    *isArray = is_array_object((*value.ptr).to_qjs());
+    true
 }
 
 // Id and object vectors.

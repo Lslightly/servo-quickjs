@@ -111,6 +111,10 @@ fn arrays() {
         rooted!(&in(cx) let v = Int32Value(1));
         assert!(IsArrayObject(cx, v.handle(), &mut is_array));
         assert!(!is_array);
+        // As in SpiderMonkey, by the builtin class: a Proxy of an array isn't one.
+        rooted!(&in(cx) let v = eval(cx, global, "new Proxy([1], {})"));
+        assert!(IsArrayObject(cx, v.handle(), &mut is_array));
+        assert!(!is_array);
         assert_eq!(builtin_class(cx, array.get()), ESClass::Array);
 
         assert!(JS_FreezeObject(cx, array.handle()));

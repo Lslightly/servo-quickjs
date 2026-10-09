@@ -75,6 +75,7 @@ The cost is memory: values stay alive until the end of the task.
 - **Resolve hooks** (`cOps.resolve`, used by globals): run lazily from an exotic `get_own_property` hook on global classes. Deleting a property that isn't defined yet runs the hook first, from an exotic `delete_property` hook, as SpiderMonkey's lookup does: Servo's interface objects are defined by the first resolution only, so `delete window.File` before any access would otherwise bring `File` back.
 - **Assignments from Rust** (`JS_SetProperty`, `JS_SetPropertyById`, `JS_SetUCProperty`, `JS_SetElement`) ignore a failed assignment, like SpiderMonkey's (sloppy mode); only exceptions fail. `[PutForwards]` relies on it.
 - **`Error.isError`** asks `DOMCallbacks::instanceClassIsError` about objects of DOM classes (Q27), so it is true for a `DOMException`.
+- **`IsArrayObject`** and structured clone's transfer list check the builtin class, like SpiderMonkey's `GetBuiltinClass`: a JS Proxy of an array is not an array there (IndexedDB rejects it as a key), although `Array.isArray` sees through it.
 - **Native functions** (every `JSNative`, e.g. bindings' `generic_method`/`getter`/`setter` with `JSJitInfo`) become objects of one `ShimFunction` class.
   - Its `call` hook receives `func_obj`, `this` (or `new.target`) and flags.
   - Its opaque data: `{native, jitinfo, realm, reserved slots for NewFunctionWithReserved}`.
