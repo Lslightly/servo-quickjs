@@ -19,7 +19,7 @@
 //! script calling import().
 
 use std::cell::RefCell;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ffi::{c_char, c_int, c_void, CStr};
 use std::marker::PhantomData;
 use std::ptr;
@@ -77,6 +77,8 @@ struct LoadState {
     pending: usize,
     /// Counted module records.
     visited: Vec<q::JSValue>,
+    /// The records in `visited`.
+    visited_set: HashSet<*mut root::JSObject>,
     /// Counted.
     host_defined: q::JSValue,
 }
@@ -666,6 +668,7 @@ unsafe fn new_load_state(
         is_loading: true,
         pending: 1,
         visited: Vec::new(),
+        visited_set: HashSet::new(),
         host_defined: q::JS_DupValueRT(cx.rt, (*host_defined.ptr).to_qjs()),
     });
     q::JS_SetOpaque(obj, Box::into_raw(data) as *mut c_void);
@@ -737,12 +740,15 @@ unsafe fn inner_module_loading(
     state: q::JSValue,
     module: *mut root::JSObject,
 ) -> bool {
+    // It recurses over loaded requests: a long chain loaded again would overflow the native
+    // stack. SpiderMonkey checks its recursion limit here too.
+    if q::JS_CheckStackOverflow(cx.qctx()) != 0 {
+        return fail_with_pending_exception(cx, state);
+    }
     let data = module_of(module);
-    let visited = (*state_data(state))
-        .visited
-        .iter()
-        .any(|v| val_obj(*v) == module);
+    let visited = (*state_data(state)).visited_set.contains(&module);
     if data.kind == ModuleKind::JavaScript && !data.loaded_graph && !visited {
+        (*state_data(state)).visited_set.insert(module);
         (*state_data(state))
             .visited
             .push(q::JS_DupValueRT(cx.rt, obj_val(module)));
