@@ -221,7 +221,7 @@ fn property_keys() {
 
 #[test]
 fn collections() {
-    with_global(|cx, global| unsafe {
+    with_global(|cx, _global| unsafe {
         rooted!(&in(cx) let map = NewMapObject(cx));
         rooted!(&in(cx) let key = Int32Value(1));
         rooted!(&in(cx) let value = Int32Value(42));
