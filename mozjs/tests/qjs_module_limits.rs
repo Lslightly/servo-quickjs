@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//! Long module chains fail to load or link instead of overflowing the native stack, as with
-//! SpiderMonkey. The load hook is asynchronous like Servo's network fetches: it queues each
-//! request, and `pump` finishes them later.
+//! Long module chains fail to load or link instead of overflowing the native stack, and module
+//! private values hold a reference through the host's hooks, as with SpiderMonkey. The load hook
+//! is asynchronous like Servo's network fetches: it queues each request, and `pump` finishes them
+//! later.
 
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
@@ -18,11 +19,12 @@ use mozjs::jsapi::{
     self, Heap, JSContext as RawJSContext, JSObject, JSScript, JSString, OnNewGlobalHookOption,
     Value,
 };
-use mozjs::jsval::UndefinedValue;
+use mozjs::jsval::{Int32Value, PrivateValue, UndefinedValue};
 use mozjs::qjs;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
-    CompileModule1, JS_NewGlobalObject, LoadRequestedModules1, ModuleLink,
+    CompileModule1, CreateDefaultExportSyntheticModule, JS_NewGlobalObject, LoadRequestedModules1,
+    ModuleLink, JS_GC,
 };
 use mozjs::rust::{
     transform_str_to_source_text, CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions,
@@ -238,6 +240,10 @@ unsafe extern "C" fn release_private(private: *const Value) {
     PRIVATE_REFS.with(|r| *r.borrow_mut().entry(id).or_default() -= 1);
 }
 
+fn private_refs(id: usize) -> isize {
+    PRIVATE_REFS.with(|r| r.borrow().get(&id).copied().unwrap_or(0))
+}
+
 fn with_realm(f: impl FnOnce(&mut JSContext)) {
     let mut runtime = Runtime::new(engine());
     let _loader = LoaderGuard;
@@ -297,5 +303,59 @@ fn long_chain_link() {
         assert!(jsapi::JS_GetPendingException(cx.raw_cx(), mh(&mut error)));
         jsapi::JS_ClearPendingException(cx.raw_cx());
         assert_eq!(message(cx, error), "stack overflow");
+    });
+}
+
+/// SetModulePrivate takes a reference through the add-ref hook and gives back the old value's
+/// through the release hook, ClearModulePrivate gives it back, and so does freeing the module.
+#[test]
+fn module_private_holds_a_reference() {
+    with_realm(|cx| unsafe {
+        let options = CompileOptionsWrapper::new(cx, c"https://test/p.js".to_owned(), 1);
+        let mut text = transform_str_to_source_text("export const x = 1;");
+        rooted!(&in(cx) let module = CompileModule1(cx, options.ptr, &mut text));
+        assert!(!module.get().is_null());
+        jsapi::SetModulePrivate(module.get(), &PrivateValue(7 as *const c_void));
+        assert_eq!(private_refs(7), 1);
+        jsapi::SetModulePrivate(module.get(), &PrivateValue(8 as *const c_void));
+        assert_eq!((private_refs(7), private_refs(8)), (0, 1));
+        jsapi::ClearModulePrivate(module.get());
+        assert_eq!(private_refs(8), 0);
+        jsapi::SetModulePrivate(module.get(), &PrivateValue(9 as *const c_void));
+
+        rooted!(&in(cx) let default = Int32Value(1));
+        rooted!(&in(cx) let synthetic = CreateDefaultExportSyntheticModule(cx, default.handle()));
+        assert!(!synthetic.get().is_null());
+        jsapi::SetModulePrivate(synthetic.get(), &PrivateValue(10 as *const c_void));
+        assert_eq!((private_refs(9), private_refs(10)), (1, 1));
+    });
+    // Freed with the runtime at the latest.
+    assert_eq!((private_refs(9), private_refs(10)), (0, 0));
+}
+
+/// A module lives as long as its realm, and releases its private value when the collector frees
+/// them.
+#[test]
+fn freed_module_releases_its_private() {
+    with_realm(|cx| unsafe {
+        {
+            rooted!(&in(cx) let global = JS_NewGlobalObject(
+                cx,
+                &SIMPLE_GLOBAL_CLASS,
+                ptr::null_mut(),
+                OnNewGlobalHookOption::FireOnNewGlobalHook,
+                &*RealmOptions::default(),
+            ));
+            let mut realm = mozjs::realm::AutoRealm::new_from_handle(cx, global.handle());
+            let cx = &mut *realm;
+            let options = CompileOptionsWrapper::new(cx, c"https://test/q.js".to_owned(), 1);
+            let mut text = transform_str_to_source_text("export const y = 2;");
+            rooted!(&in(cx) let module = CompileModule1(cx, options.ptr, &mut text));
+            jsapi::SetModulePrivate(module.get(), &PrivateValue(11 as *const c_void));
+        }
+        assert_eq!(private_refs(11), 1);
+        mozjs::quickjs::drain_autorelease_pool();
+        JS_GC(cx, jsapi::GCReason::API);
+        assert_eq!(private_refs(11), 0);
     });
 }

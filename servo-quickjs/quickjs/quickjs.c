@@ -30190,6 +30190,10 @@ static void js_free_module_def(JSRuntime *rt, JSModuleDef *m)
     JS_FreeValueRT(rt, m->promise);
     JS_FreeValueRT(rt, m->resolving_funcs[0]);
     JS_FreeValueRT(rt, m->resolving_funcs[1]);
+    /* Servo: the host's reference to a JavaScript module's private value, as for
+       scripts (Q34); C modules keep their own */
+    if (!m->init_func && !JS_IsUndefined(m->private_value) && rt->script_private_finalizer)
+        rt->script_private_finalizer(rt, m->private_value);
     JS_FreeValueRT(rt, m->private_value);
     if (m->script_or_module) {
         m->script_or_module->module = NULL;
@@ -30345,7 +30349,13 @@ int JS_SetModuleExport(JSContext *ctx, JSModuleDef *m, const char *export_name,
 
 int JS_SetModulePrivateValue(JSContext *ctx, JSModuleDef *m, JSValue val)
 {
-    set_value(ctx, &m->private_value, val);
+    JSValue old = m->private_value;
+    m->private_value = val;
+    /* Servo: the host's reference to a JavaScript module's old value, as for scripts
+       (Q34); C modules keep their own */
+    if (!m->init_func && !JS_IsUndefined(old) && ctx->rt->script_private_finalizer)
+        ctx->rt->script_private_finalizer(ctx->rt, old);
+    JS_FreeValue(ctx, old);
     return 0;
 }
 

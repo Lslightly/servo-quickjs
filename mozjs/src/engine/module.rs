@@ -204,6 +204,9 @@ unsafe extern "C" fn module_finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
         let data = Box::from_raw(data);
         RECORDS.with(|r| r.borrow_mut().remove(&(data.module as usize)));
         q::JS_FreeValueRT(rt, module_val(data.module));
+        if data.private.tag() != q::JS_TAG_UNDEFINED {
+            release_script_private(rt, data.private);
+        }
         q::JS_FreeValueRT(rt, data.private);
         free_all(rt, data.loaded.iter().chain(&data.requests));
     }
@@ -560,19 +563,32 @@ pub(crate) unsafe fn IsCyclicModule(module: *mut root::JSObject) -> bool {
     module_of(module).kind == ModuleKind::JavaScript
 }
 
+/// Like SpiderMonkey's `ScriptSourceObject::setPrivate`, the host's release hook runs for the old
+/// value and its add-ref hook for the new one; the release hook runs again when the module is
+/// freed (Q34 for JavaScript modules).
 pub(crate) unsafe fn SetModulePrivate(module: *mut root::JSObject, value: *const root::JS::Value) {
     let cx = super::current();
     let data = module_of(module);
-    let value = q::JS_DupValueRT(cx.rt, (*value).to_qjs());
+    let value = (*value).to_qjs();
     match data.kind {
         ModuleKind::JavaScript => {
-            q::JS_SetModulePrivateValue(cx.base_ctx, data.module, value);
+            q::JS_SetModulePrivateValue(cx.base_ctx, data.module, q::JS_DupValueRT(cx.rt, value));
         }
         ModuleKind::Synthetic => {
-            let old = std::mem::replace(&mut data.private, value);
+            let old = std::mem::replace(&mut data.private, q::JS_DupValueRT(cx.rt, value));
+            if old.tag() != q::JS_TAG_UNDEFINED {
+                release_script_private(cx.rt, old);
+            }
             q::JS_FreeValueRT(cx.rt, old);
         }
     }
+    if value.tag() != q::JS_TAG_UNDEFINED {
+        add_ref_script_private(cx.rt, value);
+    }
+}
+
+pub(crate) unsafe fn ClearModulePrivate(module: *mut root::JSObject) {
+    SetModulePrivate(module, &JSVal::from_qjs(q::JS_UNDEFINED));
 }
 
 pub(crate) unsafe fn JS_GetModulePrivate(

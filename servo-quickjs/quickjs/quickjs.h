@@ -1167,7 +1167,9 @@ const char *JS_GetClassNameRT(JSRuntime *rt, JSClassID class_id, char *buf, int 
 /* Servo: the host-defined value of a compiled script (JS_TAG_FUNCTION_BYTECODE),
    shared with the eval and Function code it creates. The setter takes ownership
    of 'val' and returns < 0 for modules and non-scripts. The finalizer is called
-   for a replaced value and when the last code of the script is freed. */
+   for a replaced value and when the last code of the script is freed, and also for
+   the private value of a JavaScript module (JS_SetModulePrivateValue; not of a C
+   module) when it is replaced and when the module is freed. */
 typedef void JSScriptPrivateFinalizer(JSRuntime *rt, JSValueConst val);
 void JS_SetScriptPrivateFinalizer(JSRuntime *rt, JSScriptPrivateFinalizer *finalizer);
 int JS_SetScriptPrivateValue(JSContext *ctx, JSValueConst script, JSValue val);

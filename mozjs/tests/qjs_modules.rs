@@ -1032,8 +1032,11 @@ fn script_privates() {
                 "module {i}"
             );
         }
-        SCRIPT_PRIVATE_REFS.with(|r| assert_eq!(*r.borrow(), HashMap::from([(5, 1), (6, 1)])));
+        // The two classic scripts and, as with SpiderMonkey, the two modules (Q34).
+        SCRIPT_PRIVATE_REFS
+            .with(|r| assert_eq!(*r.borrow(), HashMap::from([(5, 1), (6, 1), (1, 1), (2, 1)])));
     });
-    // Freeing the scripts releases their privates.
-    SCRIPT_PRIVATE_REFS.with(|r| assert_eq!(*r.borrow(), HashMap::from([(5, 0), (6, 0)])));
+    // Freeing the scripts and modules releases their privates.
+    SCRIPT_PRIVATE_REFS
+        .with(|r| assert_eq!(*r.borrow(), HashMap::from([(5, 0), (6, 0), (1, 0), (2, 0)])));
 }
