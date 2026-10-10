@@ -40,6 +40,12 @@ impl ObjectData {
         })
     }
 
+    /// The slots the embedder may use: all but a global's key object slot.
+    pub fn embedder_slot_count(&self) -> usize {
+        let is_global = unsafe { (*self.clasp).flags } & root::JSCLASS_IS_GLOBAL != 0;
+        self.slots.len() - is_global as usize
+    }
+
     pub unsafe fn free(self: Box<Self>, rt: *mut q::JSRuntime) {
         for v in self.slots.iter() {
             q::JS_FreeValueRT(rt, *v);
@@ -568,6 +574,10 @@ pub(crate) unsafe fn JS_GetReservedSlot(
     dest: *mut root::JS::Value,
 ) {
     let data = object_data(obj).expect("JS_GetReservedSlot on an object without slots");
+    assert!(
+        (index as usize) < data.embedder_slot_count(),
+        "reserved slot {index} out of range"
+    );
     *dest = JSVal::from_qjs(data.slots[index as usize]);
 }
 
@@ -578,6 +588,10 @@ pub(crate) unsafe fn JS_SetReservedSlot(
 ) {
     let cx = super::current();
     let data = object_data(obj).expect("JS_SetReservedSlot on an object without slots");
+    assert!(
+        (index as usize) < data.embedder_slot_count(),
+        "reserved slot {index} out of range"
+    );
     let new = q::JS_DupValueRT(cx.rt, (*v).to_qjs());
     let old = std::mem::replace(&mut data.slots[index as usize], new);
     q::JS_FreeValueRT(cx.rt, old);

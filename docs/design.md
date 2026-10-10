@@ -94,8 +94,8 @@ The cost is memory: values stay alive until the end of the task.
   - the key is the accessing realm's private key object, which its global holds;
   - the holder is kept by that key object.
 
-  No script runs, and the WindowProxy doesn't keep the accessing realm alive, as a QuickJS WeakMap would (its values live as long as the map). The entries of a freed map stay until their realm is freed.
-- **Builtins:** the shim's own operations call the builtins a realm was created with, taken before any of its scripts run (`intrinsics.rs`), as SpiderMonkey runs its builtins directly. This covers the Map, Set, Date and RegExp helpers, the self-hosted `Array` iterators, `JS_ValueToObject`, and `JSON.parse` with a reviver. Script that replaced `Map.prototype.get` or `globalThis.Object` doesn't run inside them.
+  No script runs, and the WindowProxy doesn't keep the accessing realm alive, as a QuickJS WeakMap would (its values live as long as the map). The entries of a freed map are freed at the realm's next use of the cache, or with the realm. On real WeakMaps `Get/SetWeakMapEntry` call the realm's original `WeakMap.prototype.get` and `set`.
+- **Builtins:** the shim's own operations call the builtins a realm was created with, taken before any of its scripts run (`intrinsics.rs`), as SpiderMonkey runs its builtins directly. This covers the Map, Set, WeakMap, Date and RegExp helpers, the self-hosted `Array` iterators, `JS_ValueToObject`, `JSON.parse` with a reviver, and the symbol descriptions and `Symbol.keyFor` of `JS_ValueToSource` and accessor names. Script that replaced `Map.prototype.get` or `globalThis.Object` doesn't run inside them.
 - **`JS_TransplantObject`:** swaps the proxy data of the two proxies, so the original object keeps its identity and gets the new target.
 - **Proxy prototypes:** a proxy with a static prototype keeps it in its QuickJS shape (so `JS_GetStaticPrototype` works); one with a lazy prototype (the WindowProxy) has get/set prototype hooks. Callable proxies are not supported.
 - **Realm lifetime:** a `RealmData` is owned by its QuickJS context and freed by the context finalizer (Q15).

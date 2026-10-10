@@ -216,7 +216,7 @@ unsafe fn accessor_name(cx: &mut Cx, prefix: &str, name: q::JSAtom) -> q::JSAtom
         q::JS_AtomToString(qctx, name)
     };
     let text = if is_symbol {
-        let desc = q::JS_GetPropertyStr(qctx, key, c"description".as_ptr());
+        let desc = symbol_description(cx, key);
         let text = string_lossy(qctx, desc);
         q::JS_FreeValueRT(cx.rt, desc);
         format!("{prefix} [{text}]")
@@ -225,6 +225,17 @@ unsafe fn accessor_name(cx: &mut Cx, prefix: &str, name: q::JSAtom) -> q::JSAtom
     };
     q::JS_FreeValueRT(cx.rt, key);
     q::JS_NewAtomLen(qctx, text.as_ptr() as *const c_char, text.len())
+}
+
+/// `sym.description` through the realm's original getter (a new reference or `JS_EXCEPTION`).
+pub(crate) unsafe fn symbol_description(cx: &mut Cx, sym: q::JSValue) -> q::JSValue {
+    let getter = super::intrinsics::get(
+        cx,
+        super::intrinsics::Intrinsic::Getter(super::intrinsics::CLASS_SYMBOL, c"description"),
+    );
+    let desc = q::JS_Call(cx.qctx(), getter, sym, 0, ptr::null_mut());
+    q::JS_FreeValueRT(cx.rt, getter);
+    desc
 }
 
 unsafe fn string_lossy(qctx: *mut q::JSContext, v: q::JSValue) -> String {

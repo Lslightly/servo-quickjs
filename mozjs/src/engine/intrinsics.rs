@@ -8,7 +8,8 @@
 //! (`GetRealmKeyObject`), which the global holds, together with the cross-origin property holders
 //! cached for the realm.
 
-use std::collections::HashMap;
+use std::cell::RefCell;
+use std::collections::{HashMap, HashSet};
 use std::ffi::{c_void, CStr};
 use std::ptr;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -21,10 +22,12 @@ use super::Cx;
 
 pub(crate) const CLASS_OBJECT: q::JSClassID = 1;
 pub(crate) const CLASS_ARRAY: q::JSClassID = 2;
+pub(crate) const CLASS_SYMBOL: q::JSClassID = 7;
 pub(crate) const CLASS_DATE: q::JSClassID = 10;
 pub(crate) const CLASS_REGEXP: q::JSClassID = 18;
 pub(crate) const CLASS_MAP: q::JSClassID = 35;
 pub(crate) const CLASS_SET: q::JSClassID = 36;
+pub(crate) const CLASS_WEAKMAP: q::JSClassID = 37;
 
 /// Where an intrinsic is read from in a new realm.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -61,6 +64,8 @@ const INTRINSICS: &[Intrinsic] = &[
     Method(CLASS_SET, c"entries"),
     Method(CLASS_SET, c"forEach"),
     Getter(CLASS_SET, c"size"),
+    Method(CLASS_WEAKMAP, c"get"),
+    Method(CLASS_WEAKMAP, c"set"),
     Method(CLASS_DATE, c"getTime"),
     Method(CLASS_REGEXP, c"constructor"),
     Method(CLASS_REGEXP, c"exec"),
@@ -70,6 +75,8 @@ const INTRINSICS: &[Intrinsic] = &[
     Method(CLASS_ARRAY, c"forEach"),
     Method(CLASS_OBJECT, c"constructor"),
     Global(c"JSON", Some(c"parse")),
+    Getter(CLASS_SYMBOL, c"description"),
+    Global(c"Symbol", Some(c"keyFor")),
 ];
 
 /// Opaque data of a realm's key object.
@@ -86,6 +93,51 @@ static HOLDER_MAP_CLASS: OnceLock<q::JSClassID> = OnceLock::new();
 
 /// Holder map ids are never reused, so a freed map's entries can't be found through a new one.
 static NEXT_HOLDER_MAP_ID: AtomicU64 = AtomicU64::new(1);
+
+/// Which key objects hold an entry for which holder maps, so that the entries of freed maps are
+/// dropped (`purge`) and the bookkeeping stays bounded.
+#[derive(Default)]
+struct HolderMaps {
+    /// The number of key objects with an entry, by holder map id.
+    entries: HashMap<u64, usize>,
+    /// The freed holder maps that still have entries.
+    freed: HashSet<u64>,
+}
+
+thread_local!(static HOLDER_MAPS: RefCell<HolderMaps> = RefCell::new(HolderMaps::default()));
+
+/// Counts an entry less for holder map `id`.
+fn forget_entry(maps: &mut HolderMaps, id: u64) {
+    if let Some(n) = maps.entries.get_mut(&id) {
+        *n -= 1;
+        if *n == 0 {
+            maps.entries.remove(&id);
+            maps.freed.remove(&id);
+        }
+    }
+}
+
+/// Drops the entries of freed holder maps from a key object.
+unsafe fn purge(rt: *mut q::JSRuntime, internals: &mut Internals) {
+    let freed: Vec<u64> = HOLDER_MAPS.with(|m| {
+        let m = m.borrow();
+        if m.freed.is_empty() {
+            return Vec::new();
+        }
+        internals
+            .holders
+            .keys()
+            .copied()
+            .filter(|id| m.freed.contains(id))
+            .collect()
+    });
+    for id in freed {
+        if let Some(holder) = internals.holders.remove(&id) {
+            HOLDER_MAPS.with(|m| forget_entry(&mut m.borrow_mut(), id));
+            q::JS_FreeValueRT(rt, holder);
+        }
+    }
+}
 
 unsafe fn class(
     rt: *mut q::JSRuntime,
@@ -123,7 +175,7 @@ unsafe fn holder_map_class(rt: *mut q::JSRuntime) -> q::JSClassID {
         &HOLDER_MAP_CLASS,
         q::JSClassDef {
             class_name: c"CrossOriginPropertyHolderMap".as_ptr(),
-            finalizer: None,
+            finalizer: Some(holder_map_finalize),
             gc_mark: None,
             call: None,
             exotic: ptr::null_mut(),
@@ -140,9 +192,26 @@ unsafe extern "C" fn internals_finalize(rt: *mut q::JSRuntime, val: q::JSValue) 
     let data = q::JS_GetOpaque(val, *INTERNALS_CLASS.get().unwrap()) as *mut Internals;
     if !data.is_null() {
         let data = Box::from_raw(data);
+        let _ = HOLDER_MAPS.try_with(|m| {
+            let mut m = m.borrow_mut();
+            for id in data.holders.keys() {
+                forget_entry(&mut m, *id);
+            }
+        });
         for v in data.intrinsics.iter().chain(data.holders.values()) {
             q::JS_FreeValueRT(rt, *v);
         }
+    }
+}
+
+unsafe extern "C" fn holder_map_finalize(_rt: *mut q::JSRuntime, val: q::JSValue) {
+    if let Some(id) = holder_map_id(val) {
+        let _ = HOLDER_MAPS.try_with(|m| {
+            let mut m = m.borrow_mut();
+            if m.entries.contains_key(&id) {
+                m.freed.insert(id);
+            }
+        });
     }
 }
 
@@ -263,6 +332,7 @@ pub(crate) unsafe fn holder(
 ) -> Option<q::JSValue> {
     let id = holder_map_id(map)?;
     let internals = internals_of(key)?;
+    purge(rt, internals);
     Some(match internals.holders.get(&id) {
         Some(&v) => q::JS_DupValueRT(rt, v),
         None => q::JS_UNDEFINED,
@@ -280,8 +350,10 @@ pub(crate) unsafe fn set_holder(
     let (Some(id), Some(internals)) = (holder_map_id(map), internals_of(key)) else {
         return false;
     };
-    if let Some(old) = internals.holders.insert(id, q::JS_DupValueRT(rt, value)) {
-        q::JS_FreeValueRT(rt, old);
+    purge(rt, internals);
+    match internals.holders.insert(id, q::JS_DupValueRT(rt, value)) {
+        Some(old) => q::JS_FreeValueRT(rt, old),
+        None => HOLDER_MAPS.with(|m| *m.borrow_mut().entries.entry(id).or_default() += 1),
     }
     true
 }

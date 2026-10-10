@@ -1501,16 +1501,12 @@ pub(crate) unsafe fn GetWeakMapEntry(
     val: root::JS::MutableHandleValue,
 ) -> bool {
     let cx = Cx::from_raw(cx);
-    match intrinsics::holder(cx.rt, obj_val(*mapObj.ptr), (*key.ptr).to_qjs()) {
-        Some(v) => set_result(cx, v, val),
-        None => {
-            q::JS_ThrowTypeError(
-                cx.qctx(),
-                c"not a cross-origin property holder map".as_ptr(),
-            );
-            false
-        }
-    }
+    let (map, key) = (obj_val(*mapObj.ptr), (*key.ptr).to_qjs());
+    let v = match intrinsics::holder(cx.rt, map, key) {
+        Some(v) => v,
+        None => call_method(cx, CLASS_WEAKMAP, c"get", map, &[key]),
+    };
+    set_result(cx, v, val)
 }
 
 pub(crate) unsafe fn SetWeakMapEntry(
@@ -1520,19 +1516,20 @@ pub(crate) unsafe fn SetWeakMapEntry(
     val: root::JS::HandleValue,
 ) -> bool {
     let cx = Cx::from_raw(cx);
-    if intrinsics::set_holder(
-        cx.rt,
+    let (map, key, val) = (
         obj_val(*mapObj.ptr),
         (*key.ptr).to_qjs(),
         (*val.ptr).to_qjs(),
-    ) {
+    );
+    if intrinsics::set_holder(cx.rt, map, key, val) {
         return true;
     }
-    q::JS_ThrowTypeError(
-        cx.qctx(),
-        c"not a cross-origin property holder map".as_ptr(),
-    );
-    false
+    let r = call_method(cx, CLASS_WEAKMAP, c"set", map, &[key, val]);
+    if is_exception(r) {
+        return false;
+    }
+    q::JS_FreeValueRT(cx.rt, r);
+    true
 }
 
 // Date.

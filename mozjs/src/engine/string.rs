@@ -1617,7 +1617,7 @@ unsafe fn symbol_to_source(cx: &mut Cx, sym: q::JSValue, out: &mut Vec<u16>) -> 
     let well_known = (0..root::JS::SymbolCode::Limit as usize)
         .any(|code| super::well_known_symbol_atom(cx, code) == atom);
     q::JS_FreeAtomRT(cx.rt, atom);
-    let desc = q::JS_GetPropertyStr(qctx, sym, c"description".as_ptr());
+    let desc = super::property::symbol_description(cx, sym);
     if desc.tag() == q::JS_TAG_EXCEPTION {
         return false;
     }
@@ -1625,14 +1625,13 @@ unsafe fn symbol_to_source(cx: &mut Cx, sym: q::JSValue, out: &mut Vec<u16>) -> 
     if well_known {
         ok = append_to_string(cx, out, desc);
     } else {
-        let global = q::JS_GetGlobalObject(qctx);
-        let ctor = q::JS_GetPropertyStr(qctx, global, c"Symbol".as_ptr());
-        let key_for = q::JS_GetPropertyStr(qctx, ctor, c"keyFor".as_ptr());
+        let key_for = super::intrinsics::get(
+            cx,
+            super::intrinsics::Intrinsic::Global(c"Symbol", Some(c"keyFor")),
+        );
         let mut args = [sym];
-        let key = q::JS_Call(qctx, key_for, ctor, 1, args.as_mut_ptr());
-        for v in [key_for, ctor, global] {
-            q::JS_FreeValueRT(cx.rt, v);
-        }
+        let key = q::JS_Call(qctx, key_for, q::JS_UNDEFINED, 1, args.as_mut_ptr());
+        q::JS_FreeValueRT(cx.rt, key_for);
         if key.tag() == q::JS_TAG_EXCEPTION {
             ok = false;
         } else {

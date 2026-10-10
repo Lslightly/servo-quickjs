@@ -11,17 +11,19 @@ use std::sync::LazyLock;
 
 use mozjs::context::JSContext;
 use mozjs::jsapi::{
-    ClippedTime, Heap, JSObject, OnNewGlobalHookOption, RegExpFlags, JSPROP_ENUMERATE,
+    ClippedTime, GCReason, Heap, JSFunctionSpec, JSNativeWrapper, JSObject, JSPropertySpec_Name,
+    OnNewGlobalHookOption, RegExpFlags, JSPROP_ENUMERATE,
 };
-use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
+use mozjs::jsval::{Int32Value, JSVal, ObjectValue, StringValue, UndefinedValue};
 use mozjs::quickjs::{drain_autorelease_pool, realm_count};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     DateGetMsecSinceEpoch, ExecuteRegExpNoStatics, GetRealmKeyObject, GetWeakMapEntry,
-    JS_DefineProperty, JS_NewGlobalObject, JS_ParseJSONWithReviver, JS_ValueToObject, MapGet,
-    MapHas, MapSet, MapSize, NewDateObject, NewMapObject, NewSetObject, NewUCRegExpObject,
-    NewWeakMapObject, SetAdd, SetHas, SetSize, SetWeakMapEntry, JS_GC,
+    JS_DefineFunctions, JS_DefineProperty, JS_NewGlobalObject, JS_NewPlainObject,
+    JS_ParseJSONWithReviver, JS_ValueToObject, JS_ValueToSource, MapGet, MapHas, MapSet, MapSize,
+    NewDateObject, NewMapObject, NewSetObject, NewUCRegExpObject, NewWeakMapObject, SetAdd, SetHas,
+    SetSize, SetWeakMapEntry, JS_GC,
 };
 use mozjs::rust::{
     evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
@@ -55,6 +57,17 @@ unsafe fn eval(cx: &mut JSContext, global: HandleObject, src: &str) -> JSVal {
     rval.get()
 }
 
+unsafe fn set_global(cx: &mut JSContext, global: HandleObject, name: &std::ffi::CStr, v: JSVal) {
+    rooted!(&in(cx) let v = v);
+    assert!(JS_DefineProperty(
+        cx,
+        global,
+        name.as_ptr(),
+        v.handle(),
+        JSPROP_ENUMERATE as u32
+    ));
+}
+
 /// Replaces the builtins the shim used to look up by name with functions that record the call.
 const REPLACE_BUILTINS: &str = r#"
     globalThis.calls = [];
@@ -71,6 +84,8 @@ const REPLACE_BUILTINS: &str = r#"
         Object.defineProperty(ctor.prototype, "size", { get: spy(`${ctor.name}.size`) });
         ctor.prototype.constructor = spy(ctor.name);
     }
+    Object.defineProperty(Symbol.prototype, "description", { get: spy("Symbol.description") });
+    Symbol.keyFor = spy("Symbol.keyFor");
     JSON.parse = spy("JSON.parse");
     Object.prototype.constructor = spy("Object.prototype.constructor");
     globalThis.Object = spy("Object");
@@ -141,7 +156,78 @@ fn replaced_builtins_are_not_called() {
         ));
         assert!(out.get().is_object());
 
+        rooted!(&in(cx) let weak_map = eval(cx, global, "new WeakMap()").to_object());
+        rooted!(&in(cx) let weak_key = ObjectValue(JS_NewPlainObject(cx)));
+        assert!(SetWeakMapEntry(
+            cx,
+            weak_map.handle(),
+            weak_key.handle(),
+            value.handle()
+        ));
+        assert!(GetWeakMapEntry(
+            cx,
+            weak_map.handle(),
+            weak_key.handle(),
+            out.handle_mut()
+        ));
+        assert_eq!(out.get().to_int32(), 42);
+
+        for (symbol, expected) in [
+            ("Symbol('a')", "Symbol(\"a\")"),
+            ("Symbol.for('b')", "Symbol.for(\"b\")"),
+        ] {
+            rooted!(&in(cx) let sym = eval(cx, global, symbol));
+            let source = JS_ValueToSource(cx, sym.handle());
+            assert!(!source.is_null());
+            set_global(cx, global, c"source", StringValue(&*source));
+            assert!(eval(cx, global, &format!("source === {expected:?}")).to_boolean());
+        }
+
         assert!(eval(cx, global, "calls.length === 0").to_boolean());
+    }
+}
+
+#[test]
+fn self_hosted_array_methods_are_the_originals() {
+    let mut runtime = Runtime::new(ENGINE.clone());
+    let cx = runtime.cx();
+    unsafe {
+        rooted!(&in(cx) let global = new_global(cx));
+        let mut realm = AutoRealm::new_from_handle(cx, global.handle());
+        let (global, cx) = realm.global_and_reborrow();
+        eval(
+            cx,
+            global,
+            "globalThis.orig = [Array.prototype.values, Array.prototype.forEach];",
+        );
+        eval(cx, global, REPLACE_BUILTINS);
+        let spec =
+            |name: &'static std::ffi::CStr, self_hosted: &'static std::ffi::CStr| JSFunctionSpec {
+                name: JSPropertySpec_Name {
+                    string_: name.as_ptr(),
+                },
+                call: JSNativeWrapper {
+                    op: None,
+                    info: ptr::null(),
+                },
+                nargs: 0,
+                flags: 0,
+                selfHostedName: self_hosted.as_ptr(),
+            };
+        let specs = [
+            spec(c"values", c"$ArrayValues"),
+            spec(c"forEach", c"ArrayForEach"),
+            JSFunctionSpec::ZERO,
+        ];
+        rooted!(&in(cx) let obj = JS_NewPlainObject(cx));
+        assert!(JS_DefineFunctions(cx, obj.handle(), specs.as_ptr()));
+        set_global(cx, global, c"obj", ObjectValue(obj.get()));
+        assert!(eval(
+            cx,
+            global,
+            "obj.values === orig[0] && obj.forEach === orig[1]"
+        )
+        .to_boolean());
     }
 }
 
@@ -248,5 +334,68 @@ fn cross_origin_holders_live_in_the_accessing_realm() {
             out.handle_mut()
         ));
         assert!(out.get().is_undefined());
+    }
+}
+
+/// The holders cached under a freed map are freed at the accessing realm's next use of the cache.
+#[test]
+fn holders_of_freed_maps_are_freed() {
+    const N: i32 = 20;
+    let mut runtime = Runtime::new(ENGINE.clone());
+    let cx = runtime.cx();
+    unsafe {
+        let baseline = realm_count();
+        let accessing = Heap::boxed(new_global(cx));
+        for _ in 0..N {
+            rooted!(&in(cx) let target = new_global(cx));
+            let map = {
+                let mut realm = AutoRealm::new_from_handle(cx, target.handle());
+                NewWeakMapObject(&mut realm)
+            };
+            rooted!(&in(cx) let map = map);
+            rooted!(&in(cx) let accessing = accessing.get());
+            let mut realm = AutoRealm::new_from_handle(cx, accessing.handle());
+            let (global, cx) = realm.global_and_reborrow();
+            rooted!(&in(cx) let key = ObjectValue(GetRealmKeyObject(cx)));
+            rooted!(&in(cx) let holder = eval(
+                cx,
+                global,
+                "(() => { const h = { postMessage() {} };
+                          (globalThis.refs ??= []).push(new WeakRef(h)); return h; })()"
+            ));
+            assert!(SetWeakMapEntry(
+                cx,
+                map.handle(),
+                key.handle(),
+                holder.handle()
+            ));
+        }
+        drain_autorelease_pool();
+        JS_GC(cx, GCReason::API);
+        assert_eq!(realm_count(), baseline + 1);
+
+        rooted!(&in(cx) let accessing = accessing.get());
+        let mut realm = AutoRealm::new_from_handle(cx, accessing.handle());
+        let (global, cx) = realm.global_and_reborrow();
+        assert_eq!(
+            eval(cx, global, "refs.filter(r => r.deref()).length").to_int32(),
+            N
+        );
+
+        rooted!(&in(cx) let map = NewWeakMapObject(cx));
+        rooted!(&in(cx) let key = ObjectValue(GetRealmKeyObject(cx)));
+        rooted!(&in(cx) let mut out = UndefinedValue());
+        assert!(GetWeakMapEntry(
+            cx,
+            map.handle(),
+            key.handle(),
+            out.handle_mut()
+        ));
+        drain_autorelease_pool();
+        JS_GC(cx, GCReason::API);
+        assert_eq!(
+            eval(cx, global, "refs.filter(r => r.deref()).length").to_int32(),
+            0
+        );
     }
 }
