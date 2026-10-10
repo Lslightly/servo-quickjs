@@ -7982,6 +7982,17 @@ static JSValue JS_ThrowStackOverflow(JSContext *ctx)
     return JS_ThrowInternalError(ctx, "stack overflow");
 }
 
+/* Servo: whether the native stack is too deep for more recursion, throwing an InternalError if
+   it is, for the host's own recursion over JS structures (Q33) */
+JS_BOOL JS_CheckStackOverflow(JSContext *ctx)
+{
+    if (js_check_stack_overflow(ctx->rt, 0)) {
+        JS_ThrowStackOverflow(ctx);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 static JSValue JS_ThrowTypeErrorNotAnObject(JSContext *ctx)
 {
     return JS_ThrowTypeError(ctx, "not an object");
@@ -30573,6 +30584,11 @@ static JSResolveResultEnum js_resolve_export1(JSContext *ctx,
 
     *pmodule = NULL;
     *pme = NULL;
+    /* Servo: it recurses over indirect and star exports (Q33) */
+    if (js_check_stack_overflow(ctx->rt, 0)) {
+        JS_ThrowStackOverflow(ctx);
+        return JS_RESOLVE_RES_EXCEPTION;
+    }
     if (find_resolve_entry(s, m, export_name) >= 0)
         return JS_RESOLVE_RES_CIRCULAR;
     if (add_resolve_entry(ctx, s, m, export_name) < 0)
@@ -30741,6 +30757,11 @@ static __exception int get_exported_names(JSContext *ctx,
     ExportedNameEntry *en;
     int i, j;
 
+    /* Servo: it recurses over the star exports (Q33) */
+    if (js_check_stack_overflow(ctx->rt, 0)) {
+        JS_ThrowStackOverflow(ctx);
+        return -1;
+    }
     /* check circular reference */
     for(i = 0; i < s->modules_count; i++) {
         if (s->modules[i] == m)
@@ -31026,6 +31047,12 @@ static int js_create_module_function(JSContext *ctx, JSModuleDef *m)
 
     if (m->func_created)
         return 0;
+
+    /* Servo: it recurses over the module graph (Q33) */
+    if (js_check_stack_overflow(ctx->rt, 0)) {
+        JS_ThrowStackOverflow(ctx);
+        return -1;
+    }
 
     is_c_module = (m->init_func != NULL);
 

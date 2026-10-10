@@ -1067,6 +1067,9 @@ void JS_SetIsErrorHook(JSRuntime *rt, JSIsErrorHook *hook);
    in any order, so finalizers must not reach the other objects of the cycle (SpiderMonkey's
    finalization during GC). */
 JS_BOOL JS_IsCollectingCycles(JSRuntime *rt);
+/* Servo: whether the native stack is too deep for more recursion; if so, throws an
+   InternalError ("stack overflow") and returns TRUE. For the host's own recursion. */
+JS_BOOL JS_CheckStackOverflow(JSContext *ctx);
 /* Servo: the realm 'obj' was created in, where known (functions and proxies); NULL otherwise */
 JSContext *JS_GetObjectRealm(JSValueConst obj);
 /* Servo: debug hook called when an object is freed, before its finalizer */

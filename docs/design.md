@@ -203,6 +203,7 @@ The cost is memory: values stay alive until the end of the task.
 | Q30 | Promise user input state (`JS_Get/SetPromiseUserInputState`, SpiderMonkey's `PromiseUserInputEventHandlingState`): kept in the promise, copied by `then()` (and `JS_PerformPromiseThen`) to the promise it creates, which the reaction records; the enqueue hook (Q4) receives that promise, or the promise to resolve for thenable jobs | small |
 | Q31 | Scripts as referrers of module loads: the code of the innermost scripted frame (`JS_GetActiveScript`), the code of a JavaScript module (`JS_GetModuleScript`), and the module a code belongs to (`JS_GetScriptModule`) | small |
 | Q32 | HostMakeJobCallback: a host hook (`JS_SetHostMakeJobCallbackHook`) is called when `then()` or `await` creates a promise reaction; the reaction keeps its result and the enqueue hook (Q4) receives it with the job, so the incumbent global is that of the reaction's creation | small |
+| Q33 | Native stack checks where module linking recurses over the module graph without one (`js_create_module_function`, `get_exported_names`, `js_resolve_export1`), and `JS_CheckStackOverflow` for the host's own recursion | small |
 
 ## Not supported
 
