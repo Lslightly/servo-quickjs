@@ -44,8 +44,9 @@ wpt log *tests:
 fuzz_target := absolute_path(env_var_or_default("FUZZ_TARGET_DIR", target + "/fuzz"))
 
 # Fuzz a target (clone_read, eval, strings) under ASan, QuickJS's C code included; extra args go to libFuzzer.
+# The host target is passed explicitly: a prebuilt cargo-fuzz (a musl binary) defaults to its own target.
 fuzz target *args:
-    CC={{clang}} CXX={{clangxx}} CFLAGS="-fsanitize=address,fuzzer-no-link" LIBCLANG_PATH={{libclang}} CARGO_TARGET_DIR={{fuzz_target}} cargo +nightly fuzz run {{target}} fuzz/corpus/{{target}} -- {{args}}
+    CC={{clang}} CXX={{clangxx}} CFLAGS="-fsanitize=address,fuzzer-no-link" LIBCLANG_PATH={{libclang}} CARGO_TARGET_DIR={{fuzz_target}} cargo +nightly fuzz run --target "$(rustc +nightly -vV | sed -n 's/^host: //p')" {{target}} fuzz/corpus/{{target}} -- {{args}}
 
 # Run each fuzz target for `seconds` from its corpus.
 fuzz-smoke seconds="60":
