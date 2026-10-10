@@ -46,6 +46,14 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: just
+      # tools/lsan.supp matches function names, so the sanitizer reports must be symbolized.
+      - name: Symbolizer for sanitizer reports
+        run: |
+          if ! command -v "${CLANG/clang/llvm-symbolizer}" > /dev/null; then
+            sudo apt-get update && sudo apt-get install -y "${CLANG/clang/llvm}"
+          fi
+          symbolizer=$(command -v "${CLANG/clang/llvm-symbolizer}")
+          echo "ASAN_SYMBOLIZER_PATH=$symbolizer" >> "$GITHUB_ENV"
       - name: Tests under ASan and LSan
         run: just test-asan
 
@@ -57,5 +65,13 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: just,cargo-fuzz
+      # tools/lsan.supp matches function names, so the sanitizer reports must be symbolized.
+      - name: Symbolizer for sanitizer reports
+        run: |
+          if ! command -v "${CLANG/clang/llvm-symbolizer}" > /dev/null; then
+            sudo apt-get update && sudo apt-get install -y "${CLANG/clang/llvm}"
+          fi
+          symbolizer=$(command -v "${CLANG/clang/llvm-symbolizer}")
+          echo "ASAN_SYMBOLIZER_PATH=$symbolizer" >> "$GITHUB_ENV"
       - name: Fuzz each target for a minute
         run: just fuzz-smoke 60
