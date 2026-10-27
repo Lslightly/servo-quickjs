@@ -169,6 +169,24 @@ impl Cx {
         } else {
             qv
         };
+        // Per-object event for servoshell's event flame graph (`SERVO_EVENT_FLAME_DIR`); the
+        // target and the `tag`/`ptr` fields must match `event_flame.rs` there. The event name
+        // tells how the value entered the pool.
+        let event = match pooled {
+            Pooled::Borrowed => "retain_borrowed_pool",
+            Pooled::Root => "retain_root_pool",
+            Pooled::Result => "adopt_result_pool",
+            Pooled::Deferred => unreachable!(),
+        };
+        tracing::trace!(
+            target: "mozjs_gc",
+            {
+                tag = qv.tag(),
+                ptr = qv.ptr() as usize,
+                class = unsafe { class_name(qv) }.unwrap_or(""),
+            },
+            "{}", event,
+        );
         self.push_pool(qv, pooled);
         JSVal::from_qjs(qv)
     }
@@ -196,6 +214,29 @@ impl Cx {
             #[cfg(qjs_pool_stats)]
             pool_stats::popped(v);
             verify::pooled(v, -1);
+            // The pool's reference is often the last one; `release_object` cannot see this
+            // release, so tell the event flame graph the object is gone here.
+            if unsafe { q::JS_GetRefCount(v) } == 1 {
+                tracing::trace!(
+                    target: "mozjs_gc",
+                    {
+                        tag = v.tag(),
+                        ptr = v.ptr() as usize,
+                        class = unsafe { class_name(v) }.unwrap_or(""),
+                    },
+                    "drop_object_pool",
+                );
+            } else {
+                tracing::trace!(
+                    target: "mozjs_gc",
+                    {
+                        tag = v.tag(),
+                        ptr = v.ptr() as usize,
+                        class = unsafe { class_name(v) }.unwrap_or(""),
+                    },
+                    "JS_FreeValue_object_pool",
+                )
+            }
             unsafe { q::JS_FreeValueRT(self.rt, v) };
         }
         while self.atom_pool.len() > mark.1 {
@@ -297,6 +338,15 @@ pub(crate) unsafe fn retain_rooted(
 /// See `crate::quickjs::retain_object`.
 #[inline]
 pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
+    tracing::trace!(
+        target: "mozjs_gc",
+        {
+            tag = q::JS_TAG_OBJECT,
+            ptr = obj as usize,
+            class = class_name(obj_val(obj)).unwrap_or(""),
+        },
+        "retain_object",
+    );
     q::JS_DupValueRT(current().rt, obj_val(obj));
     verify::count(obj_val(obj), 1);
 }
@@ -313,8 +363,28 @@ pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
         // borrow that the target's finalizer takes too). In a cycle collection, the object may
         // belong to the cycle being freed and must go with it.
         if q::JS_GetRefCount(v) == 1 && q::JS_IsCollectingCycles(cx.rt) == 0 {
+            // Lets the event flame graph evict this object first, and use this time as the end
+            // of its timeline.
+            tracing::trace!(
+                target: "mozjs_gc",
+                {
+                    tag = q::JS_TAG_OBJECT,
+                    ptr = obj as usize,
+                    class = class_name(v).unwrap_or(""),
+                },
+                "push_to_defer_pool",
+            );
             cx.push_pool(v, Pooled::Deferred);
         } else {
+            tracing::trace!(
+                target: "mozjs_gc",
+                {
+                    tag = q::JS_TAG_OBJECT,
+                    ptr = obj as usize,
+                    class = class_name(v).unwrap_or(""),
+                },
+                "release_JS_FreeValue",
+            );
             q::JS_FreeValueRT(cx.rt, v);
         }
     }

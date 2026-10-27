@@ -31,6 +31,9 @@ libc = "0.2"
 log = "0.4"
 num-traits = "0.2"
 servo-quickjs = { path = "../servo-quickjs" }
+# Only used for the `mozjs_gc` events that servoshell's event flame graph collects; the macros
+# compile to a cheap interest check when no subscriber enables the target.
+tracing = { version = "0.1", default-features = false, features = ["std"] }
 
 [build-dependencies]
 cc = "1.2"
