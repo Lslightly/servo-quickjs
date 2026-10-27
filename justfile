@@ -1,5 +1,5 @@
 # A Servo checkout with the `js-quickjs` feature, and the cargo target dirs of Servo and of this repo.
-servo := absolute_path(env_var_or_default("SERVO_DIR", justfile_directory() + "/../servo"))
+servo := absolute_path(env_var_or_default("SERVO_DIR", justfile_directory() + "/../servo-ohos"))
 servo_target := absolute_path(env_var_or_default("SERVO_TARGET_DIR", servo + "/target"))
 target := absolute_path(env_var_or_default("QJS_TARGET_DIR", justfile_directory() + "/target"))
 libclang := env_var_or_default("LIBCLANG_PATH", "/usr/lib/llvm-18/lib")
