@@ -15,6 +15,22 @@
 //! appends a JSON line to `QJS_POOL_STATS_OUT` (default `qjs-pool-stats-<pid>.jsonl` in the
 //! temporary directory) when it is destroyed, and a snapshot every 10 s before that, for processes
 //! that are killed (WPT); `tools/pool_stats.py` keeps the last line of each runtime.
+//!
+//! With `QJS_POOL_STATS_FLAME` set (a path, empty for the temporary directory), every
+//! `QJS_POOL_STATS_FLAME_SAMPLE`-th (default 1000, 0 for none) push also records a backtrace, and
+//! a folded stack file (`qjs-pool-flame-<pid>.folded`) is rewritten at each snapshot:
+//!
+//! ```text
+//! main;servo::script::run_script;mozjs::…;result 17
+//! ```
+//!
+//! The frames are the Rust code that pushed the value — for `adopt`/`retain`/`retain_rooted`
+//! alike, since they all push through `Cx::push_pool` — and the last one is the kind. That is the
+//! format `tracing-flame` writes and `inferno-flamegraph` reads:
+//!
+//! ```sh
+//! inferno-flamegraph qjs-pool-flame-<pid>.folded > pool.svg
+//! ```
 
 use std::backtrace::Backtrace;
 use std::cell::RefCell;
@@ -69,6 +85,12 @@ struct State {
     samples: Vec<(&'static str, &'static str, Backtrace)>,
     /// The symbolized samples: how many per function, fate and calling frames.
     callers: HashMap<(&'static str, &'static str, Vec<String>), u64>,
+    /// Sampled backtraces of pushes, not symbolized yet, with the kind they pushed.
+    flame_samples: Vec<(Kind, Backtrace)>,
+    /// The symbolized flame samples: how many per kind and calling frames.
+    flame: HashMap<(Kind, Vec<String>), u64>,
+    flame_every: Option<u64>,
+    since_flame: u64,
     pushes: [u64; 4],
     tasks: u64,
     max_len: usize,
@@ -123,6 +145,29 @@ impl State {
         self.since_sample = 0;
         true
     }
+
+    /// Whether this push should record a backtrace for the flame graph. Off unless
+    /// `QJS_POOL_STATS_FLAME` names an output.
+    fn flame_sample(&mut self) -> bool {
+        let every = *self.flame_every.get_or_insert_with(|| {
+            if std::env::var_os("QJS_POOL_STATS_FLAME").is_none() {
+                return 0;
+            }
+            std::env::var("QJS_POOL_STATS_FLAME_SAMPLE")
+                .ok()
+                .and_then(|n| n.parse().ok())
+                .unwrap_or(1000)
+        });
+        if every == 0 {
+            return false;
+        }
+        self.since_flame += 1;
+        if self.since_flame < every {
+            return false;
+        }
+        self.since_flame = 0;
+        true
+    }
 }
 
 /// Records a value pushed onto the pool; `v` has a reference count.
@@ -147,6 +192,12 @@ pub(crate) fn pushed(v: q::JSValue, kind: Kind, site: &'static Location<'static>
         }
         let fresh = kind == Kind::Result && unsafe { q::JS_GetRefCount(v) } == 1;
         let backtrace = (raw && kind == Kind::Result && s.sample()).then(Backtrace::force_capture);
+        // `adopt_as`, `retain_as` and `release_object` all push through here, so one capture
+        // covers all three, with the kind telling them apart.
+        if s.flame_sample() {
+            let backtrace = Backtrace::force_capture();
+            s.flame_samples.push((kind, backtrace));
+        }
         s.entries.push(Entry {
             api,
             raw,
@@ -236,6 +287,9 @@ pub(crate) fn json(final_: bool) -> String {
         for (api, fate, backtrace) in std::mem::take(&mut s.samples) {
             *s.callers.entry((api, fate, callers(&backtrace))).or_default() += 1;
         }
+        for (kind, backtrace) in std::mem::take(&mut s.flame_samples) {
+            *s.flame.entry((kind, frames(&backtrace))).or_default() += 1;
+        }
         let s = &*s;
         let mut out = String::new();
         let thread = std::thread::current();
@@ -323,6 +377,49 @@ fn write(final_: bool) {
         }
         Err(e) => eprintln!("qjs-pool-stats: can't write {}: {e}", path.display()),
     }
+    write_flame();
+}
+
+/// Rewrites the folded stacks that `inferno-flamegraph` reads, truncating: they hold every push
+/// so far. Only when `QJS_POOL_STATS_FLAME` is set.
+fn write_flame() {
+    let Some(path) = std::env::var_os("QJS_POOL_STATS_FLAME").map(|p| {
+        if p.is_empty() {
+            std::env::temp_dir().join(format!("qjs-pool-flame-{}.folded", std::process::id()))
+        } else {
+            Path::new(&p).to_owned()
+        }
+    }) else {
+        return;
+    };
+    let flame = flame();
+    match std::fs::write(&path, &flame) {
+        Ok(()) if !flame.is_empty() => {
+            eprintln!("qjs-pool-stats: flame graph data in {}", path.display());
+        }
+        Ok(()) => {}
+        Err(e) => eprintln!("qjs-pool-stats: can't write {}: {e}", path.display()),
+    }
+}
+
+/// The sampled pushes as folded stacks, one per line: the Rust frames that pushed the value,
+/// oldest first, then the kind.
+fn flame() -> String {
+    let flame = STATE.try_with(|s| {
+        let s = &*s.borrow();
+        let mut lines: Vec<(String, &str, u64)> = s
+            .flame
+            .iter()
+            .map(|((kind, frames), n)| (frames.join(";"), KINDS[*kind as usize], *n))
+            .collect();
+        lines.sort_unstable();
+        let mut out = String::new();
+        for (frames, kind, n) in lines {
+            let _ = writeln!(out, "{frames};{kind} {n}");
+        }
+        out
+    });
+    flame.unwrap_or_default()
 }
 
 /// The first frames of `backtrace` outside the shim and the standard library: the Rust code that
@@ -330,6 +427,20 @@ fn write(final_: bool) {
 /// (the shim's repository, its generated bindings, the standard library) for generic code and
 /// closures whose symbols name another crate.
 fn callers(backtrace: &Backtrace) -> Vec<String> {
+    let mut frames = symbols(backtrace);
+    frames.truncate(3);
+    frames
+}
+
+/// Every frame of `backtrace` outside the shim and the standard library, innermost first: a
+/// folded stack from the Rust code that pushed the value out to its entry point.
+fn frames(backtrace: &Backtrace) -> Vec<String> {
+    let mut frames = symbols(backtrace);
+    frames.reverse();
+    frames
+}
+
+fn symbols(backtrace: &Backtrace) -> Vec<String> {
     const SKIP_SYMBOLS: &[&str] = &[
         "std::",
         "core::",
@@ -376,9 +487,6 @@ fn callers(backtrace: &Backtrace) -> Vec<String> {
             Some(location) => format!("{symbol} ({location})"),
             None => symbol.to_owned(),
         });
-        if frames.len() == 3 {
-            break;
-        }
     }
     frames
 }

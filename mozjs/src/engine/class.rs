@@ -125,6 +125,22 @@ pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass
     id
 }
 
+/// The name of `v`'s SpiderMonkey class (`"HTMLDivElement"`, ...), e.g. for the event flame graph.
+///
+/// `None` for values that are not objects of a registered SM class (strings, BigInts, plain
+/// objects, ...). The name points into the class's static definition, so it lives for the process.
+pub(crate) unsafe fn class_name(v: q::JSValue) -> Option<&'static str> {
+    let clasp = clasp_of_id(q::JS_GetClassID(v));
+    if clasp.is_null() {
+        return None;
+    }
+    let name = (*clasp).name;
+    if name.is_null() {
+        return None;
+    }
+    std::ffi::CStr::from_ptr(name).to_str().ok()
+}
+
 #[inline]
 fn clasp_of_id(id: q::JSClassID) -> *const root::JSClass {
     match CLASPS_BY_ID.get(id as usize) {
