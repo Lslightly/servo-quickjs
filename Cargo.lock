@@ -304,6 +304,7 @@ name = "servo-quickjs"
 version = "0.1.0"
 dependencies = [
  "cc",
+ "tracing",
 ]
 
 [[package]]
