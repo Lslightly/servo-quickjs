@@ -15,3 +15,6 @@ dump-leaks = []
 
 [build-dependencies]
 cc = "1.2"
+
+[dependencies]
+tracing = { version = "0.1", default-features = false, features = ["std"] }
