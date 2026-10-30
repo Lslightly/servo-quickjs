@@ -58,6 +58,7 @@ pub(crate) unsafe fn JS_DestroyContext(raw: *mut root::JSContext) {
     cx.drain_pool((0, 0));
     q::JS_FreeValueRT(cx.rt, cx.base_key_object.replace(q::JS_UNDEFINED));
     q::JS_FreeContext(cx.base_ctx);
+    tracing::trace!(target: "mozjs_gc", "JS_DestroyContext");
     // Frees every object and realm (realms with their contexts, patch Q15).
     q::JS_FreeRuntime(cx.rt);
     super::realm::forget_leaked_realms();

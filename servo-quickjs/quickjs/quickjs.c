@@ -2516,6 +2516,46 @@ void JS_FreeRuntime(JSRuntime *rt)
     struct list_head *el, *el1;
     int i;
 
+#ifndef DUMP_LEAKS
+    /* leaking objects */
+    {
+        BOOL header_done;
+        JSGCObjectHeader *p;
+        int count;
+
+        // /* remove the internal refcounts to display only the object
+        //    referenced externally */
+        // list_for_each(el, &rt->gc_obj_list) {
+        //     p = list_entry(el, JSGCObjectHeader, link);
+        //     js_rc(p)->mark = 0;
+        // }
+        // gc_decref(rt);
+
+        header_done = FALSE;
+        list_for_each(el, &rt->gc_obj_list) {
+            p = list_entry(el, JSGCObjectHeader, link);
+            if (js_rc(p)->ref_count != 0) {
+                if (!header_done) {
+                    printf("Object leaks:\n");
+                    JS_DumpObjectHeader(rt);
+                    header_done = TRUE;
+                }
+                JS_DumpGCObject(rt, p);
+            }
+        }
+
+        count = 0;
+        list_for_each(el, &rt->gc_obj_list) {
+            p = list_entry(el, JSGCObjectHeader, link);
+            if (js_rc(p)->ref_count == 0) {
+                count++;
+            }
+        }
+        if (count != 0)
+            printf("Secondary object leaks: %d\n", count);
+    }
+#endif
+
     js_free_rt(rt, rt->proto_cache);
     rt->proto_cache = NULL;
 

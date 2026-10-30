@@ -224,7 +224,8 @@ impl Cx {
                         ptr = v.ptr() as usize,
                         class = unsafe { class_name(v) }.unwrap_or(""),
                     },
-                    "drop_object_pool",
+                    "drop_object_pool {:p}",
+                    v.ptr(),
                 );
             } else {
                 tracing::trace!(
@@ -234,7 +235,8 @@ impl Cx {
                         ptr = v.ptr() as usize,
                         class = unsafe { class_name(v) }.unwrap_or(""),
                     },
-                    "JS_FreeValue_object_pool",
+                    "JS_FreeValue_object_pool {:p}",
+                    v.ptr(),
                 )
             }
             unsafe { q::JS_FreeValueRT(self.rt, v) };
