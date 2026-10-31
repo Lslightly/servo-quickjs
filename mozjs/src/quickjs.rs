@@ -85,7 +85,7 @@ impl Drop for AutoreleasePoolScope {
                 self.mark.0 <= len.0 && self.mark.1 <= len.1,
                 "AutoreleasePoolScope outlived a drain below its mark"
             );
-            cx.drain_pool(self.mark);
+            cx.drain_pool(self.mark, crate::engine::DrainContext::ScopeDrop);
         }
     }
 }

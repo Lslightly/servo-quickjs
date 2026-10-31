@@ -5,6 +5,11 @@
 //! Autorelease pool statistics, built with `QJS_POOL_STATS=1`: which API functions put values in
 //! the pool, and what became of each value by the time the pool drained.
 //!
+//! `Cx::drain_pool` is also timed, per `DrainContext` (why it ran: a scope dropped, a native call
+//! returned, a task ended, …). Each kind gets a count, a total, a maximum and a histogram of the
+//! durations in four buckets per power of two (`drained`). Empty drains are counted separately
+//! and not timed: they are the common case, and the clock reads would be most of their cost.
+//!
 //! - **rooted**: a `Rooted` or handle write took the value (`retain_rooted`);
 //! - **kept**: not rooted, but something else held it when the pool drained (a `Heap`, a
 //!   `Dom<T>`, a JS object);
@@ -44,9 +49,19 @@ use std::time::{Duration, Instant};
 
 use servo_quickjs as q;
 
-use super::Pooled as Kind;
+use super::{DrainContext, Pooled as Kind};
 
 const KINDS: [&str; 4] = ["result", "borrowed", "root", "deferred"];
+
+const CONTEXTS: [DrainContext; DrainContext::COUNT] = [
+    DrainContext::ScopeDrop,
+    DrainContext::NativeCall,
+    DrainContext::RuntimeDestroy,
+    DrainContext::ProxyTrap,
+    DrainContext::JobCallback,
+    DrainContext::JobRun,
+    DrainContext::Task,
+];
 
 struct Entry {
     api: &'static str,
@@ -70,6 +85,71 @@ struct Counts {
 
 type Key = (&'static str, bool, Option<&'static Location<'static>>, Kind);
 
+/// Four buckets per power of two, exact below 4 ns; the last covers `2^63` ns and above.
+const HIST_BUCKETS: usize = 252;
+
+struct DrainStats {
+    calls: u64,
+    /// Calls that found nothing to release (not timed).
+    empty: u64,
+    total_ns: u64,
+    max_ns: u64,
+    /// Values released, summed over the timed calls.
+    values: u64,
+    hist: Box<[u64]>,
+}
+
+impl Default for DrainStats {
+    fn default() -> Self {
+        Self {
+            calls: 0,
+            empty: 0,
+            total_ns: 0,
+            max_ns: 0,
+            values: 0,
+            hist: vec![0; HIST_BUCKETS].into_boxed_slice(),
+        }
+    }
+}
+
+/// The bucket `ns` falls in: exact below 4, then four per power of two.
+fn bucket(ns: u64) -> usize {
+    if ns < 4 {
+        return ns as usize;
+    }
+    let e = 63 - ns.leading_zeros() as usize;
+    e * 4 + ((ns >> (e - 2)) & 0b11) as usize - 4
+}
+
+/// The smallest duration `bucket(i)` holds, in nanoseconds.
+fn bucket_lo(i: usize) -> u64 {
+    if i < 4 {
+        return i as u64;
+    }
+    let bits = i + 4;
+    let e = bits / 4;
+    let sub = bits % 4;
+    ((4 + sub) as u64) << (e - 2)
+}
+
+/// Records one `drain_pool` call. `elapsed` is `None` when it found nothing to release; `values`
+/// is how many pool entries it freed (atoms are not counted).
+pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: u64) {
+    let _ = STATE.try_with(|s| {
+        let stats = &mut s.borrow_mut().drains[context as usize];
+        stats.calls += 1;
+        let Some(elapsed) = elapsed else {
+            stats.empty += 1;
+            return;
+        };
+        let ns = u64::try_from(elapsed.as_nanos()).unwrap_or(u64::MAX);
+        stats.total_ns += ns;
+        stats.max_ns = stats.max_ns.max(ns);
+        stats.values += values;
+        stats.hist[bucket(ns)] += 1;
+    });
+}
+
 #[derive(Default)]
 struct State {
     /// The API function running (its name, and whether it returns a raw GC pointer).
@@ -92,6 +172,8 @@ struct State {
     flame_every: Option<u64>,
     since_flame: u64,
     pushes: [u64; 4],
+    /// Time of `drain_pool`, indexed by `DrainContext`.
+    drains: [DrainStats; DrainContext::COUNT],
     tasks: u64,
     max_len: usize,
     sum_len: u64,
@@ -339,6 +421,35 @@ pub(crate) fn json(final_: bool) -> String {
                 string(api),
                 frames.join(","),
             );
+        }
+        out.push_str("],\"drains\":[");
+        for (i, context) in CONTEXTS.iter().enumerate() {
+            let d = &s.drains[*context as usize];
+            let _ = write!(
+                out,
+                "{}{{\"ctx\":{},\"calls\":{},\"empty\":{},\"total_ns\":{},\"max_ns\":{},\"values\":{},\"hist\":[",
+                if i == 0 { "" } else { "," },
+                string(context.name()),
+                d.calls,
+                d.empty,
+                d.total_ns,
+                d.max_ns,
+                d.values,
+            );
+            let mut first = true;
+            for (bucket, count) in d.hist.iter().enumerate() {
+                if *count == 0 {
+                    continue;
+                }
+                let _ = write!(
+                    out,
+                    "{}{{\"lo_ns\":{},\"count\":{count}}}",
+                    if first { "" } else { "," },
+                    bucket_lo(bucket),
+                );
+                first = false;
+            }
+            out.push('}');
         }
         out.push_str("]}");
         out
