@@ -9,17 +9,19 @@
 use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
 use std::ffi::{c_void, CStr, CString};
+use std::process::Command;
 use std::ptr::{self, NonNull};
 use std::sync::LazyLock;
 
 use mozjs::context::JSContext;
 use mozjs::conversions::jsstr_to_string;
 use mozjs::glue::{
-    CreateProxyHandler, CreateRustJSPrincipals, CreateWrapperProxyHandler, DestroyRustJSPrincipals,
-    GetProxyHandler, GetProxyHandlerExtra, GetProxyHandlerFamily, GetProxyPrivate,
-    GetProxyReservedSlot, GetRustJSPrincipalsPrivate, GetWindowProxyClass, IsProxyHandlerFamily,
-    IsWrapper, JSPrincipalsCallbacks, JS_GetReservedSlot, NewProxyObject, NewWindowProxy,
-    ProxyTraps, SetProxyPrivate, SetProxyReservedSlot, UncheckedUnwrapObject,
+    CreateForwardingProxyHandler, CreateProxyHandler, CreateRustJSPrincipals,
+    CreateWrapperProxyHandler, DestroyRustJSPrincipals, GetProxyHandler, GetProxyHandlerExtra,
+    GetProxyHandlerFamily, GetProxyPrivate, GetProxyReservedSlot, GetRustJSPrincipalsPrivate,
+    GetWindowProxyClass, IsProxyHandlerFamily, IsWrapper, JSPrincipalsCallbacks,
+    JS_GetReservedSlot, NewProxyObject, NewWindowProxy, ProxyTraps, SetProxyPrivate,
+    SetProxyReservedSlot, UncheckedUnwrapObject,
 };
 use mozjs::jsapi::{
     CheckedUnwrapStatic, Compartment, CompartmentIterResult, GCContext, GCReason,
@@ -28,13 +30,13 @@ use mozjs::jsapi::{
     JSContext as RawJSContext, JSErrNum, JSObject, JSPrincipals, JSTracer, JS_DefinePropertyById,
     JS_DeletePropertyById, JS_DropPrincipals, JS_GetOwnPropertyDescriptorById,
     JS_GlobalObjectTraceHook, JS_HasOwnPropertyById, JS_HoldPrincipals,
-    JS_InitDestroyPrincipalsCallback, JS_IterateCompartments, JS_NewObjectWithGivenProto,
-    JS_SetReservedSlot, JS_TransplantObject, JS_WrapObject, MutableHandle, MutableHandleIdVector,
-    MutableHandleValue as RawMutableHandleValue, ObjectOpResult, OnNewGlobalHookOption,
-    PropertyDescriptor, PropertyKey, SetWindowProxy, SetWindowProxyClass, ToWindowIfWindowProxy,
-    ToWindowProxyIfWindowSlow, JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY,
-    JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN, JSITER_OWNONLY,
-    JSITER_SYMBOLS, JSPROP_ENUMERATE,
+    JS_InitDestroyPrincipalsCallback, JS_IterateCompartments, JS_NewDeadWrapper,
+    JS_NewObjectWithGivenProto, JS_SetReservedSlot, JS_TransplantObject, JS_WrapObject,
+    MutableHandle, MutableHandleIdVector, MutableHandleValue as RawMutableHandleValue,
+    ObjectOpResult, OnNewGlobalHookOption, PropertyDescriptor, PropertyKey, SetWindowProxy,
+    SetWindowProxyClass, ToWindowIfWindowProxy, ToWindowProxyIfWindowSlow,
+    JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK,
+    JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN, JSITER_OWNONLY, JSITER_SYMBOLS, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, PrivateValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -524,6 +526,365 @@ fn dom_proxy_traps() {
         ));
         assert_eq!(v.get().to_int32(), 2);
     });
+}
+
+thread_local! {
+    static FORWARDED_DEFINES: Cell<usize> = const { Cell::new(0) };
+}
+
+/// Defines on the target, counting the calls.
+unsafe extern "C" fn counting_define_property(
+    cx: *mut RawJSContext,
+    proxy: RawHandleObject,
+    id: HandleId,
+    desc: Handle<PropertyDescriptor>,
+    result: *mut ObjectOpResult,
+) -> bool {
+    FORWARDED_DEFINES.with(|c| c.set(c.get() + 1));
+    let mut target = UndefinedValue();
+    GetProxyPrivate(*proxy, &mut target);
+    let target = target.to_object();
+    JS_DefinePropertyById(cx, Handle::from_marked_location(&target), id, desc, result)
+}
+
+#[test]
+fn forwarding_proxy_handler() {
+    with_runtime(|cx| unsafe {
+        rooted!(&in(cx) let global = new_global(cx, &SIMPLE_GLOBAL_CLASS, &RealmOptions::default(), ptr::null_mut()));
+        let mut realm = AutoRealm::new_from_handle(cx, global.handle());
+        let cx = &mut *realm;
+        let traps = ProxyTraps {
+            defineProperty: Some(counting_define_property),
+            ..Default::default()
+        };
+        let handler = CreateForwardingProxyHandler(&traps, &EXTRA as *const u8 as *const c_void);
+        rooted!(&in(cx) let target = eval(cx, global.handle(), "[1, 2, 3]"));
+        let proxy = NewProxyObject(
+            cx.raw_cx(),
+            handler,
+            target.handle().into(),
+            ptr::null_mut(),
+            ptr::null(),
+            true,
+        );
+        assert!(!proxy.is_null());
+        rooted!(&in(cx) let p = proxy);
+        set_global(cx, global.handle(), c"p", ObjectValue(p.get()));
+        set_global(cx, global.handle(), c"t", target.get());
+
+        // In the handler family, with its extra, and not a wrapper.
+        assert!(IsProxyHandlerFamily(p.get()));
+        assert!(!IsWrapper(p.get()));
+        assert_eq!(
+            GetProxyHandlerExtra(p.get()),
+            &EXTRA as *const u8 as *const c_void
+        );
+
+        // Missing traps forward to the target.
+        eval_true(
+            cx,
+            global.handle(),
+            "p[0] === 1 && p.length === 3 && p[5] === undefined",
+        );
+        eval_true(cx, global.handle(), "1 in p && !(5 in p) && 'push' in p");
+        eval_true(cx, global.handle(), "Object.keys(p).join() === '0,1,2'");
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.getPrototypeOf(p) === Array.prototype",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.getOwnPropertyDescriptor(p, 'length').value === 3",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.isExtensible(p) && p.hasOwnProperty(2) && !p.hasOwnProperty(3)",
+        );
+        eval_true(cx, global.handle(), "delete p[2] && !(2 in t)");
+
+        // A trap it has runs instead.
+        FORWARDED_DEFINES.with(|c| c.set(0));
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.defineProperty(p, 'x', { value: 7, configurable: true }); t.x === 7 && p.x === 7",
+        );
+        assert_eq!(FORWARDED_DEFINES.with(Cell::get), 1);
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.preventExtensions(p); !Object.isExtensible(t)",
+        );
+    });
+}
+
+#[test]
+fn is_array_of_proxies() {
+    with_runtime(|cx| unsafe {
+        rooted!(&in(cx) let global = new_global(cx, &SIMPLE_GLOBAL_CLASS, &RealmOptions::default(), ptr::null_mut()));
+        let mut realm = AutoRealm::new_from_handle(cx, global.handle());
+        let cx = &mut *realm;
+        let traps = ProxyTraps::default();
+        let extra = &EXTRA as *const u8 as *const c_void;
+        let handlers = [
+            (c"f", CreateForwardingProxyHandler(&traps, extra)),
+            (c"w", CreateWrapperProxyHandler(&traps)),
+            (c"b", CreateProxyHandler(&traps, extra)),
+        ];
+        let targets = [
+            (c"A", "[1, 2, 3]"),
+            (c"P", "new Proxy([1, 2, 3], {})"),
+            (c"O", "({ 0: 1, 1: 2, 2: 3, length: 3 })"),
+            (c"X", "globalThis.X = class extends Array {}; X.of(1, 2, 3)"),
+            (
+                c"R",
+                "const r = Proxy.revocable([], {}); r.revoke(); r.proxy",
+            ),
+        ];
+        for (target_name, src) in targets {
+            rooted!(&in(cx) let target = eval(cx, global.handle(), src));
+            for (handler_name, handler) in handlers {
+                let proxy = NewProxyObject(
+                    cx.raw_cx(),
+                    handler,
+                    target.handle().into(),
+                    ptr::null_mut(),
+                    ptr::null(),
+                    true,
+                );
+                assert!(!proxy.is_null());
+                let mut name = handler_name.to_bytes().to_vec();
+                name.extend_from_slice(target_name.to_bytes());
+                set_global(
+                    cx,
+                    global.handle(),
+                    &CString::new(name).unwrap(),
+                    ObjectValue(proxy),
+                );
+            }
+        }
+
+        // As in SpiderMonkey, forwarding handlers and wrappers ask their target, even through a
+        // JS Proxy either way, and other handlers are not arrays.
+        eval_true(
+            cx,
+            global.handle(),
+            "[fA, fP, wA, wP, new Proxy(fA, {})].every(Array.isArray)",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "![fO, wO, bA, bP, bO].some(Array.isArray)",
+        );
+
+        // ECMAScript's other IsArray users.
+        eval_true(
+            cx,
+            global.handle(),
+            "Object.prototype.toString.call(fA) === '[object Array]' && \
+             Object.prototype.toString.call(fO) === '[object Object]'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "[0].concat(fA).length === 4 && [0].concat(wA).length === 4 && \
+             [0].concat(fO).length === 2",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "JSON.stringify({ a: fA }) === '{\"a\":[1,2,3]}' && JSON.stringify([[fA]].flat(2)) === '[1,2,3]'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "JSON.stringify({ 1: 'a', x: 'y' }, fA) === '{\"1\":\"a\"}'",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "Array.prototype.map.call(fX, x => x) instanceof X",
+        );
+
+        // As in SpiderMonkey, IsArray throws through a revoked JS Proxy, for a proxy that is its
+        // own target and for a dead wrapper.
+        eval_true(
+            cx,
+            global.handle(),
+            "!Array.isArray(bR) && \
+             (() => { try { Array.isArray(fR); return false } catch (e) { return e instanceof TypeError } })()",
+        );
+        rooted!(&in(cx) let own = eval(cx, global.handle(), "fO"));
+        SetProxyPrivate(own.get().to_object(), &own.get());
+        eval_true(
+            cx,
+            global.handle(),
+            "try { Array.isArray(fO); false } catch (e) { String(e) === 'InternalError: stack overflow' }",
+        );
+        let dead = JS_NewDeadWrapper(cx.raw_cx(), ptr::null_mut());
+        assert!(!dead.is_null());
+        set_global(cx, global.handle(), c"d", ObjectValue(dead));
+        eval_true(
+            cx,
+            global.handle(),
+            "try { Array.isArray(d); false } catch (e) { e instanceof TypeError }",
+        );
+    });
+}
+
+thread_local! {
+    static CROSS_FINALIZED: Cell<usize> = const { Cell::new(0) };
+}
+
+/// Clears slot 2 of the proxy that slot 1 holds, as a Servo ObservableArray owner clears its
+/// array's owner slot from its finalizer.
+unsafe extern "C" fn clear_peer_slot(_gcx: *mut GCContext, proxy: *mut JSObject) {
+    let mut peer = UndefinedValue();
+    GetProxyReservedSlot(proxy, 1, &mut peer);
+    if peer.is_object() {
+        SetProxyReservedSlot(peer.to_object(), 2, &UndefinedValue());
+        CROSS_FINALIZED.with(|c| c.set(c.get() + 1));
+    }
+}
+
+/// Reads slot 2 of the proxy that slot 1 holds.
+unsafe extern "C" fn read_peer_slot(_gcx: *mut GCContext, proxy: *mut JSObject) {
+    let mut peer = UndefinedValue();
+    GetProxyReservedSlot(proxy, 1, &mut peer);
+    if peer.is_object() {
+        let mut value = UndefinedValue();
+        GetProxyReservedSlot(peer.to_object(), 2, &mut value);
+    }
+}
+
+/// Runs `f` in a realm after making a garbage cycle of two proxies with the finalizer `finalize`.
+fn with_proxy_cycle(
+    finalize: unsafe extern "C" fn(*mut GCContext, *mut JSObject),
+    f: impl FnOnce(&mut JSContext),
+) {
+    with_runtime(|cx| unsafe {
+        rooted!(&in(cx) let global = new_global(cx, &SIMPLE_GLOBAL_CLASS, &RealmOptions::default(), ptr::null_mut()));
+        let mut realm = AutoRealm::new_from_handle(cx, global.handle());
+        let cx = &mut *realm;
+        let traps = ProxyTraps {
+            finalize: Some(finalize),
+            ..dom_traps()
+        };
+        let handler = CreateProxyHandler(&traps, ptr::null());
+        {
+            let undefined = UndefinedValue();
+            let new = |cx: &mut JSContext| {
+                NewProxyObject(
+                    cx.raw_cx(),
+                    handler,
+                    Handle::from_marked_location(&undefined),
+                    ptr::null_mut(),
+                    &PROXY_CLASS,
+                    false,
+                )
+            };
+            rooted!(&in(cx) let a = new(cx));
+            rooted!(&in(cx) let b = new(cx));
+            SetProxyReservedSlot(a.get(), 1, &ObjectValue(b.get()));
+            SetProxyReservedSlot(b.get(), 1, &ObjectValue(a.get()));
+            SetProxyReservedSlot(a.get(), 2, &Int32Value(1));
+            SetProxyReservedSlot(b.get(), 2, &Int32Value(2));
+        }
+        f(cx);
+    });
+}
+
+#[test]
+fn finalizers_write_slots_of_finalized_proxies() {
+    CROSS_FINALIZED.with(|c| c.set(0));
+    with_proxy_cycle(clear_peer_slot, |cx| unsafe {
+        // Both die in one collection: the second finalizer writes to the first, finalized, proxy.
+        mozjs::quickjs::drain_autorelease_pool();
+        JS_GC(cx, GCReason::API);
+        assert_eq!(CROSS_FINALIZED.with(Cell::get), 2);
+    });
+}
+
+#[test]
+fn finalizers_write_slots_of_finalized_proxies_at_teardown() {
+    CROSS_FINALIZED.with(|c| c.set(0));
+    with_proxy_cycle(clear_peer_slot, |_| {});
+    assert_eq!(CROSS_FINALIZED.with(Cell::get), 2);
+}
+
+/// Run by `finalizers_cannot_read_slots_of_finalized_proxies`: the second finalizer aborts.
+#[test]
+#[ignore = "run by finalizers_cannot_read_slots_of_finalized_proxies, it aborts"]
+fn finalizer_reads_slot_of_finalized_proxy() {
+    with_proxy_cycle(read_peer_slot, |cx| unsafe {
+        mozjs::quickjs::drain_autorelease_pool();
+        JS_GC(cx, GCReason::API);
+    });
+}
+
+/// Runs the ignored test `child`, which must abort with `message`.
+fn assert_aborts(child: &str, message: &str) {
+    let output = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", child, "--ignored", "--nocapture"])
+        .output()
+        .unwrap();
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!output.status.success());
+    assert!(stderr.contains(message), "{stderr}");
+}
+
+#[test]
+fn finalizers_cannot_read_slots_of_finalized_proxies() {
+    assert_aborts(
+        "finalizer_reads_slot_of_finalized_proxy",
+        "GetProxyReservedSlot on a non-proxy",
+    );
+}
+
+/// Run by `writes_to_finalized_proxies_outside_a_collection_abort`. A WeakRef keeps a finalized
+/// object's structure after the collection, with class id 0.
+#[test]
+#[ignore = "run by writes_to_finalized_proxies_outside_a_collection_abort, it aborts"]
+fn writes_to_finalized_proxy_outside_a_collection() {
+    with_runtime(|cx| unsafe {
+        rooted!(&in(cx) let global = new_global(cx, &SIMPLE_GLOBAL_CLASS, &RealmOptions::default(), ptr::null_mut()));
+        let mut realm = AutoRealm::new_from_handle(cx, global.handle());
+        let cx = &mut *realm;
+        let handler = CreateProxyHandler(&ProxyTraps::default(), ptr::null());
+        let proxy = {
+            let undefined = UndefinedValue();
+            rooted!(&in(cx) let proxy = NewProxyObject(
+                cx.raw_cx(),
+                handler,
+                Handle::from_marked_location(&undefined),
+                ptr::null_mut(),
+                &PROXY_CLASS,
+                false,
+            ));
+            set_global(cx, global.handle(), c"p", ObjectValue(proxy.get()));
+            eval(
+                cx,
+                global.handle(),
+                "globalThis.r = new WeakRef(p); delete globalThis.p; 0",
+            );
+            proxy.get()
+        };
+        mozjs::quickjs::drain_autorelease_pool();
+        JS_GC(cx, GCReason::API);
+        eval_true(cx, global.handle(), "r.deref() === undefined");
+        SetProxyReservedSlot(proxy, 2, &UndefinedValue());
+    });
+}
+
+#[test]
+fn writes_to_finalized_proxies_outside_a_collection_abort() {
+    assert_aborts(
+        "writes_to_finalized_proxy_outside_a_collection",
+        "SetProxyReservedSlot on a non-proxy",
+    );
 }
 
 #[test]

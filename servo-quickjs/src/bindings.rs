@@ -185,6 +185,9 @@ pub const JS_GPN_SET_ENUM: u32 = 32;
 pub const JS_PARSE_JSON_EXT: u32 = 1;
 pub const JS_STRIP_SOURCE: u32 = 1;
 pub const JS_STRIP_DEBUG: u32 = 2;
+pub const JS_GC_PASS_NONE: u32 = 0;
+pub const JS_GC_PASS_DECREF: u32 = 1;
+pub const JS_GC_PASS_SCAN: u32 = 2;
 pub const JS_HAS_CACHED_ORDINARY_ONLY: u32 = 1;
 pub const JS_HAS_CACHED_NO_INDEX: u32 = 2;
 pub const JS_WRITE_OBJ_BYTECODE: u32 = 1;
@@ -774,6 +777,9 @@ pub struct JSClassExoticMethods {
         unsafe extern "C" fn(ctx: *mut JSContext, obj: JSValue) -> ::std::os::raw::c_int,
     >,
     pub prevent_extensions: ::std::option::Option<
+        unsafe extern "C" fn(ctx: *mut JSContext, obj: JSValue) -> ::std::os::raw::c_int,
+    >,
+    pub is_array: ::std::option::Option<
         unsafe extern "C" fn(ctx: *mut JSContext, obj: JSValue) -> ::std::os::raw::c_int,
     >,
 }
@@ -1848,6 +1854,31 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_CountObjectsByClass(rt: *mut JSRuntime, counts: *mut u32, len: u32) -> u32;
+}
+unsafe extern "C" {
+    pub fn JS_GetGCPass(rt: *mut JSRuntime, gc_number: *mut u32) -> ::std::os::raw::c_int;
+}
+pub type JSFinalizationRegistryJobHook = ::std::option::Option<
+    unsafe extern "C" fn(
+        rt: *mut JSRuntime,
+        realm: *mut JSContext,
+        cb: JSValue,
+        held_val: JSValue,
+        opaque: *mut ::std::os::raw::c_void,
+    ),
+>;
+unsafe extern "C" {
+    pub fn JS_SetFinalizationRegistryJobHook(
+        rt: *mut JSRuntime,
+        hook: JSFinalizationRegistryJobHook,
+        opaque: *mut ::std::os::raw::c_void,
+    );
+}
+unsafe extern "C" {
+    pub fn JS_AddAssociatedMemory(rt: *mut JSRuntime, size: usize);
+}
+unsafe extern "C" {
+    pub fn JS_RemoveAssociatedMemory(rt: *mut JSRuntime, size: usize);
 }
 pub type JSGCRootsHook = ::std::option::Option<
     unsafe extern "C" fn(

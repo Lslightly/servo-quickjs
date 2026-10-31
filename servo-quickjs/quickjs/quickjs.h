@@ -530,6 +530,9 @@ typedef struct JSClassExoticMethods {
     int (*is_extensible)(JSContext *ctx, JSValueConst obj);
     /* return < 0 if exception or TRUE/FALSE */
     int (*prevent_extensions)(JSContext *ctx, JSValueConst obj);
+    /* Servo: ECMAScript IsArray of the object, e.g. for the embedder's proxies of
+       arrays (Q44). Return < 0 if exception or TRUE/FALSE */
+    int (*is_array)(JSContext *ctx, JSValueConst obj);
 } JSClassExoticMethods;
 
 typedef void JSClassFinalizer(JSRuntime *rt, JSValue val);
@@ -1144,6 +1147,31 @@ JSAtom JS_GetScriptFileName(JSContext *ctx, JSValueConst script);
 /* Servo (debugging): the number of live objects of each class id below 'len' (other
    counts are not computed), and the runtime's number of class ids. */
 uint32_t JS_CountObjectsByClass(JSRuntime *rt, uint32_t *counts, uint32_t len);
+/* Servo (patch Q41): the cycle collector pass in progress, for trace hooks of
+   embedder objects that share references: JS_GC_PASS_DECREF subtracts every
+   mark from the marked object's reference count, JS_GC_PASS_SCAN adds every
+   mark back. '*gc_number' numbers the decrement passes: a scan pass has the
+   number of the decrement pass before it. */
+#define JS_GC_PASS_NONE   0
+#define JS_GC_PASS_DECREF 1
+#define JS_GC_PASS_SCAN   2
+int JS_GetGCPass(JSRuntime *rt, uint32_t *gc_number);
+/* Servo (patch Q42): called instead of queuing a FinalizationRegistry cleanup
+   job on the runtime's job list, during a GC: it must not allocate or run JS.
+   'realm', 'cb' and 'held_val' are borrowed: dup them (JS_DupContext,
+   JS_DupValueRT) to keep them. */
+typedef void JSFinalizationRegistryJobHook(JSRuntime *rt, JSContext *realm,
+                                           JSValueConst cb, JSValueConst held_val,
+                                           void *opaque);
+void JS_SetFinalizationRegistryJobHook(JSRuntime *rt,
+                                       JSFinalizationRegistryJobHook *hook,
+                                       void *opaque);
+/* Servo (patch Q43): memory the embedder allocated for objects, which a GC
+   may free. Like SpiderMonkey's malloc counter it has a GC trigger of its own:
+   a GC runs when it exceeds what the last GC left, or 38 MiB, times 1.5, or
+   up to 3 when GCs come less than a second apart. */
+void JS_AddAssociatedMemory(JSRuntime *rt, size_t size);
+void JS_RemoveAssociatedMemory(JSRuntime *rt, size_t size);
 /* Servo (debugging): called during each GC, before anything is freed, for every GC thing
    that is referenced from outside the GC heap ('ref_count' external references): the roots
    of the collection. 'gc_obj_type' is 0 for a JSObject ('ptr'), 5 for a JSContext. A last

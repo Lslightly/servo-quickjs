@@ -339,7 +339,16 @@ struct JSRuntime {
     struct list_head gc_zero_ref_count_list;
     struct list_head tmp_obj_list; /* used during GC */
     JSGCPhaseEnum gc_phase : 8;
+    /* Servo: the cycle collector pass in progress and the number of the
+       current decrement pass (JS_GetGCPass, patch Q41) */
+    uint8_t gc_pass;
+    uint32_t gc_number;
     size_t malloc_gc_threshold;
+    /* Servo: memory the embedder allocated for objects, and the amount of it
+       that triggers a GC (JS_AddAssociatedMemory, patch Q43) */
+    size_t malloc_associated;
+    size_t associated_gc_threshold;
+    int64_t last_gc_ms;
     struct list_head weakref_list; /* list of JSWeakRefHeader.link */
 #ifdef DUMP_LEAKS
     struct list_head string_list; /* list of JSString.link */
@@ -407,6 +416,9 @@ struct JSRuntime {
     JSDynamicImportHook *dynamic_import_hook;
     void *dynamic_import_opaque;
     JSScriptPrivateFinalizer *script_private_finalizer;
+    /* Servo: takes the FinalizationRegistry cleanup jobs (patch Q42) */
+    JSFinalizationRegistryJobHook *finrec_job_hook;
+    void *finrec_job_opaque;
     JSGCRootsHook *gc_roots_hook; /* Servo (debugging) */
     void *gc_roots_opaque;
     JSGCChildVisitor *gc_child_visitor;
@@ -1872,14 +1884,42 @@ static __maybe_unused void js_malloc_iter(JSMallocContext *s, JSMallocIterFunc *
 
 /* end JS malloc */
 
+/* Servo (patch Q43): like SpiderMonkey's malloc threshold with its default
+   parameters, a GC runs when the associated memory exceeds what the last GC
+   left, or 38 MiB if that is more, times a growth factor: 1.5, or, when GCs
+   come less than a second apart and more than 1 MiB is left, 3 up to 100 MiB,
+   falling to 1.5 at 500 MiB. */
+#define JS_ASSOCIATED_GC_THRESHOLD_BASE ((size_t)38 << 20)
+
+static int64_t date_now(void);
+
+static size_t js_associated_gc_threshold(size_t associated, BOOL high_frequency)
+{
+    const size_t mib = (size_t)1 << 20;
+    double growth = 1.5;
+    size_t base;
+
+    if (high_frequency && associated >= mib) {
+        if (associated <= 100 * mib)
+            growth = 3.0;
+        else if (associated < 500 * mib)
+            growth = 3.0 - 1.5 * (double)(associated - 100 * mib) / (double)(400 * mib);
+    }
+    base = associated > JS_ASSOCIATED_GC_THRESHOLD_BASE ?
+        associated : JS_ASSOCIATED_GC_THRESHOLD_BASE;
+    return (size_t)((double)base * growth);
+}
+
 static void js_trigger_gc(JSRuntime *rt, size_t size)
 {
-    BOOL force_gc;
+    BOOL force_gc, heap_gc;
 #ifdef FORCE_GC_AT_MALLOC
-    force_gc = TRUE;
+    force_gc = heap_gc = TRUE;
 #else
-    force_gc = ((rt->malloc_ctx.malloc_state.malloc_size + size) >
-                rt->malloc_gc_threshold);
+    heap_gc = ((rt->malloc_ctx.malloc_state.malloc_size + size) >
+               rt->malloc_gc_threshold);
+    force_gc = heap_gc ||
+        rt->malloc_associated > rt->associated_gc_threshold; /* Servo (patch Q43) */
 #endif
     if (force_gc) {
 #ifdef DUMP_GC
@@ -1887,8 +1927,11 @@ static void js_trigger_gc(JSRuntime *rt, size_t size)
                (uint64_t)rt->malloc_ctx.malloc_state.malloc_size);
 #endif
         JS_RunGC(rt);
-        rt->malloc_gc_threshold = rt->malloc_ctx.malloc_state.malloc_size +
-            (rt->malloc_ctx.malloc_state.malloc_size >> 1);
+        /* Servo (patch Q43): a GC that only the associated memory triggered
+           leaves the heap's own trigger as it is */
+        if (heap_gc)
+            rt->malloc_gc_threshold = rt->malloc_ctx.malloc_state.malloc_size +
+                (rt->malloc_ctx.malloc_state.malloc_size >> 1);
     }
 }
 
@@ -2185,6 +2228,7 @@ JSRuntime *JS_NewRuntime2(const JSMallocFunctions *mf, void *opaque)
     rt->malloc_ctx.mf = *mf;
     rt->malloc_ctx.malloc_state = ms;
     rt->malloc_gc_threshold = 256 * 1024;
+    rt->associated_gc_threshold = js_associated_gc_threshold(0, FALSE); /* Servo (patch Q43) */
 
     init_list_head(&rt->context_list);
     init_list_head(&rt->gc_obj_list);
@@ -6908,6 +6952,10 @@ static void gc_decref(JSRuntime *rt)
 
     init_list_head(&rt->tmp_obj_list);
 
+    /* Servo (patch Q41) */
+    rt->gc_pass = JS_GC_PASS_DECREF;
+    rt->gc_number++;
+
     /* decrement the refcount of all the children of all the GC
        objects and move the GC objects with zero refcount to
        tmp_obj_list */
@@ -6921,6 +6969,10 @@ static void gc_decref(JSRuntime *rt)
             list_add_tail(&p->link, &rt->tmp_obj_list);
         }
     }
+
+    /* Servo (patch Q41): the roots hook's walks between the passes change
+       no counts */
+    rt->gc_pass = JS_GC_PASS_NONE;
 }
 
 static void gc_scan_incref_child(JSRuntime *rt, JSGCObjectHeader *p)
@@ -6945,6 +6997,8 @@ static void gc_scan(JSRuntime *rt)
     struct list_head *el;
     JSGCObjectHeader *p;
 
+    rt->gc_pass = JS_GC_PASS_SCAN; /* Servo (patch Q41) */
+
     /* keep the objects with a refcount > 0 and their children. */
     list_for_each(el, &rt->gc_obj_list) {
         p = list_entry(el, JSGCObjectHeader, link);
@@ -6958,6 +7012,8 @@ static void gc_scan(JSRuntime *rt)
         p = list_entry(el, JSGCObjectHeader, link);
         mark_children(rt, p, gc_scan_incref_child2);
     }
+
+    rt->gc_pass = JS_GC_PASS_NONE; /* Servo (patch Q41) */
 }
 
 static void gc_free_cycles(JSRuntime *rt)
@@ -7069,6 +7125,15 @@ static void JS_RunGCInternal(JSRuntime *rt, BOOL remove_weak_objects)
 
     /* free the GC objects in a cycle */
     gc_free_cycles(rt);
+
+    /* Servo (patch Q43): after every GC, explicit ones too */
+    {
+        int64_t now = date_now();
+        BOOL high_frequency = now - rt->last_gc_ms < 1000;
+        rt->last_gc_ms = now;
+        rt->associated_gc_threshold =
+            js_associated_gc_threshold(rt->malloc_associated, high_frequency);
+    }
 }
 
 void JS_RunGC(JSRuntime *rt)
@@ -14905,6 +14970,17 @@ int JS_IsArray(JSContext *ctx, JSValueConst val)
         return -1;
     if (JS_VALUE_GET_TAG(val) == JS_TAG_OBJECT) {
         JSObject *p = JS_VALUE_GET_OBJ(val);
+        /* Servo: the class's is_array exotic method answers (Q44) */
+        if (p->is_exotic && p->class_id != JS_CLASS_ARRAY) {
+            const JSClassExoticMethods *em = ctx->rt->class_array[p->class_id].exotic;
+            if (em && em->is_array) {
+                if (js_check_stack_overflow(ctx->rt, 0)) {
+                    JS_ThrowStackOverflow(ctx);
+                    return -1;
+                }
+                return em->is_array(ctx, val);
+            }
+        }
         return p->class_id == JS_CLASS_ARRAY;
     } else {
         return FALSE;
@@ -62661,8 +62737,14 @@ static void finrec_delete_weakref(JSRuntime *rt, JSWeakRefHeader *wh)
             JSValueConst args[2];
             args[0] = frd->cb;
             args[1] = fre->held_val;
-            /* no exception is raised to avoid recursing into the GC */
-            JS_EnqueueJob2(frd->realm, js_finrec_job, 2, args, TRUE, JS_UNDEFINED, JS_UNDEFINED);
+            if (rt->finrec_job_hook) {
+                /* Servo: the embedder takes the job (patch Q42) */
+                rt->finrec_job_hook(rt, frd->realm, args[0], args[1],
+                                    rt->finrec_job_opaque);
+            } else {
+                /* no exception is raised to avoid recursing into the GC */
+                JS_EnqueueJob2(frd->realm, js_finrec_job, 2, args, TRUE, JS_UNDEFINED, JS_UNDEFINED);
+            }
                 
             js_weakref_free(rt, fre->target);
             js_weakref_free(rt, fre->token);
@@ -63206,6 +63288,36 @@ static int js_servo_dynamic_import(JSContext *ctx, JSValueConst specifier,
 
     return ctx->rt->dynamic_import_hook(ctx, m, script_private, specifier, attributes,
                                         promise, ctx->rt->dynamic_import_opaque);
+}
+
+/* Servo (patch Q41) */
+int JS_GetGCPass(JSRuntime *rt, uint32_t *gc_number)
+{
+    if (gc_number)
+        *gc_number = rt->gc_number;
+    return rt->gc_pass;
+}
+
+/* Servo (patch Q42) */
+void JS_SetFinalizationRegistryJobHook(JSRuntime *rt,
+                                       JSFinalizationRegistryJobHook *hook,
+                                       void *opaque)
+{
+    rt->finrec_job_hook = hook;
+    rt->finrec_job_opaque = opaque;
+}
+
+/* Servo (patch Q43) */
+void JS_AddAssociatedMemory(JSRuntime *rt, size_t size)
+{
+    rt->malloc_associated += size;
+}
+
+void JS_RemoveAssociatedMemory(JSRuntime *rt, size_t size)
+{
+    if (size > rt->malloc_associated)
+        size = rt->malloc_associated;
+    rt->malloc_associated -= size;
 }
 
 /* Servo (debugging): live objects per class */
