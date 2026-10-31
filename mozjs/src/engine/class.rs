@@ -490,7 +490,7 @@ pub(crate) unsafe fn call_native(
         }
         q::JS_EXCEPTION
     };
-    cx.drain_pool(pool_mark);
+    cx.drain_pool(pool_mark, super::DrainContext::NativeCall);
     result
 }
 

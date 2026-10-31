@@ -66,6 +66,12 @@ fn fates_of_raw_results() {
             "{json}"
         );
         assert!(!json.contains("\"fate\":\"rooted\""), "{json}");
+        // Drains are timed per context; the second `drain_autorelease_pool` released the three
+        // values above, the first found nothing.
+        assert!(json.contains("\"ctx\":\"scope_drop\""), "{json}");
+        let task = json.split("\"ctx\":\"task\"").nth(1).unwrap_or_default();
+        assert!(task.contains("\"calls\":2,\"empty\":0,"), "{json}");
+        assert!(task.contains("\"hist\":[{\"lo_ns\":"), "{json}");
         drop(kept);
     }
 }

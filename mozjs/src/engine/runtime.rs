@@ -55,7 +55,7 @@ pub(crate) unsafe fn JS_DestroyContext(raw: *mut root::JSContext) {
         cx.leave_realm();
     }
     super::free_microtasks(cx);
-    cx.drain_pool((0, 0));
+    cx.drain_pool((0, 0), super::DrainContext::RuntimeDestroy);
     q::JS_FreeValueRT(cx.rt, cx.base_key_object.replace(q::JS_UNDEFINED));
     q::JS_FreeContext(cx.base_ctx);
     tracing::trace!(target: "mozjs_gc", "JS_DestroyContext");
