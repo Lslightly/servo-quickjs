@@ -560,7 +560,7 @@ unsafe extern "C" fn make_job_callback(ctx: *mut q::JSContext, opaque: *mut c_vo
     };
     // What the trap pooled (its out-parameters) would otherwise stay until the task ends, one
     // entry per `then()` or `await`.
-    cx.drain_pool(mark);
+    cx.drain_pool(mark, super::DrainContext::JobCallback);
     incumbent
 }
 
@@ -611,7 +611,7 @@ unsafe fn enqueue_microtask(
             let mark = cx.pool_mark();
             let incumbent = incumbent_global(cx, queue)
                 .map(|incumbent| q::JS_DupValueRT(cx.rt, object_or_undefined(incumbent)));
-            cx.drain_pool(mark);
+            cx.drain_pool(mark, super::DrainContext::JobRun);
             match incumbent {
                 Some(incumbent) => incumbent,
                 None => return -1,

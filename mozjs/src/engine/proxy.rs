@@ -666,7 +666,7 @@ impl Drop for Trap {
         if self.entered {
             unsafe { cx.leave_realm() };
         }
-        cx.drain_pool(self.pool_mark);
+        cx.drain_pool(self.pool_mark, super::DrainContext::ProxyTrap);
     }
 }
 

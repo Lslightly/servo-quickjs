@@ -97,6 +97,43 @@ pub(crate) struct RealmData {
     pub window_proxy: *mut root::JSObject,
 }
 
+/// Why `Cx::drain_pool` ran. With `QJS_POOL_STATS=1` the time of each kind is recorded
+/// separately (see `pool_stats.rs`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum DrainContext {
+    /// An `AutoreleasePoolScope` was dropped.
+    ScopeDrop,
+    /// A native or class method called from JavaScript returned.
+    NativeCall,
+    /// The runtime is being destroyed (`JS_DestroyContext`).
+    RuntimeDestroy,
+    /// A proxy trap returned.
+    ProxyTrap,
+    /// `then()` or `await` created a reaction (`HostMakeJobCallback`).
+    JobCallback,
+    /// A promise job took its incumbent global.
+    JobRun,
+    /// A task ended and drained the whole pool (`drain_current_pool`).
+    Task,
+}
+
+#[cfg(qjs_pool_stats)]
+impl DrainContext {
+    pub(crate) const COUNT: usize = 7;
+
+    pub(crate) fn name(self) -> &'static str {
+        match self {
+            Self::ScopeDrop => "scope_drop",
+            Self::NativeCall => "native_call",
+            Self::RuntimeDestroy => "runtime_destroy",
+            Self::ProxyTrap => "proxy_trap",
+            Self::JobCallback => "job_callback",
+            Self::JobRun => "job_run",
+            Self::Task => "task",
+        }
+    }
+}
+
 thread_local!(static CURRENT: Cell<*const Cx> = const { Cell::new(ptr::null()) });
 
 impl Cx {
@@ -208,11 +245,22 @@ impl Cx {
 
     /// Releases the values retained since `mark` (see `pool_mark`). The frees can run finalizers
     /// that release more values into the pool (`release_object`), which are drained too.
-    pub fn drain_pool(&self, mark: (usize, usize)) {
+    #[cfg_attr(not(qjs_pool_stats), allow(unused_variables))]
+    pub fn drain_pool(&self, mark: (usize, usize), context: DrainContext) {
+        // Time the drain for `QJS_POOL_STATS=1`. Empty drains skip the clock: they are the common
+        // case, and the two reads would be most of what they measure.
+        #[cfg(qjs_pool_stats)]
+        let start = (self.pool.len() > mark.0 || self.atom_pool.len() > mark.1)
+            .then(std::time::Instant::now);
+        #[cfg(qjs_pool_stats)]
+        let mut values = 0u64;
         while self.pool.len() > mark.0 {
             let v = self.pool.pop().unwrap();
             #[cfg(qjs_pool_stats)]
-            pool_stats::popped(v);
+            {
+                values += 1;
+                pool_stats::popped(v);
+            }
             verify::pooled(v, -1);
             // The pool's reference is often the last one; `release_object` cannot see this
             // release, so tell the event flame graph the object is gone here.
@@ -245,6 +293,8 @@ impl Cx {
             let a = self.atom_pool.pop().unwrap();
             unsafe { q::JS_FreeAtomRT(self.rt, a) };
         }
+        #[cfg(qjs_pool_stats)]
+        pool_stats::drained(context, start.map(|start| start.elapsed()), values);
     }
 
     pub fn pool_mark(&self) -> (usize, usize) {
@@ -396,7 +446,7 @@ pub(crate) fn drain_current_pool() {
     if let Some(cx) = try_current() {
         #[cfg(qjs_pool_stats)]
         pool_stats::task_drained(cx.pool.len());
-        cx.drain_pool((0, 0));
+        cx.drain_pool((0, 0), DrainContext::Task);
     }
 }
 
