@@ -9,6 +9,8 @@
 //! returned, a task ended, …). Each kind gets a count, a total, a maximum and a histogram of the
 //! durations in four buckets per power of two (`drained`). Empty drains are counted separately
 //! and not timed: they are the common case, and the clock reads would be most of their cost.
+//! The JSON's `drains` field has one object per kind, and its `hist` lists only the nonzero
+//! buckets, as `{"lo_ns": lower bound, "count": durations in the bucket}`.
 //!
 //! - **rooted**: a `Rooted` or handle write took the value (`retain_rooted`);
 //! - **kept**: not rooted, but something else held it when the pool drained (a `Heap`, a
@@ -18,8 +20,9 @@
 //! For values returned as raw GC pointers, every `QJS_POOL_STATS_SAMPLE`-th (default 100, 0 for
 //! none) records a backtrace, so that the Rust code using them unrooted can be found. Each runtime
 //! appends a JSON line to `QJS_POOL_STATS_OUT` (default `qjs-pool-stats-<pid>.jsonl` in the
-//! temporary directory) when it is destroyed, and a snapshot every 10 s before that, for processes
-//! that are killed (WPT); `tools/pool_stats.py` keeps the last line of each runtime.
+//! temporary directory) when it is destroyed, and a snapshot every `QJS_POOL_STATS_SNAPSHOT_MS`
+//! (default 10000, 0 for only the final line) before that, for processes that are killed (WPT,
+//! Dromaeo); `tools/pool_stats.py` keeps the last line of each runtime.
 //!
 //! With `QJS_POOL_STATS_FLAME` set (a path, empty for the temporary directory), every
 //! `QJS_POOL_STATS_FLAME_SAMPLE`-th (default 1000, 0 for none) push also records a backtrace, and
@@ -53,6 +56,9 @@ use super::{DrainContext, Pooled as Kind};
 
 const KINDS: [&str; 4] = ["result", "borrowed", "root", "deferred"];
 
+/// Every `DrainContext`, in the order the JSON lists them. `State::drains` is indexed by the
+/// discriminant instead, so only the array length (not this order) ties the two together: after
+/// bumping `DrainContext::COUNT`, a missing entry here fails to compile.
 const CONTEXTS: [DrainContext; DrainContext::COUNT] = [
     DrainContext::ScopeDrop,
     DrainContext::NativeCall,
@@ -88,14 +94,19 @@ type Key = (&'static str, bool, Option<&'static Location<'static>>, Kind);
 /// Four buckets per power of two, exact below 4 ns; the last covers `2^63` ns and above.
 const HIST_BUCKETS: usize = 252;
 
+/// The timing of one `DrainContext`, in nanoseconds (`u64` holds ~584 years).
 struct DrainStats {
+    /// Every call, including the empty ones.
     calls: u64,
     /// Calls that found nothing to release (not timed).
     empty: u64,
+    /// Sum and maximum over the timed calls only.
     total_ns: u64,
     max_ns: u64,
     /// Values released, summed over the timed calls.
     values: u64,
+    /// One count per duration bucket (`bucket`). Boxed to keep `State` small: it is allocated
+    /// once, in `Default`, and never resized.
     hist: Box<[u64]>,
 }
 
@@ -113,6 +124,10 @@ impl Default for DrainStats {
 }
 
 /// The bucket `ns` falls in: exact below 4, then four per power of two.
+///
+/// Above 4, `e` is the floor of `log2(ns)`, and the two bits below the leading one pick the
+/// quarter of `[2^e, 2^(e+1))`; `- 4` leaves 0..3 for the exact values below. A bucket's width is
+/// therefore 1/4 to 1/7 of its lower bound.
 fn bucket(ns: u64) -> usize {
     if ns < 4 {
         return ns as usize;
@@ -121,7 +136,10 @@ fn bucket(ns: u64) -> usize {
     e * 4 + ((ns >> (e - 2)) & 0b11) as usize - 4
 }
 
-/// The smallest duration `bucket(i)` holds, in nanoseconds.
+/// The smallest duration `bucket(i)` holds, in nanoseconds; the next bucket's `lo` is its end.
+///
+/// This must stay the inverse of `bucket`: the JSON reports these bounds, and a mismatch would
+/// place a bucket's counts at the wrong time.
 fn bucket_lo(i: usize) -> u64 {
     if i < 4 {
         return i as u64;
@@ -134,6 +152,9 @@ fn bucket_lo(i: usize) -> u64 {
 
 /// Records one `drain_pool` call. `elapsed` is `None` when it found nothing to release; `values`
 /// is how many pool entries it freed (atoms are not counted).
+///
+/// This runs on every drain, so it does no allocation and takes no locks: the histogram is
+/// preallocated, and the counts live in the thread-local `State`.
 pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: u64) {
     let _ = STATE.try_with(|s| {
         let stats = &mut s.borrow_mut().drains[context as usize];
@@ -172,16 +193,27 @@ struct State {
     flame_every: Option<u64>,
     since_flame: u64,
     pushes: [u64; 4],
-    /// Time of `drain_pool`, indexed by `DrainContext`.
+    /// Time of `drain_pool`, indexed by the `DrainContext` discriminant.
     drains: [DrainStats; DrainContext::COUNT],
     tasks: u64,
     max_len: usize,
     sum_len: u64,
+    /// One backtrace every `sample_every` pushes of a value the API returned as a raw GC
+    /// pointer (`Result` kind), so the Rust code using such values unrooted can be found. Read
+    /// from `QJS_POOL_STATS_SAMPLE` on first use: default 100, `0` records none. Written to the
+    /// JSON as-is, so a reader knows the rate the `samples` were taken at.
     sample_every: Option<u64>,
+    /// Eligible pushes (raw-pointer `Result` values) since the last recorded backtrace.
     since_sample: u64,
     /// Identifies the runtime's lines in the output.
     runtime: u64,
+    /// When this runtime first pushed a value; `elapsed_ms` is measured from here. `None` until
+    /// the first push, so a runtime that never pushes reports 0.
+    start: Option<Instant>,
     last_snapshot: Option<Instant>,
+    /// The snapshot interval; `None` until it is read from the environment. `Some(None)` means
+    /// snapshots are off and only the final line is written.
+    snapshot_interval: Option<Option<Duration>>,
 }
 
 static NEXT_RUNTIME: AtomicU64 = AtomicU64::new(1);
@@ -256,6 +288,7 @@ impl State {
 pub(crate) fn pushed(v: q::JSValue, kind: Kind, site: &'static Location<'static>) {
     let _ = STATE.try_with(|s| {
         let s = &mut *s.borrow_mut();
+        s.start.get_or_insert_with(Instant::now);
         s.pushes[kind as usize] += 1;
         let (api, raw) = s.api.unwrap_or(("", false));
         let index = s.entries.len();
@@ -346,9 +379,20 @@ pub(crate) fn task_drained(len: usize) {
         s.max_len = s.max_len.max(len);
         s.sum_len += len as u64;
         let now = Instant::now();
-        let due = s
-            .last_snapshot
-            .is_none_or(|last| now - last >= SNAPSHOT_INTERVAL);
+        // Read once per `State`: this runs on every drain, and a short process (a single
+        // benchmark) may never reach the default 10 s interval before it is killed.
+        let interval = *s.snapshot_interval.get_or_insert_with(|| {
+            match std::env::var("QJS_POOL_STATS_SNAPSHOT_MS")
+                .ok()
+                .and_then(|ms| ms.parse::<u64>().ok())
+            {
+                Some(0) => None,
+                Some(ms) => Some(Duration::from_millis(ms)),
+                None => Some(SNAPSHOT_INTERVAL),
+            }
+        });
+        let due = interval
+            .is_some_and(|interval| s.last_snapshot.is_none_or(|last| now - last >= interval));
         if due {
             s.last_snapshot = Some(now);
         }
@@ -377,10 +421,11 @@ pub(crate) fn json(final_: bool) -> String {
         let thread = std::thread::current();
         let _ = write!(
             out,
-            "{{\"thread\":{},\"pid\":{},\"runtime\":{},\"final\":{final_},\"sample_every\":{},\"tasks\":{},\"max_len\":{},\"sum_len\":{},\"pushes\":{{",
+            "{{\"thread\":{},\"pid\":{},\"runtime\":{},\"elapsed_ms\":{},\"final\":{final_},\"sample_every\":{},\"tasks\":{},\"max_len\":{},\"sum_len\":{},\"pushes\":{{",
             string(thread.name().unwrap_or("")),
             std::process::id(),
             s.runtime,
+            s.start.map_or(0, |start| start.elapsed().as_millis() as u64),
             s.sample_every.unwrap_or(0),
             s.tasks,
             s.max_len,
@@ -422,6 +467,8 @@ pub(crate) fn json(final_: bool) -> String {
                 frames.join(","),
             );
         }
+        // The drain timings come last, so a reader of the older fields is unaffected. Every
+        // context is listed, even an idle one: a fixed shape is easier to consume.
         out.push_str("],\"drains\":[");
         for (i, context) in CONTEXTS.iter().enumerate() {
             let d = &s.drains[*context as usize];
@@ -436,6 +483,8 @@ pub(crate) fn json(final_: bool) -> String {
                 d.max_ns,
                 d.values,
             );
+            // Only nonempty buckets: an idle or short-lived context stays small. `lo_ns` is the
+            // bucket's lower bound; it ends where the next written bucket begins.
             let mut first = true;
             for (bucket, count) in d.hist.iter().enumerate() {
                 if *count == 0 {
@@ -449,8 +498,10 @@ pub(crate) fn json(final_: bool) -> String {
                 );
                 first = false;
             }
-            out.push('}');
+            // Close the histogram array and this context's object.
+            out.push_str("]}");
         }
+        // Close the `drains` array and the root object.
         out.push_str("]}");
         out
     });
