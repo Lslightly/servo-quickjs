@@ -99,6 +99,10 @@ pub(crate) struct RealmData {
 
 /// Why `Cx::drain_pool` ran. With `QJS_POOL_STATS=1` the time of each kind is recorded
 /// separately (see `pool_stats.rs`).
+///
+/// The call site picks the variant, so this costs nothing when the statistics are off: the
+/// parameter is unused and the enum is a constant. The variants' discriminants index
+/// `pool_stats::State::drains`, so don't renumber them without updating that array.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum DrainContext {
     /// An `AutoreleasePoolScope` was dropped.
@@ -119,8 +123,10 @@ pub(crate) enum DrainContext {
 
 #[cfg(qjs_pool_stats)]
 impl DrainContext {
+    /// The number of variants and the length of `State::drains`; keep in sync with the enum.
     pub(crate) const COUNT: usize = 7;
 
+    /// The `ctx` value in the JSON output. Tools match these strings, so keep them stable.
     pub(crate) fn name(self) -> &'static str {
         match self {
             Self::ScopeDrop => "scope_drop",
@@ -245,13 +251,19 @@ impl Cx {
 
     /// Releases the values retained since `mark` (see `pool_mark`). The frees can run finalizers
     /// that release more values into the pool (`release_object`), which are drained too.
+    ///
+    /// `context` says why this drain ran; with `QJS_POOL_STATS=1` its time is recorded under that
+    /// kind. Nothing else reads it.
     #[cfg_attr(not(qjs_pool_stats), allow(unused_variables))]
     pub fn drain_pool(&self, mark: (usize, usize), context: DrainContext) {
-        // Time the drain for `QJS_POOL_STATS=1`. Empty drains skip the clock: they are the common
-        // case, and the two reads would be most of what they measure.
+        // Time the drain for `QJS_POOL_STATS=1`. The clock is read only when there is something to
+        // release: empty drains are the common case, and the two reads would be most of what they
+        // measure. `start` is `None` for them, and `drained` counts them apart.
         #[cfg(qjs_pool_stats)]
         let start = (self.pool.len() > mark.0 || self.atom_pool.len() > mark.1)
             .then(std::time::Instant::now);
+        // The number of pool entries freed. Atoms are timed but not counted: a slow drain can be
+        // many cheap frees or a few expensive ones, and this tells the two apart.
         #[cfg(qjs_pool_stats)]
         let mut values = 0u64;
         while self.pool.len() > mark.0 {
@@ -293,6 +305,8 @@ impl Cx {
             let a = self.atom_pool.pop().unwrap();
             unsafe { q::JS_FreeAtomRT(self.rt, a) };
         }
+        // `start` is `Some` iff the drain had work; atoms are part of the elapsed time but not of
+        // `values`.
         #[cfg(qjs_pool_stats)]
         pool_stats::drained(context, start.map(|start| start.elapsed()), values);
     }
