@@ -5,13 +5,6 @@
 //! Autorelease pool statistics, built with `QJS_POOL_STATS=1`: which API functions put values in
 //! the pool, and what became of each value by the time the pool drained.
 //!
-//! `Cx::drain_pool` is also timed, per `DrainContext` (why it ran: a scope dropped, a native call
-//! returned, a task ended, …). Each kind gets a count, a total, a maximum and a histogram of the
-//! durations in four buckets per power of two (`drained`). Empty drains are counted separately
-//! and not timed: they are the common case, and the clock reads would be most of their cost.
-//! The JSON's `drains` field has one object per kind, and its `hist` lists only the nonzero
-//! buckets, as `{"lo_ns": lower bound, "count": durations in the bucket}`.
-//!
 //! - **rooted**: a `Rooted` or handle write took the value (`retain_rooted`);
 //! - **kept**: not rooted, but something else held it when the pool drained (a `Heap`, a
 //!   `Dom<T>`, a JS object);
@@ -20,25 +13,8 @@
 //! For values returned as raw GC pointers, every `QJS_POOL_STATS_SAMPLE`-th (default 100, 0 for
 //! none) records a backtrace, so that the Rust code using them unrooted can be found. Each runtime
 //! appends a JSON line to `QJS_POOL_STATS_OUT` (default `qjs-pool-stats-<pid>.jsonl` in the
-//! temporary directory) when it is destroyed, and a snapshot every `QJS_POOL_STATS_SNAPSHOT_MS`
-//! (default 10000, 0 for only the final line) before that, for processes that are killed (WPT,
-//! Dromaeo); `tools/pool_stats.py` keeps the last line of each runtime.
-//!
-//! With `QJS_POOL_STATS_FLAME` set (a path, empty for the temporary directory), every
-//! `QJS_POOL_STATS_FLAME_SAMPLE`-th (default 1000, 0 for none) push also records a backtrace, and
-//! a folded stack file (`qjs-pool-flame-<pid>.folded`) is rewritten at each snapshot:
-//!
-//! ```text
-//! main;servo::script::run_script;mozjs::…;result 17
-//! ```
-//!
-//! The frames are the Rust code that pushed the value — for `adopt`/`retain`/`retain_rooted`
-//! alike, since they all push through `Cx::push_pool` — and the last one is the kind. That is the
-//! format `tracing-flame` writes and `inferno-flamegraph` reads:
-//!
-//! ```sh
-//! inferno-flamegraph qjs-pool-flame-<pid>.folded > pool.svg
-//! ```
+//! temporary directory) when it is destroyed, and a snapshot every 10 s before that, for processes
+//! that are killed (WPT); `tools/pool_stats.py` keeps the last line of each runtime.
 
 use std::backtrace::Backtrace;
 use std::cell::RefCell;
@@ -52,22 +28,9 @@ use std::time::{Duration, Instant};
 
 use servo_quickjs as q;
 
-use super::{DrainContext, Pooled as Kind};
+use super::Pooled as Kind;
 
 const KINDS: [&str; 4] = ["result", "borrowed", "root", "deferred"];
-
-/// Every `DrainContext`, in the order the JSON lists them. `State::drains` is indexed by the
-/// discriminant instead, so only the array length (not this order) ties the two together: after
-/// bumping `DrainContext::COUNT`, a missing entry here fails to compile.
-const CONTEXTS: [DrainContext; DrainContext::COUNT] = [
-    DrainContext::ScopeDrop,
-    DrainContext::NativeCall,
-    DrainContext::RuntimeDestroy,
-    DrainContext::ProxyTrap,
-    DrainContext::JobCallback,
-    DrainContext::JobRun,
-    DrainContext::Task,
-];
 
 struct Entry {
     api: &'static str,
@@ -91,86 +54,6 @@ struct Counts {
 
 type Key = (&'static str, bool, Option<&'static Location<'static>>, Kind);
 
-/// Four buckets per power of two, exact below 4 ns; the last covers `2^63` ns and above.
-const HIST_BUCKETS: usize = 252;
-
-/// The timing of one `DrainContext`, in nanoseconds (`u64` holds ~584 years).
-struct DrainStats {
-    /// Every call, including the empty ones.
-    calls: u64,
-    /// Calls that found nothing to release (not timed).
-    empty: u64,
-    /// Sum and maximum over the timed calls only.
-    total_ns: u64,
-    max_ns: u64,
-    /// Values released, summed over the timed calls.
-    values: u64,
-    /// One count per duration bucket (`bucket`). Boxed to keep `State` small: it is allocated
-    /// once, in `Default`, and never resized.
-    hist: Box<[u64]>,
-}
-
-impl Default for DrainStats {
-    fn default() -> Self {
-        Self {
-            calls: 0,
-            empty: 0,
-            total_ns: 0,
-            max_ns: 0,
-            values: 0,
-            hist: vec![0; HIST_BUCKETS].into_boxed_slice(),
-        }
-    }
-}
-
-/// The bucket `ns` falls in: exact below 4, then four per power of two.
-///
-/// Above 4, `e` is the floor of `log2(ns)`, and the two bits below the leading one pick the
-/// quarter of `[2^e, 2^(e+1))`; `- 4` leaves 0..3 for the exact values below. A bucket's width is
-/// therefore 1/4 to 1/7 of its lower bound.
-fn bucket(ns: u64) -> usize {
-    if ns < 4 {
-        return ns as usize;
-    }
-    let e = 63 - ns.leading_zeros() as usize;
-    e * 4 + ((ns >> (e - 2)) & 0b11) as usize - 4
-}
-
-/// The smallest duration `bucket(i)` holds, in nanoseconds; the next bucket's `lo` is its end.
-///
-/// This must stay the inverse of `bucket`: the JSON reports these bounds, and a mismatch would
-/// place a bucket's counts at the wrong time.
-fn bucket_lo(i: usize) -> u64 {
-    if i < 4 {
-        return i as u64;
-    }
-    let bits = i + 4;
-    let e = bits / 4;
-    let sub = bits % 4;
-    ((4 + sub) as u64) << (e - 2)
-}
-
-/// Records one `drain_pool` call. `elapsed` is `None` when it found nothing to release; `values`
-/// is how many pool entries it freed (atoms are not counted).
-///
-/// This runs on every drain, so it does no allocation and takes no locks: the histogram is
-/// preallocated, and the counts live in the thread-local `State`.
-pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: u64) {
-    let _ = STATE.try_with(|s| {
-        let stats = &mut s.borrow_mut().drains[context as usize];
-        stats.calls += 1;
-        let Some(elapsed) = elapsed else {
-            stats.empty += 1;
-            return;
-        };
-        let ns = u64::try_from(elapsed.as_nanos()).unwrap_or(u64::MAX);
-        stats.total_ns += ns;
-        stats.max_ns = stats.max_ns.max(ns);
-        stats.values += values;
-        stats.hist[bucket(ns)] += 1;
-    });
-}
-
 #[derive(Default)]
 struct State {
     /// The API function running (its name, and whether it returns a raw GC pointer).
@@ -186,34 +69,15 @@ struct State {
     samples: Vec<(&'static str, &'static str, Backtrace)>,
     /// The symbolized samples: how many per function, fate and calling frames.
     callers: HashMap<(&'static str, &'static str, Vec<String>), u64>,
-    /// Sampled backtraces of pushes, not symbolized yet, with the kind they pushed.
-    flame_samples: Vec<(Kind, Backtrace)>,
-    /// The symbolized flame samples: how many per kind and calling frames.
-    flame: HashMap<(Kind, Vec<String>), u64>,
-    flame_every: Option<u64>,
-    since_flame: u64,
     pushes: [u64; 4],
-    /// Time of `drain_pool`, indexed by the `DrainContext` discriminant.
-    drains: [DrainStats; DrainContext::COUNT],
     tasks: u64,
     max_len: usize,
     sum_len: u64,
-    /// One backtrace every `sample_every` pushes of a value the API returned as a raw GC
-    /// pointer (`Result` kind), so the Rust code using such values unrooted can be found. Read
-    /// from `QJS_POOL_STATS_SAMPLE` on first use: default 100, `0` records none. Written to the
-    /// JSON as-is, so a reader knows the rate the `samples` were taken at.
     sample_every: Option<u64>,
-    /// Eligible pushes (raw-pointer `Result` values) since the last recorded backtrace.
     since_sample: u64,
     /// Identifies the runtime's lines in the output.
     runtime: u64,
-    /// When this runtime first pushed a value; `elapsed_ms` is measured from here. `None` until
-    /// the first push, so a runtime that never pushes reports 0.
-    start: Option<Instant>,
     last_snapshot: Option<Instant>,
-    /// The snapshot interval; `None` until it is read from the environment. `Some(None)` means
-    /// snapshots are off and only the final line is written.
-    snapshot_interval: Option<Option<Duration>>,
 }
 
 static NEXT_RUNTIME: AtomicU64 = AtomicU64::new(1);
@@ -259,36 +123,12 @@ impl State {
         self.since_sample = 0;
         true
     }
-
-    /// Whether this push should record a backtrace for the flame graph. Off unless
-    /// `QJS_POOL_STATS_FLAME` names an output.
-    fn flame_sample(&mut self) -> bool {
-        let every = *self.flame_every.get_or_insert_with(|| {
-            if std::env::var_os("QJS_POOL_STATS_FLAME").is_none() {
-                return 0;
-            }
-            std::env::var("QJS_POOL_STATS_FLAME_SAMPLE")
-                .ok()
-                .and_then(|n| n.parse().ok())
-                .unwrap_or(1000)
-        });
-        if every == 0 {
-            return false;
-        }
-        self.since_flame += 1;
-        if self.since_flame < every {
-            return false;
-        }
-        self.since_flame = 0;
-        true
-    }
 }
 
 /// Records a value pushed onto the pool; `v` has a reference count.
 pub(crate) fn pushed(v: q::JSValue, kind: Kind, site: &'static Location<'static>) {
     let _ = STATE.try_with(|s| {
         let s = &mut *s.borrow_mut();
-        s.start.get_or_insert_with(Instant::now);
         s.pushes[kind as usize] += 1;
         let (api, raw) = s.api.unwrap_or(("", false));
         let index = s.entries.len();
@@ -307,12 +147,6 @@ pub(crate) fn pushed(v: q::JSValue, kind: Kind, site: &'static Location<'static>
         }
         let fresh = kind == Kind::Result && unsafe { q::JS_GetRefCount(v) } == 1;
         let backtrace = (raw && kind == Kind::Result && s.sample()).then(Backtrace::force_capture);
-        // `adopt_as`, `retain_as` and `release_object` all push through here, so one capture
-        // covers all three, with the kind telling them apart.
-        if s.flame_sample() {
-            let backtrace = Backtrace::force_capture();
-            s.flame_samples.push((kind, backtrace));
-        }
         s.entries.push(Entry {
             api,
             raw,
@@ -379,20 +213,9 @@ pub(crate) fn task_drained(len: usize) {
         s.max_len = s.max_len.max(len);
         s.sum_len += len as u64;
         let now = Instant::now();
-        // Read once per `State`: this runs on every drain, and a short process (a single
-        // benchmark) may never reach the default 10 s interval before it is killed.
-        let interval = *s.snapshot_interval.get_or_insert_with(|| {
-            match std::env::var("QJS_POOL_STATS_SNAPSHOT_MS")
-                .ok()
-                .and_then(|ms| ms.parse::<u64>().ok())
-            {
-                Some(0) => None,
-                Some(ms) => Some(Duration::from_millis(ms)),
-                None => Some(SNAPSHOT_INTERVAL),
-            }
-        });
-        let due = interval
-            .is_some_and(|interval| s.last_snapshot.is_none_or(|last| now - last >= interval));
+        let due = s
+            .last_snapshot
+            .is_none_or(|last| now - last >= SNAPSHOT_INTERVAL);
         if due {
             s.last_snapshot = Some(now);
         }
@@ -413,19 +236,15 @@ pub(crate) fn json(final_: bool) -> String {
         for (api, fate, backtrace) in std::mem::take(&mut s.samples) {
             *s.callers.entry((api, fate, callers(&backtrace))).or_default() += 1;
         }
-        for (kind, backtrace) in std::mem::take(&mut s.flame_samples) {
-            *s.flame.entry((kind, frames(&backtrace))).or_default() += 1;
-        }
         let s = &*s;
         let mut out = String::new();
         let thread = std::thread::current();
         let _ = write!(
             out,
-            "{{\"thread\":{},\"pid\":{},\"runtime\":{},\"elapsed_ms\":{},\"final\":{final_},\"sample_every\":{},\"tasks\":{},\"max_len\":{},\"sum_len\":{},\"pushes\":{{",
+            "{{\"thread\":{},\"pid\":{},\"runtime\":{},\"final\":{final_},\"sample_every\":{},\"tasks\":{},\"max_len\":{},\"sum_len\":{},\"pushes\":{{",
             string(thread.name().unwrap_or("")),
             std::process::id(),
             s.runtime,
-            s.start.map_or(0, |start| start.elapsed().as_millis() as u64),
             s.sample_every.unwrap_or(0),
             s.tasks,
             s.max_len,
@@ -467,41 +286,6 @@ pub(crate) fn json(final_: bool) -> String {
                 frames.join(","),
             );
         }
-        // The drain timings come last, so a reader of the older fields is unaffected. Every
-        // context is listed, even an idle one: a fixed shape is easier to consume.
-        out.push_str("],\"drains\":[");
-        for (i, context) in CONTEXTS.iter().enumerate() {
-            let d = &s.drains[*context as usize];
-            let _ = write!(
-                out,
-                "{}{{\"ctx\":{},\"calls\":{},\"empty\":{},\"total_ns\":{},\"max_ns\":{},\"values\":{},\"hist\":[",
-                if i == 0 { "" } else { "," },
-                string(context.name()),
-                d.calls,
-                d.empty,
-                d.total_ns,
-                d.max_ns,
-                d.values,
-            );
-            // Only nonempty buckets: an idle or short-lived context stays small. `lo_ns` is the
-            // bucket's lower bound; it ends where the next written bucket begins.
-            let mut first = true;
-            for (bucket, count) in d.hist.iter().enumerate() {
-                if *count == 0 {
-                    continue;
-                }
-                let _ = write!(
-                    out,
-                    "{}{{\"lo_ns\":{},\"count\":{count}}}",
-                    if first { "" } else { "," },
-                    bucket_lo(bucket),
-                );
-                first = false;
-            }
-            // Close the histogram array and this context's object.
-            out.push_str("]}");
-        }
-        // Close the `drains` array and the root object.
         out.push_str("]}");
         out
     });
@@ -539,49 +323,6 @@ fn write(final_: bool) {
         }
         Err(e) => eprintln!("qjs-pool-stats: can't write {}: {e}", path.display()),
     }
-    write_flame();
-}
-
-/// Rewrites the folded stacks that `inferno-flamegraph` reads, truncating: they hold every push
-/// so far. Only when `QJS_POOL_STATS_FLAME` is set.
-fn write_flame() {
-    let Some(path) = std::env::var_os("QJS_POOL_STATS_FLAME").map(|p| {
-        if p.is_empty() {
-            std::env::temp_dir().join(format!("qjs-pool-flame-{}.folded", std::process::id()))
-        } else {
-            Path::new(&p).to_owned()
-        }
-    }) else {
-        return;
-    };
-    let flame = flame();
-    match std::fs::write(&path, &flame) {
-        Ok(()) if !flame.is_empty() => {
-            eprintln!("qjs-pool-stats: flame graph data in {}", path.display());
-        }
-        Ok(()) => {}
-        Err(e) => eprintln!("qjs-pool-stats: can't write {}: {e}", path.display()),
-    }
-}
-
-/// The sampled pushes as folded stacks, one per line: the Rust frames that pushed the value,
-/// oldest first, then the kind.
-fn flame() -> String {
-    let flame = STATE.try_with(|s| {
-        let s = &*s.borrow();
-        let mut lines: Vec<(String, &str, u64)> = s
-            .flame
-            .iter()
-            .map(|((kind, frames), n)| (frames.join(";"), KINDS[*kind as usize], *n))
-            .collect();
-        lines.sort_unstable();
-        let mut out = String::new();
-        for (frames, kind, n) in lines {
-            let _ = writeln!(out, "{frames};{kind} {n}");
-        }
-        out
-    });
-    flame.unwrap_or_default()
 }
 
 /// The first frames of `backtrace` outside the shim and the standard library: the Rust code that
@@ -589,20 +330,6 @@ fn flame() -> String {
 /// (the shim's repository, its generated bindings, the standard library) for generic code and
 /// closures whose symbols name another crate.
 fn callers(backtrace: &Backtrace) -> Vec<String> {
-    let mut frames = symbols(backtrace);
-    frames.truncate(3);
-    frames
-}
-
-/// Every frame of `backtrace` outside the shim and the standard library, innermost first: a
-/// folded stack from the Rust code that pushed the value out to its entry point.
-fn frames(backtrace: &Backtrace) -> Vec<String> {
-    let mut frames = symbols(backtrace);
-    frames.reverse();
-    frames
-}
-
-fn symbols(backtrace: &Backtrace) -> Vec<String> {
     const SKIP_SYMBOLS: &[&str] = &[
         "std::",
         "core::",
@@ -649,6 +376,9 @@ fn symbols(backtrace: &Backtrace) -> Vec<String> {
             Some(location) => format!("{symbol} ({location})"),
             None => symbol.to_owned(),
         });
+        if frames.len() == 3 {
+            break;
+        }
     }
     frames
 }
