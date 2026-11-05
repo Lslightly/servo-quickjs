@@ -121,6 +121,10 @@ pub(crate) enum DrainContext {
     JobRun,
     /// A task ended and drained the whole pool (`drain_current_pool`).
     Task,
+    /// The test hook `runtime.drain_pool_gc()` drained the pool and then ran a full GC. The
+    /// recorded time is the sum of both, not just the drain.
+    #[cfg(drain_stats)]
+    DrainPoolGc,
 }
 
 #[cfg(drain_stats)]
@@ -135,6 +139,7 @@ impl DrainContext {
             Self::JobCallback => "job_callback",
             Self::JobRun => "job_run",
             Self::Task => "task",
+            Self::DrainPoolGc => "drain_pool_gc",
         }
     }
 }
@@ -261,18 +266,23 @@ impl Cx {
         #[cfg(drain_stats)]
         let start = (self.pool.len() > mark.0 || self.atom_pool.len() > mark.1)
             .then(std::time::Instant::now);
-        // The number of pool entries freed. Atoms are timed but not counted: a slow drain can be
-        // many cheap frees or a few expensive ones, and this tells the two apart.
+        let _values = self.drain_release(mark);
+        // `start` is `Some` iff the drain had work; atoms are part of the elapsed time but not of
+        // `values`.
         #[cfg(drain_stats)]
+        drain_stats::drained(context, start.map(|start| start.elapsed()), _values);
+    }
+
+    /// Frees the values and atoms above `mark`, returning the number of pool entries freed.
+    /// Atoms are not counted: a slow drain can be many cheap frees or a few expensive ones, and
+    /// this tells the two apart.
+    fn drain_release(&self, mark: (usize, usize)) -> u64 {
         let mut values = 0u64;
         while self.pool.len() > mark.0 {
             let v = self.pool.pop().unwrap();
             #[cfg(qjs_pool_stats)]
             pool_stats::popped(v);
-            #[cfg(drain_stats)]
-            {
-                values += 1;
-            }
+            values += 1;
             verify::pooled(v, -1);
             // The pool's reference is often the last one; `release_object` cannot see this
             // release, so tell the event flame graph the object is gone here.
@@ -305,10 +315,7 @@ impl Cx {
             let a = self.atom_pool.pop().unwrap();
             unsafe { q::JS_FreeAtomRT(self.rt, a) };
         }
-        // `start` is `Some` iff the drain had work; atoms are part of the elapsed time but not of
-        // `values`.
-        #[cfg(drain_stats)]
-        drain_stats::drained(context, start.map(|start| start.elapsed()), values);
+        values
     }
 
     pub fn pool_mark(&self) -> (usize, usize) {
@@ -462,6 +469,21 @@ pub(crate) fn drain_current_pool() {
         pool_stats::task_drained(cx.pool.len());
         cx.drain_pool((0, 0), DrainContext::Task);
     }
+}
+
+/// Drains the whole pool, then runs a full GC, as one operation. With `DRAIN_STATS=1` the total
+/// time of both is recorded under `DrainContext::DrainPoolGc`.
+pub(crate) fn drain_pool_and_gc() {
+    let Some(cx) = try_current() else {
+        return;
+    };
+    #[cfg(drain_stats)]
+    let start = std::time::Instant::now();
+    let _values = cx.drain_release((0, 0));
+    // SAFETY: `cx` is the live runtime of this thread, and the caller is a JS hook on it.
+    unsafe { JS_GC(cx.as_raw(), root::JS::GCReason::API) };
+    #[cfg(drain_stats)]
+    drain_stats::drained(DrainContext::DrainPoolGc, Some(start.elapsed()), _values);
 }
 
 /// How a value entered the autorelease pool.
