@@ -66,8 +66,9 @@ pub(crate) unsafe fn JS_DestroyContext(raw: *mut root::JSContext) {
     // After the finalizers that `JS_FreeRuntime` runs, which still release values into the pool.
     #[cfg(qjs_pool_stats)]
     super::pool_stats::report();
+    // Drain stats are written per drain, so only the runtime id has to be reset here.
     #[cfg(drain_stats)]
-    super::drain_stats::report();
+    super::drain_stats::reset_runtime();
     super::verify::reset();
     super::forget_shared_rcs();
     drop(Box::from_raw(raw as *mut Cx));
