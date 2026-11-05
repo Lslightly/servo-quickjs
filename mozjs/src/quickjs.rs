@@ -97,6 +97,13 @@ pub fn pool_stats_json() -> String {
     crate::engine::pool_stats::json(false)
 }
 
+/// The drain timing of this thread's runtime as JSON (built with `DRAIN_STATS=1`, see
+/// `engine/drain_stats.rs`).
+#[cfg(drain_stats)]
+pub fn drain_stats_json() -> String {
+    crate::engine::drain_stats::json()
+}
+
 /// The number of values currently kept alive by the autorelease pool.
 pub fn autorelease_pool_len() -> usize {
     crate::engine::current().pool.len()

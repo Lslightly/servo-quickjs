@@ -25,6 +25,13 @@ fn main() {
         println!("cargo:rustc-cfg=qjs_pool_stats");
     }
     println!("cargo:rerun-if-env-changed=QJS_POOL_STATS");
+
+    println!("cargo:rustc-check-cfg=cfg(drain_stats)");
+    if std::env::var("DRAIN_STATS").is_ok_and(|v| !v.is_empty() && v != "0") {
+        println!("cargo:rustc-cfg=drain_stats");
+    }
+    println!("cargo:rerun-if-env-changed=DRAIN_STATS");
+
     println!("cargo:rerun-if-changed=stub_bindings.py");
     println!("cargo:rerun-if-changed=upstream-bindgen");
     println!("cargo:rerun-if-changed=src/engine");
