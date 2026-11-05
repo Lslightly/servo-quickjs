@@ -121,7 +121,6 @@ pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: 
         // fsync per drain.
         if result
             .and_then(|()| out.flush())
-            .and_then(|()| out.get_ref().sync_all())
             .is_err()
         {
             s.failed = true;
