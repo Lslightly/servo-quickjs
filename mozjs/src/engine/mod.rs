@@ -31,6 +31,8 @@ mod debugger;
 #[cfg(not(qjs_debugger))]
 #[path = "no_debugger.rs"]
 mod debugger;
+#[cfg(drain_stats)]
+pub(crate) mod drain_stats;
 mod error;
 mod eval;
 mod exception;
@@ -39,8 +41,6 @@ mod intrinsics;
 mod misc;
 mod module;
 mod object;
-#[cfg(drain_stats)]
-pub(crate) mod drain_stats;
 #[cfg(qjs_pool_stats)]
 pub(crate) mod pool_stats;
 mod promise;
@@ -135,9 +135,6 @@ pub(crate) enum DrainContext {
 
 #[cfg(drain_stats)]
 impl DrainContext {
-    /// The number of variants and the length of `State::drains`; keep in sync with the enum.
-    pub(crate) const COUNT: usize = 7;
-
     /// The `ctx` value in the JSON output. Tools match these strings, so keep them stable.
     pub(crate) fn name(self) -> &'static str {
         match self {
