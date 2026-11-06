@@ -6,7 +6,11 @@
 
 use std::cell::Cell;
 use std::ffi::{c_char, c_int, c_void};
+use std::fmt::Write as _;
+use std::fs::{File, OpenOptions};
+use std::io::{LineWriter, Write as _};
 use std::ptr;
+use std::sync::Once;
 
 use servo_quickjs as q;
 
@@ -128,16 +132,33 @@ pub(crate) unsafe fn JS_GC(cx: *mut root::JSContext, reason: root::JS::GCReason)
     let _ = reason;
     let cx = Cx::from_raw(cx);
     let rt = cx.rt;
-    let roots = gc_stats_mode().is_some_and(|mode| mode == "roots" || mode.starts_with("paths:"));
+    let mode = gc_stats_mode();
+    let roots = mode.is_some_and(|mode| mode == "roots" || mode.starts_with("paths:"));
     if roots {
         q::JS_SetGCRootsHook(rt, Some(record_root), ptr::null_mut());
     }
+    // `QJS_GC_STATS`: the live heap on both sides of the collection. The timer wraps only
+    // `JS_RunGC`, not the sampling or the roots hook.
+    let before = if mode.is_some() {
+        Some(QJS_MemStats::collect(rt))
+    } else {
+        None
+    };
+    let start = std::time::Instant::now();
     q::JS_RunGC(rt);
+    let elapsed = start.elapsed();
+    let after = if mode.is_some() {
+        Some(QJS_MemStats::collect(rt))
+    } else {
+        None
+    };
     if roots {
         q::JS_SetGCRootsHook(rt, None, ptr::null_mut());
         print_roots(cx);
     }
-    print_gc_stats(rt);
+    if let (Some(before), Some(after)) = (before, after) {
+        print_gc_stats(&before, &after, elapsed);
+    }
 }
 
 fn gc_stats_mode() -> Option<&'static str> {
@@ -356,45 +377,168 @@ unsafe fn print_roots(cx: &Cx) {
     }
 }
 
-/// With `QJS_GC_STATS=1`, a line of live realms, objects and memory after each `JS_GC`; with
-/// `QJS_GC_STATS=classes`, also the classes with the most live objects; with `roots`, also what
-/// the collection found referenced from outside, by realm and class; with `paths:<class>`, also
-/// the paths from those roots to the live objects of the class. For leak hunting.
-unsafe fn print_gc_stats(rt: *mut q::JSRuntime) {
-    let Some(mode) = gc_stats_mode() else {
-        return;
-    };
-    let mut usage: q::JSMemoryUsage = std::mem::zeroed();
-    q::JS_ComputeMemoryUsage(rt, &mut usage);
-    eprintln!(
-        "qjs-gc: [{}] realms={} objects={} strings={} functions={} shapes={} malloc={}KiB",
-        std::thread::current().name().unwrap_or("?"),
-        super::realm::realm_count(),
-        usage.obj_count,
-        usage.str_count,
-        usage.js_func_count,
-        usage.shape_count,
-        usage.malloc_size / 1024,
-    );
-    if mode == "1" {
-        return;
+/// The live heap at one point in time, sampled for the `QJS_GC_STATS` JSON output.
+#[allow(non_camel_case_types)]
+struct QJS_MemStats {
+    realms: usize,
+    objects: i64,
+    strings: i64,
+    functions: i64,
+    shapes: i64,
+    /// Bytes allocated through malloc (`JSMemoryUsage.malloc_size`).
+    malloc_size: i64,
+    /// Live objects by class name, sorted by name in the JSON output.
+    classes: std::collections::BTreeMap<String, u64>,
+}
+
+impl QJS_MemStats {
+    unsafe fn collect(rt: *mut q::JSRuntime) -> Self {
+        let mut usage: q::JSMemoryUsage = std::mem::zeroed();
+        q::JS_ComputeMemoryUsage(rt, &mut usage);
+        // One count per class id; the returned length is the number of classes seen.
+        let mut counts = vec![0u32; 8192];
+        let len = (q::JS_CountObjectsByClass(rt, counts.as_mut_ptr(), counts.len() as u32) as usize)
+            .min(counts.len());
+        let mut buf = [0 as c_char; 64];
+        let mut classes = std::collections::BTreeMap::new();
+        for (id, &n) in counts[..len].iter().enumerate() {
+            if n == 0 {
+                continue;
+            }
+            let name = q::JS_GetClassNameRT(
+                rt,
+                id as q::JSClassID,
+                buf.as_mut_ptr(),
+                buf.len() as c_int,
+            );
+            let name = std::ffi::CStr::from_ptr(name)
+                .to_string_lossy()
+                .into_owned();
+            *classes.entry(name).or_insert(0) += n as u64;
+        }
+        Self {
+            realms: super::realm::realm_count(),
+            objects: usage.obj_count,
+            strings: usage.str_count,
+            functions: usage.js_func_count,
+            shapes: usage.shape_count,
+            malloc_size: usage.malloc_size,
+            classes,
+        }
     }
-    let mut counts = vec![0u32; 8192];
-    let len = (q::JS_CountObjectsByClass(rt, counts.as_mut_ptr(), counts.len() as u32) as usize)
-        .min(counts.len());
-    let mut classes: Vec<(u32, usize)> = counts[..len]
-        .iter()
-        .enumerate()
-        .filter(|(_, &n)| n > 0)
-        .map(|(id, &n)| (n, id))
-        .collect();
-    classes.sort_unstable_by(|a, b| b.cmp(a));
-    let mut buf = [0 as std::ffi::c_char; 64];
-    for (n, id) in classes.into_iter().take(25) {
-        let name = q::JS_GetClassNameRT(rt, id as q::JSClassID, buf.as_mut_ptr(), buf.len() as i32);
-        eprintln!(
-            "qjs-gc:   {n:7} {}",
-            std::ffi::CStr::from_ptr(name).to_string_lossy()
+
+    /// Appends `self` as a JSON object.
+    fn write_json(&self, out: &mut String) {
+        let _ = write!(
+            out,
+            "{{\"realms\":{},\"objects\":{},\"strings\":{},\"functions\":{},\
+             \"shapes\":{},\"malloc_size\":{},\"classes\":{{",
+            self.realms,
+            self.objects,
+            self.strings,
+            self.functions,
+            self.shapes,
+            self.malloc_size,
         );
+        for (i, (name, count)) in self.classes.iter().enumerate() {
+            if i > 0 {
+                out.push(',');
+            }
+            out.push_str(&json_string(name));
+            let _ = write!(out, ":{count}");
+        }
+        out.push_str("}}");
+    }
+}
+
+/// `s` as a quoted JSON string.
+fn json_string(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 2);
+    out.push('"');
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            c if (c as u32) < 0x20 => {
+                let _ = write!(out, "\\u{:04x}", c as u32);
+            }
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
+}
+
+/// Where this thread's `QJS_GC_STATS` lines go: opened on the first collection, and `Failed`
+/// after an open or write error so the file is not retried on every collection.
+enum GcStatsFile {
+    Unopened,
+    Out(LineWriter<File>),
+    Failed,
+}
+
+thread_local!(static GC_STATS_OUT: std::cell::RefCell<GcStatsFile> =
+    const { std::cell::RefCell::new(GcStatsFile::Unopened) });
+
+/// Truncates the output file once per process: lines left behind by an earlier run must not mix
+/// into this run's data.
+static GC_STATS_FIRST_WRITE: Once = Once::new();
+
+/// With `QJS_GC_STATS=1`, one JSON line per `JS_GC` appended to `QJS_GC_STATS_OUT` (default
+/// `qjs-gc-<pid>.jsonl` in the temporary directory):
+/// `{"gc_time(us)":<us>,"thread":"<name>","tid":"<ThreadId>","before":{...},"after":{...}}`,
+/// where `gc_time(us)` is how long `JS_RunGC` itself took, in microseconds, `thread` and `tid`
+/// identify the collecting thread, and each side is the live heap: `realms`, `objects`,
+/// `strings`, `functions`, `shapes`, `malloc_size` (bytes) and `classes` (live objects by class
+/// name). With `roots` and `paths:<class>`, `print_roots` / `print_paths` print their own lines
+/// as well. For leak hunting.
+fn print_gc_stats(before: &QJS_MemStats, after: &QJS_MemStats, elapsed: std::time::Duration) {
+    let thread = std::thread::current();
+    let mut line = String::with_capacity(512);
+    let _ = write!(
+        line,
+        "{{\"gc_time(us)\":{},\"thread\":{},\"tid\":{},\"before\":",
+        u64::try_from(elapsed.as_micros()).unwrap_or(u64::MAX),
+        json_string(thread.name().unwrap_or("")),
+        json_string(&format!("{:?}", thread.id())),
+    );
+    before.write_json(&mut line);
+    line.push_str(",\"after\":");
+    after.write_json(&mut line);
+    line.push('}');
+
+    let _ = GC_STATS_OUT.try_with(|out| {
+        let mut out = out.borrow_mut();
+        if let GcStatsFile::Unopened = &*out {
+            *out = open_gc_stats();
+        }
+        let result = match &mut *out {
+            GcStatsFile::Out(file) => writeln!(file, "{line}").and_then(|()| file.flush()),
+            GcStatsFile::Unopened | GcStatsFile::Failed => Ok(()),
+        };
+        if result.is_err() {
+            *out = GcStatsFile::Failed;
+        }
+    });
+}
+
+fn open_gc_stats() -> GcStatsFile {
+    let path = std::env::var_os("QJS_GC_STATS_OUT")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| {
+            std::env::temp_dir().join(format!("qjs-gc-{}.jsonl", std::process::id()))
+        });
+    GC_STATS_FIRST_WRITE.call_once(|| {
+        let _ = File::create(&path);
+    });
+    match OpenOptions::new().create(true).append(true).open(&path) {
+        Ok(file) => {
+            log::info!("qjs-gc-stats: writing to {}", path.display());
+            GcStatsFile::Out(LineWriter::new(file))
+        }
+        Err(e) => {
+            log::error!("qjs-gc-stats: can't write {}: {e}", path.display());
+            GcStatsFile::Failed
+        }
     }
 }
