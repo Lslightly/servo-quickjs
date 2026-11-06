@@ -266,27 +266,29 @@ impl Cx {
         #[cfg(drain_stats)]
         let start = (self.pool.len() > mark.0 || self.atom_pool.len() > mark.1)
             .then(std::time::Instant::now);
-        let _values = self.drain_release(mark);
+        let (last, shared) = self.drain_release(mark);
         // `start` is `Some` iff the drain had work; atoms are part of the elapsed time but not of
-        // `values`.
+        // the value counts.
         #[cfg(drain_stats)]
-        drain_stats::drained(context, start.map(|start| start.elapsed()), _values);
+        drain_stats::drained(context, start.map(|start| start.elapsed()), last, shared);
     }
 
-    /// Frees the values and atoms above `mark`, returning the number of pool entries freed.
-    /// Atoms are not counted: a slow drain can be many cheap frees or a few expensive ones, and
-    /// this tells the two apart.
-    fn drain_release(&self, mark: (usize, usize)) -> u64 {
-        let mut values = 0u64;
+    /// Frees the values and atoms above `mark`, returning `(last, shared)`: how many freed values
+    /// had a reference count of 1 (the pool held the last reference, so the object dies) and how
+    /// many had a count of 2 or more (something else still holds it). Atoms are not counted: a
+    /// slow drain can be many cheap frees or a few expensive ones, and this tells the two apart.
+    fn drain_release(&self, mark: (usize, usize)) -> (u64, u64) {
+        let mut last = 0u64;
+        let mut shared = 0u64;
         while self.pool.len() > mark.0 {
             let v = self.pool.pop().unwrap();
             #[cfg(qjs_pool_stats)]
             pool_stats::popped(v);
-            values += 1;
             verify::pooled(v, -1);
             // The pool's reference is often the last one; `release_object` cannot see this
             // release, so tell the event flame graph the object is gone here.
             if unsafe { q::JS_GetRefCount(v) } == 1 {
+                last += 1;
                 tracing::trace!(
                     target: "mozjs_gc",
                     {
@@ -298,6 +300,7 @@ impl Cx {
                     v.ptr(),
                 );
             } else {
+                shared += 1;
                 tracing::trace!(
                     target: "mozjs_gc",
                     {
@@ -315,7 +318,7 @@ impl Cx {
             let a = self.atom_pool.pop().unwrap();
             unsafe { q::JS_FreeAtomRT(self.rt, a) };
         }
-        values
+        (last, shared)
     }
 
     pub fn pool_mark(&self) -> (usize, usize) {
@@ -479,11 +482,13 @@ pub(crate) fn drain_pool_and_gc() {
     };
     #[cfg(drain_stats)]
     let start = std::time::Instant::now();
-    let _values = cx.drain_release((0, 0));
+    let (last, shared) = cx.drain_release((0, 0));
+    #[cfg(not(drain_stats))]
+    let _ = (last, shared);
     // SAFETY: `cx` is the live runtime of this thread, and the caller is a JS hook on it.
     unsafe { JS_GC(cx.as_raw(), root::JS::GCReason::API) };
     #[cfg(drain_stats)]
-    drain_stats::drained(DrainContext::DrainPoolGc, Some(start.elapsed()), _values);
+    drain_stats::drained(DrainContext::DrainPoolGc, Some(start.elapsed()), last, shared);
 }
 
 /// How a value entered the autorelease pool.
