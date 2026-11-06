@@ -8,12 +8,15 @@
 //! `qjs-drain-stats-<pid>.jsonl` in the temporary directory):
 //!
 //! ```json
-//! {"thread":"Script(1,1)","pid":123,"runtime":1,"ctx":"native_call","elapsed_ns":1234,"values":5}
+//! {"thread":"Script(1,1)","pid":123,"runtime":1,"ctx":"native_call","elapsed_ns":1234,"values":5,
+//!  "free(==1)":3,"free(>=2)":2}
 //! ```
 //!
 //! `ctx` says why the drain ran (a scope dropped, a native call returned, …). `elapsed_ns` is
 //! `null` for an empty drain (nothing to release; those are not timed). `values` is how many pool
-//! entries the drain freed; atoms are not counted.
+//! entries the drain freed; atoms are not counted. `free(==1)` and `free(>=2)` split those values
+//! by reference count: how many held the last reference (the object dies with the free) and how
+//! many were still shared.
 //!
 //! This module does no aggregation: `merge_drain_stats.py` computes counts, totals, maxima and
 //! histograms from the raw lines. Each line is flushed and fsynced before `drained` returns, so a
@@ -61,7 +64,7 @@ thread_local!(static STATE: RefCell<State> = RefCell::new(State::default()));
 ///
 /// `elapsed` is `None` when the drain found nothing to release. This runs on every drain, so it
 /// keeps the file open per thread and writes one line per call.
-pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: u64) {
+pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, last: u64, shared: u64) {
     let _ = STATE.try_with(|s| {
         let s = &mut *s.borrow_mut();
         if s.failed {
@@ -99,6 +102,7 @@ pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: 
         let ctx = string(context.name());
         let pid = std::process::id();
         let runtime = s.runtime;
+        let values = last + shared;
         let out = s.out.as_mut().unwrap();
 
         let result = match elapsed {
@@ -107,13 +111,15 @@ pub(crate) fn drained(context: DrainContext, elapsed: Option<Duration>, values: 
                 writeln!(
                     out,
                     "{{\"thread\":{thread},\"pid\":{pid},\"runtime\":{runtime},\"ctx\":{ctx},\
-                     \"elapsed_ns\":{ns},\"values\":{values}}}"
+                     \"elapsed_ns\":{ns},\"values\":{values},\"free(==1)\":{last},\
+                     \"free(>=2)\":{shared}}}"
                 )
             }
             None => writeln!(
                 out,
                 "{{\"thread\":{thread},\"pid\":{pid},\"runtime\":{runtime},\"ctx\":{ctx},\
-                 \"elapsed_ns\":null,\"values\":{values}}}"
+                 \"elapsed_ns\":null,\"values\":{values},\"free(==1)\":{last},\
+                 \"free(>=2)\":{shared}}}"
             ),
         };
         // Flush the line out of the `LineWriter` and fsync it: the newline alone only gets the
