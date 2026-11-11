@@ -1151,6 +1151,16 @@ unsafe extern "C" {
     pub fn JS_NewObjectClass(ctx: *mut JSContext, class_id: ::std::os::raw::c_int) -> JSValue;
 }
 unsafe extern "C" {
+    pub fn JS_NewDomStub(
+        ctx: *mut JSContext,
+        class_id: JSClassID,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_UnbindDomStub(ctx: *mut JSContext, obj: JSValue);
+}
+unsafe extern "C" {
     pub fn JS_NewObjectProto(ctx: *mut JSContext, proto: JSValue) -> JSValue;
 }
 unsafe extern "C" {

@@ -677,3 +677,7 @@ wrap!(jsapi: pub fn JS_GetUCPropertyDescriptor(cx: &mut JSContext, obj: HandleOb
 wrap!(jsapi: pub fn CreateError(cx: &mut JSContext, type_: JSExnType, stack: HandleObject, fileName: HandleString, lineNumber: u32, columnNumber: u32, report: *mut JSErrorReport, message: HandleString, cause: HandleValue, rval: MutableHandleValue) -> bool);
 wrap!(jsapi: pub fn GetExceptionCause(exc: *mut JSObject, dest: MutableHandleValue));
 wrap!(jsapi: pub fn NewEnvironmentChain(cx: &mut JSContext, supportUnscopables: SupportUnscopables) -> *mut EnvironmentChain);
+
+wrap!(jsapi: pub fn JS_NewDomStub(cx: &mut JSContext, clasp: *const JSClass) -> *mut JSObject);
+wrap!(jsapi: pub fn JS_UnbindDomStub(cx: &mut JSContext, obj: *mut JSObject));
+wrap!(jsapi: pub fn JS_GetDomStubRefCount(stub: *mut JSObject) -> i32);

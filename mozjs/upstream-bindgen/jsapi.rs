@@ -18806,6 +18806,21 @@ pub mod root {
         ) -> *mut root::JSObject;
     }
     extern "C" {
+        pub fn JS_NewDomStub(
+            cx: *mut JSContext,
+            clasp: *const JSClass,
+        ) -> *mut JSObject;
+    }
+    extern "C" {
+        pub fn JS_UnbindDomStub(
+            cx: *mut JSContext,
+            obj: *mut root::JSObject,
+        );
+    }
+    extern "C" {
+        pub fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32;
+    }
+    extern "C" {
         #[link_name = "\u{1}_Z12JS_NewObjectP9JSContextPK7JSClass"]
         pub fn JS_NewObject(
             cx: *mut root::JSContext,
