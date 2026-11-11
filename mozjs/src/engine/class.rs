@@ -668,6 +668,42 @@ pub(crate) unsafe fn JS_NewObjectWithGivenProto(
     adopt_object(cx, obj)
 }
 
+/// Creates a `JSDomStub` backed by a fresh `ObjectData`, so that the stub answers the usual
+/// `JS_GetClassID`/`JS_GetOpaque` API like a real object. The stub owns the `ObjectData` until it
+/// is unbound; the caller stores the DOM node in its reserved slots, as for a materialized object.
+pub(crate) unsafe fn JS_NewDomStub(
+    cx: *mut root::JSContext,
+    clasp: *const root::JSClass,
+) -> *mut root::JSObject {
+    let cx = Cx::from_raw(cx);
+    let id = class_id(cx.rt, clasp);
+    let data = ObjectData::new(clasp, cx.current_realm());
+    let obj = q::JS_NewDomStub(cx.qctx(), id, Box::into_raw(data) as *mut c_void);
+    adopt_object(cx, obj)
+}
+
+/// Detaches the DOM node from its stub and frees the stub's `ObjectData`. The stub stays alive
+/// until its references are dropped, but no longer finalizes the node. The caller must have
+/// handed the node to its new owner (the `JSObject` bound in place of the stub) beforehand.
+pub(crate) unsafe fn JS_UnbindDomStub(cx: *mut root::JSContext, obj: *mut root::JSObject) {
+    let cx = Cx::from_raw(cx);
+    let v = obj_val(obj);
+    let data = q::JS_GetOpaque(v, q::JS_GetClassID(v)) as *mut ObjectData;
+    if !data.is_null() {
+        // The reserved slots still describe the DOM object, which now belongs to the new
+        // `JSObject`: free the `ObjectData` and the slot array, but not the values it holds.
+        let ObjectData { realm, slots, .. } = *Box::from_raw(data);
+        drop(slots);
+        super::release_realm(realm);
+    }
+    q::JS_UnbindDomStub(cx.qctx(), v);
+}
+
+/// The reference count of a `JSDomStub` (or of any other GC object).
+pub(crate) unsafe fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32 {
+    q::JS_GetRefCount(obj_val(stub))
+}
+
 pub(crate) unsafe fn JS_NewPlainObject(cx: *mut root::JSContext) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let obj = q::JS_NewObject(cx.qctx());
