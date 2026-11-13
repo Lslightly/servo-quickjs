@@ -18966,6 +18966,14 @@ pub mod root {
         pub fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32;
     }
     extern "C" {
+        pub fn JS_GetDomStubInfo(
+            stub: *mut root::JSObject,
+            clasp: *mut *const JSClass,
+            global: *mut *mut root::JSObject,
+            cx: *mut *mut JSContext,
+        );
+    }
+    extern "C" {
         #[link_name = "\u{1}_Z12JS_NewObjectP9JSContextPK7JSClass"]
         pub fn JS_NewObject(
             cx: *mut root::JSContext,
