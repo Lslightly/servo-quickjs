@@ -720,6 +720,21 @@ pub(crate) unsafe fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32 {
     q::JS_GetRefCount(obj_val(stub))
 }
 
+/// What a `JSDomStub` recorded at wrap time and needs to materialize: its class, the global
+/// object of its realm and the shim context that owns the realm. Must be called before
+/// `JS_UnbindDomStub`, which frees the stub's `ObjectData`.
+pub(crate) unsafe fn JS_GetDomStubInfo(
+    stub: *mut root::JSObject,
+    clasp: *mut *const root::JSClass,
+    global: *mut *mut root::JSObject,
+    cx: *mut *mut root::JSContext,
+) {
+    let data = object_data(stub).expect("JS_GetDomStubInfo on an object without ObjectData");
+    *clasp = data.clasp;
+    *global = (*data.realm).global;
+    *cx = super::context_of_realm(data.realm);
+}
+
 pub(crate) unsafe fn JS_NewPlainObject(cx: *mut root::JSContext) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     let obj = q::JS_NewObject(cx.qctx());
