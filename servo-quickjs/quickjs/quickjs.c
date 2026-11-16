@@ -8669,6 +8669,8 @@ JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
     JSShapeProperty *prs;
     uint32_t tag;
 
+    if (js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB) abort();
+
     tag = JS_VALUE_GET_TAG(obj);
     if (unlikely(tag != JS_TAG_OBJECT)) {
         switch(tag) {
