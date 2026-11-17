@@ -682,5 +682,6 @@ wrap!(jsapi: pub fn NewEnvironmentChain(cx: &mut JSContext, supportUnscopables: 
 wrap!(jsapi: pub fn JS_NewDomStub(cx: &mut JSContext, clasp: *const JSClass) -> *mut JSObject);
 wrap!(jsapi: pub fn JS_UnbindDomStub(cx: &mut JSContext, obj: *mut JSObject));
 wrap!(jsapi: pub fn JS_GetDomStubRefCount(stub: *mut JSObject) -> i32);
+wrap!(jsapi: pub fn JS_IsDomStub(obj: *mut JSObject) -> bool);
 // `jsapi::JSContext` (not the safe `JSContext`) is the raw context type the shim takes.
 wrap!(jsapi: pub fn JS_GetDomStubInfo(stub: *mut JSObject, clasp: *mut *const JSClass, global: *mut *mut JSObject, cx: *mut *mut jsapi::JSContext));

@@ -49,11 +49,7 @@ where
             index % 8
         };
         let mask = 1 << bit_index;
-        if val {
-            byte | mask
-        } else {
-            byte & !mask
-        }
+        if val { byte | mask } else { byte & !mask }
     }
     #[inline]
     pub fn set_bit(&mut self, index: usize, val: bool) {
@@ -211,6 +207,7 @@ pub const JS_DEF_OBJECT: u32 = 8;
 pub const JS_DEF_ALIAS: u32 = 9;
 pub const JS_DEF_PROP_ATOM: u32 = 10;
 pub const JS_DEF_PROP_BOOL: u32 = 11;
+pub type __uint64_t = ::std::os::raw::c_ulong;
 pub type __off_t = ::std::os::raw::c_long;
 pub type __off64_t = ::std::os::raw::c_long;
 pub type FILE = _IO_FILE;
@@ -248,7 +245,9 @@ pub struct _IO_FILE {
     pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: ::std::os::raw::c_int,
-    pub _flags2: ::std::os::raw::c_int,
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 3usize]>,
+    pub _short_backupbuf: [::std::os::raw::c_char; 1usize],
     pub _old_offset: __off_t,
     pub _cur_column: ::std::os::raw::c_ushort,
     pub _vtable_offset: ::std::os::raw::c_schar,
@@ -259,9 +258,11 @@ pub struct _IO_FILE {
     pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut ::std::os::raw::c_void,
-    pub __pad5: usize,
+    pub _prevchain: *mut *mut _IO_FILE,
     pub _mode: ::std::os::raw::c_int,
-    pub _unused2: [::std::os::raw::c_char; 20usize],
+    pub _unused3: ::std::os::raw::c_int,
+    pub _total_written: __uint64_t,
+    pub _unused2: [::std::os::raw::c_char; 8usize],
 }
 impl Default for _IO_FILE {
     fn default() -> Self {
@@ -270,6 +271,50 @@ impl Default for _IO_FILE {
             ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
             s.assume_init()
         }
+    }
+}
+impl _IO_FILE {
+    #[inline]
+    pub fn _flags2(&self) -> ::std::os::raw::c_int {
+        unsafe { ::std::mem::transmute(self._bitfield_1.get(0usize, 24u8) as u32) }
+    }
+    #[inline]
+    pub fn set__flags2(&mut self, val: ::std::os::raw::c_int) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            self._bitfield_1.set(0usize, 24u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn _flags2_raw(this: *const Self) -> ::std::os::raw::c_int {
+        unsafe {
+            ::std::mem::transmute(<__BindgenBitfieldUnit<[u8; 3usize]>>::raw_get(
+                ::std::ptr::addr_of!((*this)._bitfield_1),
+                0usize,
+                24u8,
+            ) as u32)
+        }
+    }
+    #[inline]
+    pub unsafe fn set__flags2_raw(this: *mut Self, val: ::std::os::raw::c_int) {
+        unsafe {
+            let val: u32 = ::std::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 3usize]>>::raw_set(
+                ::std::ptr::addr_of_mut!((*this)._bitfield_1),
+                0usize,
+                24u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(_flags2: ::std::os::raw::c_int) -> __BindgenBitfieldUnit<[u8; 3usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 3usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 24u8, {
+            let _flags2: u32 = unsafe { ::std::mem::transmute(_flags2) };
+            _flags2 as u64
+        });
+        __bindgen_bitfield_unit
     }
 }
 #[repr(C)]
@@ -824,6 +869,19 @@ unsafe extern "C" {
     pub fn JS_GetClassID(v: JSValue) -> JSClassID;
 }
 unsafe extern "C" {
+    pub fn JS_NewDomStub(
+        ctx: *mut JSContext,
+        class_id: u16,
+        opaque: *mut ::std::os::raw::c_void,
+    ) -> JSValue;
+}
+unsafe extern "C" {
+    pub fn JS_UnbindDomStub(ctx: *mut JSContext, obj: JSValue);
+}
+unsafe extern "C" {
+    pub fn JS_IsDomStub(v: JSValue) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
     pub fn JS_NewClass(
         rt: *mut JSRuntime,
         class_id: JSClassID,
@@ -1043,7 +1101,7 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_ToFloat64(ctx: *mut JSContext, pres: *mut f64, val: JSValue)
-        -> ::std::os::raw::c_int;
+    -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
     pub fn JS_ToBigInt64(
@@ -1150,16 +1208,6 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_NewObjectClass(ctx: *mut JSContext, class_id: ::std::os::raw::c_int) -> JSValue;
-}
-unsafe extern "C" {
-    pub fn JS_NewDomStub(
-        ctx: *mut JSContext,
-        class_id: JSClassID,
-        opaque: *mut ::std::os::raw::c_void,
-    ) -> JSValue;
-}
-unsafe extern "C" {
-    pub fn JS_UnbindDomStub(ctx: *mut JSContext, obj: JSValue);
 }
 unsafe extern "C" {
     pub fn JS_NewObjectProto(ctx: *mut JSContext, proto: JSValue) -> JSValue;
@@ -2349,7 +2397,7 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_GetRegExpOriginal(ctx: *mut JSContext, obj: JSValue, pflags: *mut JSValue)
-        -> JSValue;
+    -> JSValue;
 }
 unsafe extern "C" {
     pub fn JS_NewRegExpOriginal(ctx: *mut JSContext, source: JSValue, flags: JSValue) -> JSValue;
