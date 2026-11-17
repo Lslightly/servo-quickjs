@@ -18966,6 +18966,9 @@ pub mod root {
         pub fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32;
     }
     extern "C" {
+        pub fn JS_IsDomStub(obj: *mut JSObject) -> bool;
+    }
+    extern "C" {
         pub fn JS_GetDomStubInfo(
             stub: *mut root::JSObject,
             clasp: *mut *const JSClass,
