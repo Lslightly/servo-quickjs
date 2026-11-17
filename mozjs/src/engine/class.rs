@@ -678,7 +678,9 @@ pub(crate) unsafe fn JS_NewDomStub(
     let cx = Cx::from_raw(cx);
     let id = class_id(cx.rt, clasp);
     let data = ObjectData::new(clasp, cx.current_realm());
-    let obj = q::JS_NewDomStub(cx.qctx(), id, Box::into_raw(data) as *mut c_void);
+    // A `JSDomStub` stores a 16-bit class id; Servo only registers a few hundred classes.
+    debug_assert!(id <= u16::MAX as q::JSClassID);
+    let obj = q::JS_NewDomStub(cx.qctx(), id as u16, Box::into_raw(data) as *mut c_void);
     adopt_object(cx, obj)
 }
 
@@ -697,6 +699,11 @@ pub(crate) unsafe fn JS_UnbindDomStub(cx: *mut root::JSContext, obj: *mut root::
         super::release_realm(realm);
     }
     q::JS_UnbindDomStub(cx.qctx(), v);
+}
+
+/// Whether `obj` is a `JSDomStub` that has not been materialized into a real `JSObject` yet.
+pub(crate) unsafe fn JS_IsDomStub(obj: *mut root::JSObject) -> bool {
+    !obj.is_null() && q::JS_IsDomStub(obj_val(obj)) != 0
 }
 
 /// The reference count of a `JSDomStub` (or of any other GC object).
