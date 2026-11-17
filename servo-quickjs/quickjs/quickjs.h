@@ -565,6 +565,14 @@ typedef struct JSClassDef {
 JSClassID JS_NewClassID(JSClassID *pclass_id);
 /* Returns the class ID if `v` is an object, otherwise returns JS_INVALID_CLASS_ID. */
 JSClassID JS_GetClassID(JSValue v);
+/* Servo: allocate a new JSDomStub, i.e. a lazy DOM object that is not yet a real JSObject.
+   `opaque` becomes the stub's class context and is owned by the stub. */
+JSValue JS_NewDomStub(JSContext *ctx, uint16_t class_id, void *opaque);
+/* Servo: detach the class context from its stub without freeing the stub. */
+void JS_UnbindDomStub(JSContext *ctx, JSValue obj);
+/* Servo: whether `v` is a JSDomStub (see JS_NewDomStub), i.e. a lazy DOM object that has not
+   been materialized into a real JSObject yet. Returns FALSE for non-object values. */
+JS_BOOL JS_IsDomStub(JSValueConst v);
 int JS_NewClass(JSRuntime *rt, JSClassID class_id, const JSClassDef *class_def);
 int JS_IsRegisteredClass(JSRuntime *rt, JSClassID class_id);
 

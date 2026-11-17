@@ -6646,6 +6646,16 @@ void JS_UnbindDomStub(JSContext *ctx, JSValue obj) {
     p->opaque = NULL; // unbind class context
 }
 
+// Servo: whether `v` is a JSDomStub. A stub is a GC object that is not a JSObject, so this
+// cannot use JS_GetClassID() alone: a non-object value has no class id either.
+BOOL JS_IsDomStub(JSValueConst v) {
+    JSObject *p;
+    if (JS_VALUE_GET_TAG(v) != JS_TAG_OBJECT)
+        return FALSE;
+    p = JS_VALUE_GET_OBJ(v);
+    return js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB;
+}
+
 // Servo: free its corresponding DOM T in servo and free JSDomStub
 static void free_dom_stub(JSRuntime *rt, JSDomStub *p) {
     JSClassFinalizer *finalizer;
@@ -8619,7 +8629,7 @@ JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
     JSShapeProperty *prs;
     uint32_t tag;
 
-    if (js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB) abort();
+    if (JS_IsDomStub(obj)) abort();
 
     tag = JS_VALUE_GET_TAG(obj);
     if (unlikely(tag != JS_TAG_OBJECT)) {
