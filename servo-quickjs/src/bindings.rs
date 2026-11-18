@@ -872,7 +872,9 @@ unsafe extern "C" {
     pub fn JS_NewDomStub(
         ctx: *mut JSContext,
         class_id: u16,
-        opaque: *mut ::std::os::raw::c_void,
+        dom_ptr: *mut ::std::os::raw::c_void,
+        realm: *mut ::std::os::raw::c_void,
+        given_proto: *mut ::std::os::raw::c_void,
     ) -> JSValue;
 }
 unsafe extern "C" {
@@ -880,6 +882,15 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_IsDomStub(v: JSValue) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_GetDomStubDomPtr(v: JSValue) -> *mut ::std::os::raw::c_void;
+}
+unsafe extern "C" {
+    pub fn JS_GetDomStubRealm(v: JSValue) -> *mut ::std::os::raw::c_void;
+}
+unsafe extern "C" {
+    pub fn JS_GetDomStubGivenProto(v: JSValue) -> *mut ::std::os::raw::c_void;
 }
 unsafe extern "C" {
     pub fn JS_NewClass(
