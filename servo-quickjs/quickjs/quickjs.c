@@ -520,16 +520,21 @@ struct JSGCObjectHeader {
 };
 
 /* Servo: DOM Stub object. A small stand-in for a JSObject: it is a GC object with its own
-   reference count, but carries no shape or properties. `JS_GetClassID`/`JS_GetOpaque` dispatch
-   on `gc_obj_type`, so the class id and the opaque pointer are readable through the usual API.
+   reference count, but carries no shape or properties. `JS_GetClassID` dispatches on
+   `gc_obj_type`, so the class id is readable through the usual API.
    TODO(Qingwei Li): embed the struct in Servo's reflector */
 typedef struct JSDomStub {
     JSGCObjectHeader header;
     uint16_t class_id;
-    /* Servo: the stub's class context, i.e. the `ObjectData` a JSObject of this class would
-       carry. `NULL` once the stub has been unbound (its DOM node now belongs to a real
-       JSObject): the stub no longer finalizes the node after that. */
-    void *opaque;
+    /* Servo: the DOM node (its `Reflector`), owned by the stub until it is unbound or
+       finalized. `NULL` once the stub has been unbound. */
+    void *dom_ptr;
+    /* Servo: the realm (`RealmData*`) the DOM object belongs to. The stub holds one reference
+       to it; `NULL` once the stub has been unbound. */
+    void *realm;
+    /* Servo: the prototype the caller passed to `wrap` (already outerized), or `NULL` for the
+       canonical prototype. Not retained: owned elsewhere like a `MaterializeCache` was. */
+    void *given_proto;
 } JSDomStub;
 
 const int sizeofJSDomStub = sizeof(JSDomStub);
@@ -6670,10 +6675,12 @@ static void free_object(JSRuntime *rt, JSObject *p)
 
 /* Servo: DOM Stub object (see the definition near JSGCObjectHeader) */
 
-// Servo: allocate a new JSDomStub with `opaque` as its class context (`ObjectData`). Ownership
-// passes to the stub: either the class finalizer frees it when the stub is collected, or the
-// embedder frees it and then calls `JS_UnbindDomStub` to clear the field before that.
-JSValue JS_NewDomStub(JSContext *ctx, uint16_t class_id, void *opaque) {
+// Servo: allocate a new JSDomStub owning `dom_ptr` (a DOM node of class `class_id`) and one
+// reference to `realm`. Either the class finalizer frees the node when the stub is collected, or
+// the embedder hands the node to a real JSObject and calls `JS_UnbindDomStub` before that.
+// `given_proto` is not retained: like the old `MaterializeCache`, it is only valid until then.
+JSValue JS_NewDomStub(JSContext *ctx, uint16_t class_id, void *dom_ptr, void *realm,
+                      void *given_proto) {
     JSDomStub *s;
 
     js_trigger_gc(ctx->rt, sizeof(JSDomStub));
@@ -6681,19 +6688,24 @@ JSValue JS_NewDomStub(JSContext *ctx, uint16_t class_id, void *opaque) {
     if (unlikely(!s))
         return JS_EXCEPTION;
     s->class_id = class_id;
-    s->opaque = opaque;
+    s->dom_ptr = dom_ptr;
+    s->realm = realm;
+    s->given_proto = given_proto;
     js_rc(s)->ref_count = 1;
     add_gc_object(ctx->rt, &s->header, JS_GC_OBJ_TYPE_DOM_STUB);
     return JS_MKPTR(JS_TAG_OBJECT, s);
 }
 
-// Servo: detach the class context from its stub, without freeing the stub. The stub may still be
-// referenced from the autorelease pool, so it is freed when its last reference goes away; by then
-// `opaque` is `NULL` and `free_dom_stub` does not run the finalizer (the new JSObject owns the DOM
-// node). The embedder frees the old context before calling this.
+// Servo: detach the DOM node, realm and given prototype from the stub, without freeing the stub.
+// The stub may still be referenced from the autorelease pool, so it is freed when its last
+// reference goes away; by then `dom_ptr` is `NULL` and `free_dom_stub` does not run the finalizer
+// (the new JSObject owns the DOM node and holds its own realm reference). The embedder releases
+// the stub's realm reference after this call.
 void JS_UnbindDomStub(JSContext *ctx, JSValue obj) {
     JSDomStub *p = (JSDomStub *)obj.u.ptr;
-    p->opaque = NULL; // unbind class context
+    p->dom_ptr = NULL;
+    p->realm = NULL;
+    p->given_proto = NULL;
 }
 
 // Servo: whether `v` is a JSDomStub. A stub is a GC object that is not a JSObject, so this
@@ -6706,12 +6718,35 @@ BOOL JS_IsDomStub(JSValueConst v) {
     return js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB;
 }
 
+static JSDomStub *to_dom_stub(JSValueConst v) {
+    if (JS_VALUE_GET_TAG(v) != JS_TAG_OBJECT)
+        return NULL;
+    if (js_rc(JS_VALUE_GET_OBJ(v))->gc_obj_type != JS_GC_OBJ_TYPE_DOM_STUB)
+        return NULL;
+    return (JSDomStub *)JS_VALUE_GET_OBJ(v);
+}
+
+void *JS_GetDomStubDomPtr(JSValueConst v) {
+    JSDomStub *s = to_dom_stub(v);
+    return s ? s->dom_ptr : NULL;
+}
+
+void *JS_GetDomStubRealm(JSValueConst v) {
+    JSDomStub *s = to_dom_stub(v);
+    return s ? s->realm : NULL;
+}
+
+void *JS_GetDomStubGivenProto(JSValueConst v) {
+    JSDomStub *s = to_dom_stub(v);
+    return s ? s->given_proto : NULL;
+}
+
 // Servo: free its corresponding DOM T in servo and free JSDomStub
 static void free_dom_stub(JSRuntime *rt, JSDomStub *p) {
     JSClassFinalizer *finalizer;
 
-    // An unbound stub has no class context left to finalize.
-    finalizer = p->opaque ? rt->class_array[p->class_id].finalizer : NULL;
+    // An unbound stub has no DOM node left to finalize.
+    finalizer = p->dom_ptr ? rt->class_array[p->class_id].finalizer : NULL;
     if (finalizer)
         (*finalizer)(rt, JS_MKPTR(JS_TAG_OBJECT, p));
 
@@ -11521,13 +11556,10 @@ void *JS_GetOpaque(JSValueConst obj, JSClassID class_id)
     if (JS_VALUE_GET_TAG(obj) != JS_TAG_OBJECT)
         return NULL;
     p = JS_VALUE_GET_OBJ(obj);
-    /* Servo: a JSDomStub keeps its class id and opaque pointer in its own layout. */
-    if (js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB) {
-        JSDomStub *s = (JSDomStub *)p;
-        if (s->class_id != class_id)
-            return NULL;
-        return s->opaque;
-    }
+    /* Servo: a JSDomStub has no opaque (`ObjectData`); its fields are read through
+       `JS_GetDomStub*` instead. */
+    if (js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB)
+        return NULL;
     if (p->class_id != class_id)
         return NULL;
     return p->u.opaque;
