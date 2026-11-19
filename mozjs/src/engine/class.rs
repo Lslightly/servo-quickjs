@@ -130,7 +130,11 @@ pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass
 /// `None` for values that are not objects of a registered SM class (strings, BigInts, plain
 /// objects, ...). The name points into the class's static definition, so it lives for the process.
 pub(crate) unsafe fn class_name(v: q::JSValue) -> Option<&'static str> {
-    let clasp = clasp_of_id(q::JS_GetClassID(v));
+    let clasp = if q::JS_IsDomStub(v) != 0 {
+        stub_class(v)
+    } else {
+        clasp_of_id(q::JS_GetClassID(v))
+    };
     if clasp.is_null() {
         return None;
     }
@@ -148,6 +152,66 @@ fn clasp_of_id(id: q::JSClassID) -> *const root::JSClass {
         None => with_registry(|r| r.by_id.get(&id).copied().unwrap_or(0) as *const root::JSClass),
     }
 }
+
+/// QuickJS: the first field of Servo's `Reflector` (`dom_js_class: Cell<*const DOMJSClass>`),
+/// which is the `Cell` holding the interface's `DOMJSClass`. `DOMJSClass::base` is a `JSClass`
+/// and comes first, so the pointer also names the `JSClass`.
+///
+/// QuickJS calls `servo_dom_stub_class_id` with a stub's `dom_ptr` (the address of the node's
+/// `Reflector`, and thus of this field), so QuickJS itself never has to know the layout of
+/// `Reflector`.
+#[repr(C)]
+struct ReflectorHeader {
+    dom_js_class: Cell<*const root::JSClass>,
+}
+
+/// The `JSClass` of the DOM node a `JSDomStub` owns, or null once the stub has been unbound.
+///
+/// A stub carries no class id: the interface's class is the `DOMJSClass` recorded first on the
+/// Rust `Reflector` that the node pointer points to (`components/script_bindings/reflector.rs`).
+/// Its `base` field is the `JSClass` the interface was wrapped with.
+#[inline]
+unsafe fn stub_class_from_ptr(dom_ptr: *mut c_void) -> *const root::JSClass {
+    if dom_ptr.is_null() {
+        return ptr::null();
+    }
+    (*(dom_ptr as *const ReflectorHeader)).dom_js_class.get()
+}
+
+/// The QuickJS class id of the interface whose DOM node is `dom_ptr` (a `Reflector`), or
+/// `JS_INVALID_CLASS_ID` if it is unknown.
+///
+/// QuickJS calls this from its own stub handling (`JS_GetClassID`, `free_dom_stub` and the GC
+/// mark branch), where the class id it registered the interface's class with is not recorded on
+/// the stub. `rt` is NULL from `JS_GetClassID`, which has no runtime at hand; the current
+/// context's runtime is then used. `class_id` registers the interface's class in `rt` on first
+/// use, which `JS_NewDomStub` has always done by the time a stub is finalized or traced.
+#[no_mangle]
+pub unsafe extern "C" fn servo_dom_stub_class_id(
+    rt: *mut q::JSRuntime,
+    dom_ptr: *mut c_void,
+) -> q::JSClassID {
+    let clasp = stub_class_from_ptr(dom_ptr);
+    if clasp.is_null() {
+        return q::JS_INVALID_CLASS_ID;
+    }
+    let rt = if rt.is_null() {
+        match super::try_current() {
+            Some(cx) => cx.rt,
+            None => return q::JS_INVALID_CLASS_ID,
+        }
+    } else {
+        rt
+    };
+    class_id(rt, clasp)
+}
+
+/// The `JSClass` of the DOM node a `JSDomStub` owns.
+#[inline]
+unsafe fn stub_class(val: q::JSValue) -> *const root::JSClass {
+    stub_class_from_ptr(q::JS_GetDomStubDomPtr(val))
+}
+
 
 /// The object data of `obj`, if it is an object of a SpiderMonkey class (globals included).
 #[inline]
@@ -182,10 +246,12 @@ static FUNCTION_CLASS: root::JSClass = root::JSClass {
 
 /// `js::GetObjectClass` / mozjs `get_object_class`.
 pub(crate) unsafe fn object_class(obj: *mut root::JSObject) -> *const root::JSClass {
-    // QuickJS: a `JSDomStub` carries only its class id. This must come before
-    // `object_data`/`JS_IsFunction`, which would read the stub's fields as a `JSObject`'s.
+    // QuickJS: a `JSDomStub`'s interface class lives on the Rust `Reflector` the stub points to.
+    // This must come before `object_data`/`JS_IsFunction`, which would read the stub's fields as
+    // a `JSObject`'s.
     if q::JS_IsDomStub(obj_val(obj)) != 0 {
-        return clasp_of_id(q::JS_GetClassID(obj_val(obj)));
+        let clasp = stub_class(obj_val(obj));
+        return if clasp.is_null() { &PLAIN_CLASS } else { clasp };
     }
     if let Some(data) = object_data(obj) {
         return data.clasp;
@@ -236,7 +302,8 @@ unsafe extern "C" fn finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
     if q::JS_IsDomStub(val) != 0 {
         let realm = q::JS_GetDomStubRealm(val) as *mut RealmData;
         if !q::JS_GetDomStubDomPtr(val).is_null() {
-            let clasp = clasp_of_id(q::JS_GetClassID(val));
+            // The interface class, from the `Reflector` the stub owns.
+            let clasp = stub_class(val);
             if !clasp.is_null() {
                 let ops = (*clasp).cOps;
                 if !ops.is_null() {
@@ -395,14 +462,14 @@ pub(crate) fn forget_shared_rcs() {
 
 unsafe extern "C" fn gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
     // QuickJS: a `JSDomStub` has no slots. Mark its realm and trace the DOM node like an
-    // `ObjectData`-backed object did. `given_proto` is deliberately not marked: the stub does
-    // not own a reference to it (see `JS_NewDomStub`).
+    // `ObjectData`-backed object did.
     if q::JS_IsDomStub(val) != 0 {
         if q::JS_GetDomStubDomPtr(val).is_null() {
             return;
         }
         super::mark_realm(rt, q::JS_GetDomStubRealm(val) as *mut RealmData, mark);
-        let clasp = clasp_of_id(q::JS_GetClassID(val));
+        // The interface class, from the `Reflector` the stub owns.
+        let clasp = stub_class(val);
         if !clasp.is_null() {
             let ops = (*clasp).cOps;
             if !ops.is_null() {
@@ -734,28 +801,24 @@ pub(crate) unsafe fn JS_NewObjectWithGivenProto(
     adopt_object(cx, obj)
 }
 
-/// Creates a `JSDomStub` owning `dom_ptr` (a DOM node of class `clasp`) and one reference to the
-/// current realm. Unlike a materialized object, the stub carries no `ObjectData` and no slots:
-/// its fields are read back through `JS_GetDomStub*`. `given_proto` (already in this realm) is
-/// stored as a bare pointer and not retained, like the old `MaterializeCache` recorded it.
+/// Creates a `JSDomStub` owning `dom_ptr` (a DOM node) and one reference to the current realm.
+/// Unlike a materialized object, the stub carries no `ObjectData` and no slots: its fields are
+/// read back through `JS_GetDomStub*`. `clasp` is the interface's class, the one `wrap` recorded
+/// on the `Reflector` that `dom_ptr` points to; `QuickJS` later resolves the class id from it via
+/// `servo_dom_stub_class_id`.
 pub(crate) unsafe fn JS_NewDomStub(
     cx: *mut root::JSContext,
     clasp: *const root::JSClass,
     dom_ptr: *mut c_void,
-    given_proto: *mut root::JSObject,
 ) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
-    let id = class_id(cx.rt, clasp);
-    // A `JSDomStub` stores a 16-bit class id; Servo only registers a few hundred classes.
-    debug_assert!(id <= u16::MAX as q::JSClassID);
+    // Registers the interface's class in this runtime on first use; QuickJS gets the id back
+    // through `servo_dom_stub_class_id` when it finalizes or traces the stub, so the stub itself
+    // needs no class id.
+    assert!(!clasp.is_null(), "JSDomStub without an interface class");
+    class_id(cx.rt, clasp);
     let realm = super::hold_realm(cx.current_realm());
-    let obj = q::JS_NewDomStub(
-        cx.qctx(),
-        id as u16,
-        dom_ptr,
-        realm as *mut c_void,
-        given_proto as *mut c_void,
-    );
+    let obj = q::JS_NewDomStub(cx.qctx(), dom_ptr, realm as *mut c_void);
     if obj.tag() == q::JS_TAG_EXCEPTION {
         // `js_malloc` failed: the stub was not created, so drop the reference it would own.
         super::release_realm(realm);
@@ -764,9 +827,8 @@ pub(crate) unsafe fn JS_NewDomStub(
     adopt_object(cx, obj)
 }
 
-/// Detaches the DOM node, realm and given prototype from its stub and releases the stub's realm
-/// reference. The stub stays alive until its references are dropped, but no longer finalizes the
-/// node. The caller must have handed the node to its new owner (the `JSObject` bound in place of
+/// Detaches the DOM node and realm from its stub and releases the stub's realm reference. The
+/// stub stays alive until its references are dropped, but no longer finalizes the node. The caller must have handed the node to its new owner (the `JSObject` bound in place of
 /// the stub) beforehand, so that the new object holds its own realm reference.
 pub(crate) unsafe fn JS_UnbindDomStub(cx: *mut root::JSContext, obj: *mut root::JSObject) {
     let cx = Cx::from_raw(cx);
@@ -786,29 +848,22 @@ pub(crate) unsafe fn JS_GetDomStubDomPtr(obj: *mut root::JSObject) -> *mut c_voi
     q::JS_GetDomStubDomPtr(obj_val(obj))
 }
 
-/// The prototype `wrap` recorded on a `JSDomStub`, or null for the canonical prototype.
-pub(crate) unsafe fn JS_GetDomStubGivenProto(obj: *mut root::JSObject) -> *mut root::JSObject {
-    q::JS_GetDomStubGivenProto(obj_val(obj)) as *mut root::JSObject
-}
-
 /// The reference count of a `JSDomStub` (or of any other GC object).
 pub(crate) unsafe fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32 {
     q::JS_GetRefCount(obj_val(stub))
 }
 
-/// What a `JSDomStub` recorded at wrap time and needs to materialize: its class, the global
-/// object of its realm and the shim context that owns the realm. Must be called before
-/// `JS_UnbindDomStub`, which clears the stub's realm.
+/// What a `JSDomStub` recorded at wrap time and needs to materialize: the global object of its
+/// realm and the shim context that owns the realm. Must be called before `JS_UnbindDomStub`,
+/// which clears the stub's realm. The interface's class comes from the `Reflector` instead.
 pub(crate) unsafe fn JS_GetDomStubInfo(
     stub: *mut root::JSObject,
-    clasp: *mut *const root::JSClass,
     global: *mut *mut root::JSObject,
     cx: *mut *mut root::JSContext,
 ) {
     let v = obj_val(stub);
     let realm = q::JS_GetDomStubRealm(v) as *mut RealmData;
     assert!(!realm.is_null(), "JS_GetDomStubInfo on an unbound stub");
-    *clasp = clasp_of_id(q::JS_GetClassID(v));
     *global = (*realm).global;
     *cx = super::context_of_realm(realm);
 }

@@ -679,11 +679,10 @@ wrap!(jsapi: pub fn CreateError(cx: &mut JSContext, type_: JSExnType, stack: Han
 wrap!(jsapi: pub fn GetExceptionCause(exc: *mut JSObject, dest: MutableHandleValue));
 wrap!(jsapi: pub fn NewEnvironmentChain(cx: &mut JSContext, supportUnscopables: SupportUnscopables) -> *mut EnvironmentChain);
 
-wrap!(jsapi: pub fn JS_NewDomStub(cx: &mut JSContext, clasp: *const JSClass, dom_ptr: *mut c_void, given_proto: *mut JSObject) -> *mut JSObject);
+wrap!(jsapi: pub fn JS_NewDomStub(cx: &mut JSContext, clasp: *const JSClass, dom_ptr: *mut c_void) -> *mut JSObject);
 wrap!(jsapi: pub fn JS_UnbindDomStub(cx: &mut JSContext, obj: *mut JSObject));
 wrap!(jsapi: pub fn JS_GetDomStubRefCount(stub: *mut JSObject) -> i32);
 wrap!(jsapi: pub fn JS_IsDomStub(obj: *mut JSObject) -> bool);
 wrap!(jsapi: pub fn JS_GetDomStubDomPtr(obj: *mut JSObject) -> *mut c_void);
-wrap!(jsapi: pub fn JS_GetDomStubGivenProto(obj: *mut JSObject) -> *mut JSObject);
 // `jsapi::JSContext` (not the safe `JSContext`) is the raw context type the shim takes.
-wrap!(jsapi: pub fn JS_GetDomStubInfo(stub: *mut JSObject, clasp: *mut *const JSClass, global: *mut *mut JSObject, cx: *mut *mut jsapi::JSContext));
+wrap!(jsapi: pub fn JS_GetDomStubInfo(stub: *mut JSObject, global: *mut *mut JSObject, cx: *mut *mut jsapi::JSContext));

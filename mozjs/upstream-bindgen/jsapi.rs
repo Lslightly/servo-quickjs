@@ -18955,7 +18955,6 @@ pub mod root {
             cx: *mut JSContext,
             clasp: *const JSClass,
             dom_ptr: *mut ::std::os::raw::c_void,
-            given_proto: *mut JSObject,
         ) -> *mut JSObject;
     }
     extern "C" {
@@ -18979,7 +18978,6 @@ pub mod root {
     extern "C" {
         pub fn JS_GetDomStubInfo(
             stub: *mut root::JSObject,
-            clasp: *mut *const JSClass,
             global: *mut *mut root::JSObject,
             cx: *mut *mut JSContext,
         );
