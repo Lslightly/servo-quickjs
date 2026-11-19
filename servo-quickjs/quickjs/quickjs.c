@@ -488,21 +488,17 @@ struct JSGCObjectHeader {
 };
 
 /* Servo: DOM Stub object. A small stand-in for a JSObject: it is a GC object with its own
-   reference count, but carries no shape or properties. `JS_GetClassID` dispatches on
-   `gc_obj_type`, so the class id is readable through the usual API.
+   reference count, but carries no shape or properties and no class id. The interface's class id
+   (and its `DOMJSClass`) is recorded on the Rust `Reflector` that `dom_ptr` points to.
    TODO(Qingwei Li): embed the struct in Servo's reflector */
 typedef struct JSDomStub {
     JSGCObjectHeader header;
-    uint16_t class_id;
     /* Servo: the DOM node (its `Reflector`), owned by the stub until it is unbound or
        finalized. `NULL` once the stub has been unbound. */
     void *dom_ptr;
     /* Servo: the realm (`RealmData*`) the DOM object belongs to. The stub holds one reference
        to it; `NULL` once the stub has been unbound. */
     void *realm;
-    /* Servo: the prototype the caller passed to `wrap` (already outerized), or `NULL` for the
-       canonical prototype. Not retained: owned elsewhere like a `MaterializeCache` was. */
-    void *given_proto;
 } JSDomStub;
 
 const int sizeofJSDomStub = sizeof(JSDomStub);
@@ -4053,15 +4049,34 @@ JSClassID JS_NewClassID(JSClassID *pclass_id)
     return class_id;
 }
 
+/* Servo: resolves a JSDomStub's interface class id from its DOM node. Implemented by the Rust
+   shim (`mozjs/src/engine/class.rs`), which owns the `Reflector` layout: it dereferences the node
+   to its `DOMJSClass`, and maps that class to the QuickJS class id it was registered with.
+   Weak: a standalone QuickJS link without the shim still links, and its stubs have no class. */
+extern JSClassID servo_dom_stub_class_id(JSRuntime *rt, void *dom_ptr)
+    __attribute__((weak));
+
+/* Servo: the QuickJS class id of a JSDomStub's interface. A stub stores no class id: Servo
+   records the interface's class on the Rust `Reflector` that `dom_ptr` points to. `rt` may be
+   NULL where QuickJS has none at hand; the shim then uses the current context's runtime. */
+static JSClassID dom_stub_class_id(JSRuntime *rt, const JSDomStub *p)
+{
+    if (!p->dom_ptr || !servo_dom_stub_class_id)
+        return JS_INVALID_CLASS_ID;
+    return servo_dom_stub_class_id(rt, p->dom_ptr);
+}
+
 JSClassID JS_GetClassID(JSValue v)
 {
     JSObject *p;
     if (JS_VALUE_GET_TAG(v) != JS_TAG_OBJECT)
         return JS_INVALID_CLASS_ID;
     p = JS_VALUE_GET_OBJ(v);
-    /* Servo: a JSDomStub is not a JSObject and stores `class_id` at a different offset. */
+    /* Servo: a JSDomStub is not a JSObject; its interface's class id is recorded on the Rust
+       `Reflector` it points to. `JS_GetClassID` has no runtime at hand, so the shim uses the
+       current context's. */
     if (js_rc(p)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB)
-        return ((JSDomStub *)p)->class_id;
+        return dom_stub_class_id(NULL, (const JSDomStub *)p);
     return p->class_id;
 }
 
@@ -6625,37 +6640,33 @@ static void free_object(JSRuntime *rt, JSObject *p)
 
 /* Servo: DOM Stub object (see the definition near JSGCObjectHeader) */
 
-// Servo: allocate a new JSDomStub owning `dom_ptr` (a DOM node of class `class_id`) and one
-// reference to `realm`. Either the class finalizer frees the node when the stub is collected, or
-// the embedder hands the node to a real JSObject and calls `JS_UnbindDomStub` before that.
-// `given_proto` is not retained: like the old `MaterializeCache`, it is only valid until then.
-JSValue JS_NewDomStub(JSContext *ctx, uint16_t class_id, void *dom_ptr, void *realm,
-                      void *given_proto) {
+// Servo: allocate a new JSDomStub owning `dom_ptr` (a DOM node) and one reference to `realm`.
+// Either the class finalizer frees the node when the stub is collected, or the embedder hands the
+// node to a real JSObject and calls `JS_UnbindDomStub` before that. The stub's interface class is
+// recorded on the Rust `Reflector` that `dom_ptr` points to; see `free_dom_stub`.
+JSValue JS_NewDomStub(JSContext *ctx, void *dom_ptr, void *realm) {
     JSDomStub *s;
 
     js_trigger_gc(ctx->rt, sizeof(JSDomStub));
     s = js_malloc(ctx, sizeof(JSDomStub));
     if (unlikely(!s))
         return JS_EXCEPTION;
-    s->class_id = class_id;
     s->dom_ptr = dom_ptr;
     s->realm = realm;
-    s->given_proto = given_proto;
     js_rc(s)->ref_count = 1;
     add_gc_object(ctx->rt, &s->header, JS_GC_OBJ_TYPE_DOM_STUB);
     return JS_MKPTR(JS_TAG_OBJECT, s);
 }
 
-// Servo: detach the DOM node, realm and given prototype from the stub, without freeing the stub.
-// The stub may still be referenced from the autorelease pool, so it is freed when its last
-// reference goes away; by then `dom_ptr` is `NULL` and `free_dom_stub` does not run the finalizer
-// (the new JSObject owns the DOM node and holds its own realm reference). The embedder releases
-// the stub's realm reference after this call.
+// Servo: detach the DOM node and realm from the stub, without freeing the stub. The stub may still
+// be referenced from the autorelease pool, so it is freed when its last reference goes away; by
+// then `dom_ptr` is `NULL` and `free_dom_stub` does not run the finalizer (the new JSObject owns
+// the DOM node and holds its own realm reference). The embedder releases the stub's realm
+// reference after this call.
 void JS_UnbindDomStub(JSContext *ctx, JSValue obj) {
     JSDomStub *p = (JSDomStub *)obj.u.ptr;
     p->dom_ptr = NULL;
     p->realm = NULL;
-    p->given_proto = NULL;
 }
 
 // Servo: whether `v` is a JSDomStub. A stub is a GC object that is not a JSObject, so this
@@ -6686,17 +6697,16 @@ void *JS_GetDomStubRealm(JSValueConst v) {
     return s ? s->realm : NULL;
 }
 
-void *JS_GetDomStubGivenProto(JSValueConst v) {
-    JSDomStub *s = to_dom_stub(v);
-    return s ? s->given_proto : NULL;
-}
-
 // Servo: free its corresponding DOM T in servo and free JSDomStub
 static void free_dom_stub(JSRuntime *rt, JSDomStub *p) {
     JSClassFinalizer *finalizer;
+    JSClassID class_id;
 
-    // An unbound stub has no DOM node left to finalize.
-    finalizer = p->dom_ptr ? rt->class_array[p->class_id].finalizer : NULL;
+    // An unbound stub has no DOM node left to finalize. The stub's class is the interface class
+    // registered when the node was wrapped; its finalizer reaches the Rust `Reflector`.
+    class_id = dom_stub_class_id(rt, p);
+    finalizer = (p->dom_ptr && JS_IsRegisteredClass(rt, class_id))
+                  ? rt->class_array[class_id].finalizer : NULL;
     if (finalizer)
         (*finalizer)(rt, JS_MKPTR(JS_TAG_OBJECT, p));
 
@@ -7010,7 +7020,11 @@ static void mark_children(JSRuntime *rt, JSGCObjectHeader *gp,
         {
             JSDomStub *p = (JSDomStub *)gp;
             JSClassGCMark *gc_mark;
-            gc_mark = rt->class_array[p->class_id].gc_mark;
+            JSClassID class_id = dom_stub_class_id(rt, p);
+            /* Servo: mark a stub with the gc_mark of its interface's class, registered when the
+               DOM node was wrapped. */
+            gc_mark = JS_IsRegisteredClass(rt, class_id)
+                        ? rt->class_array[class_id].gc_mark : NULL;
             if (gc_mark)
                 gc_mark(rt, JS_MKPTR(JS_TAG_OBJECT, p), mark_func);
         }

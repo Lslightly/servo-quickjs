@@ -566,11 +566,12 @@ JSClassID JS_NewClassID(JSClassID *pclass_id);
 /* Returns the class ID if `v` is an object, otherwise returns JS_INVALID_CLASS_ID. */
 JSClassID JS_GetClassID(JSValue v);
 /* Servo: allocate a new JSDomStub, i.e. a lazy DOM object that is not yet a real JSObject.
-   The stub owns the DOM node `dom_ptr` (of class `class_id`) and one reference to `realm`.
-   `given_proto` may be NULL; the stub does not retain it. */
-JSValue JS_NewDomStub(JSContext *ctx, uint16_t class_id, void *dom_ptr, void *realm,
-                      void *given_proto);
-/* Servo: detach the DOM node, realm and given prototype from a stub without freeing the stub. */
+   The stub owns the DOM node `dom_ptr` and one reference to `realm`. A stub has no class of its
+   own and stores no class id: the embedder records the interface's class on the node, and resolves
+   the QuickJS class id it was registered with through `servo_dom_stub_class_id`, a symbol that
+   QuickJS declares weak and the mozjs shim implements (see `dom_stub_class_id` in quickjs.c). */
+JSValue JS_NewDomStub(JSContext *ctx, void *dom_ptr, void *realm);
+/* Servo: detach the DOM node and realm from a stub without freeing the stub. */
 void JS_UnbindDomStub(JSContext *ctx, JSValue obj);
 /* Servo: whether `v` is a JSDomStub (see JS_NewDomStub), i.e. a lazy DOM object that has not
    been materialized into a real JSObject yet. Returns FALSE for non-object values. */
@@ -578,7 +579,6 @@ JS_BOOL JS_IsDomStub(JSValueConst v);
 /* Servo: read the fields of a JSDomStub (NULL for a non-stub). */
 void *JS_GetDomStubDomPtr(JSValueConst v);
 void *JS_GetDomStubRealm(JSValueConst v);
-void *JS_GetDomStubGivenProto(JSValueConst v);
 int JS_NewClass(JSRuntime *rt, JSClassID class_id, const JSClassDef *class_def);
 int JS_IsRegisteredClass(JSRuntime *rt, JSClassID class_id);
 
