@@ -873,7 +873,6 @@ unsafe extern "C" {
         ctx: *mut JSContext,
         dom_ptr: *mut ::std::os::raw::c_void,
         realm: *mut ::std::os::raw::c_void,
-        given_proto: *mut ::std::os::raw::c_void,
     ) -> JSValue;
 }
 unsafe extern "C" {
@@ -887,9 +886,6 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_GetDomStubRealm(v: JSValue) -> *mut ::std::os::raw::c_void;
-}
-unsafe extern "C" {
-    pub fn JS_GetDomStubGivenProto(v: JSValue) -> *mut ::std::os::raw::c_void;
 }
 unsafe extern "C" {
     pub fn JS_NewClass(
