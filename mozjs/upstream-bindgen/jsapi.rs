@@ -18955,6 +18955,7 @@ pub mod root {
             cx: *mut JSContext,
             clasp: *const JSClass,
             dom_ptr: *mut ::std::os::raw::c_void,
+            given_proto: *mut root::JSObject,
         ) -> *mut JSObject;
     }
     extern "C" {
