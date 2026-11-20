@@ -803,13 +803,15 @@ pub(crate) unsafe fn JS_NewObjectWithGivenProto(
 
 /// Creates a `JSDomStub` owning `dom_ptr` (a DOM node) and one reference to the current realm.
 /// Unlike a materialized object, the stub carries no `ObjectData` and no slots: its fields are
-/// read back through `JS_GetDomStub*`. `clasp` is the interface's class, the one `wrap` recorded
-/// on the `Reflector` that `dom_ptr` points to; `QuickJS` later resolves the class id from it via
+/// read back through `JS_GetDomStub*`. `given_proto` is the prototype the embedder was asked for
+/// (null for the interface's canonical prototype); the stub only borrows it. `clasp` is the interface's class, the one `wrap` recorded on the `Reflector`
+/// that `dom_ptr` points to; `QuickJS` later resolves the class id from it via
 /// `servo_dom_stub_class_id`.
 pub(crate) unsafe fn JS_NewDomStub(
     cx: *mut root::JSContext,
     clasp: *const root::JSClass,
     dom_ptr: *mut c_void,
+    given_proto: *mut root::JSObject,
 ) -> *mut root::JSObject {
     let cx = Cx::from_raw(cx);
     // Registers the interface's class in this runtime on first use; QuickJS gets the id back
@@ -818,7 +820,12 @@ pub(crate) unsafe fn JS_NewDomStub(
     assert!(!clasp.is_null(), "JSDomStub without an interface class");
     class_id(cx.rt, clasp);
     let realm = super::hold_realm(cx.current_realm());
-    let obj = q::JS_NewDomStub(cx.qctx(), dom_ptr, realm as *mut c_void);
+    let obj = q::JS_NewDomStub(
+        cx.qctx(),
+        dom_ptr,
+        realm as *mut c_void,
+        given_proto as *mut c_void,
+    );
     if obj.tag() == q::JS_TAG_EXCEPTION {
         // `js_malloc` failed: the stub was not created, so drop the reference it would own.
         super::release_realm(realm);
@@ -846,6 +853,12 @@ pub(crate) unsafe fn JS_IsDomStub(obj: *mut root::JSObject) -> bool {
 /// The DOM node a `JSDomStub` owns (null once it has been unbound).
 pub(crate) unsafe fn JS_GetDomStubDomPtr(obj: *mut root::JSObject) -> *mut c_void {
     q::JS_GetDomStubDomPtr(obj_val(obj))
+}
+
+/// The prototype the embedder gave the `JSDomStub` at wrap time (null for the interface's
+/// canonical prototype, and null once the stub has been unbound).
+pub(crate) unsafe fn JS_GetDomStubGivenProto(obj: *mut root::JSObject) -> *mut root::JSObject {
+    q::JS_GetDomStubGivenProto(obj_val(obj)) as *mut root::JSObject
 }
 
 /// The reference count of a `JSDomStub` (or of any other GC object).

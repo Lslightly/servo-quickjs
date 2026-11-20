@@ -531,6 +531,10 @@ typedef struct JSDomStub {
     /* Servo: the realm (`RealmData*`) the DOM object belongs to. The stub holds one reference
        to it; `NULL` once the stub has been unbound. */
     void *realm;
+    /* Servo: the prototype the embedder was asked for (a `JSObject *`), borrowed by the stub;
+       it stays reachable from the class that created the object. `NULL` means "use the
+       interface's canonical prototype". */
+    void *given_proto;
 } JSDomStub;
 
 const int sizeofJSDomStub = sizeof(JSDomStub);
@@ -6692,9 +6696,11 @@ static void free_object(JSRuntime *rt, JSObject *p)
 
 // Servo: allocate a new JSDomStub owning `dom_ptr` (a DOM node) and one reference to `realm`.
 // Either the class finalizer frees the node when the stub is collected, or the embedder hands the
-// node to a real JSObject and calls `JS_UnbindDomStub` before that. The stub's interface class is
-// recorded on the Rust `Reflector` that `dom_ptr` points to; see `free_dom_stub`.
-JSValue JS_NewDomStub(JSContext *ctx, void *dom_ptr, void *realm) {
+// node to a real JSObject and calls `JS_UnbindDomStub` before that. `given_proto` (a `JSObject *`,
+// or NULL) is the prototype the embedder was asked for; the stub only borrows it (it stays
+// reachable from the class that created the object). The stub's interface class is recorded on
+// the Rust `Reflector` that `dom_ptr` points to; see `free_dom_stub`.
+JSValue JS_NewDomStub(JSContext *ctx, void *dom_ptr, void *realm, void *given_proto) {
     JSDomStub *s;
 
     js_trigger_gc(ctx->rt, sizeof(JSDomStub));
@@ -6703,20 +6709,22 @@ JSValue JS_NewDomStub(JSContext *ctx, void *dom_ptr, void *realm) {
         return JS_EXCEPTION;
     s->dom_ptr = dom_ptr;
     s->realm = realm;
+    s->given_proto = given_proto;
     js_rc(s)->ref_count = 1;
     add_gc_object(ctx->rt, &s->header, JS_GC_OBJ_TYPE_DOM_STUB);
     return JS_MKPTR(JS_TAG_OBJECT, s);
 }
 
-// Servo: detach the DOM node and realm from the stub, without freeing the stub. The stub may still
-// be referenced from the autorelease pool, so it is freed when its last reference goes away; by
-// then `dom_ptr` is `NULL` and `free_dom_stub` does not run the finalizer (the new JSObject owns
-// the DOM node and holds its own realm reference). The embedder releases the stub's realm
-// reference after this call.
+// Servo: detach the DOM node, realm and given prototype from the stub, without freeing the stub.
+// The stub may still be referenced from the autorelease pool, so it is freed when its last
+// reference goes away; by then `dom_ptr` is `NULL` and `free_dom_stub` does not run the finalizer
+// (the new JSObject owns the DOM node and holds its own realm reference). The embedder releases
+// the stub's realm reference after this call.
 void JS_UnbindDomStub(JSContext *ctx, JSValue obj) {
     JSDomStub *p = (JSDomStub *)obj.u.ptr;
     p->dom_ptr = NULL;
     p->realm = NULL;
+    p->given_proto = NULL;
 }
 
 // Servo: whether `v` is a JSDomStub. A stub is a GC object that is not a JSObject, so this
@@ -6747,6 +6755,11 @@ void *JS_GetDomStubRealm(JSValueConst v) {
     return s ? s->realm : NULL;
 }
 
+void *JS_GetDomStubGivenProto(JSValueConst v) {
+    JSDomStub *s = to_dom_stub(v);
+    return s ? s->given_proto : NULL;
+}
+
 // Servo: free its corresponding DOM T in servo and free JSDomStub
 static void free_dom_stub(JSRuntime *rt, JSDomStub *p) {
     JSClassFinalizer *finalizer;
@@ -6759,6 +6772,8 @@ static void free_dom_stub(JSRuntime *rt, JSDomStub *p) {
                   ? rt->class_array[class_id].finalizer : NULL;
     if (finalizer)
         (*finalizer)(rt, JS_MKPTR(JS_TAG_OBJECT, p));
+
+    // The stub only borrows `given_proto`; nothing to release here.
 
     // The stub may be on `gc_zero_ref_count_list` (freed from `free_zero_refcount`) or on
     // `tmp_obj_list` (freed while removing cycles); unlink it before either freeing it or
@@ -7072,7 +7087,7 @@ static void mark_children(JSRuntime *rt, JSGCObjectHeader *gp,
             JSClassGCMark *gc_mark;
             JSClassID class_id = dom_stub_class_id(rt, p);
             /* Servo: mark a stub with the gc_mark of its interface's class, registered when the
-               DOM node was wrapped. */
+               DOM node was wrapped. `p->given_proto` is borrowed and not traced. */
             gc_mark = JS_IsRegisteredClass(rt, class_id)
                         ? rt->class_array[class_id].gc_mark : NULL;
             if (gc_mark)
