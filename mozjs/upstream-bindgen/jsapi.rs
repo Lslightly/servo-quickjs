@@ -18955,7 +18955,6 @@ pub mod root {
             cx: *mut JSContext,
             clasp: *const JSClass,
             dom_ptr: *mut ::std::os::raw::c_void,
-            given_proto: *mut root::JSObject,
         ) -> *mut JSObject;
     }
     extern "C" {
@@ -18966,9 +18965,6 @@ pub mod root {
     }
     extern "C" {
         pub fn JS_GetDomStubDomPtr(obj: *mut JSObject) -> *mut ::std::os::raw::c_void;
-    }
-    extern "C" {
-        pub fn JS_GetDomStubGivenProto(obj: *mut JSObject) -> *mut JSObject;
     }
     extern "C" {
         pub fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32;
