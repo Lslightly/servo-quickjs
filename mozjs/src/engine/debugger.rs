@@ -486,7 +486,7 @@ unsafe fn call_hosts(
             cx.enter_realm(realm);
             let mark = cx.pool_mark();
             let r = q::JS_Call(qctx, f, host, args.len() as c_int, args.as_mut_ptr());
-            cx.drain_pool(mark);
+            cx.drain_pool(mark, super::DrainContext::CallHosts);
             cx.leave_realm();
             r
         };

@@ -135,6 +135,7 @@ pub(crate) enum DrainContext {
     /// recorded time is the sum of both, not just the drain.
     #[cfg(drain_stats)]
     DrainPoolGc,
+    CallHosts,
 }
 
 #[cfg(drain_stats)]
