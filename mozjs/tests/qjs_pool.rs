@@ -21,7 +21,10 @@ use mozjs::quickjs::{
 };
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject};
+use mozjs::rust::wrappers2::{
+    JS_GetDomStubPoolRefCount, JS_NewDomStub, JS_NewGlobalObject, JS_NewObject,
+    JS_NewPlainObject, JS_UnbindDomStub,
+};
 use mozjs::rust::{
     evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
     Runtime, SIMPLE_GLOBAL_CLASS,
@@ -114,6 +117,76 @@ static OWNED_CLASS: JSClass = JSClass {
     ext: ptr::null(),
     oOps: ptr::null(),
 };
+
+static STUB_CLASS: JSClass = JSClass {
+    name: c"Stub".as_ptr(),
+    flags: 0,
+    cOps: ptr::null(),
+    spec: ptr::null(),
+    ext: ptr::null(),
+    oOps: ptr::null(),
+};
+
+#[repr(C)]
+struct FakeReflector {
+    dom_js_class: Cell<*const JSClass>,
+}
+
+#[test]
+fn dom_stub_pool_entries_are_counted() {
+    with_global(|cx, _| unsafe {
+        let reflector = Box::leak(Box::new(FakeReflector {
+            dom_js_class: Cell::new(&STUB_CLASS),
+        }));
+        let pool_len = autorelease_pool_len();
+        // The wrapper adopts the raw allocation result before returning it, moving the new
+        // object's initial count into the pool.
+        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        assert!(!stub.is_null());
+        assert_eq!(autorelease_pool_len(), pool_len + 1);
+        assert_eq!(refs(stub), 1);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
+
+        retain_object(stub);
+        assert_eq!(refs(stub), 2);
+
+        drain_autorelease_pool();
+        assert_eq!(refs(stub), 1);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 0);
+
+        // The last count goes to the pool as `Deferred`, so the stub must be counted once more.
+        release_object(stub);
+        assert_eq!(refs(stub), 1);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
+        drain_autorelease_pool();
+    });
+}
+
+#[test]
+fn unbind_clears_stub_pool_tracking() {
+    with_global(|cx, _| unsafe {
+        let reflector = Box::leak(Box::new(FakeReflector {
+            dom_js_class: Cell::new(&STUB_CLASS),
+        }));
+        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        retain_object(stub);
+        assert_eq!(refs(stub), 2);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
+
+        JS_UnbindDomStub(cx, stub);
+        assert_eq!(refs(stub), 2);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 0);
+
+        drain_autorelease_pool();
+        assert_eq!(refs(stub), 1);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 0);
+
+        release_object(stub);
+        assert_eq!(refs(stub), 1);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
+        drain_autorelease_pool();
+    });
+}
 
 /// The drain frees the owned objects' entries first, then the owners, whose finalizers drop the
 /// owned objects' last references, which go to the pool in the middle of the drain. Optimized

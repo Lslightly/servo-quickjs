@@ -40,6 +40,11 @@ pub fn drain_autorelease_pool() {
     crate::engine::drain_current_pool()
 }
 
+/// Releases every value the pool holds, then runs a full GC as one operation.
+pub fn drain_pool_and_gc() {
+    crate::engine::drain_pool_and_gc()
+}
+
 /// Releases, when it is dropped, what the autorelease pool took while it was alive: the values
 /// the engine handed to Rust and the last references Rust dropped. Otherwise they stay until the
 /// task ends. Servo opens one for each microtask, so that a long chain of microtasks in one task

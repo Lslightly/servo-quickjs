@@ -834,6 +834,9 @@ pub(crate) unsafe fn JS_UnbindDomStub(cx: *mut root::JSContext, obj: *mut root::
     let cx = Cx::from_raw(cx);
     let v = obj_val(obj);
     let realm = q::JS_GetDomStubRealm(v) as *mut RealmData;
+    // Once detached, this stub cannot be materialized again. Drop the auxiliary pool count now
+    // so draining its remaining pool entries only performs a cheap map miss.
+    super::forget_dom_stub_pool_refs(obj);
     q::JS_UnbindDomStub(cx.qctx(), v);
     super::release_realm(realm);
 }
@@ -851,6 +854,11 @@ pub(crate) unsafe fn JS_GetDomStubDomPtr(obj: *mut root::JSObject) -> *mut c_voi
 /// The reference count of a `JSDomStub` (or of any other GC object).
 pub(crate) unsafe fn JS_GetDomStubRefCount(stub: *mut root::JSObject) -> i32 {
     q::JS_GetRefCount(obj_val(stub))
+}
+
+/// The number of autorelease-pool entries currently holding `stub`.
+pub(crate) unsafe fn JS_GetDomStubPoolRefCount(stub: *mut root::JSObject) -> u32 {
+    super::dom_stub_pool_ref_count(stub)
 }
 
 /// What a `JSDomStub` recorded at wrap time and needs to materialize: the global object of its
