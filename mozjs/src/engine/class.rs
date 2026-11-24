@@ -130,7 +130,7 @@ pub(crate) unsafe fn class_id(rt: *mut q::JSRuntime, clasp: *const root::JSClass
 /// `None` for values that are not objects of a registered SM class (strings, BigInts, plain
 /// objects, ...). The name points into the class's static definition, so it lives for the process.
 pub(crate) unsafe fn class_name(v: q::JSValue) -> Option<&'static str> {
-    let clasp = if q::JS_IsDomStub(v) != 0 {
+    let clasp = if is_dom_stub(v) {
         stub_class(v)
     } else {
         clasp_of_id(q::JS_GetClassID(v))
@@ -249,7 +249,7 @@ pub(crate) unsafe fn object_class(obj: *mut root::JSObject) -> *const root::JSCl
     // QuickJS: a `JSDomStub`'s interface class lives on the Rust `Reflector` the stub points to.
     // This must come before `object_data`/`JS_IsFunction`, which would read the stub's fields as
     // a `JSObject`'s.
-    if q::JS_IsDomStub(obj_val(obj)) != 0 {
+    if is_dom_stub(obj_val(obj)) {
         let clasp = stub_class(obj_val(obj));
         return if clasp.is_null() { &PLAIN_CLASS } else { clasp };
     }
@@ -278,7 +278,7 @@ pub(crate) unsafe fn object_realm(cx: &Cx, obj: *mut root::JSObject) -> *mut Rea
 /// The realm recorded by stub objects, shim objects, functions, proxies and globals, or null.
 pub(crate) unsafe fn known_object_realm(obj: *mut root::JSObject) -> *mut RealmData {
     // QuickJS: a `JSDomStub` records its realm directly (and has no `ObjectData`).
-    if q::JS_IsDomStub(obj_val(obj)) != 0 {
+    if is_dom_stub(obj_val(obj)) {
         return q::JS_GetDomStubRealm(obj_val(obj)) as *mut RealmData;
     }
     if let Some(data) = object_data(obj) {
@@ -299,7 +299,7 @@ pub(crate) unsafe fn known_object_realm(obj: *mut root::JSObject) -> *mut RealmD
 unsafe extern "C" fn finalize(rt: *mut q::JSRuntime, val: q::JSValue) {
     // QuickJS: a `JSDomStub` has no `ObjectData`; it owns the DOM node and one realm reference.
     // `free_dom_stub` only calls a class finalizer while `dom_ptr` is set.
-    if q::JS_IsDomStub(val) != 0 {
+    if is_dom_stub(val) {
         let realm = q::JS_GetDomStubRealm(val) as *mut RealmData;
         if !q::JS_GetDomStubDomPtr(val).is_null() {
             // The interface class, from the `Reflector` the stub owns.
@@ -463,7 +463,7 @@ pub(crate) fn forget_shared_rcs() {
 unsafe extern "C" fn gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS_MarkFunc) {
     // QuickJS: a `JSDomStub` has no slots. Mark its realm and trace the DOM node like an
     // `ObjectData`-backed object did.
-    if q::JS_IsDomStub(val) != 0 {
+    if is_dom_stub(val) {
         if q::JS_GetDomStubDomPtr(val).is_null() {
             return;
         }
@@ -841,9 +841,63 @@ pub(crate) unsafe fn JS_UnbindDomStub(cx: *mut root::JSContext, obj: *mut root::
     super::release_realm(realm);
 }
 
+/// Rust layout of the prefix of QuickJS's private `JSMallocBlockHeader`.
+///
+/// `gc_obj_type_and_mark` represents the adjacent C bitfields `gc_obj_type: 7` and `mark: 1`.
+/// Keep the field order in sync with `JSMallocBlockHeader` in `quickjs.c`.
+#[repr(C, align(8))]
+struct JSMallocBlockHeader {
+    _block_idx_or_free_next: u16,
+    _block_size_idx: u8,
+    gc_obj_type_and_mark: u8,
+    _ref_count: c_int,
+}
+
+const _: () = {
+    assert!(std::mem::size_of::<JSMallocBlockHeader>() == 8);
+    assert!(std::mem::align_of::<JSMallocBlockHeader>() == 8);
+    assert!(std::mem::offset_of!(JSMallocBlockHeader, gc_obj_type_and_mark) == 3);
+    assert!(std::mem::offset_of!(JSMallocBlockHeader, _ref_count) == 4);
+};
+
+#[cfg(target_endian = "little")]
+const JS_MALLOC_BLOCK_GC_OBJ_TYPE_MASK: u8 = 0x7f;
+#[cfg(target_endian = "big")]
+const JS_MALLOC_BLOCK_GC_OBJ_TYPE_MASK: u8 = 0xfe;
+#[cfg(target_endian = "little")]
+const JS_MALLOC_BLOCK_GC_OBJ_TYPE_SHIFT: u32 = 0;
+#[cfg(target_endian = "big")]
+const JS_MALLOC_BLOCK_GC_OBJ_TYPE_SHIFT: u32 = 1;
+const JS_GC_OBJ_TYPE_DOM_STUB: u8 = 7;
+
+/// Rust-side implementation of QuickJS's `JS_IsDomStub`.
+///
+/// Keep this check in sync with `JS_IsDomStub` in `quickjs.c`: a stub is a GC object that is not
+/// a `JSObject`, so its `gc_obj_type` must be read from the allocator header instead of using
+/// `JS_GetClassID`. The type and `mark` share the header byte before `ref_count`; their bit order
+/// follows the target ABI (little-endian starts at the least-significant bit).
+#[inline(always)]
+pub(crate) unsafe fn is_dom_stub(v: q::JSValue) -> bool {
+    if v.tag() != q::JS_TAG_OBJECT {
+        return false;
+    }
+    let ptr = v.ptr();
+    if ptr.is_null() {
+        return false;
+    }
+    let header = unsafe { &*ptr.cast::<JSMallocBlockHeader>().sub(1) };
+    let gc_obj_type = (header.gc_obj_type_and_mark & JS_MALLOC_BLOCK_GC_OBJ_TYPE_MASK)
+        >> JS_MALLOC_BLOCK_GC_OBJ_TYPE_SHIFT;
+    gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB
+}
+
 /// Whether `obj` is a `JSDomStub` that has not been materialized into a real `JSObject` yet.
+///
+/// This is the Rust-side implementation of QuickJS's `JS_IsDomStub`, inlined without calling the
+/// C FFI function. Keep it in sync with `JS_IsDomStub` in `quickjs.c`.
+#[inline(always)]
 pub(crate) unsafe fn JS_IsDomStub(obj: *mut root::JSObject) -> bool {
-    !obj.is_null() && q::JS_IsDomStub(obj_val(obj)) != 0
+    !obj.is_null() && is_dom_stub(obj_val(obj))
 }
 
 /// The DOM node a `JSDomStub` owns (null once it has been unbound).

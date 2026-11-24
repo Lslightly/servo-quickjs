@@ -126,7 +126,7 @@ fn object_key(v: q::JSValue) -> Option<usize> {
 
 #[inline]
 unsafe fn note_dom_stub_pool_push(v: q::JSValue) {
-    if unsafe { q::JS_IsDomStub(v) } == 0 {
+    if !unsafe { is_dom_stub(v) } {
         return;
     }
     let key = v.ptr() as usize;
@@ -137,9 +137,10 @@ unsafe fn note_dom_stub_pool_push(v: q::JSValue) {
 
 #[inline]
 fn note_dom_stub_pool_pop(v: q::JSValue) {
-    let Some(key) = object_key(v) else {
+    if !unsafe { is_dom_stub(v) } {
         return;
-    };
+    }
+    let key = v.ptr() as usize;
     DOM_STUB_POOL_REFS.with(|refs| {
         let mut refs = refs.borrow_mut();
         if refs.is_empty() {
