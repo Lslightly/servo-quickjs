@@ -16,8 +16,8 @@ use mozjs::jsapi::{
 };
 use mozjs::jsval::{PrivateValue, UndefinedValue};
 use mozjs::quickjs::{
-    AutoreleasePoolScope, autorelease_pool_len, drain_autorelease_pool, release_dom_stub_count,
-    release_object, retain_object, retain_object_count, sys as qjs,
+    autorelease_pool_len, drain_autorelease_pool, release_dom_stub_count, release_object,
+    retain_object, retain_object_count, sys as qjs, AutoreleasePoolScope,
 };
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
@@ -26,8 +26,8 @@ use mozjs::rust::wrappers2::{
     JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject, JS_UnbindDomStub,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS, evaluate_script,
+    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
+    Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {

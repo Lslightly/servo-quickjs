@@ -13,18 +13,18 @@
 
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
-use std::ffi::{CStr, c_char, c_int, c_void};
+use std::ffi::{c_char, c_int, c_void, CStr};
 use std::ptr;
 
 use servo_quickjs as q;
 
-use super::proxy::{ToWindowIfWindowProxy, proxy_class_name};
+use super::proxy::{proxy_class_name, ToWindowIfWindowProxy};
 use super::realm::{
     hold_realm, realm_of_global, realm_of_object, realm_of_plain_object, realm_of_qctx,
     release_realm,
 };
 use super::reentrant::Stack;
-use super::{Cx, RealmData, obj_val, val_obj};
+use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 
 const SOURCE: &str = concat!(include_str!("debugger_api.js"), "\0");
@@ -441,7 +441,7 @@ unsafe fn remove_breakpoint(cx: &Cx, code: q::JSValue, pc: u32) {
             Some(entry) if entry.0 > 1 => {
                 entry.0 -= 1;
                 None
-            },
+            }
             Some(_) => breakpoints.remove(&key).map(|entry| entry.1),
             None => None,
         }

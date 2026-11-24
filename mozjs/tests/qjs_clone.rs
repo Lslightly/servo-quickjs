@@ -6,7 +6,7 @@
 //! writer's buffer and copied into a new buffer for reading.
 
 use std::cell::RefCell;
-use std::ffi::{CStr, c_void};
+use std::ffi::{c_void, CStr};
 use std::ptr;
 use std::sync::LazyLock;
 
@@ -16,16 +16,16 @@ use mozjs::glue::{
     WriteBytesToJSStructuredCloneData,
 };
 use mozjs::jsapi::{
-    CloneDataPolicy, Handle, HandleObject as RawHandleObject, JS_GetStringLength, JS_NewObject,
-    JS_NewStringCopyZ, JS_NewUint8Array, JS_ReadBytes, JS_ReadDouble, JS_ReadString,
-    JS_ReadTypedArray, JS_SCERR_DUP_TRANSFERABLE, JS_SCERR_NOT_CLONABLE,
-    JS_SCERR_SHMEM_TRANSFERABLE, JS_SCERR_TRANSFERABLE, JS_SCERR_TRANSFERABLE_TWICE,
-    JS_SCERR_TYPED_ARRAY_DETACHED, JS_SCERR_UNSUPPORTED_TYPE, JS_STRUCTURED_CLONE_VERSION,
-    JS_SetReservedSlot, JS_WriteBytes, JS_WriteDouble, JS_WriteString, JS_WriteTypedArray,
-    JS_WriteUint32PairUnchecked, JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT,
-    JSClass, JSContext as RawJSContext, JSObject, JSString, JSStructuredCloneCallbacks,
-    JSStructuredCloneReader, JSStructuredCloneWriter, MutableHandle, MutableHandleObject,
-    OnNewGlobalHookOption, StructuredCloneScope, TransferableOwnership,
+    CloneDataPolicy, Handle, HandleObject as RawHandleObject, JSClass, JSContext as RawJSContext,
+    JSObject, JSString, JSStructuredCloneCallbacks, JSStructuredCloneReader,
+    JSStructuredCloneWriter, JS_GetStringLength, JS_NewObject, JS_NewStringCopyZ, JS_NewUint8Array,
+    JS_ReadBytes, JS_ReadDouble, JS_ReadString, JS_ReadTypedArray, JS_SetReservedSlot,
+    JS_WriteBytes, JS_WriteDouble, JS_WriteString, JS_WriteTypedArray, JS_WriteUint32PairUnchecked,
+    MutableHandle, MutableHandleObject, OnNewGlobalHookOption, StructuredCloneScope,
+    TransferableOwnership, JSCLASS_RESERVED_SLOTS_MASK, JSCLASS_RESERVED_SLOTS_SHIFT,
+    JS_SCERR_DUP_TRANSFERABLE, JS_SCERR_NOT_CLONABLE, JS_SCERR_SHMEM_TRANSFERABLE,
+    JS_SCERR_TRANSFERABLE, JS_SCERR_TRANSFERABLE_TWICE, JS_SCERR_TYPED_ARRAY_DETACHED,
+    JS_SCERR_UNSUPPORTED_TYPE, JS_STRUCTURED_CLONE_VERSION,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -35,8 +35,9 @@ use mozjs::rust::wrappers2::{
     JS_SetProperty, JS_StructuredClone, JS_WriteStructuredClone,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSAutoStructuredCloneBufferWrapper, JSEngine,
-    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script, get_object_class,
+    evaluate_script, get_object_class, CompileOptionsWrapper, HandleObject,
+    JSAutoStructuredCloneBufferWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS,
 };
 
 /// The engine can only be initialized once per process; it is shared by the tests.

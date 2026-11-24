@@ -11,8 +11,8 @@ use std::sync::LazyLock;
 
 use mozjs::context::JSContext;
 use mozjs::jsapi::{
-    ClippedTime, GCReason, Heap, JSFunctionSpec, JSNativeWrapper, JSObject, JSPROP_ENUMERATE,
-    JSPropertySpec_Name, OnNewGlobalHookOption, RegExpFlags,
+    ClippedTime, GCReason, Heap, JSFunctionSpec, JSNativeWrapper, JSObject, JSPropertySpec_Name,
+    OnNewGlobalHookOption, RegExpFlags, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, StringValue, UndefinedValue};
 use mozjs::quickjs::{drain_autorelease_pool, realm_count};
@@ -20,14 +20,14 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     DateGetMsecSinceEpoch, ExecuteRegExpNoStatics, GetRealmKeyObject, GetWeakMapEntry,
-    JS_DefineFunctions, JS_DefineProperty, JS_GC, JS_NewGlobalObject, JS_NewPlainObject,
+    JS_DefineFunctions, JS_DefineProperty, JS_NewGlobalObject, JS_NewPlainObject,
     JS_ParseJSONWithReviver, JS_ValueToObject, JS_ValueToSource, MapGet, MapHas, MapSet, MapSize,
     NewDateObject, NewMapObject, NewSetObject, NewUCRegExpObject, NewWeakMapObject, SetAdd, SetHas,
-    SetSize, SetWeakMapEntry,
+    SetSize, SetWeakMapEntry, JS_GC,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS, evaluate_script,
+    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
+    Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {
@@ -222,14 +222,12 @@ fn self_hosted_array_methods_are_the_originals() {
         rooted!(&in(cx) let obj = JS_NewPlainObject(cx));
         assert!(JS_DefineFunctions(cx, obj.handle(), specs.as_ptr()));
         set_global(cx, global, c"obj", ObjectValue(obj.get()));
-        assert!(
-            eval(
-                cx,
-                global,
-                "obj.values === orig[0] && obj.forEach === orig[1]"
-            )
-            .to_boolean()
-        );
+        assert!(eval(
+            cx,
+            global,
+            "obj.values === orig[0] && obj.forEach === orig[1]"
+        )
+        .to_boolean());
     }
 }
 

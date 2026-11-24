@@ -7,7 +7,7 @@
 //! (A separate test binary: the setting is process-wide.)
 
 use std::cell::Cell;
-use std::ffi::{CString, c_void};
+use std::ffi::{c_void, CString};
 use std::ptr::{self, NonNull};
 
 use mozjs::context::JSContext;
@@ -17,20 +17,20 @@ use mozjs::glue::{
     SetProxyPrivate,
 };
 use mozjs::jsapi::{
-    Handle, HandleId, HandleObject as RawHandleObject, HandleValue as RawHandleValue,
-    JS_DefinePropertyById, JS_ForwardGetPropertyTo, JS_GetOwnPropertyDescriptorById,
-    JS_GetPrototype, JS_HasOwnPropertyById, JS_HasPropertyById, JS_NewObjectWithGivenProto,
-    JSCLASS_IS_PROXY, JSClass, JSContext as RawJSContext, JSObject, MutableHandle,
-    MutableHandleValue as RawMutableHandleValue, ObjectOpResult, OnNewGlobalHookOption,
-    PropertyDescriptor, SetDOMProxyInformation,
+    Handle, HandleId, HandleObject as RawHandleObject, HandleValue as RawHandleValue, JSClass,
+    JSContext as RawJSContext, JSObject, JS_DefinePropertyById, JS_ForwardGetPropertyTo,
+    JS_GetOwnPropertyDescriptorById, JS_GetPrototype, JS_HasOwnPropertyById, JS_HasPropertyById,
+    JS_NewObjectWithGivenProto, MutableHandle, MutableHandleValue as RawMutableHandleValue,
+    ObjectOpResult, OnNewGlobalHookOption, PropertyDescriptor, SetDOMProxyInformation,
+    JSCLASS_IS_PROXY,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_SetProperty};
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
-    evaluate_script,
+    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS,
 };
 
 static EXTRA: u8 = 0;

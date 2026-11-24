@@ -18,7 +18,7 @@ use std::ptr;
 
 use servo_quickjs as q;
 
-use super::{Cx, adopt_object, obj_val, val_obj};
+use super::{adopt_object, obj_val, val_obj, Cx};
 use crate::sys::jsapi as root;
 use root::JS::Scalar::Type;
 
@@ -166,7 +166,7 @@ fn qjs_type(ty: Type) -> q::JSTypedArrayEnum {
         Type::BigUint64 => q::JS_TYPED_ARRAY_BIG_UINT64,
         Type::MaxTypedArrayViewType | Type::Int64 | Type::Simd128 => {
             unreachable!("not a typed array type")
-        },
+        }
     }
 }
 
@@ -403,12 +403,12 @@ unsafe fn length_and_data<T>(
             set(length, b.byte_length() / size_of::<T>());
             set(isSharedMemory, b.shared());
             set(data, b.data() as *mut T);
-        },
+        }
         None => {
             set(length, 0);
             set(isSharedMemory, false);
             set(data, ptr::null_mut());
-        },
+        }
     }
 }
 

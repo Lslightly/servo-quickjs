@@ -11,13 +11,13 @@
 use std::cell::Cell;
 use std::ffi::{c_int, c_void};
 use std::ptr;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 use servo_quickjs as q;
 
 use super::reentrant::{Queue, Stack};
-use super::{Cx, RealmData, obj_val, val_obj};
+use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::{JSVal, UndefinedValue};
 
@@ -616,7 +616,7 @@ unsafe fn enqueue_microtask(
                 Some(incumbent) => incumbent,
                 None => return -1,
             }
-        },
+        }
     };
     let task = q::JS_NewObjectProtoClass(cx.qctx(), q::JS_NULL, microtask_class(cx.rt));
     if task.tag() == q::JS_TAG_EXCEPTION {

@@ -12,10 +12,10 @@ use std::sync::LazyLock;
 use mozjs::context::JSContext;
 use mozjs::jsapi::{
     CallArgs, ClippedTime, ESClass, GCReason, GetFunctionNativeReserved, HandleValueArray,
-    IsCallable, IsConstructor, JSContext as RawJSContext, JSFunctionSpec, JSITER_HIDDEN,
-    JSITER_OWNONLY, JSITER_SYMBOLS, JSITER_SYMBOLSONLY, JSJitInfo, JSJitMethodCallArgs,
-    JSNativeWrapper, JSObject, JSPROP_ENUMERATE, JSPropertySpec_Name, NewArrayObject1,
-    OnNewGlobalHookOption, RegExpFlags, SetFunctionNativeReserved, Value,
+    IsCallable, IsConstructor, JSContext as RawJSContext, JSFunctionSpec, JSJitInfo,
+    JSJitMethodCallArgs, JSNativeWrapper, JSObject, JSPropertySpec_Name, NewArrayObject1,
+    OnNewGlobalHookOption, RegExpFlags, SetFunctionNativeReserved, Value, JSITER_HIDDEN,
+    JSITER_OWNONLY, JSITER_SYMBOLS, JSITER_SYMBOLSONLY, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, StringValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -23,16 +23,16 @@ use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     CheckRegExpSyntax, DateGetMsecSinceEpoch, ExecuteRegExpNoStatics, GetArrayLength,
     GetBuiltinClass, GetPropertyKeys, GetRealmObjectPrototype, GetWeakMapEntry, IsArrayObject,
-    JS_ClearPendingException, JS_DefineFunctions, JS_DefineProperty, JS_FreezeObject, JS_GC,
+    JS_ClearPendingException, JS_DefineFunctions, JS_DefineProperty, JS_FreezeObject,
     JS_GetElement, JS_GetFunctionId, JS_GetPropertyById, JS_HasInstance, JS_IsExceptionPending,
     JS_NewGlobalObject, JS_NewPlainObject, JS_SetElement, JS_SetProperty, MapEntries, MapGet,
     MapSet, MapSize, NewArrayObject, NewDateObject, NewFunctionWithReserved, NewMapObject,
     NewSetObject, NewUCRegExpObject, NewWeakMapObject, ObjectIsDate, SetAdd, SetArrayLength,
-    SetWeakMapEntry,
+    SetWeakMapEntry, JS_GC,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, IdVector, JSEngine, JSEngineHandle, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS, evaluate_script, for_of,
+    evaluate_script, for_of, CompileOptionsWrapper, HandleObject, IdVector, JSEngine,
+    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 unsafe fn eval(cx: &mut JSContext, global: HandleObject, src: &str) -> JSVal {
@@ -249,14 +249,12 @@ fn collections() {
         assert_eq!(out.get().to_int32(), 42);
         assert!(MapEntries(cx, map.handle(), out.handle_mut()));
         let mut entries = 0;
-        assert!(
-            for_of::<_, _, ()>(cx, out.handle(), |_, entry| {
-                assert!(entry.get().is_object());
-                entries += 1;
-                Ok(ControlFlow::Continue(()))
-            })
-            .is_ok()
-        );
+        assert!(for_of::<_, _, ()>(cx, out.handle(), |_, entry| {
+            assert!(entry.get().is_object());
+            entries += 1;
+            Ok(ControlFlow::Continue(()))
+        })
+        .is_ok());
         assert_eq!(entries, 1);
         assert_eq!(builtin_class(cx, map.get()), ESClass::Map);
 
@@ -285,13 +283,11 @@ fn collections() {
         assert_eq!(builtin_class(cx, set.get()), ESClass::Set);
         rooted!(&in(cx) let set_value = ObjectValue(set.get()));
         let mut sum = 0;
-        assert!(
-            for_of::<_, _, ()>(cx, set_value.handle(), |_, v| {
-                sum += v.get().to_int32();
-                Ok(ControlFlow::Continue(()))
-            })
-            .is_ok()
-        );
+        assert!(for_of::<_, _, ()>(cx, set_value.handle(), |_, v| {
+            sum += v.get().to_int32();
+            Ok(ControlFlow::Continue(()))
+        })
+        .is_ok());
         assert_eq!(sum, 43);
         assert!(mozjs::jsapi::SetClear(cx.raw_cx(), set.handle().into()));
         assert_eq!(mozjs::jsapi::SetSize(cx.raw_cx(), set.handle().into()), 0);
@@ -612,11 +608,10 @@ fn accessor_function_names() {
 fn builtin_conformance() {
     with_global(|cx, global| unsafe {
         // Q25: Iterator.prototype.constructor has a getter and a setter of its own.
-        assert!(
-            eval(
-                cx,
-                global,
-                "
+        assert!(eval(
+            cx,
+            global,
+            "
             var d = Object.getOwnPropertyDescriptor(Iterator.prototype, 'constructor');
             var o = Object.create(Iterator.prototype);
             o.constructor = 5;
@@ -625,9 +620,8 @@ fn builtin_conformance() {
             d.get !== d.set && d.set.length === 1 && Iterator.prototype.constructor === Iterator &&
                 Object.getOwnPropertyDescriptor(o, 'constructor').value === 5 && threw
             "
-            )
-            .to_boolean()
-        );
+        )
+        .to_boolean());
         // Q28: Array.fromAsync.
         eval(
             cx,
@@ -651,22 +645,19 @@ fn builtin_conformance() {
             ",
         );
         mozjs::jsapi::RunJobs(cx.raw_cx());
-        assert!(
-            eval(
-                cx,
-                global,
-                "Array.fromAsync.length === 1 && Array.fromAsync.name === 'fromAsync' && \
+        assert!(eval(
+            cx,
+            global,
+            "Array.fromAsync.length === 1 && Array.fromAsync.name === 'fromAsync' && \
              results.sort().join(' ') === \
              'arraylike:a,b async:1,2 mapfn:true rejected:r:true subclass:true sync:6,9'"
-            )
-            .to_boolean()
-        );
+        )
+        .to_boolean());
         // Q29: Error.prototype.stack accessor; errors keep their own stack.
-        assert!(
-            eval(
-                cx,
-                global,
-                "
+        assert!(eval(
+            cx,
+            global,
+            "
             var d = Object.getOwnPropertyDescriptor(Error.prototype, 'stack');
             var e = new Error('x');
             var o = Object.create(Error.prototype);
@@ -679,9 +670,8 @@ fn builtin_conformance() {
                 d.get.call(e) === e.stack && Object.create(Error.prototype).stack === '' &&
                 notError && own.value === 's' && own.enumerable && own.writable
             "
-            )
-            .to_boolean()
-        );
+        )
+        .to_boolean());
         // Q26: localeCompare returns -1, 0 or 1.
         assert!(eval(
             cx,

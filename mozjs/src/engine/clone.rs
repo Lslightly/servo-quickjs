@@ -19,13 +19,13 @@
 //! SpiderMonkey.
 
 use std::collections::HashMap;
-use std::ffi::{CStr, c_int, c_void};
+use std::ffi::{c_int, c_void, CStr};
 use std::marker::PhantomData;
 use std::ptr;
 
 use servo_quickjs as q;
 
-use super::{Cx, obj_val, object_realm, val_obj};
+use super::{obj_val, object_realm, val_obj, Cx};
 use crate::sys::jsapi as root;
 
 const MAGIC: u32 = u32::from_le_bytes(*b"QJSC");
@@ -165,7 +165,7 @@ unsafe fn report_error(
         Some(report) => report(cx.as_raw(), id, closure, message.as_ptr()),
         None => {
             q::JS_ThrowTypeError(cx.qctx(), c"%s".as_ptr(), message.as_ptr());
-        },
+        }
     }
 }
 
@@ -184,7 +184,7 @@ unsafe fn flat_string(cx: &Cx, v: q::JSValue) -> Option<Owned> {
         q::JS_TAG_STRING_ROPE => {
             let s = q::JS_ToString(cx.qctx(), v);
             (!is_exception(s)).then(|| Owned::new(cx, s))
-        },
+        }
         _ => None,
     }
 }
@@ -396,8 +396,8 @@ impl Writer {
             match q::JS_GetBufferInfo(item.v, &mut info) {
                 q::JS_BUFFER_SHARED_ARRAY_BUFFER => {
                     return self.report(root::JS_SCERR_SHMEM_TRANSFERABLE);
-                },
-                q::JS_BUFFER_ARRAY_BUFFER => {},
+                }
+                q::JS_BUFFER_ARRAY_BUFFER => {}
                 _ => {
                     let Some(can_transfer) = self.callbacks.as_ref().and_then(|c| c.canTransfer)
                     else {
@@ -417,7 +417,7 @@ impl Writer {
                     if !ok {
                         return self.report(root::JS_SCERR_TRANSFERABLE);
                     }
-                },
+                }
             }
             if self.memory.contains_key(&(item.v.ptr() as usize)) {
                 return self.report(root::JS_SCERR_DUP_TRANSFERABLE);
@@ -441,7 +441,7 @@ impl Writer {
                 Ok(None) => {
                     stack.pop();
                     continue;
-                },
+                }
                 Err(()) => return false,
             };
             if !self.start(child.v, &mut stack) {
@@ -460,19 +460,19 @@ impl Writer {
             q::JS_TAG_INT => {
                 self.put_u8(T_INT32);
                 self.put_u32(v.int() as u32);
-            },
+            }
             q::JS_TAG_FLOAT64 => {
                 self.put_u8(T_DOUBLE);
                 self.put_f64(v.float64());
-            },
+            }
             q::JS_TAG_STRING | q::JS_TAG_STRING_ROPE => {
                 self.put_u8(T_STRING);
                 return self.write_string(v);
-            },
+            }
             q::JS_TAG_SHORT_BIG_INT | q::JS_TAG_BIG_INT => {
                 self.put_u8(T_BIGINT);
                 self.write_bigint(v);
-            },
+            }
             q::JS_TAG_OBJECT => return self.start_object(v, stack),
             _ => return self.report(root::JS_SCERR_UNSUPPORTED_TYPE),
         }
@@ -523,7 +523,7 @@ impl Writer {
             CLASS_OBJECT => {
                 self.put_u8(T_OBJECT);
                 self.properties(v)
-            },
+            }
             CLASS_ARRAY => {
                 let Some(len) = array_length(self.cx(), v) else {
                     return false;
@@ -531,12 +531,12 @@ impl Writer {
                 self.put_u8(T_ARRAY);
                 self.put_u32(len);
                 self.properties(v)
-            },
+            }
             CLASS_MAP | CLASS_SET => self.start_map(v, class == CLASS_SET),
             CLASS_ERROR => self.start_error(v),
             CLASS_NUMBER | CLASS_STRING | CLASS_BOOLEAN | CLASS_BIG_INT | CLASS_DATE => {
                 return self.write_primitive_object(v, class);
-            },
+            }
             CLASS_REGEXP => return self.write_regexp(v),
             _ => return self.write_other(v),
         };
@@ -544,7 +544,7 @@ impl Writer {
             Some(frame) => {
                 stack.push(frame);
                 true
-            },
+            }
             None => false,
         }
     }
@@ -572,7 +572,7 @@ impl Writer {
                     }
                     return Ok(Some(value));
                 }
-            },
+            }
             WriteFrame::Entries { records, len, next } => {
                 if *next < *len {
                     let item = Owned::new(cx, q::JS_GetPropertyUint32(ctx, records.v, *next));
@@ -583,7 +583,7 @@ impl Writer {
                         Ok(Some(item))
                     };
                 }
-            },
+            }
             WriteFrame::Error {
                 values,
                 stack,
@@ -603,7 +603,7 @@ impl Writer {
                     }
                 }
                 return Ok(None);
-            },
+            }
         }
         self.put_u8(T_END);
         Ok(None)
@@ -615,23 +615,23 @@ impl Writer {
             CLASS_NUMBER => {
                 self.put_u8(T_NUMBER_OBJECT);
                 self.put_f64(number(data.v));
-            },
+            }
             CLASS_DATE => {
                 self.put_u8(T_DATE);
                 self.put_f64(number(data.v));
-            },
+            }
             CLASS_BOOLEAN => {
                 self.put_u8(T_BOOLEAN_OBJECT);
                 self.put_u8((data.v.int() != 0) as u8);
-            },
+            }
             CLASS_STRING => {
                 self.put_u8(T_STRING_OBJECT);
                 return self.write_string(data.v);
-            },
+            }
             _ => {
                 self.put_u8(T_BIGINT_OBJECT);
                 self.write_bigint(data.v);
-            },
+            }
         }
         true
     }
@@ -658,7 +658,7 @@ impl Writer {
             q::JS_BUFFER_SHARED_ARRAY_BUFFER => self.report(root::JS_SCERR_NOT_CLONABLE),
             kind @ (q::JS_BUFFER_TYPED_ARRAY | q::JS_BUFFER_DATA_VIEW) => {
                 self.write_view(kind, &info)
-            },
+            }
             _ => self.write_host(v),
         }
     }
@@ -742,7 +742,7 @@ impl Writer {
                     return None;
                 }
                 Some(s)
-            },
+            }
             None => None,
         };
         let cause = own_data_property(cx, obj, c"cause").ok()?;
@@ -1070,7 +1070,7 @@ impl<'a> Reader<'a> {
             Err(_) => {
                 bad_data(self.cx(), c"length");
                 None
-            },
+            }
         }
     }
 
@@ -1145,7 +1145,7 @@ impl<'a> Reader<'a> {
                 };
                 self.all_objs.push(buffer.take());
                 true
-            },
+            }
             XFER_CUSTOM => {
                 let (Some(tag), Some(_ownership), Some(content), Some(extra)) =
                     (self.u32(), self.u32(), self.u64(), self.u64())
@@ -1194,11 +1194,11 @@ impl<'a> Reader<'a> {
                 }
                 self.all_objs.push(q::JS_DupValueRT(cx.rt, obj_val(obj)));
                 true
-            },
+            }
             _ => {
                 bad_data(self.cx(), c"transfer map");
                 false
-            },
+            }
         }
     }
 
@@ -1248,14 +1248,14 @@ impl<'a> Reader<'a> {
                     _ => {
                         self.bad(c"invalid back reference");
                         return None;
-                    },
+                    }
                 }
-            },
+            }
             T_OBJECT => {
                 let obj = self.new_object(q::JS_NewObject(ctx))?;
                 stack.push(ReadFrame::Properties { obj, key: None });
                 return Some(Started::Container);
-            },
+            }
             T_ARRAY => {
                 let len = self.u32()?;
                 let obj = self.new_object(q::JS_NewArray(ctx))?;
@@ -1266,7 +1266,7 @@ impl<'a> Reader<'a> {
                 }
                 stack.push(ReadFrame::Properties { obj, key: None });
                 return Some(Started::Container);
-            },
+            }
             T_MAP | T_SET => {
                 let map = self.new_object(q::JS_NewMapOrSet(ctx, (tag == T_SET) as c_int))?;
                 stack.push(ReadFrame::Entries {
@@ -1275,7 +1275,7 @@ impl<'a> Reader<'a> {
                     key: None,
                 });
                 return Some(Started::Container);
-            },
+            }
             T_ERROR => {
                 let kind = self.u8()? as i8;
                 let error = self.new_object(q::JS_NewNativeErrorObject(ctx, kind as c_int))?;
@@ -1294,7 +1294,7 @@ impl<'a> Reader<'a> {
                 }
                 stack.push(ReadFrame::Error { error, next: 0 });
                 return Some(Started::Container);
-            },
+            }
             _ => return self.read_object(tag).map(Started::Value),
         };
         Some(Started::Value(Owned::new(self.cx(), value)))
@@ -1311,11 +1311,11 @@ impl<'a> Reader<'a> {
                     T_STRING => {
                         let s = self.read_string()?;
                         q::JS_ValueToAtom(ctx, s.v)
-                    },
+                    }
                     _ => {
                         self.bad(c"property key");
                         return None;
-                    },
+                    }
                 };
                 if atom == 0 {
                     return None;
@@ -1325,14 +1325,14 @@ impl<'a> Reader<'a> {
                     rt: self.cx().rt,
                 });
                 Some(true)
-            },
+            }
             ReadFrame::Entries { key, .. } => {
                 if key.is_none() && self.peek_u8()? == T_END {
                     self.pos += 1;
                     return Some(false);
                 }
                 Some(true)
-            },
+            }
             ReadFrame::Error { error, next } => {
                 while *next < ERROR_FIELDS.len() {
                     *next += 1;
@@ -1354,7 +1354,7 @@ impl<'a> Reader<'a> {
                     }
                 }
                 Some(false)
-            },
+            }
         }
     }
 
@@ -1371,7 +1371,7 @@ impl<'a> Reader<'a> {
                     value.take(),
                     q::JS_PROP_C_W_E as c_int,
                 ) >= 0
-            },
+            }
             ReadFrame::Entries {
                 map, is_set: true, ..
             } => q::JS_AddMapRecord(ctx, map.v, value.v, q::JS_UNDEFINED) >= 0,
@@ -1380,7 +1380,7 @@ impl<'a> Reader<'a> {
                 None => {
                     *key = Some(value);
                     true
-                },
+                }
             },
             ReadFrame::Error { error, next } => {
                 let name = ERROR_FIELDS[*next - 1];
@@ -1391,7 +1391,7 @@ impl<'a> Reader<'a> {
                     value.take(),
                     ERROR_FIELD_FLAGS,
                 ) >= 0
-            },
+            }
         };
         ok.then_some(())
     }
@@ -1403,18 +1403,18 @@ impl<'a> Reader<'a> {
             T_DATE => {
                 let time = self.f64()?;
                 return self.new_object(q::JS_NewDate(ctx, time));
-            },
+            }
             T_REGEXP => {
                 let source = self.read_string()?;
                 let flags = self.read_string()?;
                 return self.new_object(q::JS_NewRegExpOriginal(ctx, source.v, flags.v));
-            },
+            }
             T_ARRAY_BUFFER => {
                 let buffer = self.read_array_buffer()?;
                 let index = self.reserve();
                 self.fill(index, &buffer);
                 return Some(buffer);
-            },
+            }
             T_TYPED_ARRAY | T_DATA_VIEW => return self.read_view(tag),
             T_HOST => return self.read_host(),
             T_NUMBER_OBJECT => Owned::new(self.cx(), q::JS_NewFloat64(ctx, self.f64()?)),
@@ -1424,7 +1424,7 @@ impl<'a> Reader<'a> {
             _ => {
                 self.bad(c"unknown tag");
                 return None;
-            },
+            }
         };
         self.new_object(q::JS_NewPrimitiveObject(ctx, value.v))
     }
@@ -1580,7 +1580,7 @@ unsafe fn discard_transferables(data: *mut root::JSStructuredCloneData) {
             Some(XFER_ARRAY_BUFFER) => {
                 let Some(len) = u64_at(pos + 4) else { return };
                 pos += 4 + 16 + len as usize;
-            },
+            }
             Some(XFER_CUSTOM) => {
                 let (Some(tag), Some(ownership), Some(content), Some(extra)) = (
                     u32_at(pos + 4),
@@ -1600,7 +1600,7 @@ unsafe fn discard_transferables(data: *mut root::JSStructuredCloneData) {
                     );
                 }
                 pos += 28;
-            },
+            }
             _ => return,
         }
     }
@@ -1901,11 +1901,11 @@ pub(crate) unsafe fn JS_ReadString(
 ) -> bool {
     let r = reader(r);
     match r.u8() {
-        Some(T_STRING) => {},
+        Some(T_STRING) => {}
         Some(_) => {
             r.bad(c"expected string");
             return false;
-        },
+        }
         None => return false,
     }
     let Some(s) = r.read_string() else {
@@ -1929,11 +1929,11 @@ pub(crate) unsafe fn JS_ReadTypedArray(
 ) -> bool {
     let r = reader(r);
     match r.peek_u8() {
-        Some(T_TYPED_ARRAY | T_BACKREF) => {},
+        Some(T_TYPED_ARRAY | T_BACKREF) => {}
         Some(_) => {
             r.bad(c"expected typed array");
             return false;
-        },
+        }
         None => return false,
     }
     let Some(v) = r.read_value() else {

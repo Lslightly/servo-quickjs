@@ -139,11 +139,11 @@ pub(crate) fn pushed(v: q::JSValue, kind: Kind, site: &'static Location<'static>
                 if let Some(i) = s.unrooted.remove(&k) {
                     s.entries[i].rooted = true;
                 }
-            },
+            }
             Kind::Result | Kind::Borrowed => {
                 s.unrooted.insert(k, index);
-            },
-            Kind::Deferred => {},
+            }
+            Kind::Deferred => {}
         }
         let fresh = kind == Kind::Result && unsafe { q::JS_GetRefCount(v) } == 1;
         let backtrace = (raw && kind == Kind::Result && s.sample()).then(Backtrace::force_capture);
@@ -320,7 +320,7 @@ fn write(final_: bool) {
             if final_ {
                 eprintln!("qjs-pool-stats: appended to {}", path.display());
             }
-        },
+        }
         Err(e) => eprintln!("qjs-pool-stats: can't write {}: {e}", path.display()),
     }
 }
@@ -388,7 +388,7 @@ fn strip_hash(symbol: &str) -> &str {
     match symbol.rsplit_once("::h") {
         Some((name, hash)) if hash.len() == 16 && hash.bytes().all(|b| b.is_ascii_hexdigit()) => {
             name
-        },
+        }
         _ => symbol,
     }
 }
@@ -402,7 +402,7 @@ fn string(s: &str) -> String {
             '\\' => out.push_str("\\\\"),
             c if (c as u32) < 0x20 => {
                 let _ = write!(out, "\\u{:04x}", c as u32);
-            },
+            }
             c => out.push(c),
         }
     }

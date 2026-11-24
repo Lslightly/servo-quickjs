@@ -10,15 +10,15 @@
 
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
-use std::ffi::{CStr, c_void};
+use std::ffi::{c_void, CStr};
 use std::ptr;
-use std::sync::OnceLock;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::OnceLock;
 
 use servo_quickjs as q;
 
-use super::Cx;
 use super::class::object_data;
+use super::Cx;
 
 pub(crate) const CLASS_OBJECT: q::JSClassID = 1;
 pub(crate) const CLASS_ARRAY: q::JSClassID = 2;
@@ -242,7 +242,7 @@ unsafe fn read(qctx: *mut q::JSContext, which: Intrinsic) -> q::JSValue {
             let v = q::JS_GetPropertyStr(qctx, proto, name.as_ptr());
             q::JS_FreeValueRT(rt, proto);
             v
-        },
+        }
         Getter(class, name) => {
             let proto = q::JS_GetClassProto(qctx, class);
             let atom = q::JS_NewAtom(qctx, name.as_ptr());
@@ -257,7 +257,7 @@ unsafe fn read(qctx: *mut q::JSContext, which: Intrinsic) -> q::JSValue {
             } else {
                 q::JS_UNDEFINED
             }
-        },
+        }
         Global(name, member) => {
             let global = q::JS_GetGlobalObject(qctx);
             let v = q::JS_GetPropertyStr(qctx, global, name.as_ptr());
@@ -267,10 +267,10 @@ unsafe fn read(qctx: *mut q::JSContext, which: Intrinsic) -> q::JSValue {
                     let m = q::JS_GetPropertyStr(qctx, v, member.as_ptr());
                     q::JS_FreeValueRT(rt, v);
                     m
-                },
+                }
                 None => v,
             }
-        },
+        }
     }
 }
 

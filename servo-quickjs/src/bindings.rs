@@ -49,7 +49,11 @@ where
             index % 8
         };
         let mask = 1 << bit_index;
-        if val { byte | mask } else { byte & !mask }
+        if val {
+            byte | mask
+        } else {
+            byte & !mask
+        }
     }
     #[inline]
     pub fn set_bit(&mut self, index: usize, val: bool) {
@@ -1107,7 +1111,7 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_ToFloat64(ctx: *mut JSContext, pres: *mut f64, val: JSValue)
-    -> ::std::os::raw::c_int;
+        -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
     pub fn JS_ToBigInt64(
@@ -2040,7 +2044,7 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_SetBreakpoint(ctx: *mut JSContext, script: JSValue, pc: u32)
-    -> ::std::os::raw::c_int;
+        -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
     pub fn JS_ClearBreakpoint(
@@ -2403,7 +2407,7 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_GetRegExpOriginal(ctx: *mut JSContext, obj: JSValue, pflags: *mut JSValue)
-    -> JSValue;
+        -> JSValue;
 }
 unsafe extern "C" {
     pub fn JS_NewRegExpOriginal(ctx: *mut JSContext, source: JSValue, flags: JSValue) -> JSValue;

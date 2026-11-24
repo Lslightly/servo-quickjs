@@ -9,15 +9,15 @@
 //! an atom's string is the atom itself. External strings are copied and their buffer is released
 //! at once. Pinned atoms are kept alive by the pool, like every other value handed to Rust.
 
-use std::ffi::{CStr, c_char, c_int, c_void};
+use std::ffi::{c_char, c_int, c_void, CStr};
 use std::{ptr, slice};
 
 use servo_quickjs as q;
 
-use super::{Cx, obj_val};
+use super::{obj_val, Cx};
 use crate::sys::glue;
 use crate::sys::jsapi as root;
-use crate::sys::jsid::{IntId, from_atom};
+use crate::sys::jsid::{from_atom, IntId};
 use crate::sys::jsval::{Int32Value, JSVal, StringValue, UndefinedValue};
 
 extern "C" {
@@ -192,7 +192,7 @@ pub(crate) unsafe fn JS_GetLatin1StringCharsAndLength(
         Chars::Latin1(c) => {
             *length = c.len();
             c.as_ptr()
-        },
+        }
         Chars::TwoByte(_) => panic!("JS_GetLatin1StringCharsAndLength on a two-byte string"),
     }
 }
@@ -208,7 +208,7 @@ pub(crate) unsafe fn JS_GetTwoByteStringCharsAndLength(
         Chars::TwoByte(c) => {
             *length = c.len();
             c.as_ptr()
-        },
+        }
         Chars::Latin1(_) => panic!("JS_GetTwoByteStringCharsAndLength on a Latin-1 string"),
     }
 }
@@ -422,7 +422,7 @@ pub(crate) unsafe fn JS_ConcatStrings(
             let mut chars = l.to_utf16();
             chars.extend(r.units());
             new_utf16_string(cx, &chars)
-        },
+        }
     }
 }
 
@@ -688,7 +688,7 @@ unsafe fn utf8_to_two_byte_z(
             return root::JS::TwoByteCharsZ {
                 _base: ranged_ptr(ptr::null_mut()),
             };
-        },
+        }
     };
     *outlen = units.len();
     root::JS::TwoByteCharsZ {
@@ -824,7 +824,11 @@ fn modular(d: f64, bits: u32) -> u64 {
     } else {
         r as u64
     };
-    if bits == 64 { n } else { n & ((1 << bits) - 1) }
+    if bits == 64 {
+        n
+    } else {
+        n & ((1 << bits) - 1)
+    }
 }
 
 unsafe fn to_modular(cx: *mut root::JSContext, v: root::JS::HandleValue, bits: u32) -> Option<u64> {
@@ -844,7 +848,7 @@ pub(crate) unsafe fn ToNumberSlow(
         Some(d) => {
             *dp = d;
             true
-        },
+        }
         None => false,
     }
 }
@@ -986,8 +990,8 @@ unsafe fn to_primitive(cx: &Cx, obj: q::JSValue, hint: root::JSType) -> q::JSVal
                 root::JSType::JSTYPE_NUMBER
             };
             return ordinary_to_primitive(cx, obj, hint);
-        },
-        _ => {},
+        }
+        _ => {}
     }
     if q::JS_IsFunction(qctx, exotic) == 0 {
         q::JS_FreeValueRT(cx.rt, exotic);
@@ -1181,14 +1185,14 @@ pub(crate) unsafe fn PropertySpecNameEqualsId(
     match spec_symbol_code(name) {
         Some(code) => {
             id.is_symbol() && id.to_atom() == super::well_known_symbol_atom(super::current(), code)
-        },
+        }
         None => {
             id.is_string()
                 && equals_ascii(
                     Chars::of(id.to_string()),
                     CStr::from_ptr(name.string_).to_bytes(),
                 )
-        },
+        }
     }
 }
 
@@ -1589,17 +1593,17 @@ unsafe fn value_to_source(
         q::JS_TAG_UNDEFINED => push_str(out, "(void 0)"),
         q::JS_TAG_STRING | q::JS_TAG_STRING_ROPE => {
             return with_string_chars(cx, v, |c| push_quoted(out, c));
-        },
+        }
         q::JS_TAG_FLOAT64 if v.float64() == 0.0 && v.float64().is_sign_negative() => {
             push_str(out, "-0")
-        },
+        }
         q::JS_TAG_SYMBOL => return symbol_to_source(cx, v, out),
         q::JS_TAG_BIG_INT | q::JS_TAG_SHORT_BIG_INT => {
             if !append_to_string(cx, out, v) {
                 return false;
             }
             out.push(b'n' as u16);
-        },
+        }
         q::JS_TAG_OBJECT => return object_to_source(cx, v, seen, out),
         _ => return append_to_string(cx, out, v),
     }
@@ -1721,7 +1725,7 @@ unsafe fn builtin_object_to_source(
             q::JS_FreeValueRT(cx.rt, prim);
             push_str(out, "))");
             ok
-        },
+        }
         _ => plain_object_to_source(cx, obj, seen, out),
     }
 }

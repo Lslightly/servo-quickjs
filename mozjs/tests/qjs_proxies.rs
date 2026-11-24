@@ -8,7 +8,7 @@
 
 use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
-use std::ffi::{CStr, CString, c_void};
+use std::ffi::{c_void, CStr, CString};
 use std::process::Command;
 use std::ptr::{self, NonNull};
 use std::sync::LazyLock;
@@ -19,36 +19,36 @@ use mozjs::glue::{
     CreateForwardingProxyHandler, CreateProxyHandler, CreateRustJSPrincipals,
     CreateWrapperProxyHandler, DestroyRustJSPrincipals, GetProxyHandler, GetProxyHandlerExtra,
     GetProxyHandlerFamily, GetProxyPrivate, GetProxyReservedSlot, GetRustJSPrincipalsPrivate,
-    GetWindowProxyClass, IsProxyHandlerFamily, IsWrapper, JS_GetReservedSlot,
-    JSPrincipalsCallbacks, NewProxyObject, NewWindowProxy, ProxyTraps, SetProxyPrivate,
+    GetWindowProxyClass, IsProxyHandlerFamily, IsWrapper, JSPrincipalsCallbacks,
+    JS_GetReservedSlot, NewProxyObject, NewWindowProxy, ProxyTraps, SetProxyPrivate,
     SetProxyReservedSlot, UncheckedUnwrapObject,
 };
 use mozjs::jsapi::{
     CheckedUnwrapStatic, Compartment, CompartmentIterResult, GCContext, GCReason,
     GetObjectRealmOrNull, GetRealmPrincipals, Handle, HandleId, HandleObject as RawHandleObject,
-    HandleValue as RawHandleValue, IsWindowProxy, IsWindowSlow, JS_DefinePropertyById,
+    HandleValue as RawHandleValue, IsWindowProxy, IsWindowSlow, JSClass, JSClassOps,
+    JSContext as RawJSContext, JSErrNum, JSObject, JSPrincipals, JSTracer, JS_DefinePropertyById,
     JS_DeletePropertyById, JS_DropPrincipals, JS_GetOwnPropertyDescriptorById,
     JS_GlobalObjectTraceHook, JS_HasOwnPropertyById, JS_HoldPrincipals,
     JS_InitDestroyPrincipalsCallback, JS_IterateCompartments, JS_NewDeadWrapper,
     JS_NewObjectWithGivenProto, JS_SetReservedSlot, JS_TransplantObject, JS_WrapObject,
-    JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK,
-    JSCLASS_RESERVED_SLOTS_SHIFT, JSClass, JSClassOps, JSContext as RawJSContext, JSErrNum,
-    JSITER_HIDDEN, JSITER_OWNONLY, JSITER_SYMBOLS, JSObject, JSPROP_ENUMERATE, JSPrincipals,
-    JSTracer, MutableHandle, MutableHandleIdVector, MutableHandleValue as RawMutableHandleValue,
+    MutableHandle, MutableHandleIdVector, MutableHandleValue as RawMutableHandleValue,
     ObjectOpResult, OnNewGlobalHookOption, PropertyDescriptor, PropertyKey, SetWindowProxy,
     SetWindowProxyClass, ToWindowIfWindowProxy, ToWindowProxyIfWindowSlow,
+    JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK,
+    JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN, JSITER_OWNONLY, JSITER_SYMBOLS, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, PrivateValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     AppendToIdVector, GetPropertyKeys, GetRealmObjectPrototype, JS_AtomizeAndPinString,
-    JS_DefineProperty, JS_GC, JS_GetProperty, JS_GetPropertyById, JS_NewGlobalObject,
-    JS_NewPlainObject, RUST_INTERNED_STRING_TO_JSID,
+    JS_DefineProperty, JS_GetProperty, JS_GetPropertyById, JS_NewGlobalObject, JS_NewPlainObject,
+    JS_GC, RUST_INTERNED_STRING_TO_JSID,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS, evaluate_script, get_object_class,
+    evaluate_script, get_object_class, CompileOptionsWrapper, HandleObject, JSEngine,
+    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 /// The engine can only be initialized once per process; it is shared by the tests.

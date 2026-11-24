@@ -10,7 +10,7 @@
 
 use std::cell::RefCell;
 use std::collections::HashSet;
-use std::ffi::{CStr, CString, c_char, c_void};
+use std::ffi::{c_char, c_void, CStr, CString};
 use std::ptr;
 
 pub type UErrorCode = i32;

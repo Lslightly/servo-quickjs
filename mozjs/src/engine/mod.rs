@@ -346,14 +346,14 @@ pub(crate) unsafe fn retain_rooted(
         RootKind::Value => {
             cx.retain_as(*(data as *const JSVal), Pooled::Root);
             return;
-        },
+        }
         RootKind::Id => {
             let id = *(data as *const root::jsid);
             if id.is_string() || id.is_symbol() {
                 cx.adopt_atom(q::JS_DupAtom(cx.base_ctx, id.to_atom()));
             }
             return;
-        },
+        }
         RootKind::Object => q::JS_TAG_OBJECT,
         RootKind::String => q::JS_TAG_STRING,
         RootKind::Symbol => q::JS_TAG_SYMBOL,

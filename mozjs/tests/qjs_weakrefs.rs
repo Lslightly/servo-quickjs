@@ -16,9 +16,9 @@ use mozjs::jsapi::{
 use mozjs::jsval::{JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_GC, JS_NewGlobalObject, JS_NewObject, JS_SetProperty};
+use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewObject, JS_SetProperty, JS_GC};
 use mozjs::rust::{
-    CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
+    evaluate_script, CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 thread_local! {

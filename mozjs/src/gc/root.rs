@@ -5,7 +5,7 @@ use std::ptr;
 use std::ptr::NonNull;
 
 use crate::context::NoGC;
-use crate::jsapi::{JS, JSContext, JSFunction, JSObject, JSScript, JSString, Symbol, Value, jsid};
+use crate::jsapi::{jsid, JSContext, JSFunction, JSObject, JSScript, JSString, Symbol, Value, JS};
 use crate::sys::jsgc::{RootKind, Rooted};
 
 use crate::jsapi::Handle as RawHandle;

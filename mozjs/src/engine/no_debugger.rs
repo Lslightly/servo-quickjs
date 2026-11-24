@@ -5,7 +5,7 @@
 //! A build without the debugger (see `debugger.rs`): QuickJS has no patches for debuggers, and
 //! no debugger is ever active, so what the shim does for debuggers compiles away.
 
-use std::ffi::{CStr, c_char, c_int};
+use std::ffi::{c_char, c_int, CStr};
 
 use servo_quickjs as q;
 

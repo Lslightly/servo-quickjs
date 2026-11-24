@@ -1,7 +1,7 @@
 //! Unresolvable references throw a ReferenceError even when the global's prototype chain has an
 //! exotic object with a `get_property` hook, such as Servo's WindowProperties proxy.
 
-use std::ffi::{CString, c_int};
+use std::ffi::{c_int, CString};
 
 use servo_quickjs::*;
 

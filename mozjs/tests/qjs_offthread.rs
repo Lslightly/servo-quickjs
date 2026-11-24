@@ -6,7 +6,7 @@
 //! compiles them with its `dom_script_asynch` preference, and instantiated from their stencils.
 
 use std::cell::RefCell;
-use std::ffi::{CString, c_void};
+use std::ffi::{c_void, CString};
 use std::mem::MaybeUninit;
 use std::ptr;
 use std::sync::{Arc, OnceLock};
@@ -18,7 +18,7 @@ use mozjs::jsapi::{
     OnNewGlobalHookOption, PromiseRejectionHandlingState,
 };
 use mozjs::jsval::{JSVal, PrivateValue, UndefinedValue};
-use mozjs::offthread::{CompilationResult, FrontendContext, compile_to_stencil_offthread};
+use mozjs::offthread::{compile_to_stencil_offthread, CompilationResult, FrontendContext};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     Compile1, ConvertFrontendErrorsToRuntimeErrors, InstantiateGlobalStencil,
@@ -26,9 +26,9 @@ use mozjs::rust::wrappers2::{
     JS_SetProperty,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, JSEngineHandle,
-    OwningCompileOptionsWrapper, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
-    transform_str_to_source_text,
+    evaluate_script, transform_str_to_source_text, CompileOptionsWrapper,
+    HandleObject as SafeHandleObject, JSEngine, JSEngineHandle, OwningCompileOptionsWrapper,
+    RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 /// The engine can be initialized once per process; the tests share it and never shut it down.

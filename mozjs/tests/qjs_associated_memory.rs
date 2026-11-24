@@ -14,8 +14,8 @@ use std::sync::LazyLock;
 use mozjs::context::JSContext;
 use mozjs::gc::Traceable;
 use mozjs::jsapi::{
-    self, AddAssociatedMemory, GCContext, Heap, JSClass, JSClassOps, JSObject, JSPROP_ENUMERATE,
-    JSTracer, MemoryUse, OnNewGlobalHookOption, RemoveAssociatedMemory,
+    self, AddAssociatedMemory, GCContext, Heap, JSClass, JSClassOps, JSObject, JSTracer, MemoryUse,
+    OnNewGlobalHookOption, RemoveAssociatedMemory, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{JSVal, ObjectValue};
 use mozjs::quickjs::drain_autorelease_pool;

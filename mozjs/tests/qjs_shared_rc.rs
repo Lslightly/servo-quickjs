@@ -17,15 +17,15 @@ use std::sync::LazyLock;
 use mozjs::context::JSContext;
 use mozjs::gc::Traceable;
 use mozjs::jsapi::{
-    self, GCContext, GCReason, Heap, JSClass, JSClassOps, JSObject, JSPROP_ENUMERATE, JSTracer,
-    OnNewGlobalHookOption,
+    self, GCContext, GCReason, Heap, JSClass, JSClassOps, JSObject, JSTracer,
+    OnNewGlobalHookOption, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{JSVal, ObjectValue, UndefinedValue};
 use mozjs::quickjs::drain_autorelease_pool;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
-    JS_DefineProperty, JS_GC, JS_GetProperty, JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject,
+    JS_DefineProperty, JS_GetProperty, JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject, JS_GC,
 };
 use mozjs::rust::{JSEngine, JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 

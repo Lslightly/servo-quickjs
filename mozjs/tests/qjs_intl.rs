@@ -15,8 +15,8 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
-    evaluate_script,
+    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS,
 };
 
 /// The string value of `expr`, or "throws " and the error's name (and message if `verbose`).

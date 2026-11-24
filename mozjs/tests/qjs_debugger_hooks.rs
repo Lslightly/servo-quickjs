@@ -23,8 +23,8 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{Compile1, JS_ExecuteScript, JS_NewGlobalObject};
 use mozjs::rust::{
-    CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
-    transform_str_to_source_text,
+    transform_str_to_source_text, CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions,
+    Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 fn engine() -> JSEngineHandle {
@@ -302,12 +302,12 @@ unsafe extern "C" fn on_exit(
         1 if kind == qjs::JS_FRAME_EXIT_RETURN && describe(ctx, value) == "2" => {
             qjs::JS_ThrowTypeError(ctx, c"exit".as_ptr());
             -1
-        },
+        }
         2 if kind == qjs::JS_FRAME_EXIT_RETURN && describe(ctx, value) == "2" => {
             qjs::JS_ThrowInternalError(ctx, c"terminated".as_ptr());
             qjs::JS_SetUncatchableException(ctx, 1);
             -1
-        },
+        }
         _ => 0,
     }
 }
@@ -465,17 +465,15 @@ fn terminated_frames() {
     with_global(|cx| unsafe {
         assert!(jsapi::JS_AddInterruptCallback(cx.raw_cx(), Some(terminate)));
         rooted!(&in(cx) let global = jsapi::CurrentGlobalOrNull(cx.raw_cx()));
-        assert!(
-            !jsapi::JS_DefineFunction(
-                cx.raw_cx(),
-                global.handle().into(),
-                c"requestTermination".as_ptr(),
-                Some(request_termination),
-                0,
-                0
-            )
-            .is_null()
-        );
+        assert!(!jsapi::JS_DefineFunction(
+            cx.raw_cx(),
+            global.handle().into(),
+            c"requestTermination".as_ptr(),
+            Some(request_termination),
+            0,
+            0
+        )
+        .is_null());
         let result = run_with_frame_hooks(
             cx,
             "function loop() { requestTermination(); for (;;) {} } loop()",

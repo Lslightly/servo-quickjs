@@ -11,13 +11,13 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+use crate::sys::jsapi::JSContext;
+use crate::sys::jsapi::JSObject;
+use crate::sys::jsapi::JSString;
 use crate::sys::jsapi::JS::BigInt;
 use crate::sys::jsapi::JS::Symbol;
 use crate::sys::jsapi::JS::TraceKind;
 use crate::sys::jsapi::JS::Value;
-use crate::sys::jsapi::JSContext;
-use crate::sys::jsapi::JSObject;
-use crate::sys::jsapi::JSString;
 
 use libc::c_void;
 use servo_quickjs as q;

@@ -19,9 +19,9 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
+    describe_scripted_caller, error_info_from_exception_stack, evaluate_script,
     CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS, describe_scripted_caller, error_info_from_exception_stack,
-    evaluate_script,
+    SIMPLE_GLOBAL_CLASS,
 };
 
 fn with_global(engine: &JSEngine, f: impl FnOnce(&mut JSContext, SafeHandleObject)) {

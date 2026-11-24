@@ -7,7 +7,7 @@
 use std::any::Any;
 use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
-use std::ffi::{CStr, CString, c_char, c_int};
+use std::ffi::{c_char, c_int, CStr, CString};
 use std::ptr;
 use std::rc::Rc;
 use std::slice;
@@ -318,7 +318,11 @@ unsafe fn bool_option(
     };
     let b = q::JS_ToBool(ctx, v);
     q::JS_FreeValue(ctx, v);
-    if b < 0 { Err(()) } else { Ok(Some(b != 0)) }
+    if b < 0 {
+        Err(())
+    } else {
+        Ok(Some(b != 0))
+    }
 }
 
 unsafe fn number_option(
@@ -361,7 +365,7 @@ unsafe fn type_option(
     match any_string_option(ctx, options, name)? {
         Some(s) if !is_type(&s) => {
             throw_range(ctx, &format!("invalid {}: {s:?}", name.to_string_lossy()))
-        },
+        }
         s => Ok(s.map(|s| s.to_ascii_lowercase())),
     }
 }
@@ -419,7 +423,7 @@ unsafe fn push_tag(ctx: *mut q::JSContext, out: &mut Vec<String>, tag: &str) -> 
                 out.push(tag);
             }
             Ok(())
-        },
+        }
         None => throw_range(ctx, &format!("invalid language tag: {tag}")),
     }
 }
@@ -660,7 +664,7 @@ unsafe fn collator_state(
         (None, Some(co)) => {
             keywords.push(("co", co));
             co.to_owned()
-        },
+        }
         (None, None) => "default".to_owned(),
     };
     let kn = keyword(&requested_keywords, "kn").filter(|v| ["", "true", "false"].contains(v));
@@ -918,14 +922,14 @@ unsafe fn number_state(
             } else {
                 Grouping::Auto
             }
-        },
+        }
         Some(v) if v.tag() == q::JS_TAG_BOOL => {
             if v.int() != 0 {
                 Grouping::Always
             } else {
                 Grouping::Off
             }
-        },
+        }
         Some(v) => {
             let s = to_string(ctx, v);
             q::JS_FreeValue(ctx, v);
@@ -939,9 +943,9 @@ unsafe fn number_state(
                         ctx,
                         &format!("invalid value {s:?} for option useGrouping"),
                     );
-                },
+                }
             }
-        },
+        }
     };
     let sign_display = string_option(
         ctx,
@@ -987,7 +991,7 @@ unsafe fn number_state(
             })
             .map(|f| f.get(icu::UNUM_MAX_FRACTION_DIGITS))
             .unwrap_or(2)
-        },
+        }
         _ => 0,
     };
     let mnfd_default = if style == "currency" && notation == "standard" {
@@ -1025,7 +1029,7 @@ unsafe fn number_state(
                 ctx,
                 "minimumFractionDigits is greater than maximumFractionDigits",
             );
-        },
+        }
         (Some(min), Some(max)) => (min, max),
     };
 
@@ -1054,15 +1058,15 @@ unsafe fn number_state(
             f.set(icu::UNUM_MIN_FRACTION_DIGITS, fraction.0);
         }
         match grouping {
-            Grouping::Auto => {},
+            Grouping::Auto => {}
             Grouping::Always => {
                 f.set(icu::UNUM_GROUPING_USED, 1);
                 f.set(icu::UNUM_MINIMUM_GROUPING_DIGITS, 1);
-            },
+            }
             Grouping::Min2 => {
                 f.set(icu::UNUM_GROUPING_USED, 1);
                 f.set(icu::UNUM_MINIMUM_GROUPING_DIGITS, 2);
-            },
+            }
             Grouping::Off => f.set(icu::UNUM_GROUPING_USED, 0),
         }
         if sign_display == "always" {
@@ -1186,16 +1190,16 @@ unsafe fn number_resolved_options(ctx: *mut q::JSContext, s: &NumberState) -> q:
     match s.grouping {
         Grouping::Off => {
             o.bool(c"useGrouping", false);
-        },
+        }
         Grouping::Auto => {
             o.str(c"useGrouping", "auto");
-        },
+        }
         Grouping::Always => {
             o.str(c"useGrouping", "always");
-        },
+        }
         Grouping::Min2 => {
             o.str(c"useGrouping", "min2");
-        },
+        }
     }
     o.str(c"notation", s.notation);
     if s.notation == "compact" {
@@ -1287,7 +1291,7 @@ fn generator(locale: &Locale) -> Option<Rc<Generator>> {
             (Some(pos), false) => {
                 let glue = format!("{}{{1}}{}", &both[..pos], &both[pos + styles[7].len()..]);
                 glue.replacen(&styles[3], "{0}", 1)
-            },
+            }
             _ => "{1} {0}".to_owned(),
         };
         let glue = if glue.contains("{0}") && glue.contains("{1}") {
@@ -1363,13 +1367,13 @@ unsafe fn time_zone(
                 if utc(&name) { "UTC".to_owned() } else { name },
                 Some(units),
             ))
-        },
+        }
         Some(name) if utc(&name) => Ok(("UTC".to_owned(), Some("UTC".encode_utf16().collect()))),
         Some(name) => match icu::canonical_time_zone(&name) {
             Some(id) => {
                 let units = id.encode_utf16().collect();
                 Ok((if utc(&id) { "UTC".to_owned() } else { id }, Some(units)))
-            },
+            }
             None => throw_range(ctx, &format!("invalid time zone: {name}")),
         },
     }
@@ -1744,43 +1748,43 @@ unsafe fn date_resolved_options(ctx: *mut q::JSContext, s: &DateState) -> q::JSV
         match c {
             'E' | 'c' | 'e' => {
                 o.str(c"weekday", text(n));
-            },
+            }
             'G' => {
                 o.str(c"era", text(n));
-            },
+            }
             'y' | 'Y' | 'u' | 'r' | 'U' => {
                 o.str(c"year", digits(n));
-            },
+            }
             'M' | 'L' => {
                 o.str(c"month", if n <= 2 { digits(n) } else { text(n) });
-            },
+            }
             'd' => {
                 o.str(c"day", digits(n));
-            },
+            }
             'B' | 'b' => {
                 o.str(c"dayPeriod", text(n));
-            },
+            }
             'h' | 'H' | 'k' | 'K' => {
                 o.str(c"hour", digits(n));
-            },
+            }
             'm' => {
                 o.str(c"minute", digits(n));
-            },
+            }
             's' => {
                 o.str(c"second", digits(n));
-            },
+            }
             'S' => {
                 o.int(c"fractionalSecondDigits", n as i32);
-            },
+            }
             'z' => {
                 o.str(c"timeZoneName", if n >= 4 { "long" } else { "short" });
-            },
+            }
             'O' => {
                 o.str(
                     c"timeZoneName",
                     if n >= 4 { "longOffset" } else { "shortOffset" },
                 );
-            },
+            }
             'v' | 'V' => {
                 o.str(
                     c"timeZoneName",
@@ -1790,8 +1794,8 @@ unsafe fn date_resolved_options(ctx: *mut q::JSContext, s: &DateState) -> q::JSV
                         "shortGeneric"
                     },
                 );
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
     o.obj
@@ -1914,7 +1918,7 @@ unsafe extern "C" fn call_bound(
         State::Date(s) => {
             let s = s.clone();
             time_value(ctx, arg(argc, argv, 0)).and_then(|t| formatted(ctx, s.format.format(t)))
-        },
+        }
     })
 }
 
@@ -1937,7 +1941,7 @@ unsafe extern "C" fn format_to_parts(
         Ok(State::Number(s)) => format_number_to_parts(ctx, &s, arg(argc, argv, 0)),
         Ok(State::Date(s)) => {
             time_value(ctx, arg(argc, argv, 0)).and_then(|t| format_date_to_parts(ctx, &s, t))
-        },
+        }
         _ => Err(()),
     })
 }
@@ -1985,13 +1989,13 @@ unsafe extern "C" fn number_to_locale_string(
         q::JS_TAG_INT | q::JS_TAG_FLOAT64 => this,
         q::JS_TAG_OBJECT if q::JS_GetClassID(this) == CLASS_NUMBER => {
             q::JS_GetPrimitiveObjectData(ctx, this)
-        },
+        }
         _ => {
             return ret(throw_type(
                 ctx,
                 "Number.prototype.toLocaleString called on an incompatible receiver",
             ));
-        },
+        }
     };
     ret(number_state(ctx, arg(argc, argv, 0), arg(argc, argv, 1))
         .and_then(|s| format_number(ctx, &s, value)))

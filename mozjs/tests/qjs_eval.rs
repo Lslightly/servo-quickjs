@@ -15,8 +15,8 @@ use mozjs::jsval::{Int32Value, JSVal, ObjectValue, UndefinedValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{Call, CompileFunction, JS_NewGlobalObject, JS_SetProperty};
 use mozjs::rust::{
-    CompileOptionsWrapper, EnvironmentChain, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
-    Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script, transform_u16_to_source_text,
+    evaluate_script, transform_u16_to_source_text, CompileOptionsWrapper, EnvironmentChain,
+    HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 /// The engine can be initialized once per process; the tests share it and never shut it down.

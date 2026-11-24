@@ -10,7 +10,7 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{JS_ClearPendingException, JS_IsExceptionPending, JS_NewGlobalObject};
-use mozjs::rust::{CompileOptionsWrapper, evaluate_script};
+use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
 use mozjs::rust::{HandleObject, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 struct SM {
@@ -77,7 +77,7 @@ impl SM {
                     assert!(JS_IsExceptionPending(cx));
                     JS_ClearPendingException(cx);
                     Err(())
-                },
+                }
             }
         }
     }

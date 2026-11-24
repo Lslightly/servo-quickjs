@@ -13,17 +13,17 @@
 //! current realm's intrinsic prototypes.
 
 use std::collections::HashSet;
-use std::ffi::{CStr, c_int};
+use std::ffi::{c_int, CStr};
 use std::ptr;
 
 use servo_quickjs as q;
 
 use super::class::{
-    QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT, adopt_object, function_data, object_data,
+    adopt_object, function_data, object_data, QJS_CLASS_BYTECODE_FUNCTION, QJS_CLASS_OBJECT,
 };
 use super::intrinsics::{self, Intrinsic};
-use super::property::{Atom, data_flags, well_known_symbol_atom};
-use super::{Cx, RealmData, obj_val, val_obj};
+use super::property::{data_flags, well_known_symbol_atom, Atom};
+use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
@@ -834,7 +834,7 @@ pub(crate) unsafe fn GetBuiltinClass(
         // of SpiderMonkey classes are not.
         _ if object_data(obj).is_none() && q::JS_IsFunction(cx.qctx(), obj_val(obj)) != 0 => {
             ESClass::Function
-        },
+        }
         _ => ESClass::Other,
     };
     true
@@ -1662,7 +1662,11 @@ unsafe fn number_property(cx: &Cx, obj: q::JSValue, name: &CStr) -> Option<f64> 
     let mut n = 0f64;
     let r = q::JS_ToFloat64(cx.qctx(), &mut n, v);
     q::JS_FreeValueRT(cx.rt, v);
-    if r < 0 { None } else { Some(n) }
+    if r < 0 {
+        None
+    } else {
+        Some(n)
+    }
 }
 
 /// The length of the matched substring of a match array.

@@ -9,7 +9,7 @@
 
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
-use std::ffi::{CString, c_void};
+use std::ffi::{c_void, CString};
 use std::marker::PhantomData;
 use std::ptr;
 use std::sync::OnceLock;
@@ -23,11 +23,11 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::qjs;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
-    CompileModule1, JS_GC, JS_NewGlobalObject, LoadRequestedModules1, ModuleEvaluate, ModuleLink,
+    CompileModule1, JS_NewGlobalObject, LoadRequestedModules1, ModuleEvaluate, ModuleLink, JS_GC,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
-    transform_str_to_source_text,
+    transform_str_to_source_text, CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions,
+    Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 const BASE: &str = "https://test/";

@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use crate::sys::jsapi::{JS, js};
-use crate::sys::jsapi::{JSFunction, JSObject, JSScript, JSString, JSTracer, jsid};
+use crate::sys::jsapi::{js, JS};
+use crate::sys::jsapi::{jsid, JSFunction, JSObject, JSScript, JSString, JSTracer};
 use crate::sys::jsid::VoidId;
 use std::cell::UnsafeCell;
 use std::collections::VecDeque;

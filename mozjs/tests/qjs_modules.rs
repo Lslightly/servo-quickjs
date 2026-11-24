@@ -8,7 +8,7 @@
 
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::ffi::{CString, c_void};
+use std::ffi::{c_void, CString};
 use std::marker::PhantomData;
 use std::ptr;
 use std::sync::OnceLock;
@@ -27,8 +27,8 @@ use mozjs::rust::wrappers2::{
     ThrowOnModuleEvaluationFailure,
 };
 use mozjs::rust::{
-    CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
-    transform_str_to_source_text,
+    transform_str_to_source_text, CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions,
+    Runtime, SIMPLE_GLOBAL_CLASS,
 };
 
 const BASE: &str = "https://test/";
@@ -300,17 +300,15 @@ unsafe fn install_hooks(cx: &mut JSContext) {
     jsapi::SetModuleMetadataHook(rt, Some(metadata_hook));
     assert!(jsapi::GetModuleLoadHook(rt).is_some());
     let global = jsapi::CurrentGlobalOrNull(cx.raw_cx());
-    assert!(
-        !jsapi::JS_DefineFunction(
-            cx.raw_cx(),
-            h(&global),
-            c"callerId".as_ptr(),
-            Some(caller_id),
-            0,
-            0
-        )
-        .is_null()
-    );
+    assert!(!jsapi::JS_DefineFunction(
+        cx.raw_cx(),
+        h(&global),
+        c"callerId".as_ptr(),
+        Some(caller_id),
+        0,
+        0
+    )
+    .is_null());
     qjs::JS_SetHostPromiseRejectionTracker(
         rt as *mut qjs::JSRuntime,
         Some(rejection_tracker),
@@ -739,17 +737,15 @@ unsafe extern "C" fn request_termination(cx: *mut RawJSContext, _: u32, _: *mut 
 /// the module that calls it, inside its loop.
 unsafe fn add_termination(cx: &mut JSContext, global: *mut JSObject) {
     assert!(jsapi::JS_AddInterruptCallback(cx.raw_cx(), Some(terminate)));
-    assert!(
-        !jsapi::JS_DefineFunction(
-            cx.raw_cx(),
-            h(&global),
-            c"requestTermination".as_ptr(),
-            Some(request_termination),
-            0,
-            0
-        )
-        .is_null()
-    );
+    assert!(!jsapi::JS_DefineFunction(
+        cx.raw_cx(),
+        h(&global),
+        c"requestTermination".as_ptr(),
+        Some(request_termination),
+        0,
+        0
+    )
+    .is_null());
     run_classic(
         cx,
         "stop.js",

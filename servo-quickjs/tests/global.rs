@@ -1,7 +1,7 @@
 //! Servo patches: a global object of an embedder class, a separate global `this`, and lazy
 //! global properties defined during enumeration.
 
-use std::ffi::{CStr, CString, c_char, c_int, c_void};
+use std::ffi::{c_char, c_int, c_void, CStr, CString};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use servo_quickjs::*;

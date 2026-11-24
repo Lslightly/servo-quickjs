@@ -13,12 +13,12 @@ use std::cell::Cell;
 use std::collections::HashMap;
 use std::ffi::{c_int, c_void};
 use std::ptr;
-use std::sync::Mutex;
 use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::sync::Mutex;
 
 use servo_quickjs as q;
 
-use super::{Cx, RealmData, obj_val, val_obj};
+use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::{JSVal, TAG_MAGIC};
 

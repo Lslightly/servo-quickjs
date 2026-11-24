@@ -70,8 +70,8 @@ fn icu() {
             }
             suffix = symbol_suffix(&icu);
             println!("cargo:rustc-cfg=qjs_intl");
-        },
-        _ => {},
+        }
+        _ => {}
     }
     println!("cargo:rustc-env=ICU_SUFFIX={suffix}");
 }

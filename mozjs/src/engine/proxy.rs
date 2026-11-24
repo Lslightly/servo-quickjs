@@ -25,16 +25,16 @@
 use std::cell::{Cell, RefCell};
 #[cfg(qjs_debugger)]
 use std::ffi::c_char;
-use std::ffi::{CString, c_int, c_uint, c_void};
+use std::ffi::{c_int, c_uint, c_void, CString};
 use std::ptr;
-use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::OnceLock;
 
 use servo_quickjs as q;
 
 use super::class::{self, Tracer};
 use super::realm::{for_each_realm, realm_of_global};
-use super::{Cx, RealmData, obj_val, val_obj};
+use super::{obj_val, val_obj, Cx, RealmData};
 use crate::sys::glue;
 use crate::sys::jsapi as root;
 use crate::sys::jsid::from_atom;
@@ -405,7 +405,7 @@ impl ProxyRef {
                     handle_mut(desc),
                     is_none,
                 )
-            },
+            }
             None => self.unsupported("getOwnPropertyDescriptor"),
         }
     }
@@ -436,7 +436,7 @@ impl ProxyRef {
             None if self.forwards() => {
                 let target = self.target();
                 super::JS_GetPrototype(self.cx, handle(&target), handle_mut(proto))
-            },
+            }
             None => self.unsupported("getPrototype"),
         }
     }
@@ -448,7 +448,7 @@ impl ProxyRef {
                 let r = q::JS_IsExtensible(self.qctx(), obj_val(self.target()));
                 *extensible = r > 0;
                 r >= 0
-            },
+            }
             None => self.unsupported("isExtensible"),
         }
     }
@@ -605,7 +605,7 @@ impl ProxyRef {
                     handle(desc),
                     result,
                 )
-            },
+            }
             None => self.unsupported("defineProperty"),
         }
     }
@@ -616,7 +616,7 @@ impl ProxyRef {
             None if self.forwards() => {
                 let target = self.target();
                 super::JS_DeletePropertyById(self.cx, handle(&target), handle(id), result)
-            },
+            }
             None => self.unsupported("delete"),
         }
     }
@@ -628,7 +628,7 @@ impl ProxyRef {
                 let target = self.target();
                 let flags = root::JSITER_OWNONLY | root::JSITER_HIDDEN | root::JSITER_SYMBOLS;
                 super::GetPropertyKeys(self.cx, handle(&target), flags as c_uint, props)
-            },
+            }
             None => self.unsupported("ownPropertyKeys"),
         }
     }
@@ -950,7 +950,7 @@ unsafe fn unshadowed(ctx: *mut q::JSContext, obj: q::JSValue, atom: q::JSAtom) -
     let expando = data.private.get();
     if expando.tag() == q::JS_TAG_OBJECT {
         match q::JS_GetOwnProperty(ctx, ptr::null_mut(), expando, atom) {
-            0 => {},
+            0 => {}
             1 => return Unshadowed::No,
             _ => return Unshadowed::Exception,
         }
@@ -967,9 +967,9 @@ unsafe extern "C" fn proxy_get_property(
     match unshadowed(ctx, obj, atom) {
         Unshadowed::Proto(proto) => {
             return q::JS_GetPropertyInternal(ctx, proto, atom, receiver, 0);
-        },
+        }
         Unshadowed::Exception => return q::JS_EXCEPTION,
-        Unshadowed::No => {},
+        Unshadowed::No => {}
     }
     let t = Trap::new(ctx, obj);
     let mut vp = UndefinedValue();
@@ -995,9 +995,9 @@ unsafe extern "C" fn proxy_set_property(
         Unshadowed::Proto(proto) => {
             let value = q::JS_DupValue(ctx, value);
             return q::JS_SetPropertyInternal(ctx, proto, atom, value, receiver, flags);
-        },
+        }
         Unshadowed::Exception => return -1,
-        Unshadowed::No => {},
+        Unshadowed::No => {}
     }
     let t = Trap::new(ctx, obj);
     let mut result = new_op_result();
@@ -1051,7 +1051,7 @@ unsafe extern "C" fn proxy_prevent_extensions(ctx: *mut q::JSContext, obj: q::JS
         Some(trap) => trap(t.proxy.cx, t.proxy.proxy(), &mut result),
         None if t.proxy.forwards() => {
             return q::JS_PreventExtensions(ctx, obj_val(t.proxy.target()));
-        },
+        }
         None => t.proxy.unsupported("preventExtensions"),
     };
     if !ok {

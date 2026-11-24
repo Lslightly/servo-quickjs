@@ -11,13 +11,13 @@
 //! the first frame of `stack`.
 
 use std::cell::{Cell, RefCell};
-use std::ffi::{CStr, CString, c_char, c_int, c_void};
+use std::ffi::{c_char, c_int, c_void, CStr, CString};
 use std::ptr;
 
 use servo_quickjs as q;
 
 use super::class::{new_object, object_class, object_data};
-use super::{Cx, RealmData, obj_val};
+use super::{obj_val, Cx, RealmData};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
@@ -492,10 +492,10 @@ pub(crate) unsafe fn BuildStackString(
         match (stackFormat, name) {
             (root::js::StackFormat::V8, Some(name)) => {
                 out += &format!("    at {name} ({source}:{line}:{column})\n")
-            },
+            }
             (root::js::StackFormat::V8, None) => {
                 out += &format!("    at {source}:{line}:{column}\n")
-            },
+            }
             (_, name) => out += &format!("{}@{source}:{line}:{column}\n", name.unwrap_or_default()),
         }
         let parent = slots[SAVED_FRAME_PARENT].get();

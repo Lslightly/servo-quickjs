@@ -6,7 +6,7 @@
 //! either, and stays alive while its functions are reachable or while it is entered.
 
 use std::cell::Cell;
-use std::ffi::{CStr, c_void};
+use std::ffi::{c_void, CStr};
 use std::ptr;
 use std::sync::LazyLock;
 
@@ -17,21 +17,21 @@ use mozjs::glue::{
 };
 use mozjs::jsapi::{
     self, CurrentGlobalOrNull, EnterRealm, GCContext, GCReason, GetCurrentRealmOrNull,
-    GetObjectRealmOrNull, Heap, JS_DropPrincipals, JS_GetFunctionObject, JS_HoldPrincipals,
-    JS_InitDestroyPrincipalsCallback, JS_NewFunction, JS_TransplantObject,
+    GetObjectRealmOrNull, Heap, JSClass, JSClassOps, JSContext as RawJSContext, JSObject,
+    JSPrincipals, JSTracer, JS_DropPrincipals, JS_GetFunctionObject, JS_HoldPrincipals,
+    JS_InitDestroyPrincipalsCallback, JS_NewFunction, JS_TransplantObject, LeaveRealm,
+    OnNewGlobalHookOption, Realm, SetWindowProxy, SetWindowProxyClass, Value,
     JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_RESERVED_SLOTS_MASK,
-    JSCLASS_RESERVED_SLOTS_SHIFT, JSClass, JSClassOps, JSContext as RawJSContext, JSObject,
-    JSPROP_ENUMERATE, JSPrincipals, JSTracer, LeaveRealm, OnNewGlobalHookOption, Realm,
-    SetWindowProxy, SetWindowProxyClass, Value,
+    JSCLASS_RESERVED_SLOTS_SHIFT, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{BooleanValue, JSVal, ObjectValue, UndefinedValue};
 use mozjs::quickjs::{drain_autorelease_pool, realm_count};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_DefineProperty, JS_GC, JS_NewGlobalObject};
+use mozjs::rust::wrappers2::{JS_DefineProperty, JS_NewGlobalObject, JS_GC};
 use mozjs::rust::{
-    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
-    evaluate_script,
+    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
+    Runtime,
 };
 
 static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {

@@ -6,8 +6,8 @@
 
 use std::ptr;
 
-use mozjs::jsapi::JSPROP_ENUMERATE;
 use mozjs::jsapi::SetGCZeal;
+use mozjs::jsapi::JSPROP_ENUMERATE;
 use mozjs::jsapi::{
     JSClass, JSContext, JSFunction, JSFunctionSpec, JSNativeWrapper, JSObject, JSPropertySpec_Name,
     JSString, OnNewGlobalHookOption, Value,
@@ -18,7 +18,7 @@ use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     GetRealmObjectPrototype, JS_NewGlobalObject, JS_NewObjectWithGivenProto,
 };
-use mozjs::rust::{JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, define_methods};
+use mozjs::rust::{define_methods, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 #[test]
 fn rooting() {

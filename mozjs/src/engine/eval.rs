@@ -4,12 +4,12 @@
 
 //! Compile options and classic script evaluation.
 
-use std::ffi::{CString, c_char, c_uint, c_void};
+use std::ffi::{c_char, c_uint, c_void, CString};
 use std::ptr;
 
 use servo_quickjs as q;
 
-use super::{Cx, cstring_lossy};
+use super::{cstring_lossy, Cx};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
