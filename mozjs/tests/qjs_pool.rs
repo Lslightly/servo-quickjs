@@ -16,8 +16,8 @@ use mozjs::jsapi::{
 };
 use mozjs::jsval::UndefinedValue;
 use mozjs::quickjs::{
-    autorelease_pool_len, drain_autorelease_pool, release_object, retain_object, sys as qjs,
-    AutoreleasePoolScope,
+    autorelease_pool_len, drain_autorelease_pool, release_dom_stub_count, release_object,
+    retain_object, retain_object_count, sys as qjs, AutoreleasePoolScope,
 };
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
@@ -57,6 +57,35 @@ fn with_global(f: impl FnOnce(&mut JSContext, HandleObject)) {
 
 fn refs(obj: *mut JSObject) -> i32 {
     unsafe { qjs::JS_GetRefCount(qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _)) }
+}
+
+#[test]
+fn batch_dom_stub_references_are_counted_and_released() {
+    with_global(|cx, _| unsafe {
+        let reflector = Box::leak(Box::new(FakeReflector {
+            dom_js_class: Cell::new(&STUB_CLASS),
+        }));
+        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        assert!(!stub.is_null());
+
+        retain_object_count(stub, 4);
+        assert_eq!(refs(stub), 5);
+        drain_autorelease_pool();
+        assert_eq!(refs(stub), 4);
+
+        release_dom_stub_count(stub, 3);
+        assert_eq!(refs(stub), 1);
+        release_dom_stub_count(stub, 1);
+    });
+}
+
+#[test]
+#[should_panic(expected = "release_dom_stub_count called on a non-JSDomStub object")]
+fn release_dom_stub_count_requires_a_stub() {
+    with_global(|cx, _| unsafe {
+        let obj = JS_NewPlainObject(cx);
+        release_dom_stub_count(obj, 1);
+    });
 }
 
 fn eval_bool(cx: &mut JSContext, global: HandleObject, source: &str) -> bool {
@@ -117,6 +146,22 @@ static OWNED_CLASS: JSClass = JSClass {
     ext: ptr::null(),
     oOps: ptr::null(),
 };
+
+#[test]
+fn batch_free_at_zero_releases_immediately() {
+    with_global(|cx, _| unsafe {
+        OWNED_FREED.with(|f| f.set(0));
+        let obj = JS_NewObject(cx, &OWNED_CLASS);
+        assert!(!obj.is_null());
+        retain_object_count(obj, 2);
+        drain_autorelease_pool();
+        assert_eq!(refs(obj), 2);
+
+        let rt = jsapi::JS_GetRuntime(cx.raw_cx()) as *mut qjs::JSRuntime;
+        qjs::JS_FreeValueRTCount(rt, qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _), 2);
+        assert_eq!(OWNED_FREED.with(Cell::get), 1);
+    });
+}
 
 static STUB_CLASS: JSClass = JSClass {
     name: c"Stub".as_ptr(),

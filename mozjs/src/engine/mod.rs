@@ -374,6 +374,18 @@ pub(crate) unsafe fn retain_object(obj: *mut root::JSObject) {
     verify::count(obj_val(obj), 1);
 }
 
+/// See `crate::quickjs::retain_object_count`.
+#[inline]
+pub(crate) unsafe fn retain_object_count(obj: *mut root::JSObject, count: u32) {
+    if count == 0 {
+        return;
+    }
+    let count = i32::try_from(count).expect("reference count increment exceeds i32::MAX");
+    let v = obj_val(obj);
+    q::JS_DupValueRTCount(current().rt, v, count);
+    verify::count(v, i64::from(count));
+}
+
 /// See `crate::quickjs::release_object`.
 #[inline]
 pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
@@ -391,6 +403,28 @@ pub(crate) unsafe fn release_object(obj: *mut root::JSObject) {
             q::JS_FreeValueRT(cx.rt, v);
         }
     }
+}
+
+/// See `crate::quickjs::release_dom_stub_count`.
+#[inline]
+pub(crate) unsafe fn release_dom_stub_count(obj: *mut root::JSObject, count: u32) {
+    assert!(
+        class::JS_IsDomStub(obj),
+        "release_dom_stub_count called on a non-JSDomStub object"
+    );
+    if count == 0 {
+        return;
+    }
+    let cx = current();
+    let count = i32::try_from(count).expect("reference count decrement exceeds i32::MAX");
+    let v = obj_val(obj);
+    let ref_count = q::JS_GetRefCount(v);
+    assert!(
+        count <= ref_count,
+        "releasing {count} references from an object with {ref_count}"
+    );
+    verify::count(v, -i64::from(count));
+    q::JS_FreeValueRTCount(cx.rt, v, count);
 }
 
 pub(crate) fn drain_current_pool() {

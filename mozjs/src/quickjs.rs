@@ -18,6 +18,15 @@ pub unsafe fn retain_object(obj: *mut JSObject) {
     crate::engine::retain_object(obj)
 }
 
+/// Adds `count` references to `obj` at once.
+///
+/// # Safety
+/// `obj` must be a live object of the current thread's runtime.
+#[inline]
+pub unsafe fn retain_object_count(obj: *mut JSObject, count: u32) {
+    crate::engine::retain_object_count(obj, count)
+}
+
 /// Drops a reference added by `retain_object`.
 ///
 /// # Safety
@@ -25,6 +34,16 @@ pub unsafe fn retain_object(obj: *mut JSObject) {
 #[inline]
 pub unsafe fn release_object(obj: *mut JSObject) {
     crate::engine::release_object(obj)
+}
+
+/// Drops `count` references from a `JSDomStub`.
+///
+/// # Safety
+/// `obj` must be a live `JSDomStub` of the current thread's runtime, and the caller must own
+/// `count` references to it.
+#[inline]
+pub unsafe fn release_dom_stub_count(obj: *mut JSObject, count: u32) {
+    crate::engine::release_dom_stub_count(obj, count)
 }
 
 /// Whether the current thread's runtime is alive. Destroying it frees every object, after which
