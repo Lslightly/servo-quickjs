@@ -9,12 +9,12 @@ use std::ptr;
 use std::sync::LazyLock;
 
 use mozjs::context::{JSContext, RawJSContext};
-use mozjs::glue::{CreateJobQueue, DeleteJobQueue, JobQueueTraps};
+use mozjs::glue::{CreateJobQueue, DeleteJobQueue, JS_GetReservedSlot, JobQueueTraps};
 use mozjs::jsapi::{
     self, GCContext, Handle, JSClass, JSClassOps, JSObject, MutableHandleObject,
     OnNewGlobalHookOption,
 };
-use mozjs::jsval::UndefinedValue;
+use mozjs::jsval::{PrivateValue, UndefinedValue};
 use mozjs::quickjs::{
     autorelease_pool_len, drain_autorelease_pool, release_dom_stub_count, release_object,
     retain_object, retain_object_count, sys as qjs, AutoreleasePoolScope,
@@ -22,8 +22,8 @@ use mozjs::quickjs::{
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
-    JS_GetDomStubPoolRefCount, JS_NewDomStub, JS_NewGlobalObject, JS_NewObject,
-    JS_NewPlainObject, JS_UnbindDomStub,
+    JS_GetDomStubPoolRefCount, JS_GetDomStubRefCount, JS_IsDomStub, JS_NewDomStub,
+    JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject, JS_UnbindDomStub,
 };
 use mozjs::rust::{
     evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
@@ -99,6 +99,8 @@ thread_local! {
     /// Objects `Owner`s hold counted references to; each owner's finalizer releases one.
     static OWNED: RefCell<Vec<*mut JSObject>> = const { RefCell::new(Vec::new()) };
     static OWNED_FREED: Cell<usize> = const { Cell::new(0) };
+    /// Reflectors dropped by `finalize_reflector`.
+    static REFLECTOR_FREED: Cell<usize> = const { Cell::new(0) };
 }
 
 unsafe extern "C" fn finalize_owner(_: *mut GCContext, _: *mut JSObject) {
@@ -166,11 +168,26 @@ fn batch_free_at_zero_releases_immediately() {
 /// `STUB_CLASS`'s finalize hook: frees the fake DOM node's `Reflector`, like an interface's
 /// `finalize_common` drops the real node. `JSDomStub` finalization (`engine/class.rs`) calls the
 /// class's `finalize` with the stub object, whose `dom_ptr` is the `Reflector`; it is only called
-/// while the stub still owns the node, so an unbound stub does not reach here.
+/// while the stub still owns the node, so an unbound stub does not reach here. A materialized
+/// object of the same class keeps the node in `DOM_OBJECT_SLOT` instead (`wrap_object` and
+/// `materialize_if_needed` put it there), the way `private_from_object` reads it.
 unsafe extern "C" fn finalize_reflector(_: *mut GCContext, obj: *mut JSObject) {
-    let dom_ptr = qjs::JS_GetDomStubDomPtr(qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _));
+    // Like `private_from_object`: a `JSDomStub` stores its node directly, a materialized object
+    // of the same class keeps it in `DOM_OBJECT_SLOT`.
+    let dom_ptr = if JS_IsDomStub(obj) {
+        qjs::JS_GetDomStubDomPtr(qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _))
+    } else {
+        let mut value = UndefinedValue();
+        JS_GetReservedSlot(obj, 0, &mut value);
+        if value.is_undefined() {
+            ptr::null_mut()
+        } else {
+            value.to_private()
+        }
+    };
     if !dom_ptr.is_null() {
         drop(Box::from_raw(dom_ptr as *mut FakeReflector));
+        REFLECTOR_FREED.with(|f| f.set(f.get() + 1));
     }
 }
 
@@ -178,7 +195,8 @@ static STUB_OPS: JSClassOps = ops(finalize_reflector);
 
 static STUB_CLASS: JSClass = JSClass {
     name: c"Stub".as_ptr(),
-    flags: 0,
+    // One reserved slot: `DOM_OBJECT_SLOT`, where a materialized object keeps its node.
+    flags: (1 & jsapi::JSCLASS_RESERVED_SLOTS_MASK) << jsapi::JSCLASS_RESERVED_SLOTS_SHIFT,
     cOps: &STUB_OPS,
     spec: ptr::null(),
     ext: ptr::null(),
@@ -247,6 +265,119 @@ fn unbind_clears_stub_pool_tracking() {
         // Unbinding clears the stub's `dom_ptr`, so `finalize_reflector` no longer runs and the
         // fake node, which the test has no JSObject to hand over to, is freed here.
         drop(Box::from_raw(reflector as *mut FakeReflector));
+    });
+}
+
+/// What `Reflector::materialize_if_needed` does in `components/script_bindings/reflector.rs`:
+/// the stub's non-pool references move to a newly created `JSObject` before the stub is unbound,
+/// and only the transferred ones are released from the stub afterwards. The stub's remaining
+/// pool entry still drains normally, and the new object's own pool entry does too, leaving the
+/// transferred reference as its only one.
+#[test]
+fn materialization_transfers_stub_counts_to_a_new_object() {
+    with_global(|cx, _| unsafe {
+        OWNED_FREED.with(|f| f.set(0));
+        REFLECTOR_FREED.with(|f| f.set(0));
+        let reflector = Box::leak(Box::new(FakeReflector {
+            dom_js_class: Cell::new(&STUB_CLASS),
+        }));
+        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        retain_object(stub);
+        assert_eq!(refs(stub), 2);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
+
+        // Stands in for the object `materialize_if_needed` binds to; its initial count is
+        // adopted into the pool, as any object created by the engine is.
+        let obj = JS_NewObject(cx, &OWNED_CLASS);
+        assert!(!obj.is_null());
+        assert_eq!(refs(obj), 1);
+
+        // Transfer the stub's non-pool references without adding pool entries: the new object's
+        // adopted count will be released by the drain.
+        let transferred_ref_count =
+            JS_GetDomStubRefCount(stub) - JS_GetDomStubPoolRefCount(stub) as i32;
+        assert_eq!(transferred_ref_count, 1);
+        retain_object_count(obj, transferred_ref_count as u32);
+        assert_eq!(refs(obj), 2);
+
+        // The stub no longer owns its node, so its pool entries must only free the stub.
+        JS_UnbindDomStub(cx, stub);
+        assert_eq!(refs(stub), 2);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 0);
+
+        // Release exactly what was handed to the new object.
+        release_dom_stub_count(stub, transferred_ref_count as u32);
+        assert_eq!(refs(stub), 1);
+        assert_eq!(refs(obj), 2);
+
+        // The drain releases the stub's last (pool) reference, freeing the unbound stub without
+        // finalizing the reflector, and the new object's adopted count, leaving only the
+        // transferred reference.
+        drain_autorelease_pool();
+        assert_eq!(refs(obj), 1);
+        assert_eq!(REFLECTOR_FREED.with(Cell::get), 0);
+
+        release_object(obj);
+        assert_eq!(refs(obj), 1);
+        drain_autorelease_pool();
+        assert_eq!(OWNED_FREED.with(Cell::get), 1);
+
+        // Unbinding cleared the stub's `dom_ptr`, so `finalize_reflector` no longer runs and the
+        // fake node, which the test has no JSObject to hand over to, is freed here.
+        drop(Box::from_raw(reflector as *mut FakeReflector));
+    });
+}
+
+/// The same transfer as above, but a drain happens between unbinding and releasing the
+/// transferred count. The drain only frees the stub's pool entry, so the stub is still alive
+/// afterwards; the count release then drops its last reference and frees the unbound stub on the
+/// spot. The new object shares the stub's class and, like `wrap_object`, takes the node in
+/// `DOM_OBJECT_SLOT`; freeing it later is what reclaims the fake `Reflector`.
+#[test]
+fn drain_before_the_count_release_frees_the_stub_but_not_the_reflector() {
+    with_global(|cx, _| unsafe {
+        REFLECTOR_FREED.with(|f| f.set(0));
+        let reflector = Box::leak(Box::new(FakeReflector {
+            dom_js_class: Cell::new(&STUB_CLASS),
+        }));
+        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        retain_object(stub);
+        let obj = JS_NewObject(cx, &STUB_CLASS);
+        assert!(!obj.is_null());
+        // As `materialize_if_needed` does before it unbinds the stub, hand the node to the new
+        // object through `DOM_OBJECT_SLOT`.
+        jsapi::JS_SetReservedSlot(
+            obj,
+            0,
+            &PrivateValue(reflector as *mut _ as *mut std::ffi::c_void),
+        );
+        let transferred_ref_count =
+            JS_GetDomStubRefCount(stub) - JS_GetDomStubPoolRefCount(stub) as i32;
+        assert_eq!(transferred_ref_count, 1);
+        retain_object_count(obj, transferred_ref_count as u32);
+        assert_eq!(refs(stub), 2);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
+
+        JS_UnbindDomStub(cx, stub);
+        assert_eq!(JS_GetDomStubPoolRefCount(stub), 0);
+
+        // The drain releases only the stub's pool entry: the not-yet-released transferred count
+        // keeps the stub alive. The new object's adopted count goes too.
+        drain_autorelease_pool();
+        assert_eq!(refs(stub), 1);
+        assert_eq!(refs(obj), 1);
+
+        // The transferred count is the stub's last reference, so this frees the stub immediately
+        // instead of parking it in the pool. Unbound, it does not finalize the reflector.
+        release_dom_stub_count(stub, transferred_ref_count as u32);
+        assert_eq!(autorelease_pool_len(), 0);
+        assert_eq!(REFLECTOR_FREED.with(Cell::get), 0);
+
+        // Freeing the new object finalizes the class, which reads the node from
+        // `DOM_OBJECT_SLOT` and reclaims the reflector.
+        release_object(obj);
+        drain_autorelease_pool();
+        assert_eq!(REFLECTOR_FREED.with(Cell::get), 1);
     });
 }
 
