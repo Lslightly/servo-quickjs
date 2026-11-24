@@ -2040,7 +2040,7 @@ unsafe extern "C" {
 }
 unsafe extern "C" {
     pub fn JS_SetBreakpoint(ctx: *mut JSContext, script: JSValue, pc: u32)
-        -> ::std::os::raw::c_int;
+    -> ::std::os::raw::c_int;
 }
 unsafe extern "C" {
     pub fn JS_ClearBreakpoint(
