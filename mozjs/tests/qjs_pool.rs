@@ -163,10 +163,23 @@ fn batch_free_at_zero_releases_immediately() {
     });
 }
 
+/// `STUB_CLASS`'s finalize hook: frees the fake DOM node's `Reflector`, like an interface's
+/// `finalize_common` drops the real node. `JSDomStub` finalization (`engine/class.rs`) calls the
+/// class's `finalize` with the stub object, whose `dom_ptr` is the `Reflector`; it is only called
+/// while the stub still owns the node, so an unbound stub does not reach here.
+unsafe extern "C" fn finalize_reflector(_: *mut GCContext, obj: *mut JSObject) {
+    let dom_ptr = qjs::JS_GetDomStubDomPtr(qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _));
+    if !dom_ptr.is_null() {
+        drop(Box::from_raw(dom_ptr as *mut FakeReflector));
+    }
+}
+
+static STUB_OPS: JSClassOps = ops(finalize_reflector);
+
 static STUB_CLASS: JSClass = JSClass {
     name: c"Stub".as_ptr(),
     flags: 0,
-    cOps: ptr::null(),
+    cOps: &STUB_OPS,
     spec: ptr::null(),
     ext: ptr::null(),
     oOps: ptr::null(),
@@ -230,6 +243,10 @@ fn unbind_clears_stub_pool_tracking() {
         assert_eq!(refs(stub), 1);
         assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
         drain_autorelease_pool();
+
+        // Unbinding clears the stub's `dom_ptr`, so `finalize_reflector` no longer runs and the
+        // fake node, which the test has no JSObject to hand over to, is freed here.
+        drop(Box::from_raw(reflector as *mut FakeReflector));
     });
 }
 
