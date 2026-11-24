@@ -12,7 +12,7 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{InitRealmStandardClasses, JS_NewGlobalObject};
-use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
+use mozjs::rust::{CompileOptionsWrapper, evaluate_script};
 use mozjs::rust::{JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 #[test]
@@ -57,14 +57,16 @@ fn vec_conversion() {
         assert_eq!(&orig_vec, converted.get_success_value().unwrap());
 
         let options = CompileOptionsWrapper::new(&context, c"test".to_owned(), 1);
-        assert!(evaluate_script(
-            context,
-            global.handle(),
-            "new Set([1, 2, 3])",
-            rval.handle_mut(),
-            options,
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                context,
+                global.handle(),
+                "new Set([1, 2, 3])",
+                rval.handle_mut(),
+                options,
+            )
+            .is_ok()
+        );
 
         let converted =
             Vec::<i32>::from_jsval(context, rval.handle(), ConversionBehavior::Default).unwrap();

@@ -4,7 +4,7 @@
 
 //! ArrayBuffers, typed arrays and DataViews on QuickJS.
 
-use std::ffi::{c_void, CStr};
+use std::ffi::{CStr, c_void};
 use std::ptr;
 use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 
@@ -12,15 +12,14 @@ use mozjs::context::JSContext;
 use mozjs::jsapi::{
     ArrayBufferHasData, GetArrayBufferByteLength, GetArrayBufferData, GetArrayBufferLengthAndData,
     GetArrayBufferViewLengthAndData, IsArrayBufferObject, IsDetachedArrayBufferObject,
-    IsResizableArrayBufferView, JSObject, JS_GetArrayBufferViewByteLength,
-    JS_GetArrayBufferViewByteOffset, JS_GetArrayBufferViewType, JS_GetBigInt64ArrayData,
-    JS_GetFloat16ArrayData, JS_GetObjectAsFloat64Array, JS_GetTypedArrayByteLength,
-    JS_GetTypedArrayLength, JS_GetTypedArraySharedness, JS_GetUint8ArrayData,
-    JS_IsArrayBufferViewObject, JS_IsTypedArrayObject, OnNewGlobalHookOption, Type,
-    UnwrapArrayBuffer, UnwrapArrayBufferView, UnwrapBigInt64Array, UnwrapBigUint64Array,
-    UnwrapFloat16Array, UnwrapFloat32Array, UnwrapFloat64Array, UnwrapInt16Array, UnwrapInt32Array,
-    UnwrapInt8Array, UnwrapUint16Array, UnwrapUint32Array, UnwrapUint8Array,
-    UnwrapUint8ClampedArray,
+    IsResizableArrayBufferView, JS_GetArrayBufferViewByteLength, JS_GetArrayBufferViewByteOffset,
+    JS_GetArrayBufferViewType, JS_GetBigInt64ArrayData, JS_GetFloat16ArrayData,
+    JS_GetObjectAsFloat64Array, JS_GetTypedArrayByteLength, JS_GetTypedArrayLength,
+    JS_GetTypedArraySharedness, JS_GetUint8ArrayData, JS_IsArrayBufferViewObject,
+    JS_IsTypedArrayObject, JSObject, OnNewGlobalHookOption, Type, UnwrapArrayBuffer,
+    UnwrapArrayBufferView, UnwrapBigInt64Array, UnwrapBigUint64Array, UnwrapFloat16Array,
+    UnwrapFloat32Array, UnwrapFloat64Array, UnwrapInt8Array, UnwrapInt16Array, UnwrapInt32Array,
+    UnwrapUint8Array, UnwrapUint8ClampedArray, UnwrapUint16Array, UnwrapUint32Array,
 };
 use mozjs::jsval::{JSVal, ObjectValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
@@ -33,20 +32,20 @@ use mozjs::rust::wrappers2::{
     JS_NewBigUint64ArrayWithBuffer, JS_NewDataView, JS_NewFloat16Array,
     JS_NewFloat16ArrayFromArray, JS_NewFloat16ArrayWithBuffer, JS_NewFloat32Array,
     JS_NewFloat32ArrayFromArray, JS_NewFloat32ArrayWithBuffer, JS_NewFloat64Array,
-    JS_NewFloat64ArrayFromArray, JS_NewFloat64ArrayWithBuffer, JS_NewGlobalObject,
-    JS_NewInt16Array, JS_NewInt16ArrayFromArray, JS_NewInt16ArrayWithBuffer, JS_NewInt32Array,
-    JS_NewInt32ArrayFromArray, JS_NewInt32ArrayWithBuffer, JS_NewInt8Array,
-    JS_NewInt8ArrayFromArray, JS_NewInt8ArrayWithBuffer, JS_NewUint16Array,
-    JS_NewUint16ArrayFromArray, JS_NewUint16ArrayWithBuffer, JS_NewUint32Array,
-    JS_NewUint32ArrayFromArray, JS_NewUint32ArrayWithBuffer, JS_NewUint8Array,
+    JS_NewFloat64ArrayFromArray, JS_NewFloat64ArrayWithBuffer, JS_NewGlobalObject, JS_NewInt8Array,
+    JS_NewInt8ArrayFromArray, JS_NewInt8ArrayWithBuffer, JS_NewInt16Array,
+    JS_NewInt16ArrayFromArray, JS_NewInt16ArrayWithBuffer, JS_NewInt32Array,
+    JS_NewInt32ArrayFromArray, JS_NewInt32ArrayWithBuffer, JS_NewUint8Array,
     JS_NewUint8ArrayFromArray, JS_NewUint8ArrayWithBuffer, JS_NewUint8ClampedArray,
-    JS_NewUint8ClampedArrayFromArray, JS_NewUint8ClampedArrayWithBuffer, JS_SetProperty,
-    NewArrayBuffer, NewArrayBufferWithContents, NewArrayBufferWithUserOwnedContents,
-    NewExternalArrayBuffer, StealArrayBufferContents,
+    JS_NewUint8ClampedArrayFromArray, JS_NewUint8ClampedArrayWithBuffer, JS_NewUint16Array,
+    JS_NewUint16ArrayFromArray, JS_NewUint16ArrayWithBuffer, JS_NewUint32Array,
+    JS_NewUint32ArrayFromArray, JS_NewUint32ArrayWithBuffer, JS_SetProperty, NewArrayBuffer,
+    NewArrayBufferWithContents, NewArrayBufferWithUserOwnedContents, NewExternalArrayBuffer,
+    StealArrayBufferContents,
 };
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    evaluate_script,
 };
 use mozjs::typedarray::{CreateWith, Int16Array, Uint8Array};
 
@@ -431,7 +430,11 @@ fn views_with_offsets(cx: &mut JSContext, global: HandleObject) {
         *data.add(1) = 0xaa;
     }
     set_global(cx, global, c"dv", dv.get());
-    assert_js(cx, global, "dv instanceof DataView && dv.getUint8(0) === 2 && dv.getUint8(1) === 0xaa && new Uint8Array(buf)[3] === 0xaa");
+    assert_js(
+        cx,
+        global,
+        "dv instanceof DataView && dv.getUint8(0) === 2 && dv.getUint8(1) === 0xaa && new Uint8Array(buf)[3] === 0xaa",
+    );
 
     rooted!(&in(cx) let dv2 = eval_obj(cx, global, "new DataView(buf, 12)"));
     unsafe {

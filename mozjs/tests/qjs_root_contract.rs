@@ -16,13 +16,13 @@ use mozjs::glue::{CreateJobQueue, DeleteJobQueue, JobQueueTraps};
 use mozjs::jsapi::{self, Handle, JSObject, OnNewGlobalHookOption, Value};
 use mozjs::jsval::{ObjectValue, UndefinedValue};
 use mozjs::quickjs::{
-    autorelease_pool_len, drain_autorelease_pool, sys as qjs, AutoreleasePoolScope,
+    AutoreleasePoolScope, autorelease_pool_len, drain_autorelease_pool, sys as qjs,
 };
 use mozjs::realm::AutoRealm;
 use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewPlainObject};
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine,
-    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, JSEngineHandle,
+    RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 use mozjs::{auto_root, rooted};
 

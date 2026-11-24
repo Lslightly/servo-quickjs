@@ -71,7 +71,7 @@ pub(crate) unsafe fn throw_error(
         root::JSExnType::JSEXN_SYNTAXERR => q::JS_ThrowSyntaxError(qctx, fmt, message.as_ptr()),
         root::JSExnType::JSEXN_REFERENCEERR => {
             q::JS_ThrowReferenceError(qctx, fmt, message.as_ptr())
-        }
+        },
         _ => q::JS_ThrowInternalError(qctx, fmt, message.as_ptr()),
     };
 }

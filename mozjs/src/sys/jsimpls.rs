@@ -2,11 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-use crate::sys::jsapi::glue::{
-    JS_ForOfIteratorInit, JS_ForOfIteratorNext, JS_ForOfIteratorValueIsIterable,
-};
-use crate::sys::jsapi::jsid;
-use crate::sys::jsapi::mozilla;
+use crate::sys::jsapi::JS;
+use crate::sys::jsapi::JS::Scalar::Type;
 use crate::sys::jsapi::JSAutoRealm;
 use crate::sys::jsapi::JSContext;
 use crate::sys::jsapi::JSErrNum;
@@ -19,8 +16,11 @@ use crate::sys::jsapi::JSObject;
 use crate::sys::jsapi::JSPropertySpec;
 use crate::sys::jsapi::JSPropertySpec_Kind;
 use crate::sys::jsapi::JSPropertySpec_Name;
-use crate::sys::jsapi::JS;
-use crate::sys::jsapi::JS::Scalar::Type;
+use crate::sys::jsapi::glue::{
+    JS_ForOfIteratorInit, JS_ForOfIteratorNext, JS_ForOfIteratorValueIsIterable,
+};
+use crate::sys::jsapi::jsid;
+use crate::sys::jsapi::mozilla;
 use crate::sys::jsgc::{RootKind, Rooted, RootedBase, ValueArray};
 use crate::sys::jsid::VoidId;
 use crate::sys::jsval::{JSVal, UndefinedValue};

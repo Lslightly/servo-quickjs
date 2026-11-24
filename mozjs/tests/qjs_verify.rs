@@ -15,7 +15,7 @@ use mozjs::jsapi::{
 };
 use mozjs::jsval::{JSVal, ObjectValue};
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject, JS_GC};
+use mozjs::rust::wrappers2::{JS_GC, JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject};
 use mozjs::rust::{JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 thread_local! {

@@ -15,8 +15,8 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{JS_GetElement, JS_NewGlobalObject};
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
-    Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 
 static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {

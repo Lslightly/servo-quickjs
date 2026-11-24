@@ -16,8 +16,8 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, JSEngine, JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    evaluate_script,
 };
 
 /// The engine can be initialized once per process; the tests share it and never shut it down.

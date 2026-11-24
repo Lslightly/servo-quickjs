@@ -13,7 +13,7 @@ use mozjs::jsapi::{GCReason, OnNewGlobalHookOption};
 use mozjs::jsval::ObjectValue;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_NewPlainObject, JS_GC};
+use mozjs::rust::wrappers2::{JS_GC, JS_NewGlobalObject, JS_NewPlainObject};
 use mozjs::rust::{JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 #[test]

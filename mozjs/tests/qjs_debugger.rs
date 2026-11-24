@@ -23,13 +23,13 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     ClearKeptObjects, Compile, CompileFunction, CompileModule, CompileModule1, Evaluate,
-    InstantiateGlobalStencil, JS_DefineDebuggerObject, JS_ExecuteScript, JS_NewGlobalObject,
-    JS_SetNativeStackQuota, JS_SetProperty, ModuleEvaluate, ModuleLink, JS_GC,
+    InstantiateGlobalStencil, JS_DefineDebuggerObject, JS_ExecuteScript, JS_GC, JS_NewGlobalObject,
+    JS_SetNativeStackQuota, JS_SetProperty, ModuleEvaluate, ModuleLink,
 };
 use mozjs::rust::{
-    evaluate_script, transform_str_to_source_text, transform_u16_to_source_text,
     CompileOptionsWrapper, EnvironmentChain, HandleObject as SafeHandleObject, JSEngine,
-    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
+    transform_str_to_source_text, transform_u16_to_source_text,
 };
 
 fn engine() -> JSEngineHandle {
@@ -147,15 +147,17 @@ fn with_globals(
         {
             let mut inner = AutoRealm::new_from_handle(cx, debuggee.handle());
             let (debuggee_global, cx) = inner.global_and_reborrow();
-            assert!(!jsapi::JS_DefineFunction(
-                cx.raw_cx(),
-                debuggee_global.into(),
-                c"requestTermination".as_ptr(),
-                Some(request_termination),
-                0,
-                0
-            )
-            .is_null());
+            assert!(
+                !jsapi::JS_DefineFunction(
+                    cx.raw_cx(),
+                    debuggee_global.into(),
+                    c"requestTermination".as_ptr(),
+                    Some(request_termination),
+                    0,
+                    0
+                )
+                .is_null()
+            );
         }
         f(cx, global, debuggee.handle(), other.handle());
     }
@@ -567,16 +569,18 @@ fn new_scripts_of_other_compile_paths() {
             let chain = EnvironmentChain::new(cx, jsapi::SupportUnscopables::Yes);
             let args = [c"event".as_ptr()];
             let body = utf16("return 1; //# sourceURL=http://handler/");
-            assert!(!CompileFunction(
-                cx,
-                chain.get(),
-                options.ptr,
-                c"onclick".as_ptr(),
-                1,
-                args.as_ptr(),
-                &mut transform_u16_to_source_text(&body),
-            )
-            .is_null());
+            assert!(
+                !CompileFunction(
+                    cx,
+                    chain.get(),
+                    options.ptr,
+                    c"onclick".as_ptr(),
+                    1,
+                    args.as_ptr(),
+                    &mut transform_u16_to_source_text(&body),
+                )
+                .is_null()
+            );
             let mut options =
                 CompileOptionsWrapper::new(cx, c"https://example.com/u16.js".to_owned(), 1);
             options.set_introduction_type(c"srcScript");
@@ -601,13 +605,15 @@ fn new_scripts_of_other_compile_paths() {
                     .finish()
                     .unwrap();
             let instantiate_options = (&result.compile_options).into();
-            assert!(!InstantiateGlobalStencil(
-                cx,
-                &instantiate_options,
-                **result.stencil.as_ref().unwrap(),
-                result.storage.as_mut_ptr(),
-            )
-            .is_null());
+            assert!(
+                !InstantiateGlobalStencil(
+                    cx,
+                    &instantiate_options,
+                    **result.stencil.as_ref().unwrap(),
+                    result.storage.as_mut_ptr(),
+                )
+                .is_null()
+            );
         }
         check(
             cx,
@@ -698,13 +704,15 @@ fn instantiate_at(
                 .finish()
                 .unwrap();
         let instantiate_options = (&result.compile_options).into();
-        assert!(!InstantiateGlobalStencil(
-            cx,
-            &instantiate_options,
-            **result.stencil.as_ref().unwrap(),
-            result.storage.as_mut_ptr(),
-        )
-        .is_null());
+        assert!(
+            !InstantiateGlobalStencil(
+                cx,
+                &instantiate_options,
+                **result.stencil.as_ref().unwrap(),
+                result.storage.as_mut_ptr(),
+            )
+            .is_null()
+        );
     }
 }
 

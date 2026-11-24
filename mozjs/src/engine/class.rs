@@ -13,12 +13,12 @@ use std::cell::Cell;
 use std::collections::HashMap;
 use std::ffi::{c_int, c_void};
 use std::ptr;
-use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 use servo_quickjs as q;
 
-use super::{obj_val, val_obj, Cx, RealmData};
+use super::{Cx, RealmData, obj_val, val_obj};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::{JSVal, TAG_MAGIC};
 
@@ -211,7 +211,6 @@ pub unsafe extern "C" fn servo_dom_stub_class_id(
 unsafe fn stub_class(val: q::JSValue) -> *const root::JSClass {
     stub_class_from_ptr(q::JS_GetDomStubDomPtr(val))
 }
-
 
 /// The object data of `obj`, if it is an object of a SpiderMonkey class (globals included).
 #[inline]

@@ -32,21 +32,21 @@ use crate::context::JSContext;
 use crate::error::throw_type_error;
 use crate::jsapi::Heap;
 use crate::jsapi::JS;
-use crate::jsapi::{JSObject, JSString};
 use crate::jsapi::{JS_DeprecatedStringHasLatin1Chars, JSPROP_ENUMERATE};
+use crate::jsapi::{JSObject, JSString};
 use crate::jsval::{BooleanValue, DoubleValue, Int32Value, NullValue, UInt32Value, UndefinedValue};
 use crate::jsval::{JSVal, ObjectOrNullValue, ObjectValue, StringValue, SymbolValue};
 use crate::rooted;
+use crate::rust::ForOfIterationFailure;
 use crate::rust::for_of;
 use crate::rust::maybe_wrap_value;
 use crate::rust::wrappers2::{
     AssertSameCompartment, JS_DefineElement, JS_GetLatin1StringCharsAndLength,
     JS_GetTwoByteStringCharsAndLength, JS_NewStringCopyUTF8N, NewArrayObject1,
 };
-use crate::rust::ForOfIterationFailure;
-use crate::rust::{maybe_wrap_object_or_null_value, maybe_wrap_object_value, ToString};
 use crate::rust::{HandleValue, MutableHandleValue};
 use crate::rust::{ToBoolean, ToInt32, ToInt64, ToNumber, ToUint16, ToUint32, ToUint64};
+use crate::rust::{ToString, maybe_wrap_object_or_null_value, maybe_wrap_object_value};
 use libc;
 use log::debug;
 use num_traits::PrimInt;
@@ -339,7 +339,7 @@ where
         ConversionBehavior::EnforceRange => {
             let number = unsafe { ToNumber(cx, value) }?;
             enforce_range(cx, number)
-        }
+        },
         ConversionBehavior::Clamp => Ok(ConversionResult::Success(clamp_to(unsafe {
             ToNumber(cx, value)
         }?))),
@@ -771,7 +771,7 @@ impl<C: Clone, T: FromJSValConvertible<Config = C>> FromJSValConvertible for Vec
                 ConversionResult::Success(value) => value,
                 ConversionResult::Failure(error) => {
                     return Err(ForOfIterationFailure::Other(error));
-                }
+                },
             });
 
             Ok(ControlFlow::Continue(()))
@@ -781,12 +781,12 @@ impl<C: Clone, T: FromJSValConvertible<Config = C>> FromJSValConvertible for Vec
             Ok(_) => Ok(ConversionResult::Success(return_value)),
             Err(ForOfIterationFailure::ValueIsNotIterable) => {
                 Ok(ConversionResult::Failure(c"Value is not iterable".into()))
-            }
+            },
             Err(ForOfIterationFailure::JSFailed) => Err(()),
             Err(ForOfIterationFailure::Other(error)) => {
                 throw_type_error(cx, error.as_ref());
                 Err(())
-            }
+            },
         }
     }
 }
@@ -904,8 +904,8 @@ impl<'a> From<&'a str> for Utf8Chars<'a> {
     fn from(value: &'a str) -> Self {
         use std::marker::PhantomData;
 
-        use crate::jsapi::mozilla::{Range, RangedPtr};
         use crate::jsapi::UTF8Chars;
+        use crate::jsapi::mozilla::{Range, RangedPtr};
 
         let range = value.as_bytes().as_ptr_range();
         let range_start = range.start as *mut _;

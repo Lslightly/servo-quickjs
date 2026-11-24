@@ -9,7 +9,7 @@
 #![allow(non_snake_case)]
 
 use crate::sys::jsapi::JS::Symbol;
-use crate::sys::jsapi::{jsid, JSString};
+use crate::sys::jsapi::{JSString, jsid};
 use libc::c_void;
 
 #[deprecated]

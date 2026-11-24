@@ -15,10 +15,10 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::quickjs::{drain_autorelease_pool, realm_count};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
-use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_GC};
+use mozjs::rust::wrappers2::{JS_GC, JS_NewGlobalObject};
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
-    Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 
 static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {
@@ -115,14 +115,16 @@ fn cleanup_jobs_on_the_internal_queue_run() {
         jsapi::RunJobs(cx.raw_cx());
         rooted!(&in(cx) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(cx, c"qjs_finalization_jobs".to_owned(), 1);
-        assert!(evaluate_script(
-            cx,
-            global,
-            "cleaned.sort().join() === '0,1,2'",
-            rval.handle_mut(),
-            options
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                cx,
+                global,
+                "cleaned.sort().join() === '0,1,2'",
+                rval.handle_mut(),
+                options
+            )
+            .is_ok()
+        );
         assert!(rval.get().to_boolean());
     }
 }

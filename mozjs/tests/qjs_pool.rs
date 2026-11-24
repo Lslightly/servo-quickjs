@@ -16,8 +16,8 @@ use mozjs::jsapi::{
 };
 use mozjs::jsval::{PrivateValue, UndefinedValue};
 use mozjs::quickjs::{
-    autorelease_pool_len, drain_autorelease_pool, release_dom_stub_count, release_object,
-    retain_object, retain_object_count, sys as qjs, AutoreleasePoolScope,
+    AutoreleasePoolScope, autorelease_pool_len, drain_autorelease_pool, release_dom_stub_count,
+    release_object, retain_object, retain_object_count, sys as qjs,
 };
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
@@ -26,8 +26,8 @@ use mozjs::rust::wrappers2::{
     JS_NewGlobalObject, JS_NewObject, JS_NewPlainObject, JS_UnbindDomStub,
 };
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions,
-    Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 
 static ENGINE: LazyLock<JSEngineHandle> = LazyLock::new(|| {
@@ -65,7 +65,11 @@ fn batch_dom_stub_references_are_counted_and_released() {
         let reflector = Box::leak(Box::new(FakeReflector {
             dom_js_class: Cell::new(&STUB_CLASS),
         }));
-        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        let stub = JS_NewDomStub(
+            cx,
+            &STUB_CLASS,
+            reflector as *mut _ as *mut std::ffi::c_void,
+        );
         assert!(!stub.is_null());
 
         retain_object_count(stub, 4);
@@ -160,7 +164,11 @@ fn batch_free_at_zero_releases_immediately() {
         assert_eq!(refs(obj), 2);
 
         let rt = jsapi::JS_GetRuntime(cx.raw_cx()) as *mut qjs::JSRuntime;
-        qjs::JS_FreeValueRTCount(rt, qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _), 2);
+        qjs::JS_FreeValueRTCount(
+            rt,
+            qjs::JSValue::mkptr(qjs::JS_TAG_OBJECT, obj as *mut _),
+            2,
+        );
         assert_eq!(OWNED_FREED.with(Cell::get), 1);
     });
 }
@@ -217,7 +225,11 @@ fn dom_stub_pool_entries_are_counted() {
         let pool_len = autorelease_pool_len();
         // The wrapper adopts the raw allocation result before returning it, moving the new
         // object's initial count into the pool.
-        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        let stub = JS_NewDomStub(
+            cx,
+            &STUB_CLASS,
+            reflector as *mut _ as *mut std::ffi::c_void,
+        );
         assert!(!stub.is_null());
         assert_eq!(autorelease_pool_len(), pool_len + 1);
         assert_eq!(refs(stub), 1);
@@ -244,7 +256,11 @@ fn unbind_clears_stub_pool_tracking() {
         let reflector = Box::leak(Box::new(FakeReflector {
             dom_js_class: Cell::new(&STUB_CLASS),
         }));
-        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        let stub = JS_NewDomStub(
+            cx,
+            &STUB_CLASS,
+            reflector as *mut _ as *mut std::ffi::c_void,
+        );
         retain_object(stub);
         assert_eq!(refs(stub), 2);
         assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
@@ -281,7 +297,11 @@ fn materialization_transfers_stub_counts_to_a_new_object() {
         let reflector = Box::leak(Box::new(FakeReflector {
             dom_js_class: Cell::new(&STUB_CLASS),
         }));
-        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        let stub = JS_NewDomStub(
+            cx,
+            &STUB_CLASS,
+            reflector as *mut _ as *mut std::ffi::c_void,
+        );
         retain_object(stub);
         assert_eq!(refs(stub), 2);
         assert_eq!(JS_GetDomStubPoolRefCount(stub), 1);
@@ -340,7 +360,11 @@ fn drain_before_the_count_release_frees_the_stub_but_not_the_reflector() {
         let reflector = Box::leak(Box::new(FakeReflector {
             dom_js_class: Cell::new(&STUB_CLASS),
         }));
-        let stub = JS_NewDomStub(cx, &STUB_CLASS, reflector as *mut _ as *mut std::ffi::c_void);
+        let stub = JS_NewDomStub(
+            cx,
+            &STUB_CLASS,
+            reflector as *mut _ as *mut std::ffi::c_void,
+        );
         retain_object(stub);
         let obj = JS_NewObject(cx, &STUB_CLASS);
         assert!(!obj.is_null());

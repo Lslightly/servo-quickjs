@@ -23,8 +23,8 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine,
-    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, JSEngineHandle,
+    RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 
 thread_local!(static INTERRUPTS: Cell<usize> = const { Cell::new(0) });
@@ -245,15 +245,17 @@ fn run(source: &str, followup: &str) -> (bool, String) {
         let mut realm = AutoRealm::new_from_handle(context, global.handle());
         let (global, cx) = realm.global_and_reborrow();
         assert!(jsapi::JS_AddInterruptCallback(cx.raw_cx(), Some(terminate)));
-        assert!(!jsapi::JS_DefineFunction(
-            cx.raw_cx(),
-            global.into(),
-            c"requestTermination".as_ptr(),
-            Some(request_termination),
-            0,
-            0
-        )
-        .is_null());
+        assert!(
+            !jsapi::JS_DefineFunction(
+                cx.raw_cx(),
+                global.into(),
+                c"requestTermination".as_ptr(),
+                Some(request_termination),
+                0,
+                0
+            )
+            .is_null()
+        );
         eval(cx, global, PRELUDE).unwrap();
         let function = eval(cx, global, "Object").unwrap().to_object();
         let ok = eval(cx, global, source).is_ok();
@@ -269,8 +271,7 @@ fn run(source: &str, followup: &str) -> (bool, String) {
 }
 
 /// After the route, script still runs in the runtime: exceptions are caught and jobs run.
-const FOLLOWUP: &str =
-    "try { fail(); } catch (e) { log.push('caught'); } Promise.resolve().then(() => log.push('job'));";
+const FOLLOWUP: &str = "try { fail(); } catch (e) { log.push('caught'); } Promise.resolve().then(() => log.push('job'));";
 
 fn with_followup(log: &str) -> String {
     if log.is_empty() {

@@ -7,8 +7,8 @@ use mozjs::{
     realm::AutoRealm,
     rooted,
     rust::{
-        evaluate_script, wrappers2, CompileOptionsWrapper, JSEngine, RealmOptions, Runtime,
-        SIMPLE_GLOBAL_CLASS,
+        CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+        evaluate_script, wrappers2,
     },
 };
 
@@ -101,13 +101,15 @@ fn iterate_stack_frames() {
         ";
         rooted!(&in(context) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(&context, c"test.js".to_owned(), 0);
-        assert!(evaluate_script(
-            context,
-            global.handle(),
-            javascript,
-            rval.handle_mut(),
-            options
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                context,
+                global.handle(),
+                javascript,
+                rval.handle_mut(),
+                options
+            )
+            .is_ok()
+        );
     }
 }

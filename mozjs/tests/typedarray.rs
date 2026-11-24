@@ -9,7 +9,7 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{DetachArrayBuffer, JS_NewGlobalObject};
-use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
+use mozjs::rust::{CompileOptionsWrapper, evaluate_script};
 use mozjs::rust::{JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 use mozjs::typedarray;
 use mozjs::typedarray::{ArrayBuffer, CreateWith, Uint32Array};
@@ -39,14 +39,16 @@ fn typedarray() {
 
         rooted!(&in(context) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(&context, c"test".to_owned(), 1);
-        assert!(evaluate_script(
-            context,
-            global.handle(),
-            "new Uint8Array([0, 2, 4])",
-            rval.handle_mut(),
-            options,
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                context,
+                global.handle(),
+                "new Uint8Array([0, 2, 4])",
+                rval.handle_mut(),
+                options,
+            )
+            .is_ok()
+        );
         assert!(rval.is_object());
 
         typedarray!(&in(context) let array: Uint8Array = rval.to_object());

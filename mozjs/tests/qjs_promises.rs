@@ -25,8 +25,8 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine,
-    RealmOptions, Runtime, ThreadSafeJSContext, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS, ThreadSafeJSContext, evaluate_script,
 };
 
 /// Runs `f` in the realm of a new global of a new runtime.
@@ -557,12 +557,14 @@ fn interrupts(thread_safe: ThreadSafeJSContext, cx: &mut JSContext, global: Safe
         // One that returns false terminates it, uncatchably.
         KEEP_RUNNING.store(false, Ordering::SeqCst);
         jsapi::JS_RequestInterruptCallback(cx.raw_cx());
-        assert!(eval(
-            cx,
-            global,
-            "var caught = false; try { for (;;) {} } catch (e) { caught = true; }"
-        )
-        .is_err());
+        assert!(
+            eval(
+                cx,
+                global,
+                "var caught = false; try { for (;;) {} } catch (e) { caught = true; }"
+            )
+            .is_err()
+        );
         assert!(!jsapi::JS_IsExceptionPending(cx.raw_cx()));
         assert_eq!(INTERRUPTS.load(Ordering::SeqCst), 2);
         assert!(!eval_bool(cx, global, "caught"));
@@ -678,15 +680,17 @@ fn deferred_interrupts(cx: &mut JSContext, global: SafeHandleObject) {
 
         // A loop that creates promises polls both in and out of them. Whatever the phase of
         // QuickJS's poll countdown, a deferred interrupt must not be deferred at every later poll.
-        assert!(!jsapi::JS_DefineFunction(
-            cx.raw_cx(),
-            global.into(),
-            c"makePromise".as_ptr(),
-            Some(make_promise),
-            0,
-            0
-        )
-        .is_null());
+        assert!(
+            !jsapi::JS_DefineFunction(
+                cx.raw_cx(),
+                global.into(),
+                c"makePromise".as_ptr(),
+                Some(make_promise),
+                0,
+                0
+            )
+            .is_null()
+        );
         eval(cx, global, "function n() {}").unwrap();
         for calls in 0..7 {
             for offset in 0..10 {

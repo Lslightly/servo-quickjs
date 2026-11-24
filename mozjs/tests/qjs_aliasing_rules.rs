@@ -190,7 +190,7 @@ fn unbound_mut_accessors() -> Vec<(String, String)> {
                 match c {
                     '(' => depth += 1,
                     ')' => depth -= 1,
-                    _ => {}
+                    _ => {},
                 }
                 if depth == 0 {
                     close = open + j;

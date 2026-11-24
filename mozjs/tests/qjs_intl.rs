@@ -15,14 +15,16 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    evaluate_script,
 };
 
 /// The string value of `expr`, or "throws " and the error's name (and message if `verbose`).
 unsafe fn eval(cx: &mut JSContext, global: HandleObject, expr: &str, verbose: bool) -> String {
     let message = if verbose { " + ': ' + e.message" } else { "" };
-    let source = format!("String((() => {{ try {{ return {expr}; }} catch (e) {{ return 'throws ' + e.name{message}; }} }})())");
+    let source = format!(
+        "String((() => {{ try {{ return {expr}; }} catch (e) {{ return 'throws ' + e.name{message}; }} }})())"
+    );
     rooted!(&in(cx) let mut rval = UndefinedValue());
     let options = CompileOptionsWrapper::new(cx, c"qjs_intl.js".to_owned(), 1);
     evaluate_script(cx, global, &source, rval.handle_mut(), options)

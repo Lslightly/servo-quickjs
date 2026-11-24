@@ -9,7 +9,7 @@ use crate::jsapi::JS::{
     ReadOnlyCompileOptions,
 };
 use crate::jsapi::{SetNativeStackQuota, ThreadStackQuotaForSize};
-use crate::rust::{transform_str_to_source_text, OwningCompileOptionsWrapper, Stencil};
+use crate::rust::{OwningCompileOptionsWrapper, Stencil, transform_str_to_source_text};
 
 use std::mem::MaybeUninit;
 use std::ops::Deref;

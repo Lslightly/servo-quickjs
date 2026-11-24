@@ -14,7 +14,7 @@ use mozjs::jsapi::{
 use mozjs::jsval::{JSVal, UndefinedValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{JS_NewGlobalObject, JS_SetSecurityCallbacks};
-use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
+use mozjs::rust::{CompileOptionsWrapper, evaluate_script};
 use mozjs::rust::{Handle as SafeHandle, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 static SECURITY_CALLBACKS: JSSecurityCallbacks = JSSecurityCallbacks {
@@ -93,14 +93,16 @@ fn csp_allow_arguments() {
 
         rooted!(&in(context) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(&context, c"test".to_owned(), 1);
-        assert!(evaluate_script(
-            context,
-            global.handle(),
-            "Function(\"a\", \"b\", \"return a + b\")",
-            rval.handle_mut(),
-            options
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                context,
+                global.handle(),
+                "Function(\"a\", \"b\", \"return a + b\")",
+                rval.handle_mut(),
+                options
+            )
+            .is_ok()
+        );
         assert!(rval.get().is_object());
 
         assert!(*RAN_CSP_CALLBACK.lock().unwrap());

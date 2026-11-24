@@ -10,7 +10,7 @@ use std::ptr;
 
 use servo_quickjs as q;
 
-use super::{set_current, Cx};
+use super::{Cx, set_current};
 use crate::sys::jsapi as root;
 
 pub(crate) unsafe fn JS_Init() -> bool {
@@ -222,7 +222,7 @@ unsafe fn gc_thing_name(rt: *mut q::JSRuntime, gc_obj_type: i32, ptr: usize) -> 
                 "Proxy<{}>",
                 proto.strip_suffix("Prototype").unwrap_or(&proto)
             )
-        }
+        },
         1 => "(bytecode)".to_owned(),
         2 => "(shape)".to_owned(),
         3 => "(var_ref)".to_owned(),
@@ -323,7 +323,7 @@ unsafe fn print_roots(cx: &Cx) {
                     class = format!("{class}[{origin}]");
                 }
                 (super::class::object_realm(cx, obj), class)
-            }
+            },
             5 => (
                 super::realm::realm_of_qctx(ptr as *mut q::JSContext),
                 "(realm)".to_owned(),
@@ -341,7 +341,7 @@ unsafe fn print_roots(cx: &Cx) {
     for (realm, classes) in by_realm {
         let total: usize = classes.values().map(|c| c.0).sum();
         let mut classes: Vec<_> = classes.into_iter().collect();
-        classes.sort_by(|a, b| b.1 .0.cmp(&a.1 .0));
+        classes.sort_by(|a, b| b.1.0.cmp(&a.1.0));
         let list: Vec<String> = classes
             .iter()
             .take(12)

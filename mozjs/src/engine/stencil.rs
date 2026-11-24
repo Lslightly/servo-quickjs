@@ -10,17 +10,17 @@
 //! context keeps the source, and `ConvertFrontendErrorsToRuntimeErrors` compiles it again in the
 //! caller's runtime, which throws the error a compilation there would have thrown.
 
-use std::ffi::{c_char, c_void, CStr, CString};
+use std::ffi::{CStr, CString, c_char, c_void};
 use std::ptr;
-use std::sync::atomic::{fence, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering, fence};
 
 use servo_quickjs as q;
 
+use super::Cx;
 #[cfg(qjs_debugger)]
 use super::eval::units;
-use super::eval::{eval, options, source_buffer, CompileOptions};
+use super::eval::{CompileOptions, eval, options, source_buffer};
 use super::exception::throw_error;
-use super::Cx;
 use crate::sys::jsapi as root;
 
 /// What a `JS::Stencil*` points to. Immutable apart from its count, so any thread can hold it.
@@ -136,7 +136,7 @@ pub(crate) unsafe fn CompileGlobalScriptToStencil_C(
         Err(error) => {
             fc.failed = Some(FailedCompilation { source, error });
             ptr::null_mut()
-        }
+        },
     };
     *out_stencil = root::already_AddRefed {
         _phantom_0: std::marker::PhantomData,

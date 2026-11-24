@@ -20,15 +20,15 @@
 
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
-use std::ffi::{c_char, c_int, c_void, CStr};
+use std::ffi::{CStr, c_char, c_int, c_void};
 use std::marker::PhantomData;
 use std::ptr;
 use std::sync::OnceLock;
 
 use servo_quickjs as q;
 
-use super::eval::{options, padded, source_buffer, units, utf16_source, CompileOptions};
-use super::{adopt_object, obj_val, val_obj, Cx, RealmData};
+use super::eval::{CompileOptions, options, padded, source_buffer, units, utf16_source};
+use super::{Cx, RealmData, adopt_object, obj_val, val_obj};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
@@ -401,7 +401,7 @@ unsafe fn module_type_of(ctx: *mut q::JSContext, attributes: q::JSValue) -> root
             };
             q::JS_FreeCString(ctx, s);
             module_type
-        }
+        },
         _ => root::JS::ModuleType::Unknown,
     };
     if value.tag() == q::JS_TAG_EXCEPTION {
@@ -600,14 +600,14 @@ pub(crate) unsafe fn SetModulePrivate(module: *mut root::JSObject, value: *const
     match data.kind {
         ModuleKind::JavaScript => {
             q::JS_SetModulePrivateValue(cx.base_ctx, data.module, q::JS_DupValueRT(cx.rt, value));
-        }
+        },
         ModuleKind::Synthetic => {
             let old = data.private.replace(q::JS_DupValueRT(cx.rt, value));
             if old.tag() != q::JS_TAG_UNDEFINED {
                 release_script_private(cx.rt, old);
             }
             q::JS_FreeValueRT(cx.rt, old);
-        }
+        },
     }
     if value.tag() != q::JS_TAG_UNDEFINED {
         add_ref_script_private(cx.rt, value);
@@ -731,7 +731,7 @@ unsafe fn settle_load(cx: &Cx, state: q::JSValue, error: Option<q::JSValue>) -> 
         Some(error) => {
             let error = JSVal::from_qjs(error);
             data.rejected.unwrap()(cx.as_raw(), handle(&host_defined), handle(&error))
-        }
+        },
     }
 }
 
@@ -757,7 +757,7 @@ unsafe fn host_load_imported_module(
         None => {
             q::JS_ThrowTypeError(cx.qctx(), c"Module load hook not set".as_ptr());
             false
-        }
+        },
     };
     if ok {
         return true;
@@ -1003,7 +1003,7 @@ unsafe extern "C" fn resolve_imported_module(
         _ => {
             q::JS_ThrowTypeError(ctx, c"module request was not loaded".as_ptr());
             ptr::null_mut()
-        }
+        },
     }
 }
 

@@ -10,7 +10,7 @@ use std::ptr;
 use servo_quickjs as q;
 
 use super::class::new_function;
-use super::{obj_val, Cx};
+use super::{Cx, obj_val};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 
@@ -1132,25 +1132,25 @@ pub(crate) unsafe fn JS_DefineProperties(
                 q::JS_FreeAtomRT(cx.rt, get_name);
                 q::JS_FreeAtomRT(cx.rt, set_name);
                 define_accessor(cx, *obj.ptr, atom.atom, g, st, attrs)
-            }
+            },
             root::JSPropertySpec_Kind::Value => {
                 let w = &s.u.value;
                 let v = match w.type_ {
                     root::JSPropertySpec_ValueWrapper_Type::String => {
                         q::JS_NewString(cx.qctx(), w.__bindgen_anon_1.string)
-                    }
+                    },
                     root::JSPropertySpec_ValueWrapper_Type::Int32 => {
                         q::JS_NewInt32(cx.qctx(), w.__bindgen_anon_1.int32)
-                    }
+                    },
                     root::JSPropertySpec_ValueWrapper_Type::Double => {
                         q::JS_NewFloat64(cx.qctx(), w.__bindgen_anon_1.double_)
-                    }
+                    },
                 };
                 define_value(cx, *obj.ptr, atom.atom, v, attrs)
-            }
+            },
             root::JSPropertySpec_Kind::SelfHostedAccessor => {
                 panic!("self-hosted accessors are not supported")
-            }
+            },
         };
         if !ok {
             return false;

@@ -45,17 +45,17 @@ pub mod quickjs;
 
 pub mod jsapi {
     // Resolve ambiguous imports
-    pub use crate::sys::jsapi::js::detail;
     pub use crate::sys::jsapi::JS::{FrontendContext, MemoryUse};
+    pub use crate::sys::jsapi::js::detail;
 
+    pub use crate::sys::jsapi::JS::Scalar::Type;
+    pub use crate::sys::jsapi::JS::detail::*;
+    pub use crate::sys::jsapi::JS::shadow::Object;
+    pub use crate::sys::jsapi::JS::*;
     pub use crate::sys::jsapi::glue::*;
     pub use crate::sys::jsapi::js::detail::*;
     pub use crate::sys::jsapi::js::*;
     pub use crate::sys::jsapi::mozilla::MallocSizeOf;
-    pub use crate::sys::jsapi::JS::detail::*;
-    pub use crate::sys::jsapi::JS::shadow::Object;
-    pub use crate::sys::jsapi::JS::Scalar::Type;
-    pub use crate::sys::jsapi::JS::*;
     pub use crate::sys::jsapi::*;
 }
 

@@ -10,7 +10,7 @@ use mozjs::jsval::UndefinedValue;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{CollectServoSizes, JS_NewGlobalObject};
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 
 unsafe extern "C" fn measures_nothing(_obj: *mut JSObject) -> bool {
@@ -40,14 +40,16 @@ fn collect_servo_sizes() {
 
         rooted!(&in(context) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(&context, c"test".to_owned(), 1);
-        assert!(evaluate_script(
-            context,
-            global.handle(),
-            "Array.from({ length: 100 }, (_, i) => ({ i, s: 'x'.repeat(i) })).length",
-            rval.handle_mut(),
-            options
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                context,
+                global.handle(),
+                "Array.from({ length: 100 }, (_, i) => ({ i, s: 'x'.repeat(i) })).length",
+                rval.handle_mut(),
+                options
+            )
+            .is_ok()
+        );
 
         let mut sizes = std::mem::zeroed();
         assert!(CollectServoSizes(context, &mut sizes, None));

@@ -5,15 +5,15 @@
 //! Strings, conversions, property keys and JSON on QuickJS.
 
 use std::cell::RefCell;
-use std::ffi::{c_char, c_void, CStr};
+use std::ffi::{CStr, c_char, c_void};
 use std::ptr::{self, NonNull};
 use std::slice;
 
 use mozjs::context::JSContext;
-use mozjs::conversions::{jsstr_to_string, ToJSValConvertible};
+use mozjs::conversions::{ToJSValConvertible, jsstr_to_string};
 use mozjs::jsapi::{
-    jsid, JSString, JSType, JS_ClearPendingException, JS_DeprecatedStringHasLatin1Chars,
-    JS_IsExceptionPending, OnNewGlobalHookOption, SymbolCode,
+    JS_ClearPendingException, JS_DeprecatedStringHasLatin1Chars, JS_IsExceptionPending, JSString,
+    JSType, OnNewGlobalHookOption, SymbolCode, jsid,
 };
 use mozjs::jsval::{DoubleValue, Int32Value, JSVal, StringValue, UndefinedValue};
 use mozjs::rooted;
@@ -23,14 +23,14 @@ use mozjs::rust::wrappers2::{
     JS_GetTwoByteStringCharsAndLength, JS_IdToValue, JS_IndexToId, JS_IsIdentifier,
     JS_NewDependentString, JS_NewGlobalObject, JS_NewStringCopyN, JS_NewUCStringCopyN,
     JS_ParseJSON, JS_ParseJSONWithReviver, JS_SetProperty, JS_Stringify, JS_TypeOfValue,
-    JS_ValueToId, JS_ValueToSource, OrdinaryToPrimitive, SameValue, StrictlyEqual, ToInt16Slow,
-    ToInt8Slow, ToJSON, ToPrimitive, ToUint8Slow, RUST_INTERNED_STRING_TO_JSID,
-    RUST_SYMBOL_TO_JSID,
+    JS_ValueToId, JS_ValueToSource, OrdinaryToPrimitive, RUST_INTERNED_STRING_TO_JSID,
+    RUST_SYMBOL_TO_JSID, SameValue, StrictlyEqual, ToInt8Slow, ToInt16Slow, ToJSON, ToPrimitive,
+    ToUint8Slow,
 };
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, HandleObject, HandleValue, JSEngine, RealmOptions,
-    Runtime, ToBoolean, ToInt32, ToInt64, ToNumber, ToString, ToUint16, ToUint32, ToUint64,
-    SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, HandleValue, JSEngine, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS, ToBoolean, ToInt32, ToInt64, ToNumber, ToString, ToUint16, ToUint32,
+    ToUint64, evaluate_script,
 };
 
 #[test]
@@ -524,12 +524,14 @@ unsafe fn ids(cx: &mut JSContext, global: HandleObject) {
         value.handle(),
         1
     ));
-    assert!(eval(
-        cx,
-        global,
-        "keyed.name === 9 && keyed[Symbol.iterator] === 9 && keyed[3] === 9"
-    )
-    .to_boolean());
+    assert!(
+        eval(
+            cx,
+            global,
+            "keyed.name === 9 && keyed[Symbol.iterator] === 9 && keyed[3] === 9"
+        )
+        .to_boolean()
+    );
 
     for (name, expected) in [
         ("foo", true),
@@ -617,12 +619,14 @@ unsafe fn json(cx: &mut JSContext, global: HandleObject) {
         r#"{"a":[1,2.5,{"b":"é€"}],"c":null,"d":true}"#
     );
     set_global(cx, global, c"parsed", v.get());
-    assert!(eval(
-        cx,
-        global,
-        "parsed.a[2].b === '\\u00e9\\u20ac' && parsed.a[1] === 2.5"
-    )
-    .to_boolean());
+    assert!(
+        eval(
+            cx,
+            global,
+            "parsed.a[2].b === '\\u00e9\\u20ac' && parsed.a[1] === 2.5"
+        )
+        .to_boolean()
+    );
 
     let bad: Vec<u16> = "{a: 1}".encode_utf16().collect();
     assert!(!JS_ParseJSON(

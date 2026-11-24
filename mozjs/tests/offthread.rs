@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use mozjs::jsapi::OnNewGlobalHookOption;
 use mozjs::jsval::UndefinedValue;
-use mozjs::offthread::{compile_to_stencil_offthread, CompilationResult};
+use mozjs::offthread::{CompilationResult, compile_to_stencil_offthread};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{InstantiateGlobalStencil, JS_ExecuteScript, JS_NewGlobalObject};

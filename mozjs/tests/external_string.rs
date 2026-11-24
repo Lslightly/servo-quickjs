@@ -48,8 +48,8 @@ fn external_string() {
         test_latin1_string(context, "abcdefghijklmnopqrstuvwxyzabcdef"); //32 bytes
         test_latin1_string(context, "abcdefghijklmnopqrstuvwxyzabcde"); //31 bytes
         test_latin1_string(context, "abcdefghijklmnopqrstuvwxyzabcdefg"); //33 bytes
-                                                                          //test_latin1_string(context, "test latin-1 Ö"); //testing whole latin1 range.
-                                                                          // whole latin1 table
+        //test_latin1_string(context, "test latin-1 Ö"); //testing whole latin1 range.
+        // whole latin1 table
         test_latin1_string(context, "   ! 	\" 	# 	$ 	% 	& 	' 	( 	) 	* 	+ 	, 	- 	. 	/");
         test_latin1_string(context, "0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	: 	; 	< 	= 	> 	?");
         test_latin1_string(context, "@ 	A 	B 	C 	D 	E 	F 	G 	H 	I 	J 	K 	L 	M 	N 	O");

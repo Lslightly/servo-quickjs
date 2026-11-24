@@ -9,7 +9,7 @@ use mozjs::jsval::JSVal;
 use mozjs::jsval::{BooleanValue, DoubleValue, Int32Value, NullValue, UndefinedValue};
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
-use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
+use mozjs::rust::{CompileOptionsWrapper, evaluate_script};
 use mozjs::rust::{
     HandleObject, JSEngine, RealmOptions, RootedGuard, Runtime, SIMPLE_GLOBAL_CLASS,
 };

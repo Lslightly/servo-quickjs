@@ -7,9 +7,9 @@ use crate::sys::glue::{
     CallPropertyDescriptorTracer, CallScriptTracer, CallStringTracer, CallSymbolTracer,
     CallValueRootTracer, CallValueTracer,
 };
-use crate::sys::jsapi::js::TraceValueArray;
 use crate::sys::jsapi::JS::{PropertyDescriptor, Value};
-use crate::sys::jsapi::{jsid, JSFunction, JSObject, JSScript, JSString, JSTracer};
+use crate::sys::jsapi::js::TraceValueArray;
+use crate::sys::jsapi::{JSFunction, JSObject, JSScript, JSString, JSTracer, jsid};
 
 use crate::sys::jsapi::JS::{BigInt, JobQueue, Symbol};
 use crate::sys::jsgc::{Heap, ValueArray};
@@ -22,15 +22,15 @@ use std::collections::vec_deque::VecDeque;
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasher, Hash};
 use std::num::{
-    NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
-    NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
+    NonZeroI8, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI128, NonZeroIsize, NonZeroU8,
+    NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU128, NonZeroUsize,
 };
 use std::ops::Range;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::atomic::{
-    AtomicBool, AtomicI16, AtomicI32, AtomicI64, AtomicI8, AtomicIsize, AtomicU16, AtomicU32,
-    AtomicU64, AtomicU8, AtomicUsize,
+    AtomicBool, AtomicI8, AtomicI16, AtomicI32, AtomicI64, AtomicIsize, AtomicU8, AtomicU16,
+    AtomicU32, AtomicU64, AtomicUsize,
 };
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant, SystemTime};

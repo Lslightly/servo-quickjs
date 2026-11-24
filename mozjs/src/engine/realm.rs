@@ -23,7 +23,7 @@ use std::ptr;
 
 use servo_quickjs as q;
 
-use super::{obj_val, val_obj, Cx, RealmData};
+use super::{Cx, RealmData, obj_val, val_obj};
 use crate::sys::jsapi as root;
 use crate::sys::jsval::JSVal;
 

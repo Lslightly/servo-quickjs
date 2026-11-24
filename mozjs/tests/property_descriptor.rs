@@ -5,8 +5,8 @@
 use std::ptr;
 
 use mozjs::jsapi::JSObject;
-use mozjs::jsapi::{OnNewGlobalHookOption, PropertyDescriptor};
 use mozjs::jsapi::{JSPROP_ENUMERATE, JSPROP_PERMANENT, JSPROP_READONLY};
+use mozjs::jsapi::{OnNewGlobalHookOption, PropertyDescriptor};
 use mozjs::jsval::{Int32Value, NullValue};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;

@@ -12,7 +12,7 @@ use mozjs::panic::wrap_panic;
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{JS_DefineFunction, JS_NewGlobalObject, JS_SetPendingException};
-use mozjs::rust::{evaluate_script, CompileOptionsWrapper};
+use mozjs::rust::{CompileOptionsWrapper, evaluate_script};
 use mozjs::rust::{JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS};
 
 #[test]

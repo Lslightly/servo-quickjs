@@ -19,9 +19,9 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::JS_NewGlobalObject;
 use mozjs::rust::{
-    describe_scripted_caller, error_info_from_exception_stack, evaluate_script,
     CompileOptionsWrapper, HandleObject as SafeHandleObject, JSEngine, RealmOptions, Runtime,
-    SIMPLE_GLOBAL_CLASS,
+    SIMPLE_GLOBAL_CLASS, describe_scripted_caller, error_info_from_exception_stack,
+    evaluate_script,
 };
 
 fn with_global(engine: &JSEngine, f: impl FnOnce(&mut JSContext, SafeHandleObject)) {
@@ -430,7 +430,11 @@ foo();";
         global,
         "stack === 'baz@stack.js:5:12\\nbar@stack.js:7:8\\nfoo@stack.js:9:6\\n@stack.js:12:4\\n'"
     ));
-    assert!(eval_bool(cx, global, "v8Stack.split('\\n')[0] === '    at baz (stack.js:5:12)' && v8Stack.split('\\n')[3] === '    at stack.js:12:4'"));
+    assert!(eval_bool(
+        cx,
+        global,
+        "v8Stack.split('\\n')[0] === '    at baz (stack.js:5:12)' && v8Stack.split('\\n')[3] === '    at stack.js:12:4'"
+    ));
     assert!(eval_bool(
         cx,
         global,

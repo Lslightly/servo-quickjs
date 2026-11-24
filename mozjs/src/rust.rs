@@ -7,7 +7,7 @@
 use std::cell::Cell;
 use std::char;
 use std::default::Default;
-use std::ffi::{c_char, c_void, CStr, CString};
+use std::ffi::{CStr, CString, c_char, c_void};
 use std::marker::PhantomData;
 use std::mem;
 use std::mem::MaybeUninit;
@@ -35,34 +35,34 @@ use crate::glue::{DeleteCompileOptions, DeleteRootedObjectVector, DestroyRootedI
 use crate::glue::{DeleteJSAutoStructuredCloneBuffer, NewJSAutoStructuredCloneBuffer};
 use crate::glue::{GetIdVectorAddress, GetObjectVectorAddress, SliceRootedIdVector};
 use crate::jsapi;
-use crate::jsapi::glue::{DeleteRealmOptions, JS_Init, JS_NewRealmOptions};
-use crate::jsapi::js;
-use crate::jsapi::js::frontend::InitialStencilAndDelazifications;
-use crate::jsapi::mozilla::Utf8Unit;
 use crate::jsapi::HandleObjectVector as RawHandleObjectVector;
 use crate::jsapi::InstantiateOptions;
 use crate::jsapi::JS_AddExtraGCRootsTracer;
 use crate::jsapi::MutableHandleIdVector as RawMutableHandleIdVector;
 use crate::jsapi::StackFormat;
-use crate::jsapi::{already_AddRefed, jsid};
+use crate::jsapi::glue::{DeleteRealmOptions, JS_Init, JS_NewRealmOptions};
+use crate::jsapi::js;
+use crate::jsapi::js::frontend::InitialStencilAndDelazifications;
+use crate::jsapi::mozilla::Utf8Unit;
 use crate::jsapi::{BorrowedErrorReport, Rooted};
 use crate::jsapi::{DeleteOwningCompileOptions, OwningCompileOptions};
 use crate::jsapi::{HandleValueArray, StencilRelease};
 use crate::jsapi::{InitSelfHostedCode, IsWindowSlow};
-use crate::jsapi::{JSAutoStructuredCloneBuffer, JSStructuredCloneCallbacks, StructuredCloneScope};
-use crate::jsapi::{JSClass, JSClassOps, JSContext, Realm, JSCLASS_RESERVED_SLOTS_SHIFT};
-use crate::jsapi::{JSErrorReport, JSFunctionSpec, JSGCParamKey};
-use crate::jsapi::{JSObject, JSPropertySpec, JSRuntime};
-use crate::jsapi::{JSString, PersistentRootedIdVector};
 use crate::jsapi::{JS_DestroyContext, JS_ShutDown};
 use crate::jsapi::{JS_EnumerateStandardClasses, JS_GlobalObjectTraceHook};
 use crate::jsapi::{JS_MayResolveStandardClass, JS_NewContext, JS_ResolveStandardClass};
 use crate::jsapi::{JS_RequestInterruptCallback, JS_RequestInterruptCallbackCanWait};
 use crate::jsapi::{JS_SetGCParameter, JS_SetNativeStackQuota};
 use crate::jsapi::{JS_StackCapture_AllFrames, JS_StackCapture_MaxFrames};
+use crate::jsapi::{JSAutoStructuredCloneBuffer, JSStructuredCloneCallbacks, StructuredCloneScope};
+use crate::jsapi::{JSCLASS_RESERVED_SLOTS_SHIFT, JSClass, JSClassOps, JSContext, Realm};
+use crate::jsapi::{JSErrorReport, JSFunctionSpec, JSGCParamKey};
+use crate::jsapi::{JSObject, JSPropertySpec, JSRuntime};
+use crate::jsapi::{JSString, PersistentRootedIdVector};
 use crate::jsapi::{PersistentRootedObjectVector, ReadOnlyCompileOptions};
 use crate::jsapi::{RootedObject, RootedValue, ToWindowProxyIfWindowSlow};
 use crate::jsapi::{SetWarningReporter, SourceText, ToBooleanSlow};
+use crate::jsapi::{already_AddRefed, jsid};
 use crate::jsval::{JSVal, ObjectValue, UndefinedValue};
 use crate::offthread::FrontendContext;
 use crate::panic::maybe_resume_unwind;
@@ -115,11 +115,7 @@ trait ToResult {
 
 impl ToResult for bool {
     fn to_result(self) -> Result<(), ()> {
-        if self {
-            Ok(())
-        } else {
-            Err(())
-        }
+        if self { Ok(()) } else { Err(()) }
     }
 }
 
@@ -881,7 +877,7 @@ pub unsafe fn define_methods(
                     && nargs == 0
                     && flags == 0
                     && selfHostedName.is_null()
-            }
+            },
             None => false,
         }
     });
@@ -1525,9 +1521,6 @@ pub mod wrappers2 {
     use crate::glue;
     use crate::glue::*;
     use crate::jsapi;
-    use crate::jsapi::js::TempAllocPolicy;
-    use crate::jsapi::mozilla::Utf8Unit;
-    use crate::jsapi::mozilla::*;
     use crate::jsapi::BigInt;
     use crate::jsapi::CallArgs;
     use crate::jsapi::CloneDataPolicy;
@@ -1578,6 +1571,9 @@ pub mod wrappers2 {
     use crate::jsapi::UniqueChars;
     use crate::jsapi::Value;
     use crate::jsapi::WasmModule;
+    use crate::jsapi::js::TempAllocPolicy;
+    use crate::jsapi::mozilla::Utf8Unit;
+    use crate::jsapi::mozilla::*;
     use crate::jsapi::*;
     use crate::jsapi::{ElementAdder, IsArrayAnswer, PropertyDescriptor};
     use crate::jsapi::{JSFunction, JSNative, JSObject, JSString};

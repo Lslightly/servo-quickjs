@@ -14,7 +14,7 @@ use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{EncodeStringToUTF8, JS_DefineFunction, JS_NewGlobalObject};
 use mozjs::rust::{
-    evaluate_script, CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, JSEngine, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS, evaluate_script,
 };
 
 #[test]
@@ -48,14 +48,16 @@ fn callback() {
         let javascript = "puts('Test Iñtërnâtiônàlizætiøn ┬─┬ノ( º _ ºノ) ');";
         rooted!(&in(context) let mut rval = UndefinedValue());
         let options = CompileOptionsWrapper::new(&context, c"test.js".to_owned(), 0);
-        assert!(evaluate_script(
-            context,
-            global_handle,
-            javascript,
-            rval.handle_mut(),
-            options
-        )
-        .is_ok());
+        assert!(
+            evaluate_script(
+                context,
+                global_handle,
+                javascript,
+                rval.handle_mut(),
+                options
+            )
+            .is_ok()
+        );
     }
 }
 

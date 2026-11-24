@@ -8,7 +8,7 @@
 
 use std::cell::{Cell, RefCell};
 use std::collections::BTreeMap;
-use std::ffi::{c_void, CStr, CString};
+use std::ffi::{CStr, CString, c_void};
 use std::process::Command;
 use std::ptr::{self, NonNull};
 use std::sync::LazyLock;
@@ -19,36 +19,36 @@ use mozjs::glue::{
     CreateForwardingProxyHandler, CreateProxyHandler, CreateRustJSPrincipals,
     CreateWrapperProxyHandler, DestroyRustJSPrincipals, GetProxyHandler, GetProxyHandlerExtra,
     GetProxyHandlerFamily, GetProxyPrivate, GetProxyReservedSlot, GetRustJSPrincipalsPrivate,
-    GetWindowProxyClass, IsProxyHandlerFamily, IsWrapper, JSPrincipalsCallbacks,
-    JS_GetReservedSlot, NewProxyObject, NewWindowProxy, ProxyTraps, SetProxyPrivate,
+    GetWindowProxyClass, IsProxyHandlerFamily, IsWrapper, JS_GetReservedSlot,
+    JSPrincipalsCallbacks, NewProxyObject, NewWindowProxy, ProxyTraps, SetProxyPrivate,
     SetProxyReservedSlot, UncheckedUnwrapObject,
 };
 use mozjs::jsapi::{
     CheckedUnwrapStatic, Compartment, CompartmentIterResult, GCContext, GCReason,
     GetObjectRealmOrNull, GetRealmPrincipals, Handle, HandleId, HandleObject as RawHandleObject,
-    HandleValue as RawHandleValue, IsWindowProxy, IsWindowSlow, JSClass, JSClassOps,
-    JSContext as RawJSContext, JSErrNum, JSObject, JSPrincipals, JSTracer, JS_DefinePropertyById,
+    HandleValue as RawHandleValue, IsWindowProxy, IsWindowSlow, JS_DefinePropertyById,
     JS_DeletePropertyById, JS_DropPrincipals, JS_GetOwnPropertyDescriptorById,
     JS_GlobalObjectTraceHook, JS_HasOwnPropertyById, JS_HoldPrincipals,
     JS_InitDestroyPrincipalsCallback, JS_IterateCompartments, JS_NewDeadWrapper,
     JS_NewObjectWithGivenProto, JS_SetReservedSlot, JS_TransplantObject, JS_WrapObject,
-    MutableHandle, MutableHandleIdVector, MutableHandleValue as RawMutableHandleValue,
+    JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK,
+    JSCLASS_RESERVED_SLOTS_SHIFT, JSClass, JSClassOps, JSContext as RawJSContext, JSErrNum,
+    JSITER_HIDDEN, JSITER_OWNONLY, JSITER_SYMBOLS, JSObject, JSPROP_ENUMERATE, JSPrincipals,
+    JSTracer, MutableHandle, MutableHandleIdVector, MutableHandleValue as RawMutableHandleValue,
     ObjectOpResult, OnNewGlobalHookOption, PropertyDescriptor, PropertyKey, SetWindowProxy,
     SetWindowProxyClass, ToWindowIfWindowProxy, ToWindowProxyIfWindowSlow,
-    JSCLASS_GLOBAL_SLOT_COUNT, JSCLASS_IS_GLOBAL, JSCLASS_IS_PROXY, JSCLASS_RESERVED_SLOTS_MASK,
-    JSCLASS_RESERVED_SLOTS_SHIFT, JSITER_HIDDEN, JSITER_OWNONLY, JSITER_SYMBOLS, JSPROP_ENUMERATE,
 };
 use mozjs::jsval::{Int32Value, JSVal, ObjectValue, PrivateValue, UndefinedValue};
 use mozjs::realm::AutoRealm;
 use mozjs::rooted;
 use mozjs::rust::wrappers2::{
     AppendToIdVector, GetPropertyKeys, GetRealmObjectPrototype, JS_AtomizeAndPinString,
-    JS_DefineProperty, JS_GetProperty, JS_GetPropertyById, JS_NewGlobalObject, JS_NewPlainObject,
-    JS_GC, RUST_INTERNED_STRING_TO_JSID,
+    JS_DefineProperty, JS_GC, JS_GetProperty, JS_GetPropertyById, JS_NewGlobalObject,
+    JS_NewPlainObject, RUST_INTERNED_STRING_TO_JSID,
 };
 use mozjs::rust::{
-    evaluate_script, get_object_class, CompileOptionsWrapper, HandleObject, JSEngine,
-    JSEngineHandle, RealmOptions, Runtime, SIMPLE_GLOBAL_CLASS,
+    CompileOptionsWrapper, HandleObject, JSEngine, JSEngineHandle, RealmOptions, Runtime,
+    SIMPLE_GLOBAL_CLASS, evaluate_script, get_object_class,
 };
 
 /// The engine can only be initialized once per process; it is shared by the tests.
@@ -489,8 +489,16 @@ fn dom_proxy_traps() {
 
         // Rejected definitions: silent in sloppy mode, TypeError in strict mode.
         eval_true(cx, global.handle(), "o.frozen = 1; o.frozen === undefined");
-        eval_true(cx, global.handle(), "(function() { 'use strict'; try { o.frozen = 1; } catch (e) { return e instanceof TypeError; } })()");
-        eval_true(cx, global.handle(), "try { Object.defineProperty(o, 'frozen', { value: 1 }); false } catch (e) { e instanceof TypeError }");
+        eval_true(
+            cx,
+            global.handle(),
+            "(function() { 'use strict'; try { o.frozen = 1; } catch (e) { return e instanceof TypeError; } })()",
+        );
+        eval_true(
+            cx,
+            global.handle(),
+            "try { Object.defineProperty(o, 'frozen', { value: 1 }); false } catch (e) { e instanceof TypeError }",
+        );
         eval_true(
             cx,
             global.handle(),
@@ -991,7 +999,11 @@ fn window_proxy_and_transplant() {
             g1.handle(),
             "(0, eval)('this') === globalThis && Object.getPrototypeOf(this) === Object.prototype",
         );
-        eval_true(cx, g1.handle(), "'a' in this && Object.keys(this).includes('a') && Object.getOwnPropertyDescriptor(this, 'a').value === 1");
+        eval_true(
+            cx,
+            g1.handle(),
+            "'a' in this && Object.keys(this).includes('a') && Object.getOwnPropertyDescriptor(this, 'a').value === 1",
+        );
         eval_true(
             cx,
             g1.handle(),
@@ -1179,7 +1191,11 @@ fn global_class_slots_trace_and_resolve() {
             global.handle(),
             "delete lazyThing && (function() { return lazyThing; })() === 42",
         );
-        eval_true(cx, global.handle(), "typeof notLazy === 'undefined' && Object.keys(this).filter(k => k === 'lazyThing').length === 0");
+        eval_true(
+            cx,
+            global.handle(),
+            "typeof notLazy === 'undefined' && Object.keys(this).filter(k => k === 'lazyThing').length === 0",
+        );
         // Deleting a property that wasn't resolved yet resolves it first, so it stays deleted.
         eval_true(
             cx,
