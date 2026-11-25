@@ -680,6 +680,8 @@ pub struct JSMemoryUsage {
     pub fast_array_elements: i64,
     pub binary_object_count: i64,
     pub binary_object_size: i64,
+    pub dom_stub_count: i64,
+    pub dom_stub_size: i64,
 }
 unsafe extern "C" {
     pub fn JS_ComputeMemoryUsage(rt: *mut JSRuntime, s: *mut JSMemoryUsage);

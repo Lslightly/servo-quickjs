@@ -315,6 +315,18 @@ pub(crate) unsafe fn JS_SetAllNonReservedSlotsToUndefined(obj: root::JS::HandleO
 
 // Memory reporting.
 
+/// The number of live DOM stubs and the bytes they occupy, including the allocation header that
+/// each `js_malloc` block carries. Filled in by `JS_ComputeMemoryUsage`; exposed to embedders
+/// through `quickjs::dom_stub_usage`.
+pub(crate) unsafe fn dom_stub_usage(cx: &Cx) -> (usize, usize) {
+    let mut usage: q::JSMemoryUsage = std::mem::zeroed();
+    q::JS_ComputeMemoryUsage(cx.rt, &mut usage);
+    (
+        usage.dom_stub_count.max(0) as usize,
+        usage.dom_stub_size.max(0) as usize,
+    )
+}
+
 unsafe fn malloc_size(cx: &Cx) -> usize {
     let mut usage: q::JSMemoryUsage = std::mem::zeroed();
     q::JS_ComputeMemoryUsage(cx.rt, &mut usage);

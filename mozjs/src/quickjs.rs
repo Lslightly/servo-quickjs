@@ -131,3 +131,16 @@ pub fn autorelease_pool_len() -> usize {
 pub fn realm_count() -> usize {
     crate::engine::all_realms().len()
 }
+
+/// The number of live DOM stubs and the bytes they occupy, including the allocation header of
+/// each stub, or `(0, 0)` when the current thread has no live runtime. A stub is a lazy-binding
+/// placeholder before it is materialized, so this complements `GetGCHeapUsage` for measuring the
+/// lazy-binding overhead.
+#[doc(hidden)]
+pub fn dom_stub_usage() -> (usize, usize) {
+    match crate::engine::try_current() {
+        // SAFETY: `cx` is the live runtime of this thread.
+        Some(cx) => unsafe { crate::engine::dom_stub_usage(cx) },
+        None => (0, 0),
+    }
+}
