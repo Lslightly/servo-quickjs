@@ -8731,7 +8731,7 @@ JSValue JS_GetPropertyInternal(JSContext *ctx, JSValueConst obj,
     JSShapeProperty *prs;
     uint32_t tag;
 
-    if (JS_IsDomStub(obj)) abort();
+    assert(!JS_IsDomStub(obj));
 
     tag = JS_VALUE_GET_TAG(obj);
     if (unlikely(tag != JS_TAG_OBJECT)) {
