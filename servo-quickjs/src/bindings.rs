@@ -690,6 +690,15 @@ unsafe extern "C" {
     pub fn JS_DumpMemoryUsage(fp: *mut FILE, s: *const JSMemoryUsage, rt: *mut JSRuntime);
 }
 unsafe extern "C" {
+    pub fn JS_GetFreedDomStubClassCount(rt: *mut JSRuntime) -> ::std::os::raw::c_int;
+}
+unsafe extern "C" {
+    pub fn JS_GetFreedDomStubClassName(
+        rt: *mut JSRuntime,
+        index: ::std::os::raw::c_int,
+    ) -> *const ::std::os::raw::c_char;
+}
+unsafe extern "C" {
     pub fn JS_NewAtomLen(
         ctx: *mut JSContext,
         str_: *const ::std::os::raw::c_char,

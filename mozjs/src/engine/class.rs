@@ -463,23 +463,22 @@ unsafe extern "C" fn gc_mark(rt: *mut q::JSRuntime, val: q::JSValue, mark: q::JS
     // QuickJS: a `JSDomStub` has no slots. Mark its realm and trace the DOM node like an
     // `ObjectData`-backed object did.
     if is_dom_stub(val) {
-        if q::JS_GetDomStubDomPtr(val).is_null() {
-            return;
-        }
+        // QuickJS only marks a bound stub: `JS_GC_OBJ_TYPE_DOM_STUB` skips stubs whose `dom_ptr`
+        // is already NULL, so a stub reaching here still owns its DOM node and interface class.
+        debug_assert!(!q::JS_GetDomStubDomPtr(val).is_null());
         super::mark_realm(rt, q::JS_GetDomStubRealm(val) as *mut RealmData, mark);
-        // The interface class, from the `Reflector` the stub owns.
+        // The interface class, from the `Reflector` the stub owns. Every interface class is
+        // registered with trace ops, so neither is NULL here.
         let clasp = stub_class(val);
-        if !clasp.is_null() {
-            let ops = (*clasp).cOps;
-            if !ops.is_null() {
-                if let Some(trace) = (*ops).trace {
-                    let mut tracer = Tracer { rt, mark };
-                    trace(
-                        &mut tracer as *mut Tracer as *mut root::JSTracer,
-                        val_obj(val),
-                    );
-                }
-            }
+        debug_assert!(!clasp.is_null());
+        let ops = (*clasp).cOps;
+        debug_assert!(!ops.is_null());
+        if let Some(trace) = (*ops).trace {
+            let mut tracer = Tracer { rt, mark };
+            trace(
+                &mut tracer as *mut Tracer as *mut root::JSTracer,
+                val_obj(val),
+            );
         }
         return;
     }

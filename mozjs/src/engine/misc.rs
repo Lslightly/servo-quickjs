@@ -327,6 +327,21 @@ pub(crate) unsafe fn dom_stub_usage(cx: &Cx) -> (usize, usize) {
     )
 }
 
+/// The `JSDomStub` interface class names recorded as freed since the last GC started, in free
+/// order and with repeats. A GC empties the record when it starts, so what remains afterwards
+/// is what that GC reclaimed. Exposed to embedders through `quickjs::freed_dom_stub_class_names`.
+pub(crate) unsafe fn freed_dom_stub_class_names(cx: &Cx) -> Vec<String> {
+    let count = q::JS_GetFreedDomStubClassCount(cx.rt);
+    let mut names = Vec::with_capacity(count.max(0) as usize);
+    for index in 0..count {
+        let name = q::JS_GetFreedDomStubClassName(cx.rt, index);
+        if !name.is_null() {
+            names.push(std::ffi::CStr::from_ptr(name).to_string_lossy().into_owned());
+        }
+    }
+    names
+}
+
 unsafe fn malloc_size(cx: &Cx) -> usize {
     let mut usage: q::JSMemoryUsage = std::mem::zeroed();
     q::JS_ComputeMemoryUsage(cx.rt, &mut usage);

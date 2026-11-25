@@ -440,12 +440,14 @@ pub(crate) fn drain_current_pool() {
 /// This is the minimal version of the test hook: unlike the rebased branch, it does not combine
 /// the drain and GC into one `drain_stats` timing record.
 pub(crate) fn drain_pool_and_gc() {
+    eprintln!("begin drain_pool_and_gc");
     let Some(cx) = try_current() else {
         return;
     };
     cx.drain_pool((0, 0));
     // SAFETY: `cx` is the live runtime of this thread, and the caller is a JS hook on it.
     unsafe { JS_GC(cx.as_raw(), root::JS::GCReason::API) };
+    eprintln!("finish drain_pool_and_gc");
 }
 
 /// How a value entered the autorelease pool.

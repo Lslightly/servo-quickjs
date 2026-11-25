@@ -463,6 +463,12 @@ typedef struct JSMemoryUsage {
 void JS_ComputeMemoryUsage(JSRuntime *rt, JSMemoryUsage *s);
 void JS_DumpMemoryUsage(FILE *fp, const JSMemoryUsage *s, JSRuntime *rt);
 
+/* Servo (GC diagnostics): the JSDomStub interface class names recorded as freed since the
+   last GC started. `JS_GetFreedDomStubClassName` returns NULL for an out-of-range index;
+   each returned string is owned by the runtime and stays valid until the next GC starts. */
+int JS_GetFreedDomStubClassCount(JSRuntime *rt);
+const char *JS_GetFreedDomStubClassName(JSRuntime *rt, int index);
+
 /* atom support */
 #define JS_ATOM_NULL 0
 

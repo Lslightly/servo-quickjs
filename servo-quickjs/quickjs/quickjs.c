@@ -394,6 +394,12 @@ struct JSRuntime {
     JSIsErrorHook *is_error_hook;
     /* Servo: debug hook called when an object is freed */
     JSFreeObjectHook *free_object_hook;
+    /* Servo (GC diagnostics): interface class names of the JSDomStubs freed since the
+       last GC started, recorded by `servo_record_freed_stub()`. `JS_RunGCInternal`
+       empties it when it starts, so the entries are what the running GC reclaims. */
+    char **servo_freed_class_names;
+    uint32_t servo_freed_class_count;
+    uint32_t servo_freed_class_size;
     /* Servo: JS_HasPropertyCached() results, valid while proto_epoch is unchanged. It
        changes whenever an object the cached lookups met changes its properties or
        prototype, or is freed. */
@@ -1414,6 +1420,8 @@ static JSValue js_compile_regexp(JSContext *ctx, JSValueConst pattern,
                                  JSValueConst flags);
 static JSValue JS_NewRegexp(JSContext *ctx, JSValue pattern, JSValue bc);
 static void gc_decref(JSRuntime *rt);
+/* Servo (GC diagnostics): forget the class names recorded since the previous GC. */
+static void servo_clear_freed_classes(JSRuntime *rt);
 static int JS_NewClass1(JSRuntime *rt, JSClassID class_id,
                         const JSClassDef *class_def, JSAtom name);
 
@@ -2774,6 +2782,12 @@ void JS_FreeRuntime(JSRuntime *rt)
     js_free_rt(rt, rt->atom_array);
     js_free_rt(rt, rt->atom_hash);
     js_free_rt(rt, rt->shape_hash);
+    /* Servo (GC diagnostics): drop the class names recorded by the last GCs before the
+       leak accounting below, which counts every block still allocated. */
+    servo_clear_freed_classes(rt);
+    js_free_rt(rt, rt->servo_freed_class_names);
+    rt->servo_freed_class_names = NULL;
+    rt->servo_freed_class_size = 0;
 #ifdef DUMP_LEAKS
     if (!list_empty(&rt->string_list)) {
         if (rt->rt_info) {
@@ -6627,6 +6641,80 @@ static void js_for_in_iterator_mark(JSRuntime *rt, JSValueConst val,
     JS_MarkValue(rt, it->obj, mark_func);
 }
 
+/* Servo (GC diagnostics): append one JSDomStub class name to
+   `rt->servo_freed_class_names`, a dynamically grown array of NUL-terminated strings.
+   This runs on the free path, so it must not throw or recurse into GC:
+   `js_malloc_rt`/`js_realloc_rt` do neither, and an allocation failure only drops the
+   entry. */
+static void servo_record_freed_class_name(JSRuntime *rt, const char *name)
+{
+    char **names;
+    char *copy;
+    uint32_t size;
+    size_t len;
+
+    if (rt->servo_freed_class_count == rt->servo_freed_class_size) {
+        size = rt->servo_freed_class_size ? rt->servo_freed_class_size * 2 : 16;
+        names = js_realloc_rt(rt, rt->servo_freed_class_names,
+                              sizeof(rt->servo_freed_class_names[0]) * size);
+        if (!names)
+            return;
+        rt->servo_freed_class_names = names;
+        rt->servo_freed_class_size = size;
+    }
+    len = strlen(name) + 1;
+    copy = js_malloc_rt(rt, len);
+    if (!copy)
+        return;
+    memcpy(copy, name, len);
+    rt->servo_freed_class_names[rt->servo_freed_class_count++] = copy;
+}
+
+/* Servo (GC diagnostics): record a freed JSDomStub. The stub has no class id of its
+   own: its interface class is read from its DOM node, as `free_dom_stub` does. An
+   unbound stub has no node left, so it is recorded under its generic name. */
+static void servo_record_freed_stub(JSRuntime *rt, JSClassID class_id)
+{
+    char name[ATOM_GET_STR_BUF_SIZE + 16];
+    char buf[ATOM_GET_STR_BUF_SIZE];
+
+    if (!JS_IsRegisteredClass(rt, class_id)) {
+        servo_record_freed_class_name(rt, "JSDomStub");
+        return;
+    }
+    snprintf(name, sizeof(name), "JSDomStub(%s)",
+             JS_AtomGetStrRT(rt, buf, sizeof(buf), rt->class_array[class_id].class_name));
+    servo_record_freed_class_name(rt, name);
+}
+
+/* Servo (GC diagnostics): drop the class names recorded since the previous GC, keeping
+   the array itself for reuse. Called when a GC starts, so that after it the array lists
+   the classes that GC reclaimed. */
+static void servo_clear_freed_classes(JSRuntime *rt)
+{
+    uint32_t i;
+
+    for (i = 0; i < rt->servo_freed_class_count; i++)
+        js_free_rt(rt, rt->servo_freed_class_names[i]);
+    rt->servo_freed_class_count = 0;
+}
+
+/* Servo (GC diagnostics): the number of JSDomStub class names recorded as freed since the
+   last GC started. See `servo_record_freed_stub`. */
+int JS_GetFreedDomStubClassCount(JSRuntime *rt)
+{
+    return (int)rt->servo_freed_class_count;
+}
+
+/* Servo (GC diagnostics): the `index`-th name recorded since the last GC started, in free
+   order, or NULL when out of range. The name stays valid until the next GC starts. */
+const char *JS_GetFreedDomStubClassName(JSRuntime *rt, int index)
+{
+    if (index < 0 || (uint32_t)index >= rt->servo_freed_class_count)
+        return NULL;
+    return rt->servo_freed_class_names[index];
+}
+
 static void free_object(JSRuntime *rt, JSObject *p)
 {
     int i;
@@ -6755,6 +6843,8 @@ static void free_dom_stub(JSRuntime *rt, JSDomStub *p) {
     // An unbound stub has no DOM node left to finalize. The stub's class is the interface class
     // registered when the node was wrapped; its finalizer reaches the Rust `Reflector`.
     class_id = dom_stub_class_id(rt, p);
+    /* Servo (GC diagnostics): record the interface class of the freed stub. */
+    servo_record_freed_stub(rt, class_id);
     finalizer = (p->dom_ptr && JS_IsRegisteredClass(rt, class_id))
                   ? rt->class_array[class_id].finalizer : NULL;
     if (finalizer)
@@ -7070,6 +7160,10 @@ static void mark_children(JSRuntime *rt, JSGCObjectHeader *gp,
         {
             JSDomStub *p = (JSDomStub *)gp;
             JSClassGCMark *gc_mark;
+            /* Servo: an unbound stub has no DOM node left to mark, and no interface class to
+               resolve the gc_mark from. */
+            if (!p->dom_ptr)
+                break;
             JSClassID class_id = dom_stub_class_id(rt, p);
             /* Servo: mark a stub with the gc_mark of its interface's class, registered when the
                DOM node was wrapped. */
@@ -7249,6 +7343,10 @@ static void gc_free_all(JSRuntime *rt)
 
 static void JS_RunGCInternal(JSRuntime *rt, BOOL remove_weak_objects)
 {
+    /* Servo (GC diagnostics): start a new record of freed classes; the names recorded
+       from here on, including from finalizers, are what this GC reclaims. */
+    servo_clear_freed_classes(rt);
+
     if (remove_weak_objects) {
         /* free the weakly referenced object or symbol structures, delete
            the associated Map/Set entries and queue the finalization

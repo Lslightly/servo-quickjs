@@ -46,6 +46,16 @@ pub unsafe fn release_dom_stub_count(obj: *mut JSObject, count: u32) {
     crate::engine::release_dom_stub_count(obj, count)
 }
 
+/// The SpiderMonkey class name of `obj` (`"HTMLDivElement"`, ...), or `None` if it is not a DOM
+/// object of a registered class. A debug aid, e.g. when logging traced objects.
+///
+/// # Safety
+/// `obj` must be a live object of the current thread's runtime.
+#[doc(hidden)]
+pub unsafe fn class_name(obj: *mut JSObject) -> Option<&'static str> {
+    crate::engine::class_name(crate::engine::obj_val(obj))
+}
+
 /// Whether the current thread's runtime is alive. Destroying it frees every object, after which
 /// `release_object` does nothing and DOM objects must not be touched.
 #[inline]
@@ -142,5 +152,18 @@ pub fn dom_stub_usage() -> (usize, usize) {
         // SAFETY: `cx` is the live runtime of this thread.
         Some(cx) => unsafe { crate::engine::dom_stub_usage(cx) },
         None => (0, 0),
+    }
+}
+
+/// The interface class names (`"HTMLDivElement"`, ...) of the `JSDomStub`s freed since the last
+/// GC started, in free order and with one entry per stub. A GC empties the record when it
+/// starts, so calling this after `qjs_gc`/`drain_pool_gc` lists what that GC reclaimed. Empty
+/// when the current thread has no live runtime.
+#[doc(hidden)]
+pub fn freed_dom_stub_class_names() -> Vec<String> {
+    match crate::engine::try_current() {
+        // SAFETY: `cx` is the live runtime of this thread.
+        Some(cx) => unsafe { crate::engine::freed_dom_stub_class_names(cx) },
+        None => Vec::new(),
     }
 }
