@@ -6714,6 +6714,7 @@ JSValue JS_NewDomStub(JSContext *ctx, void *dom_ptr, void *realm) {
 // JSObject owns the DOM node and holds its own realm reference). The embedder releases the
 // stub's realm reference after this call.
 void JS_UnbindDomStub(JSContext *ctx, JSValue obj) {
+    assert(JS_IsDomStub(obj));
     JSDomStub *p = (JSDomStub *)obj.u.ptr;
     p->dom_ptr = NULL;
     p->realm = NULL;
