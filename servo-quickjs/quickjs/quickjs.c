@@ -7452,7 +7452,9 @@ void JS_ComputeMemoryUsage(JSRuntime *rt, JSMemoryUsage *s)
         /* XXX: could count the other GC object types too */
         if (js_rc(gp)->gc_obj_type == JS_GC_OBJ_TYPE_DOM_STUB) {
             s->dom_stub_count++;
-            s->dom_stub_size += sizeof(JSDomStub) + sizeof(JSMallocBlockHeader);
+            /* Servo: count the stub itself, like `obj_size` counts only sizeof(JSObject).
+               The allocation header is reflected in `malloc_size`. */
+            s->dom_stub_size += sizeof(JSDomStub);
             continue;
         } else if (js_rc(gp)->gc_obj_type == JS_GC_OBJ_TYPE_FUNCTION_BYTECODE) {
             compute_bytecode_size((JSFunctionBytecode *)gp, hp);
@@ -7672,13 +7674,16 @@ void JS_ComputeMemoryUsage(JSRuntime *rt, JSMemoryUsage *s)
     s->js_func_code_size = mem.js_func_code_size;
     s->js_func_pc2line_count = mem.js_func_pc2line_count;
     s->js_func_pc2line_size = mem.js_func_pc2line_size;
+    /* Servo: DOM stubs are GC objects too, but the upstream sum omits them. */
     s->memory_used_count += round(mem.memory_used_count) +
         s->atom_count + s->str_count +
         s->obj_count + s->shape_count +
-        s->js_func_count + s->js_func_pc2line_count;
+        s->js_func_count + s->js_func_pc2line_count +
+        s->dom_stub_count;
     s->memory_used_size += s->atom_size + s->str_size +
         s->obj_size + s->prop_size + s->shape_size +
-        s->js_func_size + s->js_func_code_size + s->js_func_pc2line_size;
+        s->js_func_size + s->js_func_code_size + s->js_func_pc2line_size +
+        s->dom_stub_size;
 }
 
 void JS_DumpMemoryUsage(FILE *fp, const JSMemoryUsage *s, JSRuntime *rt)

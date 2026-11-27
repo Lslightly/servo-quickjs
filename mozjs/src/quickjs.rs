@@ -64,6 +64,17 @@ pub fn drain_pool_and_gc() {
     crate::engine::drain_pool_and_gc()
 }
 
+/// Appends one row with the current thread's runtime memory usage to the CSV selected by
+/// `SERVO_MEMORY_STATS_PATH` (default: a per-pid file in the temp directory). See
+/// `engine::append_memory_stats` for the columns and the `t_ms` definition; `JS_DestroyContext`
+/// also calls it, before and after it drains the pool. Does nothing when there is no live
+/// runtime.
+pub fn append_memory_stats() {
+    if let Some(cx) = crate::engine::try_current() {
+        crate::engine::append_memory_stats(cx);
+    }
+}
+
 /// Releases, when it is dropped, what the autorelease pool took while it was alive: the values
 /// the engine handed to Rust and the last references Rust dropped. Otherwise they stay until the
 /// task ends. Servo opens one for each microtask, so that a long chain of microtasks in one task
@@ -126,16 +137,22 @@ pub fn autorelease_pool_len() -> usize {
     crate::engine::current().pool.len()
 }
 
+/// Bytes occupied by the values kept alive by the autorelease pool:
+/// `autorelease_pool_len() * size_of::<JSValue>()` (16 bytes on 64-bit).
+pub fn autorelease_pool_size() -> usize {
+    autorelease_pool_len() * std::mem::size_of::<sys::JSValue>()
+}
+
 /// The number of realms of the current thread's runtime that have not been freed yet.
 #[doc(hidden)]
 pub fn realm_count() -> usize {
     crate::engine::all_realms().len()
 }
 
-/// The number of live DOM stubs and the bytes they occupy, including the allocation header of
-/// each stub, or `(0, 0)` when the current thread has no live runtime. A stub is a lazy-binding
-/// placeholder before it is materialized, so this complements `GetGCHeapUsage` for measuring the
-/// lazy-binding overhead.
+/// The number of live DOM stubs and the bytes they occupy (each counted as `sizeof(JSDomStub)`;
+/// allocation headers are not included), or `(0, 0)` when the current thread has no live
+/// runtime. A stub is a lazy-binding placeholder before it is materialized, so this complements
+/// `GetGCHeapUsage` for measuring the lazy-binding overhead.
 #[doc(hidden)]
 pub fn dom_stub_usage() -> (usize, usize) {
     match crate::engine::try_current() {
