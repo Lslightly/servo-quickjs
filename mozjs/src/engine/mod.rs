@@ -61,8 +61,6 @@ pub(crate) use error::*;
 pub(crate) use eval::*;
 pub(crate) use exception::*;
 pub(crate) use misc::*;
-// Re-exported by `crate::quickjs`, which is why it is `pub` and not `pub(crate)`.
-pub use misc::MemoryUsage;
 pub(crate) use module::*;
 pub(crate) use object::*;
 pub(crate) use promise::*;

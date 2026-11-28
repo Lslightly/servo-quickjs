@@ -323,10 +323,10 @@ pub(crate) unsafe fn memory_usage(cx: &Cx) -> q::JSMemoryUsage {
     usage
 }
 
-/// A snapshot of `JSMemoryUsage`: the fields the embedder API exposes. Sizes are bytes; counts
-/// are numbers of objects/slots.
+/// A snapshot of `JSMemoryUsage` with the fields the memory-stats CSV records. Sizes are bytes;
+/// counts are numbers of objects/slots.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct MemoryUsage {
+pub(crate) struct MemoryUsage {
     pub obj_count: u64,
     pub obj_size: u64,
     pub dom_stub_count: u64,
