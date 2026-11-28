@@ -83,7 +83,7 @@ const MEMORY_STATS_HEADER: &str =
     "t_ms,obj_size,obj_count,dom_stub_size,dom_stub_count,prop_size,prop_count,memory_used_size,malloc_size,pool_count,pool_size\n";
 
 static MEMORY_STATS_LOCK: Mutex<()> = Mutex::new(());
-static MEMORY_STATS_PATH: OnceLock<PathBuf> = OnceLock::new();
+static MEMORY_STATS_PATH: OnceLock<Option<PathBuf>> = OnceLock::new();
 static MEMORY_STATS_ANNOUNCED: OnceLock<()> = OnceLock::new();
 static MEMORY_STATS_ERROR_REPORTED: OnceLock<()> = OnceLock::new();
 
@@ -121,21 +121,18 @@ fn process_ms() -> Option<u64> {
     None
 }
 
-/// `$SERVO_MEMORY_STATS_PATH`, or a per-pid file in the temp directory.
-fn memory_stats_path() -> &'static Path {
-    MEMORY_STATS_PATH.get_or_init(|| {
-        std::env::var_os("SERVO_MEMORY_STATS_PATH")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                std::env::temp_dir()
-                    .join(format!("servo-memory-stats-{}.csv", std::process::id()))
-            })
-    })
+/// `$SERVO_MEMORY_STATS_PATH`, or `None` when it is not set. The memory-stats CSV is opt-in:
+/// without the environment variable nothing is collected and no file is created.
+fn memory_stats_path() -> Option<&'static Path> {
+    MEMORY_STATS_PATH
+        .get_or_init(|| std::env::var_os("SERVO_MEMORY_STATS_PATH").map(PathBuf::from))
+        .as_deref()
 }
 
 /// Appends one CSV row. Writes the header when the file is still empty, serializes writers
 /// within the process, and reports an I/O error only once.
 fn write_memory_stats_row(
+    path: &Path,
     usage: super::MemoryUsage,
     t_ms: Option<u64>,
     pool_count: usize,
@@ -153,7 +150,6 @@ fn write_memory_stats_row(
         memory_used_size = usage.memory_used_size,
         malloc_size = usage.malloc_size,
     );
-    let path = memory_stats_path();
     if MEMORY_STATS_ANNOUNCED.set(()).is_ok() {
         eprintln!("memory-stats: writing {}", path.display());
     }
@@ -177,10 +173,10 @@ fn write_memory_stats_row(
     }
 }
 
-/// Appends one row with `cx`'s current memory usage to `$SERVO_MEMORY_STATS_PATH` (default: a
-/// per-pid file in the temp directory): the JSObject, Property and DOM stub sizes/counts,
-/// `memory_used_size`, `malloc_size`, and the number and size of values in the Rust-side
-/// autorelease pool.
+/// Appends one row with `cx`'s current memory usage to `$SERVO_MEMORY_STATS_PATH`: the
+/// JSObject, Property and DOM stub sizes/counts, `memory_used_size`, `malloc_size`, and the
+/// number and size of values in the Rust-side autorelease pool. When the environment variable
+/// is not set, nothing is collected, no file is created and this function returns immediately.
 ///
 /// `t_ms` is milliseconds since process start on the same monotonic `/proc/uptime` clock as
 /// `pss-sampler.sh`; it is written as an empty column when `/proc` is unavailable.
@@ -190,14 +186,18 @@ fn write_memory_stats_row(
 /// before and after draining the pool (the last two rows of a runtime; the pool is empty in the
 /// second), and `runtime.memory_stats()` exposes it to pages.
 pub(crate) fn append_memory_stats(cx: &Cx) {
+    // Opt-in: skip the heap walk entirely unless the embedder asked for the CSV.
+    let Some(path) = memory_stats_path() else {
+        return;
+    };
     // Capture the time and pool size first, then walk the heap: the row is timestamped at the
     // sample point, not after the (potentially long) `JS_ComputeMemoryUsage`.
     let t_ms = process_ms();
     let pool_count = cx.pool.len();
     let pool_size = pool_count * std::mem::size_of::<q::JSValue>();
     // SAFETY: `cx` is the live runtime of this thread.
-    let usage = super::MemoryUsage::from_qjs(unsafe { super::memory_usage(cx) });
-    write_memory_stats_row(usage, t_ms, pool_count, pool_size);
+    let usage = unsafe { super::memory_usage(cx) };
+    write_memory_stats_row(path, usage, t_ms, pool_count, pool_size);
 }
 
 pub(crate) unsafe fn JS_GetRuntime(cx: *mut root::JSContext) -> *mut root::JSRuntime {

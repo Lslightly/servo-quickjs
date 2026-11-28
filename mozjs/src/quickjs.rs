@@ -65,10 +65,10 @@ pub fn drain_pool_and_gc() {
 }
 
 /// Appends one row with the current thread's runtime memory usage to the CSV selected by
-/// `SERVO_MEMORY_STATS_PATH` (default: a per-pid file in the temp directory). See
-/// `engine::append_memory_stats` for the columns and the `t_ms` definition; `JS_DestroyContext`
-/// also calls it, before and after it drains the pool. Does nothing when there is no live
-/// runtime.
+/// `SERVO_MEMORY_STATS_PATH`. Does nothing when the environment variable is not set (the CSV is
+/// opt-in) or when there is no live runtime. See `engine::append_memory_stats` for the columns
+/// and the `t_ms` definition; `JS_DestroyContext` also calls it, before and after it drains the
+/// pool.
 pub fn append_memory_stats() {
     if let Some(cx) = crate::engine::try_current() {
         crate::engine::append_memory_stats(cx);
@@ -159,5 +159,43 @@ pub fn dom_stub_usage() -> (usize, usize) {
         // SAFETY: `cx` is the live runtime of this thread.
         Some(cx) => unsafe { crate::engine::dom_stub_usage(cx) },
         None => (0, 0),
+    }
+}
+
+/// The number of live JSObjects and the bytes they occupy (each counted as `sizeof(JSObject)`;
+/// property storage, shapes and strings are not included), or `(0, 0)` when the current thread
+/// has no live runtime. JSDomStubs are not JSObjects; use `dom_stub_usage` for those.
+#[doc(hidden)]
+pub fn obj_usage() -> (usize, usize) {
+    match crate::engine::try_current() {
+        // SAFETY: `cx` is the live runtime of this thread.
+        Some(cx) => unsafe { crate::engine::obj_usage(cx) },
+        None => (0, 0),
+    }
+}
+
+/// The live JSObject and DOM stub counts and byte sizes, in the order
+/// `(obj_count, obj_size, dom_stub_count, dom_stub_size)`, or all zeroes when the current
+/// thread has no live runtime.
+///
+/// Every value comes from one `JS_ComputeMemoryUsage` walk, so calling this once is cheaper
+/// than `obj_usage()` plus `dom_stub_usage()`, each of which walks the whole GC object list.
+/// Sizes follow the same rules as those functions: one `sizeof(JSObject)` per object and one
+/// `sizeof(JSDomStub)` per stub, with no allocation headers, property storage, shapes or
+/// strings.
+#[doc(hidden)]
+pub fn memory_usage() -> (usize, usize, usize, usize) {
+    match crate::engine::try_current() {
+        // SAFETY: `cx` is the live runtime of this thread.
+        Some(cx) => {
+            let usage = unsafe { crate::engine::memory_usage(cx) };
+            (
+                usage.obj_count as usize,
+                usage.obj_size as usize,
+                usage.dom_stub_count as usize,
+                usage.dom_stub_size as usize,
+            )
+        }
+        None => (0, 0, 0, 0),
     }
 }

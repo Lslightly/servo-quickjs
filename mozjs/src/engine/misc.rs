@@ -317,10 +317,10 @@ pub(crate) unsafe fn JS_SetAllNonReservedSlotsToUndefined(obj: root::JS::HandleO
 
 /// Fills in a fresh `JSMemoryUsage` by walking every GC object and property array of the
 /// runtime. Each call is a full traversal; callers must not cache the result across calls.
-pub(crate) unsafe fn memory_usage(cx: &Cx) -> q::JSMemoryUsage {
+pub(crate) unsafe fn memory_usage(cx: &Cx) -> MemoryUsage {
     let mut usage: q::JSMemoryUsage = std::mem::zeroed();
     q::JS_ComputeMemoryUsage(cx.rt, &mut usage);
-    usage
+    MemoryUsage::from_qjs(usage)
 }
 
 /// A snapshot of `JSMemoryUsage` with the fields the memory-stats CSV records. Sizes are bytes;
@@ -368,9 +368,11 @@ unsafe fn malloc_size(cx: &Cx) -> usize {
     memory_usage(cx).malloc_size.max(0) as usize
 }
 
+/// The number of live JSObjects and the bytes they occupy (each counted as `sizeof(JSObject)`;
+/// property storage, shapes and strings are not included). Filled in by `JS_ComputeMemoryUsage`;
+/// exposed to embedders through `quickjs::obj_usage`.
 pub(crate) unsafe fn obj_usage(cx: &Cx) -> (usize, usize) {
-    let mut usage: q::JSMemoryUsage = std::mem::zeroed();
-    q::JS_ComputeMemoryUsage(cx.rt, &mut usage);
+    let usage = memory_usage(cx);
     (
         usage.obj_count.max(0) as usize,
         usage.obj_size.max(0) as usize,
